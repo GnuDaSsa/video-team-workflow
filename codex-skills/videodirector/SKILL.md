@@ -15,6 +15,10 @@ This skill may design story, shot purpose, and visual intent, but it must not de
 
 - When this skill is active, start the response with `[videodirector]` on its own line.
 
+## Subagent spawn approval gate — 2026-07-21
+
+Do not spawn delegated lanes, subagents, Hermes sidecars, schedulers/monitors, or parallel automation loops without explicit per-spawn user approval in the current conversation. Default is single-agent sequential execution. Full policy: `team-policies/subagent_approval_gate_20260721.md` in the video-team-workflow package.
+
 ## Hermes-global routing
 
 For this user, Hermes is now the global entrypoint/orchestrator for external commands and long-memory MV/video-team direction.

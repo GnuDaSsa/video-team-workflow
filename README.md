@@ -8,6 +8,8 @@ Reusable Codex video-team workflow package: runtime scaffold, lane model, Seedan
 - `codex-skills/` — reusable video-team skills.
 - `wiki-extract/` — curated workflow and QC knowledge.
 - `seedance-operations/` — current Seedance/Runway operation policies and Finder placement helper.
+- `team-policies/` — team-wide operating gates (subagent spawn approval, latest-only principle).
+- `tools/deploy_skills_to_codex.sh` — deploy packaged skills into `~/.codex/skills` (archives replaced versions).
 
 ## Excluded
 
@@ -20,3 +22,9 @@ Use visible Runway UI as source of truth. Use Codex Computer Use for Finder-to-R
 ## Seedance operator authority
 
 `codex-skills/seedance-prompt-en/SKILL.md` is the only live Seedance prompt-and-operation contract. It owns visual prompt writing, visible Runway UI operation, reference upload, Generate, queue state, and evidence. `GLOBAL_AGENTS.md`, `videodirector`, and `music-video-production-team` do not define Seedance UI steps. Older detailed material is retained under `codex-skills/seedance-prompt-en/archive/` as reference only.
+
+## Operating principles
+
+- **Subagent spawn approval gate:** no delegated lanes, subagents, sidecars, or scheduler loops without explicit per-spawn user approval (single pre-approved exception: the 15-minute Generate-queue observer in the Seedance contract). See `team-policies/subagent_approval_gate_20260721.md`.
+- **Latest-only rule files:** active files carry only currently valid rules; corrections edit/delete in place instead of appending dated layers. History and rollback live in this repo's git history and `archive/` folders.
+- **Canonical source:** this repo is the version-controlled source of truth for video-team skills; `~/.codex/skills` is a deployment target (`tools/deploy_skills_to_codex.sh`).

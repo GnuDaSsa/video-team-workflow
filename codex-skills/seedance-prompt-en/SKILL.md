@@ -12,6 +12,7 @@ This is the **only live Seedance execution contract**. It owns prompt writing, R
 - `videodirector` and `music-video-production-team` define story, scene purpose, and image requirements only.
 - Global AGENTS defines universal safety only; it does not define Seedance UI steps.
 - Historical Seedance patches are reference material only, never active instructions.
+- Subagent spawn approval gate (2026-07-21): no delegated lanes, subagents, sidecars, or extra automation loops without explicit per-spawn user approval. The single 15-minute observer scheduler defined below is the only pre-approved background loop, and only while a queue is active. Full policy: `team-policies/subagent_approval_gate_20260721.md`.
 - Still-image generation is Codex imagegen with Gongnyang. This skill covers Seedance video generation only.
 
 ## Hard route

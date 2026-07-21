@@ -8,13 +8,13 @@ description: Use when continuing a Grok Imagine image-to-video batch from local 
 ## User tool routing hard rule
 
 - This skill is for **Grok I2V/video generation only**.
-- Source images/styleframes must come from **ChatGPT Image 2**, not Grok image generation.
-- If a project is missing styleframes, stop Grok I2V production and create/queue ChatGPT Image 2 styleframes first; do not use Grok to fill missing stills.
-- Any `grok_image` method in old manifests is obsolete and must be rewritten as `chatgpt_image_2_styleframe`.
+- Source images/styleframes must come from **Codex imagegen / built-in image_gen**, not Grok image generation.
+- If a project is missing styleframes, stop Grok I2V production and create/queue Codex imagegen styleframes first; do not use Grok to fill missing stills.
+- Any `grok_image`, `chatgpt_image_2_styleframe`, or browser-only still method in old manifests is obsolete and must be rewritten as `codex_imagegen_styleframe` unless the user explicitly requests browser generation.
 
 ## Overview
 
-Use this skill for Grok Imagine I2V production runs where local folders contain ordered ChatGPT Image 2 styleframes, `i2v-prompts` JSON/CSV/Markdown, and a `generated-videos` output folder. It captures the learned workflow from the `mv-low-signal` project: inspect missing cuts, use the user's logged-in browser session, submit one cut at a time, download outputs, recover fragile jobs, and organize final edit assets.
+Use this skill for Grok Imagine I2V production runs where local folders contain ordered Codex imagegen styleframes, `i2v-prompts` JSON/CSV/Markdown, and a `generated-videos` output folder. It captures the learned workflow from the `mv-low-signal` project: inspect missing cuts, use the user's logged-in browser session, submit one cut at a time, download outputs, recover fragile jobs, and organize final edit assets.
 
 ## Required safety and browser rules
 
@@ -38,7 +38,7 @@ Use this skill for Grok Imagine I2V production runs where local folders contain 
 3. **Submit to Grok Imagine**
    - Open `https://grok.com/imagine` in the approved browser session.
    - Set mode to Video, 16:9, desired quality/duration if exposed.
-   - Upload the ChatGPT Image 2 start frame image and fill the I2V prompt.
+   - Upload the Codex imagegen start frame image and fill the I2V prompt.
    - Submit one cut at a time. Wait for completion before starting the next cut unless the user explicitly wants parallel quota use.
 
 4. **Download and save**
@@ -101,3 +101,7 @@ For the detailed retrospective and exact commands learned from the `mv-low-signa
 - A generated clip that expands an eye close-up into a new full face is a failed asset, even if it is visually attractive. Reject/regenerate it.
 - Check identity by face shape, nose bridge, jaw, eye spacing, age impression, hair mass, outfit, and scene role; eye color alone is not enough.
 - Repair prompts for fragile close-ups must say: `preserve exact crop`, `do not reveal full face`, `no zoom out`, `no new facial structure`, `no new character`, and restrict motion to iris glint, eyelid micro-movement, hair-tip tremble, reflected light, or background shimmer.
+## Codex imagegen source-frame override — 2026-07-06
+
+Newest user override: for this video-team pipeline, still images, styleframes, start frames, and character sheets are generated through Codex `imagegen` / built-in `image_gen` by default. ChatGPT web image generation is fallback/manual only when Codex imagegen is unavailable or explicitly requested. Grok remains I2V/videoization only from saved imagegen frames and must never be used for still-image generation unless the user explicitly overrides it for that job.
+

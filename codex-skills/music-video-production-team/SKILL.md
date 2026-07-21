@@ -15,6 +15,10 @@ This skill may design story, shot purpose, and visual intent, but it must not de
 
 Start with `[music-video-production-team]` when this skill is active.
 
+## Subagent spawn approval gate — 2026-07-21
+
+Do not spawn delegated lanes, subagents, Hermes sidecars, schedulers/monitors, or parallel automation loops without explicit per-spawn user approval in the current conversation. Default is single-agent sequential execution. Full policy: `team-policies/subagent_approval_gate_20260721.md` in the video-team-workflow package.
+
 ## Core idea
 
 The MV workflow is split into these roles:
