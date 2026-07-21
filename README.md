@@ -1,34 +1,66 @@
 # Video Team Workflow
 
-Reusable Codex-native video-team workflow package: Seedance/Runway operating rules, image/I2V QC, typography, submission safety, and reusable knowledge extracts.
+Reusable **Codex-native** video-team package: Seedance/Runway operating rules, image/I2V QC, typography, submission safety, and curated knowledge.
+
+**Version line (2026-07-21 v2):** Chrome hybrid operator + dual in-flight queue + single Seedance contract + subagent approval gate + Hermes removed.
 
 ## Included
 
-- `codex-skills/` — reusable video-team skills.
-- `references/` — production reference standards (character sheets).
-- `wiki-extract/` — curated workflow and QC knowledge.
-- `seedance-operations/` — current Seedance/Runway operation policies and Finder placement helper.
-- `team-policies/` — team-wide operating gates (subagent spawn approval, latest-only principle).
-- `tools/deploy_skills_to_codex.sh` — deploy packaged skills into `~/.codex/skills` (archives replaced versions).
+| Path | Purpose |
+|---|---|
+| `codex-skills/` | Deployable Codex skills |
+| `references/` | Character sheet standards |
+| `wiki-extract/` | QC / seed knowledge extracts |
+| `seedance-operations/` | Ops helpers (Finder placement, continuity) |
+| `team-policies/` | Subagent gate, Chrome hybrid operator |
+| `docs/` | Session / version records |
+| `tools/deploy_skills_to_codex.sh` | Deploy skills → `~/.codex/skills` (archives old) |
+| `GLOBAL_AGENTS.md` | Package-side agents mirror (deploy separately if used) |
 
 ## Excluded
 
-Project folders, generated media, downloaded videos, CapCut drafts, browser/session state, credentials, tokens, `.env` files, and private personal-information forms are intentionally excluded.
+Project folders, generated media, CapCut drafts, browser/session state, credentials, tokens, `.env`, private personal-information forms.
 
-## Seedance operating boundary
+## Authority map
 
-Use visible Runway UI as source of truth. Use Codex Computer Use for Finder-to-Runway drag/drop, one reference at a time, with visible thumbnail verification. Do not use hidden inputs, path typing, picker/asset-modal shortcuts, Runway API/connector, Grok for stills, Credits/Max, or Generate without current-scene preflight.
+| Topic | Live file |
+|---|---|
+| Seedance prompt + UI | `codex-skills/seedance-prompt-en/SKILL.md` **only** |
+| Chrome hybrid + dual in-flight | `team-policies/chrome_hybrid_operator_20260721.md` |
+| No subagent fan-out | `team-policies/subagent_approval_gate_20260721.md` |
+| Cleanup history | `docs/2026-07-21-video-team-cleanup-session.md` |
+| This version-up | `docs/2026-07-21-video-team-version-up.md` |
 
-## Seedance operator authority
+`videodirector` / `music-video-production-team` define story and image requirements only — **not** Seedance UI steps.
 
-`codex-skills/seedance-prompt-en/SKILL.md` is the only live Seedance prompt-and-operation contract. It owns visual prompt writing, visible Runway UI operation, reference upload, Generate, queue state, and evidence. `GLOBAL_AGENTS.md`, `videodirector`, and `music-video-production-team` do not define Seedance UI steps. Older detailed material is retained under `codex-skills/seedance-prompt-en/archive/` as reference only.
+## Seedance operating model (v2)
+
+```
+Chrome tab = app.runwayml.com Generate board (only browser for Runway)
+ATTACH  → Computer Use: Finder → Chrome Multi-ref, one drag at a time
+VERIFY  → Chrome Codex plugin: thumbnail count/order = PASS
+WEB     → Chrome Codex plugin: prompt, settings, Generate once, cards
+QUEUE   → keep ~2 jobs in flight (~30 min each); fill next slot ASAP
+WAIT    → poll / 15-min observer only; no second agent
+```
+
+- Default I2V: **Seedance**. Grok only if the user explicitly names Grok.
+- No Runway API/connector, no picker/path/AppleScript method ladder, no Credits/Max without explicit approval.
+- No Hermes / `~/.hermes` / external orchestrator.
 
 ## Operating principles
 
-- **Subagent spawn approval gate:** no delegated lanes, subagents, sidecars, or scheduler loops without explicit per-spawn user approval (single pre-approved exception: the 15-minute Generate-queue observer in the Seedance contract). See `team-policies/subagent_approval_gate_20260721.md`.
-- **Latest-only rule files:** active files carry only currently valid rules; corrections edit/delete in place instead of appending dated layers. History and rollback live in this repo's git history and `archive/` folders.
-- **Canonical source:** this repo is the version-controlled source of truth for video-team skills; `~/.codex/skills` is a deployment target (`tools/deploy_skills_to_codex.sh`).
+1. **Subagent spawn approval gate** — no delegated lanes, subagents, sidecars, or extra loops without per-spawn user approval (exception: Seedance 15-min queue observer while active).
+2. **Latest-only** — active files hold only current rules; no stacked dated contradictions. History = git + `archive/`.
+3. **Canonical source** — this GitHub repo; `~/.codex/skills` is a deploy target.
 
-## Codex-native boundary — 2026-07-21
+## Deploy
 
-Codex is the single entrypoint and execution owner. The former Hermes supervisor/relay layer and its delegated lane scaffold (`codex-video-runtime/`) were removed; recover them from git history if ever needed. Nothing in this package may depend on `~/.hermes` paths, external orchestrator binaries, or relay personas.
+```bash
+# from package root on the Mac video machine
+./tools/deploy_skills_to_codex.sh
+```
+
+## Codex-native boundary
+
+Codex is the single entrypoint and execution owner. Former Hermes supervisor/relay and `codex-video-runtime/` scaffold were removed (2026-07-21). Recover from git history only if ever needed.

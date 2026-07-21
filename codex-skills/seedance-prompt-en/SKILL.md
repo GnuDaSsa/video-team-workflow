@@ -7,38 +7,58 @@ description: Single live contract for Seedance 2.0 prompt writing and Runway UI 
 
 ## Authority and scope
 
-This is the **only live Seedance execution contract**. It owns prompt writing, Runway preflight, Finder reference upload, Generate, queue state, download evidence, and provider labeling.
+This is the **only live Seedance execution contract**. It owns prompt writing, Chrome/Runway operation, reference attach, Generate, queue capacity, download evidence, and provider labeling.
 
 - `videodirector` and `music-video-production-team` define story, scene purpose, and image requirements only.
 - Global AGENTS defines universal safety only; it does not define Seedance UI steps.
-- Historical Seedance patches are reference material only, never active instructions.
-- Subagent spawn approval gate (2026-07-21): no delegated lanes, subagents, sidecars, or extra automation loops without explicit per-spawn user approval. The single 15-minute observer scheduler defined below is the only pre-approved background loop, and only while a queue is active. Full policy: `team-policies/subagent_approval_gate_20260721.md`.
-- Still-image generation is Codex imagegen with Gongnyang. This skill covers Seedance video generation only.
+- Hybrid operator policy: `team-policies/chrome_hybrid_operator_20260721.md`.
+- Subagent spawn approval gate: `team-policies/subagent_approval_gate_20260721.md`. No extra agents/lanes/schedulers without per-spawn user approval. Only pre-approved loop: 15-minute Generate-queue observer while a queue is active.
+- Still-image generation is Codex imagegen (Gongnyang). This skill covers Seedance video only.
+- **I2V default = Seedance.** Grok only when the user explicitly names Grok for that job.
 
-## Hard route
+## Hard route (v2 — Chrome hybrid)
 
-- Runway source of truth: the visible logged-in `app.runwayml.com` UI.
-- UI execution: **Codex Computer Use only**.
+- Runway source of truth: visible logged-in **`app.runwayml.com` in Chrome** (one Generate board tab).
+- Do **not** run a parallel Safari Runway session for the same project.
+- **Tool split (phase lock):**
+  - `ATTACH` → desktop **Computer Use drag only** (Finder → Chrome Multi-ref, one file).
+  - `VERIFY` / `WEB` / queue card / download clicks → **Chrome Codex plugin** preferred.
+  - Same moment: only one owner tool. Attach phase = no plugin clicks. Web phase = no CU mouse.
 - Never use Runway connector/API, hidden input, picker/asset selector, path typing, AppleScript/local mouse/cliclick, Credits/Max, or Grok unless the user explicitly authorizes that exact exception.
-- If the required Computer Use action is unavailable, set `BLOCKED_CODEX_COMPUTER_USE_UNAVAILABLE`. Do not open Finder, modify the deck, replace a prompt, click Generate, or create a scheduler.
+- If desktop drag is unavailable: `BLOCKED_CODEX_COMPUTER_USE_UNAVAILABLE` once. Do not open Finder, modify the deck, click Generate, spawn a helper, or invent a method ladder.
+- If Chrome plugin is unavailable: temporary fallback is full Computer Use on the **same Chrome** tab (not Safari), still one-file drag + eight-check Generate.
 
-## One scene, one state
+## Dual in-flight capacity (mandatory)
 
-Maintain one current cursor and one record:
+Seedance generation is ~30 minutes per card. **Empty second slot is a production loss.**
+
+- Target **~2** cards in `In queue` / `Generating` / `Processing` whenever ≥2 eligible scenes exist.
+- After scene A shows a **visible accepted card**, immediately run ATTACH→WEB for scene B if eligible.
+- Do **not** wait for A’s full render before submitting B.
+- Hands are sequential; **queue slots are not**.
+- No second agent to watch the queue.
+
+## One scene cursor + state
+
+Maintain one current cursor and one record per active prearm:
 
 ```json
 {
   "scene_id": "S01",
+  "browser": "chrome",
+  "phase": "attach|verify|web|inflight|download|blocked",
+  "owner_tool": "cu_drag|chrome_plugin|none",
   "refs_visible": false,
   "prompt_verified": false,
   "settings_verified": false,
   "generate_color": "blue|gray",
   "accepted_card_visible": false,
+  "inflight_count": 0,
   "status": "pending|prearming|ready|submitted_ui|downloaded|qc_pass|qc_fail|blocked"
 }
 ```
 
-A scene advances only when its own visible accepted card appears. A click, blue button, prompt text, local file, or scheduler event is not acceptance.
+A scene advances to `submitted_ui` only when **its own** visible accepted card appears. A click, blue button, prompt text, local file, or scheduler event is not acceptance.
 
 ## Visual prompt authoring
 
@@ -66,20 +86,19 @@ Do not include proper names, historical/political labels, captions, narration, c
 
 For a fragile close-up, explicitly preserve crop; otherwise do not over-lock composition. The clip must contain physical action and environmental motion, not still-image zoom/pan filler.
 
-## Reference upload: visible one-by-one transaction
+## Reference upload: one-by-one (ATTACH + VERIFY)
 
-1. Confirm the visible Runway page is frontmost and the active scene is current cursor.
-2. Open one ordered staging folder in Finder and keep it upper-right without covering Runway.
-3. Use Codex Computer Use to drag one file to the **empty** Reference slot.
-4. Wait for the thumbnail and verify its order/count before the next file.
-5. If a file is swapped, missing, or dropped into another app, stop; clear/recover the tray before continuing. Do not Generate.
-6. Never silently reuse a prior scene deck unless the scene package explicitly says it is persistent.
+1. Chrome Runway Generate board frontmost; cursor scene matches package.
+2. Open one ordered staging folder in Finder (upper-right, not covering Multi-ref/prompt/Generate).
+3. `owner_tool=cu_drag`: Computer Use drags **one** file into the empty Multi-ref slot on **Chrome**.
+4. `owner_tool=chrome_plugin`: verify visible thumbnail count/order (this is PASS, not the drag log).
+5. Repeat until all refs for the scene are visible in order.
+6. If swap/missing/wrong app drop: stop; recover tray; do not Generate; do not switch to picker/path methods.
+7. Never silently reuse a prior scene deck unless the package marks it persistent.
 
-## Eight-check preflight
+## Eight-check preflight (WEB, before Generate)
 
-Immediately before Generate, verify only:
-
-1. visible Runway is frontmost;
+1. Chrome Runway is frontmost Generate board;
 2. current cursor matches the scene package;
 3. expected reference thumbnails/order are visible;
 4. visual-only prompt is visible and ≤3500;
@@ -90,29 +109,34 @@ Immediately before Generate, verify only:
 
 Blue means eligible **after** checks, never a command by itself.
 
-## Generate, queue, scheduler
+## Generate, queue, dual fill
 
-- Click exact Generate once after all checks.
-- Wait and verify a visible new current-scene card (`In queue`, `Generating`, `Processing`, or `Completed`).
-- If card exists: set `submitted_ui`, preserve evidence, advance cursor only for the next transaction.
-- If gray, wait/Credits, or no card: keep the same scene prearmed; do not re-click, replace refs/prompt, or advance.
-- A scheduler may only observe the current cursor every 15 minutes. It may never hard-code a scene, change refs/prompt, or click without all eight checks. Delete it after the queue ends.
+- `owner_tool=chrome_plugin`: click exact Generate **once** after all checks.
+- Wait until a visible new current-scene card appears (`In queue` / `Generating` / `Processing` / `Completed`).
+- If card exists: set `submitted_ui`, record evidence, `inflight_count++`.
+- If `inflight_count < 2` and another scene is eligible: start that scene’s ATTACH→WEB immediately.
+- If gray, wait/Credits, or no card: keep the **same** scene prearmed; do not re-click, replace refs/prompt, advance, or switch providers.
+- 15-minute observer may only re-check the **current** prearmed gray→blue case with full eight checks. Delete observer when queue ends.
+- While two jobs render: offline prep next prompts/refs, download completed cards — no idle 30-min babysitting of a single bar.
 
 ## Provider and completion evidence
 
-Provider is selected in the scene package, never silently switched. If a Grok file enters the edit, label it Grok; if a Seedance card has no downloaded file, label it `UI_ONLY_NOT_DOWNLOADED`.
+Provider is selected in the scene package, never silently switched. Default provider is Seedance. Grok only with explicit user naming; label Grok files as Grok.
 
-For every selected clip record provider, exact downloaded file, size, duration/codec, scene ID, and QC verdict. A UI card, prompt, or thumbnail is never final media completion.
+For every selected clip record provider, exact downloaded file, size, duration/codec, scene ID, and QC verdict. A UI card, prompt, or thumbnail is never final media completion. Missing download = `UI_ONLY_NOT_DOWNLOADED`.
 
 ## Output format
 
 ```text
 Scene ID:
+Browser: chrome
 Visual prompt:
 Reference roles:
 Expected duration/audio:
+Inflight count after submit:
 Caption/narration notes (not for Runway):
 Operator state:
+Owner tool last used:
 ```
 
 Older research and pre-consolidation notes are archived at `archive/` and are not live rules.

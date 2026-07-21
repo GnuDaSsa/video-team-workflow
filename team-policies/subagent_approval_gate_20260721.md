@@ -8,7 +8,7 @@ User correction: after the video team is invoked, work must not fan out into sub
 - An approval request must name what is being spawned: lane id/role, purpose, and expected output. Blanket pre-approval does not exist; "the plan mentions lanes" or "the template defines roles" is **not** approval.
 - Default execution model is **single-agent, sequential, in the main conversation**. Parallel lanes are an exception the user grants per project/turn, not the default.
 - Wherever an older rule, template, or manifest says lanes "may run in parallel", read it as "may run in parallel **once the user approves that lane set**".
-- Role templates in `codex-video-runtime/templates/` define responsibilities, not standing permission to instantiate agents. One agent may play multiple roles sequentially without approval; instantiating a separate agent per role requires approval.
+- Role names in skills (Planner, Image Creator, Seedance Operator, etc.) define **responsibilities**, not standing permission to instantiate agents. One agent may play multiple roles sequentially without approval; instantiating a separate agent per role requires approval.
 - Schedulers/monitors additionally follow `seedance-operations/scene_advancement_policy_20260719.md`: never spawn a retry/heartbeat loop as a side effect of a blocker.
 - If unsure whether something counts as a spawn: it does — ask first.
 

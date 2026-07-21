@@ -109,3 +109,11 @@ seedance-prompt-en의 트리거가 "Seedance 언급 시 MUST load"라 사실상 
 | 2d2cf42 | 서브에이전트 승인 게이트 + latest-only + 배포 스크립트 |
 | 5a0cb27 | GLOBAL_AGENTS.md 게이트 동기화 |
 | 3c82d9d | 헤르메스 레이어 제거, Codex-native 단독 소유 |
+
+---
+
+## 8. Follow-up version-up (same day, v2)
+
+See `docs/2026-07-21-video-team-version-up.md`.
+
+Chrome hybrid operator + dual in-flight were formalized after this cleanup record. The "Chrome path not started" note in section 2 is superseded by that version-up.

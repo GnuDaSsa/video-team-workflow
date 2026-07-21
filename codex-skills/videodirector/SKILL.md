@@ -9,7 +9,7 @@ Specialized workflow for planning and packaging AI-assisted video production wor
 
 ## Seedance UI authority
 
-This skill may design story, shot purpose, and visual intent, but it must not define Runway/Finder uploads, Generate behavior, queue retries, or provider switching. For actual Seedance UI operation, read and follow only `/Users/gnudas/.codex/skills/seedance-prompt-en/SKILL.md`.
+This skill may design story, shot purpose, and visual intent, but it must not define Runway/Finder uploads, Generate behavior, queue retries, or provider switching. For Seedance UI operation follow only `seedance-prompt-en` plus `team-policies/chrome_hybrid_operator_20260721.md` (Chrome board; drag = CU; clicks = Chrome plugin; ~2 in-flight).
 
 ## First-line rule
 
@@ -23,9 +23,10 @@ Do not spawn delegated lanes, subagents, external sidecars, schedulers/monitors,
 
 Codex is the single entrypoint and owner of this workflow. There is no external orchestrator, sidecar, or relay layer.
 
-- Codex owns everything: direction, local files, Codex imagegen production, Computer Use browser operation for Seedance/Runway, edit/package commands, and verification.
-- Long-memory direction comes from this package (skills, seedance-operations, team-policies) and the user's wiki — not from any external agent.
-- Do not invoke external orchestrator binaries or sidecars. If extra review is needed, ask the user.
+- Codex owns direction, local files, imagegen, Seedance operation (via seedance contract), edit/package, verification.
+- Seedance browser surface is **Chrome**; do not plan Safari Runway as default.
+- I2V default is **Seedance**; Grok only when the user explicitly names Grok.
+- Do not invoke external orchestrator binaries or sidecars.
 
 ## Language rules
 
@@ -62,7 +63,7 @@ If the request is underspecified but execution can still proceed, choose sensibl
 2. Break the project into scenes
 3. Define character references if needed
 4. Write start-frame prompts for each scene
-5. Write Grok/I2V motion prompts
+5. Write Seedance/I2V motion prompts (Grok only if user named Grok)
 6. Plan Suno BGM tracks
 7. Produce narration/subtitle/edit sheets
 
@@ -72,11 +73,11 @@ If the request is underspecified but execution can still proceed, choose sensibl
 - For a new project, create character sheets/styleframes through Codex imagegen first; ChatGPT web/new chat is fallback/manual only when imagegen is unavailable or explicitly requested.
 - Codex imagegen production prompts must be **single-image prompts**: one cut only. Never ask for 2x2 grids, collages, multi-panel/contact sheets, or multiple separate images in one prompt for production styleframes.
 - Fast Codex imagegen production may use up to four separate imagegen calls in sequence, each call for exactly one standalone image for one cut, then QC the four independent outputs together. Never combine the four cuts into one prompt, 2x2 grid, collage, contact sheet, or multi-panel output.
-- Grok: **I2V/videoization only**, from saved Codex imagegen frames.
-- If Codex imagegen image production is blocked mid-project, do **not** switch Grok into still-image generation by default. Continue production by using Grok/Seedance/Runway only for I2V/videoization from any approved/saved existing frame, acceptable fallback frame, or other user-approved source frame so the edit can keep moving without a question.
-- Do not use Grok to generate still images unless the user explicitly overrides for that job.
-- Do not use Kling in the default workflow unless explicitly requested.
+- Default I2V = **Seedance** (Chrome hybrid operator). Grok I2V only when the user explicitly names Grok.
+- Do not use Grok to generate still images.
+- Do not use Kling unless explicitly requested.
 - If older wording says “Grok image prompt” or “ChatGPT Image 2 browser generation,” read it as “Codex imagegen styleframe prompt” unless the user explicitly requests otherwise.
+- If older wording says Grok is the default I2V path, ignore it.
 
 
 ## Core production rules
@@ -98,7 +99,7 @@ When the user asks for a full package, output in this order:
 3. Character JSON
 4. Character sheet JSON
 5. Scene start-frame JSON
-6. Grok/I2V motion prompts
+6. Seedance/I2V motion prompts (or Grok only if user named Grok)
 7. BGM JSON
 8. Narration/dialogue sheet
 
@@ -146,9 +147,9 @@ Use a table with these columns:
 }
 ```
 
-### Grok/I2V motion prompts
+### Seedance/I2V motion prompts (default)
 
-Write one prompt per cut using concise camera language.
+Default provider is Seedance. Write one prompt per cut/block; use Grok-style motion tags only if the user named Grok.
 
 Available movement tags:
 
@@ -453,5 +454,5 @@ Newest user override: for video/director image production, use Codex `imagegen` 
 - Still images/styleframes/start frames/character sheets: Codex `imagegen` by default.
 - Character-sheet-locked cuts must pass the sheet as an actual image reference/input when supported, and record reference sheet paths per cut.
 - If reference use cannot be verified, classify as `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED` or `BLOCKED_IMAGEGEN_EDIT_FAILED`, not PASS.
-- ChatGPT web is fallback/manual only; Runway/Seedance remains Computer Use web UI only; Grok remains I2V only.
+- ChatGPT web is fallback/manual only for stills. Runway/Seedance uses Chrome hybrid (see seedance-prompt-en). Grok is not default I2V.
 

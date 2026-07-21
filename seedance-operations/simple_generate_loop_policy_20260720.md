@@ -1,18 +1,17 @@
-# Simple Runway/Seedance generate loop policy — 2026-07-20 user correction
+# Simple Runway/Seedance generate loop policy
 
-User correction: do not overcomplicate with stale click-nonce logic.
+Live companion to `codex-skills/seedance-prompt-en/SKILL.md` and `team-policies/chrome_hybrid_operator_20260721.md`.
 
-Loop:
-1. Put the current/next scene images into Runway via Finder-frontmost direct drag/drop only.
-2. Put the matching attested visual-only Terra/high prompt into Runway.
-3. Verify visible UI: Image refs, prompt counter <=3500, Seedance 2.0, Multi-reference, Audio Off, 16:9, 720p, 15s, Unlimited.
-4. If Generate is blue: click Generate once.
-5. If Runway returns `Please wait` / Generate gray / no accepted generation state: this is NOT a completed submission and does NOT permanently consume the scene. Start/update a 15-minute scheduler to click the same prearmed scene when Generate becomes blue again after preflight.
-6. If a visible queued/generating/processing/completed result appears, mark the scene submitted and advance to the next scene.
-7. Do not click again only when the scene has a visible accepted job/result. Card/output evidence blocks duplicates; a failed wait-blocker click does not.
-8. Never switch Credits/Max, never use Grok, never use picker/asset selector unless user explicitly says so.
+Loop (Chrome Generate board):
+1. ATTACH: Finder → Chrome Multi-ref, **Computer Use drag one file at a time**.
+2. VERIFY: Chrome plugin confirms thumbnail count/order.
+3. WEB: paste visual-only prompt; confirm Image refs, counter ≤3500, Seedance 2.0, Multi-reference, Audio Off, 16:9, 720p, duration, Unlimited.
+4. If Generate is blue **and** eight checks pass: Chrome plugin clicks Generate **once**.
+5. Gray / Please wait / no card: keep same prearm; 15-min observer may retry **same** scene after full preflight only.
+6. Visible accepted card → `submitted_ui`. If in-flight &lt; 2 and next scene eligible → **immediately** start next scene (do not wait ~30 min).
+7. Never double-click a scene that already has an accepted card. Never Credits/Max/Grok/picker unless user explicitly authorizes that exception.
 
-Short rule: card/accepted-job exists -> advance; no accepted-job and blue -> click; gray/wait -> scheduler.
+Short rule: card exists → fill toward **~2 in-flight**; no card + blue+preflight → click once; gray/wait → wait same prearm; never idle a free slot for 30 min.
 
 ## Finder window placement rule — added 2026-07-20
 Before any Runway/Seedance drag/drop, close unrelated Finder windows, open exactly one current upload_staging folder, immediately move Finder to a safe non-overlapping position, then inspect visible Runway UI. Drag one file at a time and verify each Image thumbnail before continuing. Use Codex Computer Use drag only. Do not let random Finder window placement cover reference slots, prompt/settings, or Generate.
