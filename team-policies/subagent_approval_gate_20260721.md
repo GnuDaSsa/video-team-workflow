@@ -4,7 +4,7 @@ User correction: after the video team is invoked, work must not fan out into sub
 
 ## Hard rule
 
-- Spawning any additional agent surface requires **explicit user approval for that specific spawn, in the current conversation**. This covers: Codex delegated lanes, subagent/worker/explorer agents, Hermes sidecars, background monitors/schedulers/cron/heartbeat loops, and any second concurrent browser-automation loop.
+- Spawning any additional agent surface requires **explicit user approval for that specific spawn, in the current conversation**. This covers: Codex delegated lanes, subagent/worker/explorer agents, external sidecars, background monitors/schedulers/cron/heartbeat loops, and any second concurrent browser-automation loop.
 - An approval request must name what is being spawned: lane id/role, purpose, and expected output. Blanket pre-approval does not exist; "the plan mentions lanes" or "the template defines roles" is **not** approval.
 - Default execution model is **single-agent, sequential, in the main conversation**. Parallel lanes are an exception the user grants per project/turn, not the default.
 - Wherever an older rule, template, or manifest says lanes "may run in parallel", read it as "may run in parallel **once the user approves that lane set**".

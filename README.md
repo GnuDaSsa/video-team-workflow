@@ -1,11 +1,11 @@
 # Video Team Workflow
 
-Reusable Codex video-team workflow package: runtime scaffold, lane model, Seedance/Runway operating rules, image/I2V QC, typography, submission safety, and reusable knowledge extracts.
+Reusable Codex-native video-team workflow package: Seedance/Runway operating rules, image/I2V QC, typography, submission safety, and reusable knowledge extracts.
 
 ## Included
 
-- `codex-video-runtime/` — delegated runtime scaffold and lane templates.
 - `codex-skills/` — reusable video-team skills.
+- `references/` — production reference standards (character sheets).
 - `wiki-extract/` — curated workflow and QC knowledge.
 - `seedance-operations/` — current Seedance/Runway operation policies and Finder placement helper.
 - `team-policies/` — team-wide operating gates (subagent spawn approval, latest-only principle).
@@ -28,3 +28,7 @@ Use visible Runway UI as source of truth. Use Codex Computer Use for Finder-to-R
 - **Subagent spawn approval gate:** no delegated lanes, subagents, sidecars, or scheduler loops without explicit per-spawn user approval (single pre-approved exception: the 15-minute Generate-queue observer in the Seedance contract). See `team-policies/subagent_approval_gate_20260721.md`.
 - **Latest-only rule files:** active files carry only currently valid rules; corrections edit/delete in place instead of appending dated layers. History and rollback live in this repo's git history and `archive/` folders.
 - **Canonical source:** this repo is the version-controlled source of truth for video-team skills; `~/.codex/skills` is a deployment target (`tools/deploy_skills_to_codex.sh`).
+
+## Codex-native boundary — 2026-07-21
+
+Codex is the single entrypoint and execution owner. The former Hermes supervisor/relay layer and its delegated lane scaffold (`codex-video-runtime/`) were removed; recover them from git history if ever needed. Nothing in this package may depend on `~/.hermes` paths, external orchestrator binaries, or relay personas.

@@ -4,7 +4,7 @@
 
 When the current working directory is under `/Users/gnudas/Documents/Codex/video-team-runtime/`, follow the lane prompt and the local project `brief.md`/`state.json` first.
 
-This is a fresh Codex-delegated workflow, not the old Hermes video-team runtime. The old active Hermes video-team files were purged and preserved only as backup.
+This is a Codex-native workflow. Codex is the single entrypoint and execution owner; no external orchestrator, sidecar, or relay layer is part of the route.
 
 Lane rules:
 - Write only inside the assigned `lanes/<lane>/` directory unless the prompt explicitly names an output package path.
@@ -18,7 +18,7 @@ Lane rules:
 
 After the video team (or any team workflow) is invoked, work must not fan out into extra agents on its own.
 
-- Spawning any additional agent surface — Codex delegated lane, subagent/worker/explorer, Hermes sidecar, background monitor/scheduler/cron/heartbeat, or a second concurrent browser-automation loop — requires **explicit user approval for that specific spawn in the current conversation**. The approval request must name the lane/role, purpose, and expected output.
+- Spawning any additional agent surface — Codex delegated lane, subagent/worker/explorer, external orchestrator sidecar, background monitor/scheduler/cron/heartbeat, or a second concurrent browser-automation loop — requires **explicit user approval for that specific spawn in the current conversation**. The approval request must name the lane/role, purpose, and expected output.
 - Default execution model is single-agent, sequential, in the main conversation. Parallel lanes are an exception the user grants per project/turn, not the default. Role templates define responsibilities, not standing permission to instantiate agents.
 - Single pre-approved exception: the 15-minute Generate-queue observer defined in the Seedance execution contract, only while a queue is active.
 - Rule files operate latest-only: corrections edit/delete old text in place instead of appending dated layers. History and rollback live in the `GnuDaSsa/video-team-workflow` git repo and `~/.codex/archive/`. Full policy: `team-policies/subagent_approval_gate_20260721.md` in that repo.

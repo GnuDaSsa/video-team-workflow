@@ -4,7 +4,6 @@ created: 2026-05-12
 updated: 2026-05-25
 type: seed
 tags: [video, workflow, agents, seed]
-sources: [concepts/video-team-seed-system.md, concepts/video-typography-operating-manual.md, raw/transcripts/video-workflow-lockdown-fixed-rail-20260525.md]
 confidence: medium
 contested: false
 contradictions: []
@@ -14,7 +13,6 @@ contradictions: []
 
 ## Purpose
 
-새 영상 작업을 시작할 때 이 페이지를 복사해 프로젝트별 seed로 변환한다. 이 seed는 계획 문서가 아니라, 다양한 영상작업을 fixed runtime/Kanban rail에서 실행 가능한 브리프, lane deliverable, QC gate로 전환하는 원천 단위다. 관련 운영 원칙은 [[video-team-seed-system]]과 [[video-typography-operating-manual]]을 따른다.
 
 ## 1. Project Archetype
 
@@ -133,13 +131,10 @@ Production constraints:
 ## 9. Next-use Prompt
 
 ```text
-Use `~/wiki/seeds/video-project-seed-template.md` and related seed pages as the starting source. First read SCHEMA, index, `_mocs/video-production.md`, and `concepts/video-team-seed-system.md`. Then adapt the closest seed to the current project, create the runtime project and fixed Kanban rail, and route concrete fixed-lane deliverables without asking the user to repeat standing video-team rules.
 ```
 
 ## Related pages
 
 - [[tourism-mv-seed]]
-- [[video-team-seed-system]]
 - [[video-typography-operating-manual]]
 - [[video-typography-dataset]]
-- [[hermes-agent]]

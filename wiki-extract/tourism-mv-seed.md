@@ -4,7 +4,6 @@ created: 2026-05-12
 updated: 2026-05-25
 type: seed
 tags: [video, video-production, music-video, contest-film, workflow, seed]
-sources: [concepts/video-team-seed-system.md, concepts/video-typography-operating-manual.md, raw/transcripts/hermes-session-capture-20260512-142448.md, raw/transcripts/video-workflow-lockdown-fixed-rail-20260525.md]
 confidence: medium
 contested: false
 contradictions: []
@@ -18,11 +17,9 @@ contradictions: []
 
 ## Source Evidence
 
-- [[video-team-seed-system]]
 - [[video-typography-operating-manual]]
 - [[video-typography-dataset]]
 - [[video-typography-contract-template]]
-- Prior Hermes video-team transcripts in `raw/transcripts/hermes-session-capture-*.md`
 
 ## Winning Pattern
 
@@ -95,7 +92,6 @@ Use `~/wiki/seeds/tourism-mv-seed.md` as the seed. Adapt it to the current offic
 
 ## Related pages
 
-- [[video-team-seed-system]]
 - [[video-project-seed-template]]
 - [[video-typography-operating-manual]]
 - [[video-typography-dataset]]

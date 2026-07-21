@@ -17,24 +17,15 @@ This skill may design story, shot purpose, and visual intent, but it must not de
 
 ## Subagent spawn approval gate — 2026-07-21
 
-Do not spawn delegated lanes, subagents, Hermes sidecars, schedulers/monitors, or parallel automation loops without explicit per-spawn user approval in the current conversation. Default is single-agent sequential execution. Full policy: `team-policies/subagent_approval_gate_20260721.md` in the video-team-workflow package.
+Do not spawn delegated lanes, subagents, external sidecars, schedulers/monitors, or parallel automation loops without explicit per-spawn user approval in the current conversation. Default is single-agent sequential execution. Full policy: `team-policies/subagent_approval_gate_20260721.md` in the video-team-workflow package.
 
-## Hermes-global routing
+## Codex-native routing
 
-For this user, Hermes is now the global entrypoint/orchestrator for external commands and long-memory MV/video-team direction.
+Codex is the single entrypoint and owner of this workflow. There is no external orchestrator, sidecar, or relay layer.
 
-- Treat Hermes standing memory and any brief supplied by Hermes as director context.
-- Do **not** automatically invoke `/Users/gnudas/.local/bin/hermes-mv` when the request already arrived through Hermes, Telegram-Hermes, or another Hermes-managed route. That creates a duplicate Hermes loop.
-- Codex owns execution: local files, Codex imagegen production, Computer Use browser operation for Seedance/Runway when needed, Grok I2V operation, edit/package commands, and verification.
-- Invoke a separate Hermes sidecar only when the user explicitly asks for an extra Hermes critique/pass, or when Codex is being run standalone outside Hermes and the task truly needs long-memory director review.
-- If explicitly needed, use:
-
-```bash
-/Users/gnudas/.local/bin/hermes-mv -z "<compact Korean task brief + current project path + requested deliverables>"
-```
-
-- If the optional sidecar is unavailable, continue the video task using the standing rules and briefly report that the sidecar was unavailable.
-- Do not send secrets, cookies, payment details, private tokens, or sensitive account data into Hermes prompts.
+- Codex owns everything: direction, local files, Codex imagegen production, Computer Use browser operation for Seedance/Runway, edit/package commands, and verification.
+- Long-memory direction comes from this package (skills, seedance-operations, team-policies) and the user's wiki — not from any external agent.
+- Do not invoke external orchestrator binaries or sidecars. If extra review is needed, ask the user.
 
 ## Language rules
 
