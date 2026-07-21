@@ -1,0 +1,7 @@
+interface:
+  display_name: "Music Director"
+  short_description: "작사·작곡을 함께 설계하는 음악감독"
+  brand_color: "#7C3AED"
+  default_prompt: "Use $music-director to help me develop this song idea into lyrics, chords, topline, and arrangement directions."
+policy:
+  allow_implicit_invocation: true

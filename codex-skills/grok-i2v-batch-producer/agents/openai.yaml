@@ -1,0 +1,6 @@
+interface:
+  display_name: "Grok I2V Batch Producer"
+  short_description: "Batch Grok I2V clips and manifests"
+  default_prompt: "Use $grok-i2v-batch-producer to continue this local Grok Imagine I2V batch and organize the generated clips."
+policy:
+  allow_implicit_invocation: true

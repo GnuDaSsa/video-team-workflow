@@ -1,0 +1,4 @@
+interface:
+  display_name: "videodirector"
+  short_description: "Help with video planning workflows"
+  default_prompt: "Use $videodirector to plan and package a video project from concept to prompts."

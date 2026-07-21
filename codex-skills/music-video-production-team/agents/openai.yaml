@@ -1,0 +1,7 @@
+interface:
+  display_name: "Music Video Production Team"
+  short_description: "전반 MV 제작 에이전트 워크플로우"
+  brand_color: "#0F766E"
+  default_prompt: "Use $music-video-production-team to run an agentized music-video production pipeline. For the user's MV workflow, route images/styleframes through logged-in ChatGPT image generation and route image-to-video clips through Grok only."
+policy:
+  allow_implicit_invocation: true
