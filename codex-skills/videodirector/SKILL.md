@@ -73,7 +73,7 @@ If the request is underspecified but execution can still proceed, choose sensibl
 - For a new project, create character sheets/styleframes through Codex imagegen first; ChatGPT web/new chat is fallback/manual only when imagegen is unavailable or explicitly requested.
 - Codex imagegen production prompts must be **single-image prompts**: one cut only. Never ask for 2x2 grids, collages, multi-panel/contact sheets, or multiple separate images in one prompt for production styleframes.
 - Fast Codex imagegen production may use up to four separate imagegen calls in sequence, each call for exactly one standalone image for one cut, then QC the four independent outputs together. Never combine the four cuts into one prompt, 2x2 grid, collage, contact sheet, or multi-panel output.
-- Default I2V = **Seedance** (Chrome hybrid operator). Grok I2V only when the user explicitly names Grok.
+- Default I2V = **Seedance** (Safari Computer Use on this branch). Grok I2V only when the user explicitly names Grok.
 - Do not use Grok to generate still images.
 - Do not use Kling unless explicitly requested.
 - If older wording says “Grok image prompt” or “ChatGPT Image 2 browser generation,” read it as “Codex imagegen styleframe prompt” unless the user explicitly requests otherwise.

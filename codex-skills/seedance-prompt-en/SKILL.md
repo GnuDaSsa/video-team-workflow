@@ -11,20 +11,20 @@ This is the **only live Seedance execution contract** on branch `operator/safari
 
 - `videodirector` and `music-video-production-team` define story, scene purpose, and image requirements only.
 - Global AGENTS defines universal safety only; it does not define Seedance UI steps.
-- Hybrid operator policy: `team-policies/safari_computer_use_operator_20260721.md`.
+- Safari-only operator policy: `team-policies/safari_computer_use_operator_20260721.md`.
 - Subagent spawn approval gate: `team-policies/subagent_approval_gate_20260721.md`. No extra agents/lanes/schedulers without per-spawn user approval. Only pre-approved loop: 15-minute Generate-queue observer while a queue is active.
 - Still-image generation is Codex imagegen (Gongnyang). This skill covers Seedance video only.
 - **I2V default = Seedance.** Grok only when the user explicitly names Grok for that job.
-- **Mainline Chrome variant** lives on `main` (`chrome_hybrid_operator_20260721.md`). Do not mix both browsers in one project.
+- Chrome mainline is a **different branch** (`main`). This branch is Safari-only — not Safari+Chrome.
 
-## Hard route (Safari Computer Use)
+## Hard route (Safari only — all Computer Use)
 
 - Runway source of truth: visible logged-in **`app.runwayml.com` in Safari** (one Generate board tab/window).
-- Do **not** run a parallel Chrome Runway session for the same project on this path.
-- **Tool split (phase lock):**
-  - `ATTACH` → desktop **Computer Use drag only** (Finder → Safari Multi-ref, one file).
-  - `VERIFY` / `WEB` / queue card / download clicks → **Safari + Computer Use** (same Safari window).
-  - Same moment: only one phase owner. Attach phase = no Generate. Web phase = no new drags unless tray recovery.
+- **Not a browser mix.** Do not open Chrome Runway on this path.
+- **All UI via Computer Use on Safari** (phase lock only separates attach vs web steps):
+  - `ATTACH` → **Computer Use drag** (Finder → Safari Multi-ref, one file).
+  - `VERIFY` / `WEB` / queue / download clicks → **Computer Use on the same Safari window**.
+  - Attach phase = no Generate. Web phase = no new drags unless tray recovery.
 - Never use Runway connector/API, hidden input, picker/asset selector, path typing, AppleScript/local mouse/cliclick, Credits/Max, or Grok unless the user explicitly authorizes that exact exception.
 - If desktop drag is unavailable: `BLOCKED_CODEX_COMPUTER_USE_UNAVAILABLE` once. Do not open Finder, modify the deck, click Generate, spawn a helper, or invent a method ladder.
 
