@@ -1,13 +1,14 @@
-# Safari hybrid branch — 2026-07-21
+# Safari Computer Use branch — 2026-07-21
 
 ## Purpose
 
-Provide a **Safari-surface** Seedance operator parallel to `main`’s Chrome hybrid, without mixing browsers in one deploy.
+Provide a **Safari-only** Seedance operator parallel to `main`’s Chrome path.  
+Name is **not** “hybrid with Chrome” — one browser per branch.
 
-| Branch | Browser | Click path |
+| Branch | Browser | Tools |
 |---|---|---|
-| `main` | Chrome | CU drag + Chrome Codex plugin for WEB |
-| `operator/safari-hybrid` | Safari | CU drag + Safari CU for WEB |
+| `main` | Chrome only | CU drag + Chrome plugin for WEB clicks |
+| `operator/safari-computer-use` | Safari only | Computer Use for drag **and** WEB clicks |
 
 Shared on both:
 
@@ -23,13 +24,13 @@ Shared on both:
 Only one branch should be deployed to `~/.codex/skills` at a time:
 
 ```bash
-git checkout operator/safari-hybrid && ./tools/deploy_skills_to_codex.sh   # Safari machine path
+git checkout operator/safari-computer-use && ./tools/deploy_skills_to_codex.sh   # Safari machine path
 git checkout main && ./tools/deploy_skills_to_codex.sh                   # Chrome machine path
 ```
 
 ## Files specific to this branch
 
-- `team-policies/safari_hybrid_operator_20260721.md`
+- `team-policies/safari_computer_use_operator_20260721.md`
 - `codex-skills/seedance-prompt-en/SKILL.md` (Safari hard route)
 - README branch banner
 

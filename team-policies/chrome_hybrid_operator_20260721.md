@@ -1,10 +1,10 @@
 # Chrome hybrid operator — 2026-07-21 (v2)
 
-> **Branch note:** On `operator/safari-hybrid`, Seedance UI authority is  
-> `team-policies/safari_hybrid_operator_20260721.md`, not this file.  
+> **Naming:** “Hybrid” here means **tools** (CU drag + Chrome plugin clicks) on **Chrome only** — not Chrome+Safari.  
+> Safari-only path: branch `operator/safari-computer-use` → `safari_computer_use_operator_20260721.md`.  
 > This Chrome policy is live on `main`.
 
-Live operating model for Runway/Seedance after the cleanup session (Chrome mainline).
+Live operating model for Runway/Seedance (Chrome mainline).
 
 ## Goal
 

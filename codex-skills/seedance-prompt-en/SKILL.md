@@ -1,23 +1,23 @@
 ---
 name: seedance-prompt-en
-description: Single live contract for Seedance 2.0 prompt writing and Runway UI operation (Safari hybrid branch). MUST load whenever Seedance, Runway Seedance, multi-reference video prompts, or Seedance generation is requested.
+description: Single live contract for Seedance 2.0 prompt writing and Runway UI operation (Safari Computer Use branch). MUST load whenever Seedance, Runway Seedance, multi-reference video prompts, or Seedance generation is requested.
 ---
 
-# Seedance: one authoring and operating contract (Safari hybrid)
+# Seedance: one authoring and operating contract (Safari Computer Use)
 
 ## Authority and scope
 
-This is the **only live Seedance execution contract** on branch `operator/safari-hybrid`. It owns prompt writing, Safari/Runway operation, reference attach, Generate, queue capacity, download evidence, and provider labeling.
+This is the **only live Seedance execution contract** on branch `operator/safari-computer-use`. It owns prompt writing, Safari/Runway operation, reference attach, Generate, queue capacity, download evidence, and provider labeling.
 
 - `videodirector` and `music-video-production-team` define story, scene purpose, and image requirements only.
 - Global AGENTS defines universal safety only; it does not define Seedance UI steps.
-- Hybrid operator policy: `team-policies/safari_hybrid_operator_20260721.md`.
+- Hybrid operator policy: `team-policies/safari_computer_use_operator_20260721.md`.
 - Subagent spawn approval gate: `team-policies/subagent_approval_gate_20260721.md`. No extra agents/lanes/schedulers without per-spawn user approval. Only pre-approved loop: 15-minute Generate-queue observer while a queue is active.
 - Still-image generation is Codex imagegen (Gongnyang). This skill covers Seedance video only.
 - **I2V default = Seedance.** Grok only when the user explicitly names Grok for that job.
 - **Mainline Chrome variant** lives on `main` (`chrome_hybrid_operator_20260721.md`). Do not mix both browsers in one project.
 
-## Hard route (Safari hybrid)
+## Hard route (Safari Computer Use)
 
 - Runway source of truth: visible logged-in **`app.runwayml.com` in Safari** (one Generate board tab/window).
 - Do **not** run a parallel Chrome Runway session for the same project on this path.
@@ -128,7 +128,7 @@ For every selected clip record provider, exact downloaded file, size, duration/c
 ```text
 Scene ID:
 Browser: safari
-Branch: operator/safari-hybrid
+Branch: operator/safari-computer-use
 Visual prompt:
 Reference roles:
 Expected duration/audio:

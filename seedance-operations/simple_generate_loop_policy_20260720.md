@@ -1,6 +1,6 @@
-# Simple Runway/Seedance generate loop policy (Safari hybrid)
+# Simple Runway/Seedance generate loop policy (Safari Computer Use)
 
-Live companion to `codex-skills/seedance-prompt-en/SKILL.md` and `team-policies/safari_hybrid_operator_20260721.md`.
+Live companion to `codex-skills/seedance-prompt-en/SKILL.md` and `team-policies/safari_computer_use_operator_20260721.md`.
 
 Loop (Safari Generate board):
 1. ATTACH: Finder → Safari Multi-ref, **Computer Use drag one file at a time**.

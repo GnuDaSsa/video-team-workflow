@@ -9,7 +9,7 @@ Specialized workflow for planning and packaging AI-assisted video production wor
 
 ## Seedance UI authority
 
-This skill may design story, shot purpose, and visual intent, but it must not define Runway/Finder uploads, Generate behavior, queue retries, or provider switching. For Seedance UI operation follow only `seedance-prompt-en` plus `team-policies/safari_hybrid_operator_20260721.md` (Safari board; drag + web CU; ~2 in-flight). This checkout is the Safari hybrid branch.
+This skill may design story, shot purpose, and visual intent, but it must not define Runway/Finder uploads, Generate behavior, queue retries, or provider switching. For Seedance UI operation follow only `seedance-prompt-en` plus `team-policies/safari_computer_use_operator_20260721.md` (Safari board; drag + web CU; ~2 in-flight). This checkout is the Safari Computer Use branch.
 
 ## First-line rule
 
@@ -454,5 +454,5 @@ Newest user override: for video/director image production, use Codex `imagegen` 
 - Still images/styleframes/start frames/character sheets: Codex `imagegen` by default.
 - Character-sheet-locked cuts must pass the sheet as an actual image reference/input when supported, and record reference sheet paths per cut.
 - If reference use cannot be verified, classify as `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED` or `BLOCKED_IMAGEGEN_EDIT_FAILED`, not PASS.
-- ChatGPT web is fallback/manual only for stills. Runway/Seedance uses Safari hybrid (see seedance-prompt-en). Grok is not default I2V.
+- ChatGPT web is fallback/manual only for stills. Runway/Seedance uses Safari Computer Use (see seedance-prompt-en). Grok is not default I2V.
 

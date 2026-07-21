@@ -1,19 +1,20 @@
-# Safari hybrid operator — 2026-07-21 (Safari branch)
+# Safari Computer Use operator — 2026-07-21
 
-Live operating model for Runway/Seedance on the **Safari** surface.  
-Branch: `operator/safari-hybrid`.  
-Mainline default remains Chrome (`team-policies/chrome_hybrid_operator_20260721.md` on `main`).
+**Naming:** This is **Safari-only**, not Safari+Chrome.  
+All Runway UI is Safari. Desktop Computer Use drives both drag and clicks.  
+Branch: `operator/safari-computer-use`.  
+Chrome mainline (different branch): `main` + `chrome_hybrid_operator` = Chrome-only with plugin for clicks.
 
 ## Goal
 
 - Keep **~2 Seedance jobs in flight** (~30 min each; idle slots are a production loss).
 - Single-agent sequential hands; no subagent fan-out without per-spawn approval.
-- Prefer **Safari** for all Runway work so session/tab stay one surface.
+- **Safari only** for Runway — one browser surface.
 
 ## Browser
 
-- **Runway lives in Safari only** for this branch: one logged-in `app.runwayml.com` Generate board tab/window.
-- Do not open a parallel Chrome Runway session for the same project while on this operator path.
+- **Runway lives in Safari only**: one logged-in `app.runwayml.com` Generate board tab/window.
+- Do not open Chrome Runway for the same project on this path.
 - Finder is staging only (upper-right, not covering Multi-ref / prompt / Generate).
 
 ## Tool split (phase lock)
@@ -33,7 +34,7 @@ Mainline default remains Chrome (`team-policies/chrome_hybrid_operator_20260721.
 3. During `WEB`, do not drag new refs unless recovering a failed tray.
 4. Attach **PASS** = Safari-visible thumbnail count/order, not “drag returned OK”.
 5. Generate is **one click** after eight checks — never dual-click recovery.
-6. Prefer staying in Safari Computer Use for both drag and clicks on this branch (no Chrome plugin requirement). If a Chrome Codex plugin path is later available, still do **not** mix Safari Runway + Chrome Runway in one project.
+6. All steps stay in Safari Computer Use (no Chrome plugin on this branch).
 
 ## Dual in-flight (mandatory capacity)
 
