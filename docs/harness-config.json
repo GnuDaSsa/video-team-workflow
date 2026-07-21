@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "paths": {
+    "stateFile": "docs/harness-state.json",
+    "memoryFile": "docs/project-memory.md",
+    "decisionsFile": "docs/decisions.md",
+    "contractsDir": "docs/contracts"
+  },
+  "commands": {
+    "verifyQuick": "zsh -n tools/deploy_skills_to_codex.sh && test -f codex-skills/seedance-prompt-en/SKILL.md && test -f team-policies/chrome_hybrid_operator_20260721.md && test -f team-policies/subagent_approval_gate_20260721.md",
+    "verifyFull": "",
+    "docsGenerate": ""
+  },
+  "rules": {
+    "maxRepeatedFailures": 2
+  }
+}

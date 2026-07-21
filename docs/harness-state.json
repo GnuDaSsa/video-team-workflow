@@ -1,0 +1,13 @@
+{
+  "currentGoal": "Deploy the Fable/Grok video-team workflow update without reintroducing Seedance rule overlap or broken policy references.",
+  "status": "complete",
+  "currentContract": "docs/contracts/2026-07-21-workflow-deploy.md",
+  "blockers": [],
+  "nextStep": "Use the deployed Chrome-hybrid Seedance contract on the next approved Runway transaction; do not spawn extra lanes or schedulers without explicit approval.",
+  "lastUpdated": "2026-07-21T09:42:00.000Z",
+  "verification": {
+    "lastCommand": "zsh -n tools/deploy_skills_to_codex.sh plus deployed-policy, active-skill-discoverability, and Seedance-contract assertions",
+    "lastResult": "pass",
+    "notes": "Remote Fable/Grok update deployed. Policy files now deploy with the skills; archived operator skill was moved outside ~/.codex/skills."
+  }
+}

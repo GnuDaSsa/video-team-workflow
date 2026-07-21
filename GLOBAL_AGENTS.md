@@ -21,7 +21,7 @@ After the video team (or any team workflow) is invoked, work must not fan out in
 - Spawning any additional agent surface — Codex delegated lane, subagent/worker/explorer, external orchestrator sidecar, background monitor/scheduler/cron/heartbeat, or a second concurrent browser-automation loop — requires **explicit user approval for that specific spawn in the current conversation**. The approval request must name the lane/role, purpose, and expected output.
 - Default execution model is single-agent, sequential, in the main conversation. Parallel lanes are an exception the user grants per project/turn, not the default. Role templates define responsibilities, not standing permission to instantiate agents.
 - Single pre-approved exception: the 15-minute Generate-queue observer defined in the Seedance execution contract, only while a queue is active.
-- Rule files operate latest-only: corrections edit/delete old text in place instead of appending dated layers. History and rollback live in the `GnuDaSsa/video-team-workflow` git repo and `~/.codex/archive/`. Full policy: `team-policies/subagent_approval_gate_20260721.md` in that repo.
+- Rule files operate latest-only: corrections edit/delete old text in place instead of appending dated layers. History and rollback live in the `GnuDaSsa/video-team-workflow` git repo and `~/.codex/archive/`. Deployed policy: `~/.codex/video-team-policies/subagent_approval_gate_20260721.md`.
 
 ## Codex Harness Auto Workflow
 

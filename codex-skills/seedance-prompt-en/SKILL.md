@@ -11,8 +11,8 @@ This is the **only live Seedance execution contract**. It owns prompt writing, C
 
 - `videodirector` and `music-video-production-team` define story, scene purpose, and image requirements only.
 - Global AGENTS defines universal safety only; it does not define Seedance UI steps.
-- Hybrid operator policy: `team-policies/chrome_hybrid_operator_20260721.md`.
-- Subagent spawn approval gate: `team-policies/subagent_approval_gate_20260721.md`. No extra agents/lanes/schedulers without per-spawn user approval. Only pre-approved loop: 15-minute Generate-queue observer while a queue is active.
+- Hybrid operator policy: `~/.codex/video-team-policies/chrome_hybrid_operator_20260721.md`.
+- Subagent spawn approval gate: `~/.codex/video-team-policies/subagent_approval_gate_20260721.md`. No extra agents/lanes/schedulers without per-spawn user approval. Only pre-approved loop: 15-minute Generate-queue observer while a queue is active.
 - Still-image generation is Codex imagegen (Gongnyang). This skill covers Seedance video only.
 - **I2V default = Seedance.** Grok only when the user explicitly names Grok for that job.
 
