@@ -1,6 +1,10 @@
 # Chrome hybrid operator — 2026-07-21 (v2)
 
-Live operating model for Runway/Seedance after the cleanup session. Supersedes “Safari-only Computer Use for every click” as the default.
+> **Branch note:** On `operator/safari-hybrid`, Seedance UI authority is  
+> `team-policies/safari_hybrid_operator_20260721.md`, not this file.  
+> This Chrome policy is live on `main`.
+
+Live operating model for Runway/Seedance after the cleanup session (Chrome mainline).
 
 ## Goal
 

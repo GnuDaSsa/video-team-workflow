@@ -9,7 +9,7 @@ Specialized workflow for planning and packaging AI-assisted video production wor
 
 ## Seedance UI authority
 
-This skill may design story, shot purpose, and visual intent, but it must not define Runway/Finder uploads, Generate behavior, queue retries, or provider switching. For Seedance UI operation follow only `seedance-prompt-en` plus `team-policies/chrome_hybrid_operator_20260721.md` (Chrome board; drag = CU; clicks = Chrome plugin; ~2 in-flight).
+This skill may design story, shot purpose, and visual intent, but it must not define Runway/Finder uploads, Generate behavior, queue retries, or provider switching. For Seedance UI operation follow only `seedance-prompt-en` plus `team-policies/safari_hybrid_operator_20260721.md` (Safari board; drag + web CU; ~2 in-flight). This checkout is the Safari hybrid branch.
 
 ## First-line rule
 
@@ -24,7 +24,7 @@ Do not spawn delegated lanes, subagents, external sidecars, schedulers/monitors,
 Codex is the single entrypoint and owner of this workflow. There is no external orchestrator, sidecar, or relay layer.
 
 - Codex owns direction, local files, imagegen, Seedance operation (via seedance contract), edit/package, verification.
-- Seedance browser surface is **Chrome**; do not plan Safari Runway as default.
+- Seedance browser surface on this branch is **Safari**; do not plan Chrome Runway as default here.
 - I2V default is **Seedance**; Grok only when the user explicitly names Grok.
 - Do not invoke external orchestrator binaries or sidecars.
 
@@ -454,5 +454,5 @@ Newest user override: for video/director image production, use Codex `imagegen` 
 - Still images/styleframes/start frames/character sheets: Codex `imagegen` by default.
 - Character-sheet-locked cuts must pass the sheet as an actual image reference/input when supported, and record reference sheet paths per cut.
 - If reference use cannot be verified, classify as `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED` or `BLOCKED_IMAGEGEN_EDIT_FAILED`, not PASS.
-- ChatGPT web is fallback/manual only for stills. Runway/Seedance uses Chrome hybrid (see seedance-prompt-en). Grok is not default I2V.
+- ChatGPT web is fallback/manual only for stills. Runway/Seedance uses Safari hybrid (see seedance-prompt-en). Grok is not default I2V.
 
