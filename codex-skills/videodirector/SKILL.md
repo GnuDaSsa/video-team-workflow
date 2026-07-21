@@ -9,7 +9,7 @@ Specialized workflow for planning and packaging AI-assisted video production wor
 
 ## Seedance UI authority
 
-This skill may design story, shot purpose, and visual intent, but it must not define Runway/Finder uploads, Generate behavior, queue retries, or provider switching. For actual Seedance UI operation, read and follow only `/Users/gnudas/.codex/skills/seedance-operator-protocol/SKILL.md`.
+This skill may design story, shot purpose, and visual intent, but it must not define Runway/Finder uploads, Generate behavior, queue retries, or provider switching. For actual Seedance UI operation, read and follow only `/Users/gnudas/.codex/skills/seedance-prompt-en/SKILL.md`.
 
 ## First-line rule
 
@@ -83,18 +83,6 @@ If the request is underspecified but execution can still proceed, choose sensibl
 - Do not use Kling in the default workflow unless explicitly requested.
 - If older wording says “Grok image prompt” or “ChatGPT Image 2 browser generation,” read it as “Codex imagegen styleframe prompt” unless the user explicitly requests otherwise.
 
-### Runway/Seedance route correction — 2026-07-06
-
-For Runway/Seedance work, use the visible logged-in web UI with Computer Use/Safari/Browser automation. Do not use the Runway MCP/app connector/API for production actions or for blocker decisions unless the user explicitly overrides this rule. Visible UI state beats connector auth state.
-
-If the user says Runway is already open/logged in on the web, use Computer Use on that visible `app.runwayml.com` UI immediately. Do not ask for connector reauth, do not call connector auth checks, and do not classify the project as blocked by connector OAuth while the web UI is available.
-
-
-### Runway/Seedance active-window lock — Claude misroute prevention — 2026-07-06
-
-Before entering image/reference paths, uploading references, or pasting prompts for Runway/Seedance, verify the active Computer Use target is the visible `app.runwayml.com` tab/window. Do not paste or type reference paths into Claude, ChatGPT, Codex, Finder search, Terminal, or any non-Runway composer. If the frontmost window is wrong, stop immediately, switch back to Runway, re-run `get_app_state`, and only continue after the intended Reference/upload/prompt area is visible. Treat any path accidentally inserted into Claude/ChatGPT as `MISROUTED_REFERENCE_INPUT_TO_NON_RUNWAY`, not as progress.
-
-Use Finder-visible staging folders or Runway's visible asset selector for references; path strings are for local manifests/operator cards only unless a verified Runway file/path field is focused.
 
 ## Core production rules
 
@@ -471,28 +459,4 @@ Newest user override: for video/director image production, use Codex `imagegen` 
 - Character-sheet-locked cuts must pass the sheet as an actual image reference/input when supported, and record reference sheet paths per cut.
 - If reference use cannot be verified, classify as `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED` or `BLOCKED_IMAGEGEN_EDIT_FAILED`, not PASS.
 - ChatGPT web is fallback/manual only; Runway/Seedance remains Computer Use web UI only; Grok remains I2V only.
-
-## Seedance continuity-critical multi-reference rule — 2026-07-07
-
-For recurring-character public-contest/MV clips, do not rely on a single uploaded production frame in Seedance when identity, gender/role readability, car/prop geometry, or adjacent-cut continuity matters. Use multi-reference: production styleframe + approved character/model sheet(s) + adjacent continuity frame and, when needed, specific prop/vehicle staging reference. A technically clean single-image I2V output can still fail if the car/prop staging is broken, gender/role reading is unclear, or the character looks like a different person. Provider reports must truthfully name Seedance vs Grok; if the final files are Grok fallback, do not describe them as Seedance output.
-
-## Seedance ↔ Grok provider-lane separation rule — 2026-07-07
-
-For the user's video-team workflow, Seedance-primary work and Grok fallback work must be separated from the planning stage, not reconstructed after the edit.
-
-Required per-cut provider matrix before any clip enters CapCut or final timeline:
-- `seedance_primary_status`: not_started / refs_prepared / refs_uploaded_visible / submitted / queued / downloaded / qc_pass / qc_fail / blocked.
-- `seedance_downloaded_file`: exact path, or `NONE_UI_ONLY` if a Runway UI candidate exists but has not been downloaded.
-- `grok_fallback_status`: not_used / prepared / submitted / downloaded / qc_pass / qc_fail.
-- `grok_downloaded_file`: exact path when used.
-- `provider_switch_reason`: hard Runway wait/Credits/account blocker, explicit user approval, or planned provider split.
-- `final_selected_provider`: Seedance / Grok / other.
-- `final_selected_file`: exact file path used in CapCut/final export.
-
-Rules:
-- A Seedance prompt card, uploaded sourceframe, or visible reference thumbnail is not a generated Seedance candidate. It must not be reported as Seedance output until a visible queued/generated card and downloaded result file are verified, or explicitly marked `UI_ONLY_NOT_PACKAGED`.
-- If Grok files enter the timeline, call them Grok fallback files even when the project began as Seedance-primary.
-- If Runway/Seedance generated UI-side candidates but they were not downloaded/packaged, recover them from Runway history and register them as separate Seedance candidates before selection.
-- Do not collapse provider status into a single “I2V done” state. Provider evidence and selected final source are separate QC gates.
-- For continuity-critical Seedance cuts, use the character/model sheet and multi-reference package; do not rely on one production frame only.
 

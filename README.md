@@ -19,4 +19,4 @@ Use visible Runway UI as source of truth. Use Codex Computer Use for Finder-to-R
 
 ## Seedance operator authority
 
-`codex-skills/seedance-operator-protocol/SKILL.md` is the only live Runway/Seedance UI-operation contract. `seedance-prompt-en` now writes visual-only prompts; it does not define uploads, Generate, scheduling, or queue behavior. Older detailed material is retained under `codex-skills/seedance-prompt-en/archive/` as reference only.
+`codex-skills/seedance-prompt-en/SKILL.md` is the only live Seedance prompt-and-operation contract. It owns visual prompt writing, visible Runway UI operation, reference upload, Generate, queue state, and evidence. `GLOBAL_AGENTS.md`, `videodirector`, and `music-video-production-team` do not define Seedance UI steps. Older detailed material is retained under `codex-skills/seedance-prompt-en/archive/` as reference only.
