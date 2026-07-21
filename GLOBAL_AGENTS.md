@@ -10,9 +10,18 @@ Lane rules:
 - Write only inside the assigned `lanes/<lane>/` directory unless the prompt explicitly names an output package path.
 - Update `status.json` and `result.md` for the lane.
 - Real media completion requires verified files, paths, sizes, duration/codec where relevant, or verified GUI state. Prompts/plans/placeholders are not completion.
-- Parallel lanes may run at the same time; do not wait on unrelated lanes unless the lane prompt states a dependency.
+- Parallel lanes require explicit per-spawn user approval first (see "Subagent / lane spawn approval gate — 2026-07-21"). Once a lane set is approved, do not wait on unrelated lanes unless the lane prompt states a dependency.
 - Public upload, publish, contest/government submission, email send, personal-info form submit, payment, password/2FA, and irreversible deletion require explicit user approval.
 - If GUI/login/CAPTCHA/payment/permission/account-limit blocks occur, stop and write BLOCKED with exact required user action.
+
+## Subagent / lane spawn approval gate — 2026-07-21
+
+After the video team (or any team workflow) is invoked, work must not fan out into extra agents on its own.
+
+- Spawning any additional agent surface — Codex delegated lane, subagent/worker/explorer, Hermes sidecar, background monitor/scheduler/cron/heartbeat, or a second concurrent browser-automation loop — requires **explicit user approval for that specific spawn in the current conversation**. The approval request must name the lane/role, purpose, and expected output.
+- Default execution model is single-agent, sequential, in the main conversation. Parallel lanes are an exception the user grants per project/turn, not the default. Role templates define responsibilities, not standing permission to instantiate agents.
+- Single pre-approved exception: the 15-minute Generate-queue observer defined in the Seedance execution contract, only while a queue is active.
+- Rule files operate latest-only: corrections edit/delete old text in place instead of appending dated layers. History and rollback live in the `GnuDaSsa/video-team-workflow` git repo and `~/.codex/archive/`. Full policy: `team-policies/subagent_approval_gate_20260721.md` in that repo.
 
 ## Codex Harness Auto Workflow
 
