@@ -1,11 +1,15 @@
 ---
 name: "videodirector"
-description: "Use when the user asks for video work such as video planning, shortform/reels/shorts/trailer concepts, storyboards, cut lists, scene breakdowns, ChatGPT Image 2 styleframe prompts, Grok image-to-video prompts, Suno BGM planning, narration sheets, subtitle sheets, or CapCut handoff packages. Trigger on Korean requests like 영상, 영상업무, 홍보영상, 숏폼, 콘티, 컷리스트, 장면 구성, 나레이션, BGM, Grok, Suno, CapCut. Kling only when explicitly requested."
+description: "Use when the user asks for video work such as video planning, shortform/reels/shorts/trailer concepts, storyboards, cut lists, scene breakdowns, Codex imagegen styleframe prompts, Grok/Seedance image-to-video prompts, Suno BGM planning, narration sheets, subtitle sheets, or CapCut handoff packages. Trigger on Korean requests like 영상, 영상업무, 홍보영상, 숏폼, 콘티, 컷리스트, 장면 구성, 나레이션, BGM, Grok, Suno, CapCut. Kling only when explicitly requested."
 ---
 
 # Video Director
 
 Specialized workflow for planning and packaging AI-assisted video production work. Use this skill for concept development, scene structure, prompt packages, soundtrack planning, and edit-ready delivery sheets.
+
+## Seedance UI authority
+
+This skill may design story, shot purpose, and visual intent, but it must not define Runway/Finder uploads, Generate behavior, queue retries, or provider switching. For actual Seedance UI operation, read and follow only `/Users/gnudas/.codex/skills/seedance-operator-protocol/SKILL.md`.
 
 ## First-line rule
 
@@ -16,13 +20,13 @@ Specialized workflow for planning and packaging AI-assisted video production wor
 For this user, Hermes is now the global entrypoint/orchestrator for external commands and long-memory MV/video-team direction.
 
 - Treat Hermes standing memory and any brief supplied by Hermes as director context.
-- Do **not** automatically invoke `~/.local/bin/hermes-mv` when the request already arrived through Hermes, Telegram-Hermes, or another Hermes-managed route. That creates a duplicate Hermes loop.
-- Codex owns execution: local files, browser automation, ChatGPT Image 2 production, Grok I2V operation, edit/package commands, and verification.
+- Do **not** automatically invoke `/Users/gnudas/.local/bin/hermes-mv` when the request already arrived through Hermes, Telegram-Hermes, or another Hermes-managed route. That creates a duplicate Hermes loop.
+- Codex owns execution: local files, Codex imagegen production, Computer Use browser operation for Seedance/Runway when needed, Grok I2V operation, edit/package commands, and verification.
 - Invoke a separate Hermes sidecar only when the user explicitly asks for an extra Hermes critique/pass, or when Codex is being run standalone outside Hermes and the task truly needs long-memory director review.
 - If explicitly needed, use:
 
 ```bash
-~/.local/bin/hermes-mv -z "<compact Korean task brief + current project path + requested deliverables>"
+/Users/gnudas/.local/bin/hermes-mv -z "<compact Korean task brief + current project path + requested deliverables>"
 ```
 
 - If the optional sidecar is unavailable, continue the video task using the standing rules and briefly report that the sidecar was unavailable.
@@ -42,7 +46,7 @@ For this user, Hermes is now the global entrypoint/orchestrator for external com
 - Storyboards and cut lists
 - Scene breakdowns
 - Character reference prompt design
-- ChatGPT Image 2 styleframe prompts
+- Codex imagegen styleframe prompts
 - Grok/I2V motion prompts
 - Suno 5.5 BGM planning
 - Narration, subtitle, and edit handoff sheets
@@ -86,6 +90,11 @@ For Runway/Seedance work, use the visible logged-in web UI with Computer Use/Saf
 If the user says Runway is already open/logged in on the web, use Computer Use on that visible `app.runwayml.com` UI immediately. Do not ask for connector reauth, do not call connector auth checks, and do not classify the project as blocked by connector OAuth while the web UI is available.
 
 
+### Runway/Seedance active-window lock — Claude misroute prevention — 2026-07-06
+
+Before entering image/reference paths, uploading references, or pasting prompts for Runway/Seedance, verify the active Computer Use target is the visible `app.runwayml.com` tab/window. Do not paste or type reference paths into Claude, ChatGPT, Codex, Finder search, Terminal, or any non-Runway composer. If the frontmost window is wrong, stop immediately, switch back to Runway, re-run `get_app_state`, and only continue after the intended Reference/upload/prompt area is visible. Treat any path accidentally inserted into Claude/ChatGPT as `MISROUTED_REFERENCE_INPUT_TO_NON_RUNWAY`, not as progress.
+
+Use Finder-visible staging folders or Runway's visible asset selector for references; path strings are for local manifests/operator cards only unless a verified Runway file/path field is focused.
 
 ## Core production rules
 
@@ -197,6 +206,36 @@ Example:
 "대사 또는 나레이션"
 ```
 
+
+
+
+## AAA character bible page standard — 2026-06-21
+
+For future `캐릭터시트`, `캐릭터 시트`, `character sheet`, `character bible`, recurring protagonist/mascot/performer, or character approval requests, use the user's approved Character Bible Page standard from `/Users/gnudas/wiki/concepts/character-bible-page-prompt-standard.md`.
+
+Default behavior:
+- Generate/design a professional AAA artbook / animated series character bible / franchise visual-development page, not a casual collage.
+- Include one large dynamic hero action pose as the visual focal point, plus front/side/back turnaround, expression sheet, outfit/material breakdown, accessory callouts, weapons/tools/companions, color palette, and identity/lore block.
+- Keep it white-background, production-art, clean-line, high-information-density, no watermark/UI/cropped elements.
+- Also create a separate Markdown approval card because AI image text may be unreliable.
+- For downstream Seedance/I2V, do not directly rely on tiny labels/callouts; prepare clean model-sheet crops or a separate neutral/off-white clean identity sheet with no readable text/logos.
+
+This is a design-reference exception to the no-multi-panel rule: multi-panel character bible/model sheets are allowed as **design references**, but production styleframes remain one cut = one standalone image.
+
+### Character-sheet-first correction — 2026-07-06
+
+For recurring characters/people, character sheets are mandatory before production styleframes. Generate/QC the approval bible and clean production model sheet first, plus mini-sheets for recurring supporting pairs/groups. Styleframes made before this lock are `HOLD_LOOKDEV_ONLY` and must be regenerated with the sheets attached/referenced before I2V.
+
+For the current `오늘의 자동완성` 3D animation continuation, MAIN / COUPLE / GUARDIANS sheets are mandatory identity references. Each regenerated styleframe prompt/manifest must state the sheet(s) used. Pre-lock stills are composition/lookdev references only and cannot be handed to Seedance/Grok as final I2V sources.
+
+## Shinkai-style anti-noise image prompting memory — 2026-06-21
+
+When the user asks for `신카이마코토 스타일`, `신카이풍`, `너의 이름은/날씨의 아이/스즈메 같은 작풍`, or complains that images are `AI티`, `자글자글`, `웹툰같음`, or asks to use successful Shinkai-like references, first consult `/Users/gnudas/wiki/concepts/shinkai-style-anti-noise-image-prompting.md` before writing or generating image prompts.
+
+Apply its production rules through Codex imagegen: separate STYLE/CHARACTER/SET/LIGHT/TEXT/SHOT blocks, one cut = one action + one emotion + one visual point, create character/set sheets before dependent cut images, use strong no-text or only-text locks, and avoid `8k/masterpiece/extremely detailed` style overloading that causes noisy AI-looking images. If the user says not to prompt but to understand the style, switch into image-maker judgment mode: explain/record the visual doctrine first (simple-but-alive face, overwhelming light/air, plausible Korean space, emotional paused moment), do not dump prompt text.
+
+Important correction: when the user says “성공했던 이미지들을 참고,” do not broaden this to an entire EP or generic prior success. Use only references the user explicitly marked as good/successful/이 느낌, and treat rejected contact sheets as negative references.
+
 ## Style locks
 
 Embed the relevant style directly inside prompts:
@@ -210,7 +249,7 @@ Embed the relevant style directly inside prompts:
 
 - "영상 기획" -> ask the 3 start questions if needed, then produce concept + structure
 - "씬 나눠줘" -> produce a cut list
-- "프롬프트 뽑아줘" -> produce character JSON + ChatGPT Image 2 start-frame JSON + Grok/I2V prompts
+- "프롬프트 뽑아줘" -> produce character JSON + Codex imagegen start-frame JSON + Grok/Seedance/I2V prompts
 - "BGM 짜줘" -> determine track count and output BGM JSON
 - "대사 정리해줘" -> output narration/dialogue sheet with timecodes
 - "전체 패키지" -> follow the default full-package order exactly
@@ -248,7 +287,7 @@ Additional hard check: a CapCut draft is not valid merely because JSON inspectio
 
 - Lead with usable deliverables, not long theory.
 - Keep outputs copy-paste ready.
-- Be specific enough that the user can move directly into ChatGPT Image 2, Grok I2V, Suno, or CapCut.
+- Be specific enough that the user can move directly into Codex imagegen, Seedance/Runway via Computer Use, Grok I2V, Suno, or CapCut.
 
 ## User MV production standing rules
 
@@ -400,3 +439,60 @@ Typography/CapCut workflow update:
 - CapCut remains the edit-handoff environment when requested.
 - If macOS CapCut font support makes typography look generic, design/render high-fidelity Korean typography externally as transparent overlays or a baked master, then import/align it back into the CapCut draft where practical.
 - Treat external typography as a font-fidelity workaround, not an excuse to ignore CapCut.
+
+
+## I2V/Seedance anti-wobble videoization rule — 2026-06-21
+
+When the user says a generated video became `자글자글`, `우글우글`, `비디오 과정에서 망가짐`, `얼굴이 끓음`, or similar, treat it as a videoization failure even if the still image was approved. Consult `/Users/gnudas/wiki/concepts/video-image-qc-style-continuity.md` and `/Users/gnudas/wiki/concepts/seedance-prompting-knowledge.md` before writing the next prompt.
+
+Default response: use **stability-first videoization**. Lock the approved still's exact composition, face shape, hair silhouette, hands, phone/UI/text, black ad-screen placeholders, room/vehicle geometry, and background perspective. Prefer single-image 3.5–4s stable clips or multi-reference clean cuts; do not ask for morph transitions when stability matters. Allow only breathing, small shoulder/hand motion, hair-tip/curtain/light/ambience movement, short dialogue/SFX if needed. No BGM unless the user explicitly overrides. Reject clips with texture crawling, line boiling, face flicker, hand/finger warp, Korean text shimmer, phone deformation, or unstable straight lines.
+
+
+## Global image composition contract — distance + angle — 2026-06-23
+
+For Codex imagegen styleframes and video storyboards, decide **shot distance** and **camera angle** before style/detail. Canonical wiki: `/Users/gnudas/wiki/concepts/ai-image-composition-distance-angle.md`.
+
+- Distance controls attention: macro/extreme close-up = detail/clue; close-up = emotion/object impact; medium = subject plus context only; wide/establishing = location/story scale.
+- Angle controls feeling/logic: top-down = structure/map; low angle = awe/authority; Dutch/canted = intentional tension; isometric = technical clarity; over-shoulder/POV = subjective looking; back view = longing/facing vastness.
+- Avoid lazy medium shots. If it may become ambiguous or dull, specify a decisive close-up, over-shoulder POV, back view, top-down, or wide establishing shot.
+- All serious image prompts need a `CAMERA / LAYOUT CONTRACT` block listing shot distance, camera angle, foreground, midground, background, frame purpose, and banned ambiguity.
+
+## Phone screen geometry QC rule — 2026-06-29
+
+For all phone-viewing, message, birth-notification, selfie, and screen-glow shots, consult `/Users/gnudas/wiki/concepts/phone-screen-geometry-qc.md` and enforce phone-sidedness in image prompts, I2V prompts, and QC.
+
+Required lock: the screen/display exists only on the front glass side. If the phone back faces camera, it can show only case/back panel/camera lenses/reflections, never UI cards, baby photos, message bubbles, or screen glow. To show message content to the audience, use a true POV/over-the-shoulder/oblique front-glass insert or add editable CapCut text after generation. Reject I2V outputs where the screen appears on the phone back or flips sides during motion.
+
+## Codex imagegen route correction — 2026-07-06
+
+Newest user override: for video/director image production, use Codex `imagegen` / built-in `image_gen` as the default GPT image route. Older instructions that require a new ChatGPT browser tab for stills are legacy unless the user explicitly asks for browser generation.
+
+- Still images/styleframes/start frames/character sheets: Codex `imagegen` by default.
+- Character-sheet-locked cuts must pass the sheet as an actual image reference/input when supported, and record reference sheet paths per cut.
+- If reference use cannot be verified, classify as `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED` or `BLOCKED_IMAGEGEN_EDIT_FAILED`, not PASS.
+- ChatGPT web is fallback/manual only; Runway/Seedance remains Computer Use web UI only; Grok remains I2V only.
+
+## Seedance continuity-critical multi-reference rule — 2026-07-07
+
+For recurring-character public-contest/MV clips, do not rely on a single uploaded production frame in Seedance when identity, gender/role readability, car/prop geometry, or adjacent-cut continuity matters. Use multi-reference: production styleframe + approved character/model sheet(s) + adjacent continuity frame and, when needed, specific prop/vehicle staging reference. A technically clean single-image I2V output can still fail if the car/prop staging is broken, gender/role reading is unclear, or the character looks like a different person. Provider reports must truthfully name Seedance vs Grok; if the final files are Grok fallback, do not describe them as Seedance output.
+
+## Seedance ↔ Grok provider-lane separation rule — 2026-07-07
+
+For the user's video-team workflow, Seedance-primary work and Grok fallback work must be separated from the planning stage, not reconstructed after the edit.
+
+Required per-cut provider matrix before any clip enters CapCut or final timeline:
+- `seedance_primary_status`: not_started / refs_prepared / refs_uploaded_visible / submitted / queued / downloaded / qc_pass / qc_fail / blocked.
+- `seedance_downloaded_file`: exact path, or `NONE_UI_ONLY` if a Runway UI candidate exists but has not been downloaded.
+- `grok_fallback_status`: not_used / prepared / submitted / downloaded / qc_pass / qc_fail.
+- `grok_downloaded_file`: exact path when used.
+- `provider_switch_reason`: hard Runway wait/Credits/account blocker, explicit user approval, or planned provider split.
+- `final_selected_provider`: Seedance / Grok / other.
+- `final_selected_file`: exact file path used in CapCut/final export.
+
+Rules:
+- A Seedance prompt card, uploaded sourceframe, or visible reference thumbnail is not a generated Seedance candidate. It must not be reported as Seedance output until a visible queued/generated card and downloaded result file are verified, or explicitly marked `UI_ONLY_NOT_PACKAGED`.
+- If Grok files enter the timeline, call them Grok fallback files even when the project began as Seedance-primary.
+- If Runway/Seedance generated UI-side candidates but they were not downloaded/packaged, recover them from Runway history and register them as separate Seedance candidates before selection.
+- Do not collapse provider status into a single “I2V done” state. Provider evidence and selected final source are separate QC gates.
+- For continuity-critical Seedance cuts, use the character/model sheet and multi-reference package; do not rely on one production frame only.
+

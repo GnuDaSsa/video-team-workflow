@@ -16,3 +16,7 @@ Project folders, generated media, downloaded videos, CapCut drafts, browser/sess
 ## Seedance operating boundary
 
 Use visible Runway UI as source of truth. Use Codex Computer Use for Finder-to-Runway drag/drop, one reference at a time, with visible thumbnail verification. Do not use hidden inputs, path typing, picker/asset-modal shortcuts, Runway API/connector, Grok for stills, Credits/Max, or Generate without current-scene preflight.
+
+## Seedance operator authority
+
+`codex-skills/seedance-operator-protocol/SKILL.md` is the only live Runway/Seedance UI-operation contract. `seedance-prompt-en` now writes visual-only prompts; it does not define uploads, Generate, scheduling, or queue behavior. Older detailed material is retained under `codex-skills/seedance-prompt-en/archive/` as reference only.
