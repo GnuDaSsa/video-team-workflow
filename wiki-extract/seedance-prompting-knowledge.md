@@ -168,11 +168,11 @@ For this workflow, Seedance should not be used only to keep reference images sta
 
 A prompt that only maps Image 1 → Image 2 → Image 3 without camera/action verbs should be rewritten before Generate. This rule is an execution bridge for [[video-team-seed-system]].
 
-## Runway web UI reference-upload operating lesson — 2026-06-12
+## Runway web UI reference-upload operating lesson — superseded 2026-07-12
 
-For the user’s video-team workflow in Safari/Computer Use, order-critical Runway/Seedance references should default to the visible **one-by-one Reference/asset-selector flow**, not bulk upload or Finder drag/drop. A repeated failure pattern was confirmed during the Seongnam redevelopment 15s sample: selecting six PNGs in the macOS open panel returned to Runway without registering the new assets in Recents/search; visible Finder drag/drop successfully uploaded/attached only `IMG_1`, then subsequent drag attempts did not append reliably.
+The 2026-06-12 asset-selector one-by-one route is **superseded**. Current verified route (2026-07-12 correction + 2026-07-20 loop policy):
 
-Operational rule: upload/attach one image at a time, then verify the visible reference strip count/order (`IMG_1`, `IMG_2`, …) before adding the next. Never use the Search field inside the Reference/asset-selector modal; it does not help local upload ordering, can leave stale filters/state, and should be treated as a known anti-pattern for this workflow. If a multi-file or drag/drop attempt results in only one thumbnail, stop immediately and recover through the asset selector; do not keep repeating drag/drop/bulk upload. Upload appearing in Recents is not enough—the success condition is the reference strip showing the intended thumbnail in the intended slot. Do not click Generate until visible thumbnails match the required count and order.
-
-This is a UI-operation rule, not a prompt-writing rule: the prompt may already be correct, but generation must wait for verified visible references.
-
+- Finder-frontmost direct drag/drop only, one reference at a time, into the visible empty `Image N` slot.
+- Never use the asset-selector Search field, picker modal, or hidden file inputs unless the user explicitly overrides.
+- Success condition is the visible active-strip thumbnail per file, verified after each drop.
+- Full state machine: `codex-skills/seedance-prompt-en/SKILL.md` → "Runway Web UI Reference Upload Lesson — corrected 2026-07-12", and `seedance-operations/simple_generate_loop_policy_20260720.md`.

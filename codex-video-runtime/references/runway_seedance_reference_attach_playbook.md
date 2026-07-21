@@ -1,5 +1,8 @@
 # Runway → Seedance reference attach playbook
 
+> **SUPERSEDED NOTICE — 2026-07-20.** The asset-selector / file-picker sequences below are historical. The current mandatory route is Finder-frontmost direct drag/drop, one file at a time, per `seedance-operations/simple_generate_loop_policy_20260720.md` and the corrected 2026-07-12 upload lesson in `codex-skills/seedance-prompt-en/SKILL.md`. Keep this file only for the still-valid verification principles (visible top-strip thumbnail = only attachment proof).
+
+
 Purpose: make Codex Computer Use attach reference images into the active Runway Seedance 2.0 Multi-reference strip reliably. Use this for the `seedance` / 후시구로 토우지(video) lane only.
 
 ## Evidence from prior successful run

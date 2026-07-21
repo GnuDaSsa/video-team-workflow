@@ -69,15 +69,23 @@ If the request is underspecified but execution can still proceed, choose sensibl
 
 ## Tool routing hard rule for this user
 
-- Still images/styleframes/start frames/character sheets: **ChatGPT Image 2 only**.
-- For a new project, ChatGPT Image 2 work must start in a **new ChatGPT tab/new chat** dedicated to that project.
-- ChatGPT Image 2 production prompts must be **single-image prompts**: one cut only. Never ask for 2x2 grids, collages, multi-panel/contact sheets, or multiple separate images in one prompt for production styleframes.
-- Fast ChatGPT Image 2 production may use **4-request microbatching**: submit up to four separate ChatGPT Image 2 messages/requests in sequence, each message for exactly one standalone 16:9 image for one cut, then download/QC the four independent outputs together. Never combine the four cuts into one prompt, 2x2 grid, collage, contact sheet, or multi-panel output.
-- Grok: **I2V/videoization only**, from saved ChatGPT Image 2 frames.
-- If ChatGPT Image 2 image production is blocked mid-project, do **not** switch Grok into still-image generation by default. Continue production by using Grok Imagine for I2V/videoization from any approved/saved existing frame, acceptable fallback frame, or other user-approved source frame so the edit can keep moving without a question.
+- Still images/styleframes/start frames/character sheets: **Codex `imagegen` / built-in `image_gen` by default**.
+- For a new project, create character sheets/styleframes through Codex imagegen first; ChatGPT web/new chat is fallback/manual only when imagegen is unavailable or explicitly requested.
+- Codex imagegen production prompts must be **single-image prompts**: one cut only. Never ask for 2x2 grids, collages, multi-panel/contact sheets, or multiple separate images in one prompt for production styleframes.
+- Fast Codex imagegen production may use up to four separate imagegen calls in sequence, each call for exactly one standalone image for one cut, then QC the four independent outputs together. Never combine the four cuts into one prompt, 2x2 grid, collage, contact sheet, or multi-panel output.
+- Grok: **I2V/videoization only**, from saved Codex imagegen frames.
+- If Codex imagegen image production is blocked mid-project, do **not** switch Grok into still-image generation by default. Continue production by using Grok/Seedance/Runway only for I2V/videoization from any approved/saved existing frame, acceptable fallback frame, or other user-approved source frame so the edit can keep moving without a question.
 - Do not use Grok to generate still images unless the user explicitly overrides for that job.
 - Do not use Kling in the default workflow unless explicitly requested.
-- If older wording says “Grok image prompt,” read it as “ChatGPT Image 2 styleframe prompt.”
+- If older wording says “Grok image prompt” or “ChatGPT Image 2 browser generation,” read it as “Codex imagegen styleframe prompt” unless the user explicitly requests otherwise.
+
+### Runway/Seedance route correction — 2026-07-06
+
+For Runway/Seedance work, use the visible logged-in web UI with Computer Use/Safari/Browser automation. Do not use the Runway MCP/app connector/API for production actions or for blocker decisions unless the user explicitly overrides this rule. Visible UI state beats connector auth state.
+
+If the user says Runway is already open/logged in on the web, use Computer Use on that visible `app.runwayml.com` UI immediately. Do not ask for connector reauth, do not call connector auth checks, and do not classify the project as blocked by connector OAuth while the web UI is available.
+
+
 
 ## Core production rules
 

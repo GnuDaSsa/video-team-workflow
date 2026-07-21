@@ -190,17 +190,59 @@ needed part:
 
 ---
 
-### Runway Web UI Reference Upload Lesson — 2026-06-12
+### Runway Web UI Reference Upload Lesson — corrected 2026-07-12
 
-When operating Runway/Seedance through Safari or Computer Use for the user's video-team pipeline, do **not** repeat the failed pattern of bulk file-picker upload or Finder drag/drop for order-critical multi-reference assets. On this Mac/session, those paths can silently register only one asset or fail to append new references.
+For the user's current no-I2V Runway/Seedance workflow, the verified first route is **Finder-frontmost direct drag/drop**, not the asset selector or file picker.
 
 Required default:
-- Use Runway's visible asset selector / Reference button and add references **one by one** in the required order.
-- **Never use the Search field inside the Reference / asset-selector modal** for this workflow. It is not a reliable attachment path, has no useful effect for local upload ordering, and can leave confusing filters/state. Leave Search untouched; if it was used, clear/reopen the modal before continuing.
-- After each add, verify the visible `IMG_1`, `IMG_2`, ... thumbnail count/order before adding the next image.
-- If only `IMG_1` appears after a multi-file or drag/drop attempt, stop and recover with the one-by-one asset selector flow; do not keep trying drag/drop/bulk upload.
-- Do not click Generate until visible thumbnails match the required reference count and order.
-- If an uploaded file appears in Recents (for example `01_seongnam...`) but not in the reference strip, select it from Recents as the next reference; do not assume upload alone attached it.
+- **HARD LOCK:** For this no-I2V team, the Finder-frontmost direct-drag state machine is mandatory. Do not improvise a Reference-tile, asset-selector, or file-picker route before completing the direct-drag preflight. If the current reference/background hashes already match, do not upload anything; use prompt/settings-only operation.
+- Stage one exact file in a small Finder window and keep Finder frontmost, visibly above or beside Safari.
+- Do **not** click Runway before the drag. Start on the Finder file icon and drag directly onto the visible empty Runway `Image N` reference slot in the background. Clicking Runway first hides Finder and breaks the route.
+- Re-read the current Finder `AXImage` coordinate for every file and the empty-slot coordinate whenever the strip changes. Identical Finder window bounds do not imply identical icon placement; never reuse the preceding file's or an old successful run's coordinates.
+- Before mouse-down, verify that the entire Runway target slot is visible and not covered by another Finder/Codex/ChatGPT window. Close or move unrelated Finder windows—especially a large `upload_only` window that can cover Image3—and keep only one small staging window away from the target.
+- If payload capture is uncertain, use a two-phase gesture: mouse-down and move to the slot, capture a held-state screenshot proving the file ghost is over the visible Runway slot, then mouse-up.
+- Wait briefly for delayed attachment, then verify the new active-strip `Image N` thumbnail. Only after the thumbnail appears may Runway become frontmost for expanded semantic-role QC.
+- For a persistent character deck, keep Image1/Image2 and replace Image3 only when the environment changes. Do not reopen or replace character references unnecessarily.
+- Never treat upload toast, Recents/library presence, or a local path as attachment proof. The active-strip thumbnail plus expanded-pixel role check are the success condition.
+- Use copy/paste only as first fallback and Web Inspector file-input only as second fallback when direct drag fails. Avoid asset-selector Search and repeated file-picker attempts.
+- Do not click Generate until reference count/order/roles and all UI settings are verified.
+- A failed drag does not authorize repeated attempts. Re-measure the current file AXImage and empty slot, remove target occlusion, verify the held file payload, and retry exactly once before any documented fallback.
+
+
+
+
+
+
+### Seedance dialogue / voice naturalness hard gate — 2026-06-30
+
+Use this whenever the user says the Seedance voice sounds AI-like, robotic, flat, 성의없음, or not like a professional actor.
+
+- Do not rely on text prompt adjectives such as “natural” or “professional voice actor” alone. They often produce polished TTS/announcer tone.
+- Preferred route: attach a real performed Korean guide as `@Audio1` for the exact block. State that `@Audio1` controls phoneme timing, cadence, breath, hesitation, room-mic distance, pauses, and emotional dynamics.
+- If no visible `@Audio1` is attached, treat native Seedance speech as `AUDIO_FAIL_DEFAULT`; generate visuals + diegetic SFX only and replace dialogue externally in CapCut/VO.
+- Keep dialogue short. One speaker owns each beat; other people react silently or with tiny breaths/laughs unless a quoted line is assigned.
+- Prompt for real Korean family-room acting: uneven syllable lengths, swallowed endings, 0.2–0.6s thinking pauses, off-axis room mic, tiny laugh leaks, natural breath.
+- Forbid announcer/campaign/public-institution tone, metallic AI, over-clean studio TTS, equal-syllable robot rhythm, sitcom laugh track, garbled Korean, relationship errors, and any BGM/music bed.
+- Audio QC is separate from visual QC. A visual PASS clip can still be used muted when audio fails.
+
+
+
+
+
+
+### V84 Seedance native-dialogue prompt-only correction — 2026-07-01
+
+Use this when the user clarifies that they did **not** ask for human VO files and wants Seedance prompting itself to generate a more natural, more human-like Korean voice.
+
+- Do not block the work on real/performed WAVs for this iteration. The active route is Seedance native Korean dialogue generation.
+- Keep the no-BGM rule: no background music, score, piano, strings, pads, jingles, or music bed. Dialogue and diegetic SFX are allowed.
+- Prompt audio as performance mechanics, not adjectives: one speaker owns each beat, exact Korean lines in quotation marks, acting notes outside quotes, uneven syllables, room distance, tiny thinking pauses, swallowed endings, laugh/breath after meaning lands.
+- Generate at least two variants per block when the previous result sounded AI-like: S1 story-readable living-room take; S2 anti-AI under-acted take with less polish and more spontaneous room speech.
+- Do not overuse pause punctuation; one ellipsis/dash per line is enough. Too many symbols can create unstable or fake rhythm.
+- Keep relationship/story locks in every prompt: Minjae is younger male sibling/uncle, sister is 누나 teasing him, baby is sister's child.
+- QC by listening: reject metallic AI smoothing, equal-syllable rhythm, announcer/campaign tone, fake hype, garbled Korean, wrong relationship, or BGM. If audio fails but visuals pass, regenerate the audio/dialogue block with the S2 prompt variant.
+
+Seongnam V84 package: `/Users/gnudas/Documents/Codex/video-team-runtime/20260629_202812_seongnam-low-birth-2026-shortform/lanes/seedance/v84_seedance_native_dialogue_prompt_regen_20260701`.
 
 
 ## Camera Language Reference
@@ -516,3 +558,341 @@ When helping users write prompts:
 4. **Explain your choices** — briefly note why you structured the prompt this way
 5. **Offer variations** — suggest a simpler or more ambitious alternative if appropriate
 6. **Remind about constraints** — especially the face restriction and file limits
+
+## Seedance2.ai Korean Guide Integration — added 2026-07-21
+
+When writing **Seedance video prompts**, incorporate the following operating rules from the Korean guide at `https://seedance2.ai/ko/guide` (retrieved 2026-07-21). Treat this as an additional source-specific checklist layered on top of the existing user video-team rules.
+
+### 1) Basic prompt formula from the guide
+Every prompt must clearly cover the two mandatory logic anchors before style language:
+
+```text
+Subject + Motion + optional Environment + optional Aesthetic + optional Camera + optional Audio
+```
+
+- **Subject**: define who/what the video is about.
+- **Motion**: define what the subject does; do not leave the clip as pure mood.
+- **Environment / Aesthetic**: describe spatial background, lighting, visual style, and atmosphere only after subject and action are clear.
+- **Camera / Audio**: add camera choreography and ambient sound/rhythm when they help immersion or timing.
+
+Default compiler rule: if a draft prompt only says mood/style, rewrite it so `Subject` and `Motion` are explicit first.
+
+### 2) Multimodal reference control
+The guide emphasizes explicit reference targeting. For every uploaded reference, state exactly **which element** is being used and **what must remain consistent**. Use ordered names matching the UI upload order: `Image 1`, `Image 2`, `Video 1`, `Audio 1`, etc.
+
+Required reference-role grammar:
+
+```text
+Reference / extract / combine / follow [Image N or Video N]'s [specific element],
+generate [scene description], while maintaining consistent [feature/motion/camera/effect].
+```
+
+Examples of role types to encode:
+- `Image N` for subject identity, product details, outfit, logo, scene/background, storyboard panel, first frame, last frame.
+- `Video N` for action choreography, camera movement, visual effect, transition behavior, or original clip to edit/extend.
+- `Audio N` for narration cadence, BGM, SFX, rhythm, or performed guide audio when applicable.
+
+If multiple references are uploaded, write a visible role map at the top of the prompt/operator card. Never rely on the model to infer which file controls identity vs environment vs camera.
+
+### 3) Video-in-video text control
+Seedance supports text overlays in T2V/I2V/R2V/V2V, but the guide's prompt shape must be made explicit when text is required. Use ordinary characters; avoid rare symbols and special glyphs.
+
+Prompt forms:
+
+```text
+Slogan/title: [exact text] + [display timing] + [screen position] + [reveal method], [text style/color/font].
+Subtitle: subtitles reading "..." appear at the bottom in sync with the audio rhythm.
+Speech bubble: [character] says "..."; a speech bubble containing the dialogue appears near the character.
+```
+
+User override for this workspace: because final Korean typography is usually CapCut-first, only generate Seedance text when intentionally testing native text, diegetic signage, speech bubbles, or temporary scratch captions. For final public-contest/MV captions, prefer editable CapCut/baked typography after video generation unless the user explicitly wants native Seedance text.
+
+### 4) Image-reference modes
+Use the guide's two image-reference categories explicitly:
+
+#### Multi-angle subject reference
+For products or characters, write:
+
+```text
+Extract/reference the [subject] from Image 1, Image 2, Image 3.
+Generate [new scene/action], while keeping the subject's consistent features.
+```
+
+Use for recurring characters, products, mascot/body/face locks, and turnaround-like references. For this user's video workflow, this does **not** replace the stricter character-sheet-first rule; approved character/model sheets still must be attached/verified before dependent recurring-character shots.
+
+#### Multi-image reference
+For scenes with several controlled elements, write each role separately:
+
+```text
+Image 1 controls [character/product/logo].
+Image 2 controls [outfit/prop].
+Image 3 controls [environment/storyboard composition].
+Generate [action] while maintaining consistent [named element] features.
+```
+
+For storyboards, state that panel compositions appear in the uploaded order. If using logo/text reference, specify persistent position and timing.
+
+### 5) Video-reference modes
+When a video is uploaded, do not just say `reference Video 1`. Use one of the guide's concrete control targets:
+
+```text
+Action reference: Follow Video 1's [action description], generate [new scene], maintain consistent action details.
+Camera reference: Follow Video 1's [camera movement], generate [new scene], maintain the same camera path/feeling.
+Effect reference: Follow Video 1's [effect description], generate [new scene], maintain the same effect trajectory/timing.
+```
+
+If a reference video controls multiple roles, list them separately: `Video 1 controls action choreography and camera movement; Image 2 controls left character; Image 1 controls right character.`
+
+### 6) Video-editing / extension / track-completion prompt forms
+For V2V or editing-style work, use the guide's precise edit verbs. Keep preservation requirements explicit.
+
+```text
+Add element: Add [desired element] at [time position] and [spatial position] in Video N.
+Remove element: Remove [element] from Video N while keeping everything else unchanged.
+Modify element: Replace [original element] in Video N with [desired element/reference], keeping motion and camera movement unchanged.
+Extend backward/forward: Generate content before/after Video N: [extension content].
+Track completion: Connect Video 1 to Video 2 to Video 3 using [transition description].
+```
+
+For track completion, remember the guide's practical constraint: up to 3 video inputs and total uploaded video duration must remain within the model limit; prompts should describe only the necessary bridge/transition rather than asking to duplicate the original segments.
+
+### 7) Source-guide QA checklist
+Before handing off a Seedance prompt/operator card, check:
+
+- Subject and motion are explicit.
+- Each reference file has a numbered role and a preservation target.
+- Text overlay requests include exact content, timing, position, display method, and style; unnecessary native text is removed for CapCut-first projects.
+- Image references distinguish subject, outfit/prop, scene, storyboard, and logo roles.
+- Video references specify action vs camera vs effect vs edit/extension role.
+- Editing prompts use add/remove/modify/extend/connect verbs and say what remains unchanged.
+- Ordered references in the prompt match visible UI thumbnail order; if not verified, fix the UI before prompting.
+
+
+
+## Higgsfield Community Video Pattern Mining — added 2026-07-21
+
+Use this section when compiling **video generation prompts** after the user asks to learn from Higgsfield community examples. Source basis: public Higgsfield community pages (`https://higgsfield.ai/community`, `/community/generations`, `/community/projects`) and the public community-approved video feed discovered from the site JS on 2026-07-21. A local study sampled 50 approved `wan2_5_video` community generations and read at least 25; the following rules synthesize patterns from at least 15 examples. Do **not** copy community prompts verbatim; extract the directing grammar only.
+
+### 1) Higgsfield-style shot contract
+Community video prompts that read as controlled usually open with concrete cinematography, not broad style adjectives. Prefer this order:
+
+```text
+[Shot size] + [camera position/mount] + [lens or framing] + [subject identity/action] +
+[environment/light/depth] + [one dominant camera path] + [physical motion layers] +
+[sound/rhythm cues] + [mood/style] + [stability/preservation constraints]
+```
+
+If a draft says only `cinematic, beautiful, dynamic`, rewrite it into camera physics: where the camera is, whether it is mounted/handheld/static/orbiting/dollying, what moves, what stays stable, and what environmental details prove motion.
+
+### 2) One dominant camera move per short clip
+The sampled community examples often succeed by committing to a single legible camera grammar for 5–10 seconds:
+
+- **Through-aperture / portal push**: camera moves fast forward through a circular frame, keyhole, gap, mouth, eye/pupil, window, doorway, or object opening. State the aperture edge, entry direction, revealed subject, and when the foreground edge leaves frame.
+- **Mounted-camera drive**: camera is fixed to a car body, wheel, dashboard, passenger side, or other moving object. Lock the camera to the object; the background streaks, vibrates, and parallax-shifts instead.
+- **Handheld intimate track**: slight tremble, small focus adjustments, forward tracking, and natural subject micro-actions such as smoking, phone interaction, walking, conversation, or glances.
+- **Slow dolly-in / dolly-out**: one precise move toward a gaze/detail or away to reveal environment, with shake-free uniform speed.
+- **Static camera, active subject**: keep the frame fixed while the actor/dancer/hand/hat/silhouette performs a simple clear action. Use when identity stability matters.
+- **Bullet-time orbit**: subject is frozen mid-action while camera orbits 180–270 degrees; include foreground occluders, background parallax, floating particles/dust/grass, lens choice, and final three-quarter angle.
+- **Pan reveal**: camera pans/rotates from subject to environment, usually revealing skyline, interior, group, or emotional context.
+
+Default rule: for Seedance/Runway prompts, name the camera move in natural language even if the UI has a motion preset or Higgsfield-style `motion_id`. The preset is not a substitute for direction.
+
+### 3) Normal-speed vs frozen-state must be explicit
+Higgsfield examples repeatedly specify whether the subject remains at normal speed, moves subtly, or is frozen in suspended time. Add one of these states per beat:
+
+```text
+Subject motion state: normal-speed stillness with micro-expression / steady walk / simple hand action / frozen mid-air bullet-time / static silhouette dance / vehicle-mounted rush.
+```
+
+For close-ups and fragile faces/hands, prefer micro-action: breath, eye movement, hair, smoke, fabric, hand settling, tiny head turn. For high-energy action, add environmental motion instead of over-animating anatomy.
+
+### 4) Physical motion layers beat generic mood
+Add 2–4 concrete motion layers that make the generated video feel filmed:
+
+- smoke inhaled/exhaled, dust clouds, rubber particles, grass blades, airborne particles;
+- wind through hair/clothes, train sway, car vibration, tire rotation, streetlight flicker;
+- reflections on metal/glass, neon signs sliding across windows, sunset color shift;
+- foreground occluders passing camera, aperture edges exiting frame, background parallax;
+- ambient sound bed: traffic, train rolling, engine hum, wind, distant city, murmurs.
+
+Do not add many unrelated effects. Pick layers motivated by the camera move and subject action.
+
+### 5) Prompt templates distilled from community examples
+
+#### Through-aperture / reveal
+```text
+The camera starts close to [aperture/object edge], then moves fast straight forward through [opening].
+As the foreground edges leave the frame, it reveals [subject] in [environment].
+[Subject] remains [motion state]; [small physical elements] move naturally.
+Lighting: [specific]. Camera: [lens/framing], smooth/handheld as needed.
+End on [clear final composition].
+```
+
+#### Mounted vehicle/object camera
+```text
+The camera is fixed/mounted to [vehicle/object position], [angle/lens].
+[Vehicle/object] moves [speed/direction]. The camera stays locked to the frame,
+while [road/buildings/lights/background] streak/parallax past.
+Add [vibration/wind/tire/engine/sound] cues. Keep subject/vehicle geometry stable.
+```
+
+#### Bullet-time orbit
+```text
+[Subject] is frozen mid-[action], suspended in time.
+The camera orbits [180/270] degrees from [start angle] to [final angle] at [distance],
+with [foreground occluders] and [background] creating parallax.
+[Particles/dust/hair/cloth] hang in the air; [lens/depth] isolates the subject.
+End on [three-quarter/profile/detail] with the action still frozen.
+```
+
+#### Static-frame subject action
+```text
+Static camera, [shot size], [lens/framing]. [Subject] performs one simple action: [action].
+The background stays stable; only [body part/prop/environment micro-motion] moves.
+Lighting and texture: [specific]. No camera drift, no extra action, no new props.
+```
+
+### 6) Safety/adaptation rule for community motifs
+Some community examples use celebrity/real-person cameo dialogue or likeness. For this user's production prompts, do not reproduce real-person likeness, living-celebrity cameos, or branded/IP elements unless the user has explicit rights and requests it. Convert the pattern into a fictional archetype: `a famous tech-founder-like fictional entrepreneur`, `a glamorous fictional actor`, etc., or remove the cameo.
+
+### 7) Higgsfield-pattern QA
+Before handing off a prompt influenced by Higgsfield examples, verify:
+
+- At least one exact shot size or camera position is stated.
+- Exactly one dominant camera move controls the clip unless it is explicitly a multi-shot montage.
+- Subject motion state is explicit: normal-speed / micro / static / frozen / vehicle-mounted.
+- The prompt includes physical motion layers, not just mood.
+- If an aperture/portal move is used, the entry object, reveal target, and final composition are clear.
+- If mounted-camera is used, camera is locked to the object and background motion carries speed.
+- If bullet-time is used, freeze state, orbit degrees, parallax, particles, and final angle are specified.
+- Real-person/IP cameos from community examples are not copied into production prompts.
+
+
+## Higgsfield Deep Community Research Upgrade — added 2026-07-21
+
+Apply this after the first Higgsfield pattern section when a prompt needs richer video direction, especially for Seedance/Runway/I2V clips, ad/UGC videos, transition shots, vehicle/speed shots, or action/motion-control shots.
+
+Research basis: deeper public Higgsfield community study on 2026-07-21: 126 deduplicated video-like community prompts (`wan2_5_video`, `kling3_0`, `marketing_studio_video`), 100 public motion preset names, 51 project publications, and selected motion samples. Do not copy prompts verbatim; use the directing grammar.
+
+### 1) Camera grammar is a routing decision
+Before writing style, choose the clip's **camera family**:
+
+| Clip role | Camera family | Prompt obligation | Avoid |
+|---|---|---|---|
+| Identity/emotion close-up | static / slow push / macro-in | micro motion, crop lock, lens/focus behavior | fast zoom, new face/body |
+| Speed / vehicle / travel | mounted-object / Car Grip | camera fixed to object, background parallax, vibration, wind/engine | camera floating independently |
+| Reveal / transition | through-object / aperture / portal | entry geometry, object edge, reveal target, final composition | vague “portal effect” |
+| Action highlight | bullet-time / orbit / arc | frozen or exact motion state, orbit degrees/path, parallax, particles | normal-speed generic orbit |
+| Fashion/group pose | dolly/pan/static | pose hierarchy, subtle gestures, environment depth | over-animated crowd |
+| UGC/product proof | handheld phone / selfie / jump cuts | hook, product handling, tactile proof, imperfect phone realism | over-polished cinema look |
+| Public/institution | restrained static/dolly/pan | dignified physical action, clarity, no spectacle | blockbuster chaos |
+| MV/music beat | beat-selected camera move | rhythm cue, one dominant move, motivated sensory layer | random effects |
+
+### 2) Duration-to-complexity budget
+Use duration as a hard complexity budget:
+
+- **5–6s**: one action or one camera trick. No full story arc.
+- **7–10s**: one continuous setup → action → reveal, or 2–3 clean beats.
+- **11–15s**: UGC/ad sequences may use hook → proof → payoff or short montage. Every beat still needs shot size and action.
+
+If the prompt contains more actions than the duration can hold, split the block or remove actions.
+
+### 3) Translate motion/preset names into physical language
+Higgsfield exposes names such as `Handheld`, `Static`, `Bullet Time`, `Dolly In/Out/Left/Right`, `Pan Left/Right`, `Car Grip`, `Through Object In/Out`, `Eyes In`, `Mouth In`, `FPV Drone`, `Arc Right`, `Face Punch`, `Building Explosion`, and transition families (`Raven/Splash/Flame/Melt/Smoke/Hand/Jump/Roll/Display Transition`).
+
+Never rely on a preset name alone. Translate it into:
+
+```text
+Camera mount/position + direction/path + subject motion state + foreground/background relationship + physical motion layers + final frame.
+```
+
+Examples of translation, not copy targets:
+- `Handheld` → subtle operator tremble, focus breathing, human inertia, not random shake.
+- `Static` → locked frame, one simple action, stable background.
+- `Car Grip` → camera bolted to car/wheel/object; environment streaks and vibrates around it.
+- `Through Object In/Out` / `Mouth In` / `Eyes In` → aperture geometry, entry/exit edge, transition target, final composition.
+- `Bullet Time` / `Arc Right` → frozen subject, orbit degree/path, parallax layers, particles, final angle.
+- `FPV Drone` / `Flying Cam` → continuous traversable path, obstacles, altitude, acceleration, stabilization.
+- VFX/action presets → cause → effect → aftermath, with debris/lighting/safety limits.
+
+### 4) Physical motion layer menu
+Community prompts repeatedly use small physical evidence to make a clip feel filmed. Add **2–4 motivated layers**, not a pile:
+
+- hair/fabric/breath/smoke for human micro-motion;
+- dust/debris/particles/grass/rubber for impact and sports;
+- wind/rain/train sway/car vibration/engine hum for travel or speed;
+- reflections/neon/flicker/shadows/lens flare for lighting movement;
+- foreground occluders/background parallax/aperture-edge exit for camera motion;
+- ambient sound bed: traffic, room tone, train, engine, murmurs, crowd, rain.
+
+### 5) UGC / product / ad grammar
+For product or creator-style videos, do **not** use the same grammar as cinematic MV shots. Use:
+
+```text
+Vertical 9:16, iPhone/front-camera or handheld phone POV, authentic amateur feel,
+hook in 0–2s, product visible early, tactile proof action, short spoken line,
+real room/daylight details, slight handheld imperfection.
+```
+
+Product proof actions: rotate product, tap, sip, crunch, open/tear wrapper, unbox, show handle/lid/logo/material, compare before/after, fit check, app screen tap, mirror try-on.
+
+UGC negatives when relevant: no cinematic grading, no filters, no visible filming device in mirror, no over-polished studio look, no fake influencer smile, no unreadable app UI, no product morphing, no wrong logo/text.
+
+### 6) Negative tail as a menu, not a wall
+The sampled `wan2_5_video` examples often repeat: overexposed, blurred details, subtitles, jpeg artifacts, unnatural motion, extra fingers, bad hands, still image, cluttered background, duplicate limbs, random text, deformed face, asymmetrical eyes, bad anatomy, morphing, face distortion.
+
+For this workflow, choose only the relevant risks:
+- human close-up → no new facial structure, no face distortion, no asymmetrical eyes, no bad hands if hands visible;
+- hand/product → no extra fingers, no product morphing, no logo/text corruption;
+- transition → no random object substitution, no location reset, preserve final target;
+- public/institution → no logos/readable signs/flags/partisan symbols unless intended, no spectacle;
+- MV/CapCut workflow → no generated subtitles/text unless intentionally diegetic or scratch.
+
+### 7) Deep Higgsfield QA gate
+Before finalizing a prompt influenced by this research, answer:
+
+1. What is the clip role? identity / reveal / speed / action / product proof / UGC hook / atmosphere / montage / transition.
+2. What is the single dominant camera family?
+3. Is the action budget plausible for the selected duration?
+4. Is subject motion state explicit?
+5. Are there 2–4 physical motion layers tied to the shot, not random effects?
+6. If a motion preset name is used, has it been translated into camera physics?
+7. Is the negative tail role-specific rather than a generic wall?
+8. Are real-person/IP cameos removed or converted to fictional/authorized archetypes?
+
+
+
+### 8) Deep temporal grammar upgrade — added 2026-07-21
+
+The second corpus pass (126 video prompts) shows that strong community prompts use a **time-ordered action chain**, not a flat noun list:
+
+```text
+START STATE → ACTION 1 → physical consequence → CAMERA BEAT → ACTION 2 → END FRAME
+```
+
+- Use explicit temporal verbs such as `starts with`, `then`, `as`, `while`, `after`, and `finally` when a clip contains more than one action.
+- Separate simultaneous actions into three clauses: subject action, camera action, and environment action. Do not let the subject, camera, and world all share one vague “moves.”
+- Every action should produce a visible consequence before the next beat; if it cannot fit the selected duration, remove beats rather than asking for faster everything.
+- Finish with a destination: final crop, final gaze, final reveal, final object position, or final camera distance.
+- Treat `slowly/gently/quickly/smoothly` as modifiers of a named action, never as the action itself.
+
+### 9) Subject / camera / world lanes
+
+Compile every prompt into three independent lanes before merging:
+1. **Subject lane** — body state, exact action, gaze/gesture, speed, identity/costume lock.
+2. **Camera lane** — mount/position, shot size, path, speed, lens/framing, final composition.
+3. **World lane** — background relative motion, light change, wind/hair/fabric, smoke/dust/rain, reflections, diegetic sound.
+
+This prevents subject/camera speed confusion, floating vehicle cameras, and ambient effects becoming the main action.
+
+### 10) Tactile proof and positive geometry
+
+For product, fashion, lifestyle, and object shots, specify the contact chain: `reach → grip/turn/open → material responds → use/look → proof detail`. Preserve hand-object contact, label orientation, object sidedness, exact crop, and final readable angle. Write positive locks first (`camera locked to car frame`, `screen on front glass`, `one hand remains on handle`, `subject stays frozen while background parallax shifts`); add only a short role-specific negative tail afterward.
+
+### 11) Duration-to-beat compiler
+
+- **5–6s:** one setup + one payoff; at most two major subject verbs.
+- **7–10s:** setup → one interaction → one camera/reveal payoff; three major verbs maximum.
+- **11–15s:** setup → interaction → consequence/reveal or a paced mini-sequence, still with one dominant camera family.
+
+If a prompt exceeds the beat budget, split it into clips rather than compressing every action into one generation.

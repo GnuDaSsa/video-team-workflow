@@ -27,13 +27,20 @@ Use these roles for any MV project, not only the current project.
 
 For the user's normal MV production team, this routing is a standing rule:
 
-- **Images / styleframes / character sheets / start frames = ChatGPT image generation in the user's logged-in ChatGPT browser session.**
-- **Video generation / image-to-video clips = Grok Imagine only, using the selected ChatGPT-generated image as the input frame.**
+- **Images / styleframes / character sheets / start frames = Codex `imagegen` / built-in `image_gen` by default.**
+- **Video generation / image-to-video clips = Grok/Runway/Seedance I2V only, using the selected Codex imagegen output as the input frame.**
 - **Do not use Grok for image generation in this workflow** unless the user explicitly overrides the rule for that specific job.
 - **Do not start Grok video generation before the image is generated, saved, QA'd, and given an organized filename.**
-- **For every new MV/video project, open a new ChatGPT tab/new chat for ChatGPT Image 2 generation.** Do not continue in an old unrelated image-generation thread.
-- **Never request 2x2 grids, collages, contact sheets, multi-panel sheets, or multiple images in one ChatGPT Image 2 production prompt.** Generate each production styleframe as a single standalone 16:9 image: one cut, one prompt, one saved file.
+- **For every new MV/video project, generate character sheets/styleframes through Codex imagegen first.** ChatGPT web generation is fallback/manual only when imagegen is unavailable or explicitly requested.
+- **Never request 2x2 grids, collages, contact sheets, multi-panel sheets, or multiple images in one Codex imagegen production prompt.** Generate each production styleframe as a single standalone image: one cut, one prompt, one saved file. Character/model sheets may be multi-panel references.
 - Work sequentially by version/cut when the user asks for sequential execution; do not silently parallelize versions.
+
+## Runway/Seedance operation route — Computer Use only — 2026-07-06 correction
+
+When this team uses Runway/Seedance, operate the user's logged-in `app.runwayml.com` web UI through Safari/Browser/Computer Use. Do not use Runway MCP/app connector/API for production submission, polling, upload, download, or auth status unless the user explicitly overrides this for that turn.
+
+Visible UI evidence is the source of truth: reference thumbnails/order, prompt field, mode/settings, Generate button state, queue/generation/result cards. If a connector says reauthentication is required but the web UI is open and logged in, ignore the connector and continue via Computer Use.
+
 
 ## Operating rule
 
