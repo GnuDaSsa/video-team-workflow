@@ -42,9 +42,14 @@ def osa(script: str) -> tuple[int, str, str]:
 # Resolve the browser from where the Runway tab actually is. (2026-07-28)
 
 RUNWAY_HOST = 'app.runwayml.com'
+# The two browsers use different word order, not just different verbs:
+#   Safari:  do JavaScript "<js>" in current tab of front window
+#   Chrome:  execute active tab of front window javascript "<js>"
+# Getting this wrong yields a -1723 "access not allowed" that *looks* like a
+# permission problem and hides Chrome's real, actionable message.
 _BROWSERS = {
-    'Google Chrome': {'tab': 'active tab of front window', 'verb': 'execute javascript'},
-    'Safari':        {'tab': 'current tab of front window', 'verb': 'do JavaScript'},
+    'Google Chrome': {'tmpl': 'execute active tab of front window javascript {js}'},
+    'Safari':        {'tmpl': 'do JavaScript {js} in current tab of front window'},
 }
 
 
@@ -77,8 +82,8 @@ TARGET_APP = resolve_target_app()
 
 def browser_js(js: str) -> tuple[int, str, str]:
     """Run JS in the Runway tab using the target browser's own AppleScript dialect."""
-    spec = _BROWSERS[TARGET_APP]
-    return osa(f'tell application "{TARGET_APP}" to {spec["verb"]} {json.dumps(js)} in {spec["tab"]}')
+    tmpl = _BROWSERS[TARGET_APP]['tmpl']
+    return osa(f'tell application "{TARGET_APP}" to ' + tmpl.format(js=json.dumps(js)))
 
 
 def evidence(args, action: str, expected: str, observed: str, verdict: str) -> None:
