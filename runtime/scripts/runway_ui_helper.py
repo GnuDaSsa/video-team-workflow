@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Deterministic Runway/Safari synthetic-input helper (doctrine §2b enforced in code).
+"""Deterministic Runway synthetic-input helper (doctrine §2b enforced in code).
+
+Targets whichever browser actually holds the Runway tab (Chrome by default since
+2026-07-21; override with RUNWAY_BROWSER). Each browser's AppleScript dialect
+differs, so all JS goes through browser_js().
 
 Agents must NOT hand-roll osascript for clipboard/keystroke/picker work. Every
 command here bundles activate + frontmost-verify + action ATOMICALLY in one
@@ -7,9 +11,9 @@ osascript, refuses to fire keys when focus is wrong, and appends evidence JSONL.
 
 Commands:
   frontmost                              print frontmost app
-  escape                                 send ESC to Safari (verified)
-  paste-image  --png F                   Route C: clipboard=PNG data -> verified Cmd+V into Safari
-  paste-text   --file F                  clipboard=text -> verified Cmd+V into Safari
+  escape                                 send ESC to the Runway browser (verified)
+  paste-image  --png F                   Route C: clipboard=PNG data -> verified Cmd+V into the browser
+  paste-text   --file F                  clipboard=text -> verified Cmd+V into the browser
   js-click-file-input [--index N]        Route B: do JavaScript click on real input[type=file]
   js-insert-prompt --file F [--clear]    prompt Route B: execCommand insertText (React-safe)
   picker-go    --path P                  verified file-picker sheet -> Cmd+Shift+G -> path -> Return
