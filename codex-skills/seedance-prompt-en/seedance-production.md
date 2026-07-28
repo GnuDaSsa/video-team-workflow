@@ -34,7 +34,7 @@ If Computer Use itself is unavailable, stop with `BLOCKED_CODEX_COMPUTER_USE_UNA
 7. If a file, slot, order, or character-sheet thumbnail is wrong, stop and recover the deck. Do not Generate.
 8. **Deck-overlap check:** compare the visible strip against the previous block's deck. More than one shared scene reference means two near-identical clips are about to be produced — rebuild the deck before Generate.
 9. **Duplicate check:** no two thumbnails in the strip may be the same image. Identical thumbnails mean a file was attached repeatedly to fill a count — remove the duplicates and submit the honest deck.
-10. **Role-map truth check:** each visible thumbnail must actually be what the role map claims. A character sheet sitting in a "current-scene composition" slot, or three roles pointing at one picture, means the map is fiction — stop and rebuild.
+10. **Role-map truth check:** each visible thumbnail must actually be what the role map claims. Three roles pointing at one picture, or a multi-panel sheet where a single-scene composition should be, means the map is fiction — stop and rebuild. The identity slot holds the `CHAR_<ID>_PROVIDER_REF_R<n>` file; a grid of panels in that slot is the wrong file.
 
 `ImageN` order is an attachment record, not a narrative sequence — the prompt must not treat the numbering as a storyboard to interpolate or replay (`GENERAL_REFERENCE_MODE`).
 

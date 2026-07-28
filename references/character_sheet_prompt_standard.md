@@ -26,6 +26,24 @@ Every character sheet prompt must specify:
 
 ## Required sheet types
 
+### CHAR_PROVIDER_REF — the one sheet cleared for provider upload
+
+**Mandatory. A character sheet set is incomplete without it**, and it is the only asset from this standard that may be attached to Seedance/Runway.
+
+Every other sheet here is a multi-panel design document with labels, callouts and panel gutters. Those are for approval and for conditioning imagegen; a video model reads their text and grid as things to draw. Rather than asking downstream to judge which file is safe, this standard emits one that provably is.
+
+Prompt should request:
+- **one figure, one view** — a clean full-body or 3/4 identity shot of the approved design (a matching head-and-shoulders crop may be produced as `_R<n>_HEAD`);
+- neutral or off-white seamless background, flat even lighting, no set, no props beyond the character's signature items;
+- **zero text**: no name plates, labels, callouts, arrows, palette chips, measurement lines, logos, watermarks, panel borders or gutters;
+- full bleed with generous margins so any crop stays clean; nothing touching an edge;
+- identical face silhouette, eye spacing, hair mass, costume colours, body scale and signature props as the approved turnaround.
+
+Reject and regenerate if the output contains any readable glyph, panel seam, multi-figure layout, or a white gutter that would survive a crop.
+
+If this sheet does not exist for a character that downstream needs, stop with `BLOCKED_NO_PROVIDER_SAFE_SHEET` and generate it. Do not substitute a turnaround, bible page, or a crop taken out of a multi-panel sheet.
+
+
 ### CHAR_TURNAROUND
 Prompt should request:
 - full-body turnaround sheet: front, 3/4 front, profile, 3/4 back, back;
@@ -97,9 +115,9 @@ Negative constraints:
 
 ## Naming and provenance
 
-Use `CHAR_<ID>_<SHEET_TYPE>_R<n>`. Record imagegen generation ID, prompt hash, attached source reference paths/hashes, dimensions, bytes and output SHA256. If the approved identity reference attachment cannot be verified, mark `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED`.
+Use `CHAR_<ID>_<SHEET_TYPE>_R<n>`. The provider-safe sheet is `CHAR_<ID>_PROVIDER_REF_R<n>` — **downstream selects by that name, never by eye**. Anything without `PROVIDER_REF` in its filename is internal-only. Record imagegen generation ID, prompt hash, attached source reference paths/hashes, dimensions, bytes and output SHA256. If the approved identity reference attachment cannot be verified, mark `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED`.
 
 ## Route boundary
 
-- Stable I2V runtime: these assets are identity sources for Codex imagegen styleframes **and are attached to Seedance with those styleframes** when the character appears (2026-07-28). Only the clean, text-free production sheet or a deterministic crop of it may be uploaded — never the dense Bible page.
+- Stable I2V runtime: these assets are identity sources for Codex imagegen styleframes, and `CHAR_<ID>_PROVIDER_REF_R<n>` is additionally attached to Seedance alongside the styleframes when the character appears (2026-07-28). Downstream attaches the `PROVIDER_REF` file by name; the other sheet types never leave this stage.
 - No-I2V Reference-Native runtime: governed separately by `/Users/gnudas/Documents/Codex/no-i2v-team-runtime/runtime/references/character_reference_standard.md`; only its locked `PROVIDER_SAFE_REF` tier may be uploaded directly.

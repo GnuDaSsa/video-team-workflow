@@ -72,18 +72,17 @@ Promoted from the operating rules that were actually producing clips in the inde
 - `@ImageN` numbering is **not** a narrative sequence. Ordered references are independent anchors for look, palette, space, props, and plausible action — never a storyboard to interpolate, match-cut, or replay in order (`GENERAL_REFERENCE_MODE`).
 - This gate **supersedes any rule that forbids uploading character sheets to Runway.** Sheets are required multi-reference inputs when a recurring character appears.
 
-### Which sheet may be uploaded
+### Which sheet to attach
 
-The character-sheet standard produces two outputs, and only one of them is a Runway input.
+Attach the file named **`CHAR_<ID>_PROVIDER_REF_R<n>`**. Select it by name, not by eye.
 
-| Output | Upload to Runway? |
-|---|---|
-| Dense AAA character **bible page** — hero pose, callouts, labels, lore, palette blocks | **Never.** Its text, labels, and panel grid corrupt the generation. Approval and design-lock only. |
-| **Clean production sheet** — neutral/off-white background, flat lighting, no readable text, crop-safe | **Yes — this is what it was made for.** Attach it, or a deterministic crop of it, as the identity anchor. |
+The character-sheet standard produces one sheet built specifically for provider upload — single figure, neutral background, flat lighting, zero text or panel borders — plus several multi-panel design sheets (turnaround, expressions, prop/costume, bible page) whose labels, callouts and gutters a video model would try to draw. Only the `PROVIDER_REF` file leaves that stage.
 
-Same bar as the reference-native runtime's `PROVIDER_SAFE_REF` tier: no text, no labels, flat-lit, derived from the approved master.
+If no `PROVIDER_REF` sheet exists for a character you need, that is an upstream gap: stop with `BLOCKED_NO_PROVIDER_SAFE_SHEET` and have it generated. Do not improvise by attaching a turnaround, or by cropping a panel out of a multi-panel sheet.
 
-The clean sheet **does not replace** the per-cut styleframe. Attach `styleframe(s) + clean sheet` together — the styleframe carries the scene, the sheet carries the identity.
+Spec and generation rules: `runtime/references/character_sheet_prompt_standard.md`.
+
+The sheet **does not replace** the per-cut styleframe. Attach `styleframe(s) + PROVIDER_REF` — the styleframe carries the scene, the sheet carries the identity.
 
 ## Generate-ready queue observer protocol
 
