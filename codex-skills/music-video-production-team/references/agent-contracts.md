@@ -16,9 +16,9 @@ Owns recurring-character identity, hero approval, character sheets, and attachme
 Owns GPT image prompts, global style locks, negative prompts, and still-frame batch planning.
 
 Standing tool rule for the user's MV team:
-- Generate MV stills, start frames, character references, and character sheets with ChatGPT/GPT Images in the user's logged-in ChatGPT browser session.
+- Generate MV stills, start frames, character references, and character sheets with Codex `imagegen` / built-in `image_gen` through the file-backed non-GUI route. Do not open or activate a browser for this step.
 - Do not use Grok as the image generator in the default MV workflow.
-- Save every approved ChatGPT image with an ordered, descriptive filename before handing it to Motion/I2V.
+- Save every approved image with an ordered, descriptive filename before handing it to Motion/I2V.
 
 ## Image QA Agent
 Owns pass/fail selection, visual drift diagnosis, and regeneration deltas.

@@ -148,8 +148,8 @@ Outputs:
 
 Rules:
 - 16:9 by default for MV frames.
-- For the user's MV pipeline, generate images with ChatGPT/GPT Images in the logged-in ChatGPT browser session by default; Grok is not the image generator.
-- For a new project, use a new dedicated ChatGPT tab/new chat for image generation so prompts, downloadable files, and context do not mix with older projects.
+- For the user's MV pipeline, generate images with Codex `imagegen` / built-in `image_gen` through the file-backed non-GUI route by default; Grok is not the image generator.
+- Do not open or activate a browser for still-image generation. Save the returned image directly into the project artifact folder with an ordered, descriptive filename before handing it to I2V.
 - Save Codex imagegen stills into the project image folder with ordered, descriptive filenames before handing them to I2V.
 - Do not batch multiple cut images into one prompt. If a prompt says “generate exactly 4 separate images,” rewrite it into four separate one-cut prompts before generation.
 - Fast Codex imagegen production may use up to four separate imagegen calls in sequence, each call for exactly one standalone image for one cut, then QC those four independent outputs together. This is batching of requests, not a single multi-image prompt.
@@ -255,7 +255,7 @@ The user's project feedback is cumulative team memory. When the user says a prod
 
 Current standing rules learned from the `mv-low-signal` workflow:
 
-0. **Tool routing is fixed for MV production.** Image/styleframe generation belongs to ChatGPT/GPT Images in the logged-in ChatGPT browser session. Grok is reserved for image-to-video generation from those saved stills. Do not let Grok become the image generator unless the user explicitly says so for that job.
+0. **Tool routing is fixed for MV production.** Image/styleframe generation belongs to Codex `imagegen` / built-in `image_gen` through the file-backed non-GUI route. Grok is reserved for image-to-video generation from those saved stills. Do not open/activate a browser for image generation, and do not let Grok become the image generator unless the user explicitly says so for that job.
 1. **Prevent missing media by default.** Deliver self-contained packages: final master MP4, clean/no-subtitle master when relevant, `segments/`, `audio/`, `edit_decision_list.csv`, review contact sheet, key review frames, and notes. CapCut drafts should reference draft-local or package-local media, not temporary downloads/cache.
 2. **Do not arbitrarily limit scene count.** Decide cut count from song length, beat density, lyric sections, and story needs. For a full ~100s MV, 35 cuts may be too few; prefer enough segments to make the edit feel dynamic, while preserving longer story-anchor shots where needed.
 3. **Convert liked shots into structural anchors.** If the user identifies a shot as especially good, reuse its underlying creative principle as a story beat/chorus anchor/visual motif, not just a decorative insert.
@@ -360,10 +360,10 @@ Selected still:
 ## Web operation policy
 
 When browser control is available and the user has authorized automation:
-- operate GPT Images, Grok, Gemini, or other tools directly;
-- do not ask before routine generations;
+- use it only for explicitly browser-bound operations such as Runway/Grok I2V, CapCut, or a user-requested fallback;
+- never open or activate a browser for the default still-image generation route;
 - stop only for login, payment, captcha, file permissions, safety, or approval gates;
-- summarize candidates with links/screenshots/file names.
+- summarize candidates with links/screenshots/file names when a browser-bound operation was actually used.
 
 ## Language rules
 

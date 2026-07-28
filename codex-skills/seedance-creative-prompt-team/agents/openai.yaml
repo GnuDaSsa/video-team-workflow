@@ -1,0 +1,7 @@
+interface:
+  display_name: "Seedance Creative Prompt Team"
+  short_description: "창의적 시댄스 프롬프트 멀티에이전트"
+  brand_color: "#7C3AED"
+  default_prompt: "Use $seedance-creative-prompt-team to author a Creative Seedance multi-reference prompt package with the six-role pipeline, then hand READY packages to seedance-prompt-en production for Runway execution."
+policy:
+  allow_implicit_invocation: true
