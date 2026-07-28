@@ -173,7 +173,15 @@ Seedance final prompts must contain only video-relevant viewing instructions. Do
 2. **2순위 — 클린 프로덕션 시트 세부 규격**: `/Users/gnudas/Documents/Codex/video-team-runtime/runtime/references/character_sheet_prompt_standard.md` (CHAR_TURNAROUND/EXPRESSIONS/POSE_ACTION/PROP_COSTUME 레이아웃, 네거티브 블록).
 3. **역할 계약 참고**: `~/.codex/skills/videodirector/SKILL.md`·`~/.codex/skills/music-video-production-team/SKILL.md`의 Character Creator 항목.
 
-규칙: 프롬프트 저작은 위 표준대로 lane이 직접(Sol bridge 금지 — bridge도 CHAR_*를 거부한다). **실행 경로는 §3의 표준 CLI 백그라운드 생성** — 스킬 문서에 남은 "ChatGPT Image 2 웹 브라우저" 문구는 legacy이며 본 파일이 이긴다. 완성 시트는 §4.3의 직접 업로드 금지 규칙 적용(Seedance 입력물이 아니라 styleframe 생성 지시·identity QC 기준으로만 사용).
+규칙: 프롬프트 저작은 위 표준대로 lane이 직접(Sol bridge 금지 — bridge도 CHAR_*를 거부한다). **실행 경로는 §3의 표준 CLI 백그라운드 생성** — 스킬 문서에 남은 "ChatGPT Image 2 웹 브라우저" 문구는 legacy이며 본 파일이 이긴다.
+
+**완성 시트의 용도 (2026-07-28 정정)**: 2종 출력 중 ②클린 프로덕션 시트는 애초에 **Seedance/I2V identity lock을 위해** 만드는 물건이다. 따라서 반복 캐릭터가 등장하는 Seedance 생성에는 ②를 장면 레퍼런스와 함께 **항상 첨부**한다(§4.3).
+
+- **①고밀도 바이블 페이지는 어떤 경우에도 Runway에 올리지 않는다.** 텍스트·라벨·콜아웃·패널 격자가 생성물을 오염시킨다. 승인·설계 잠금 전용이다.
+- 올리는 것은 ②뿐이다: 중립/오프화이트 배경, 플랫 조명, 읽히는 텍스트 없음, crop-safe. no-I2V 팀의 `PROVIDER_SAFE_REF` 등급과 같은 기준이다.
+- ②는 컷별 styleframe을 **대체하지 않는다**. 표준 I2V 팀은 여전히 시트를 조건으로 styleframe을 만들고, Seedance에는 `styleframe + ②`를 함께 올린다.
+
+> 이전에 이 문단은 "완성 시트는 Seedance 입력물이 아니다"로 끝났다. 같은 문단이 인용하는 표준은 ②의 존재 이유를 "Seedance/I2V identity lock용"이라고 정의하므로, 그 문장은 ②를 무용지물로 만드는 자기모순이었다. 금지 조항은 원래 no-I2V 팀과의 경계를 긋기 위한 것이었는데(그 팀만 시트를 직접 올린다), 표준 I2V 팀 쪽으로 번져 첨부 자체를 막았다.
 
 ### 3a-1. Character-sheet-first hard gate — 2026-07-06 correction
 

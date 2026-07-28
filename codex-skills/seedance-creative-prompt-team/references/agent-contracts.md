@@ -17,11 +17,11 @@ Owns:
 Must:
 - start from a concrete camera situation, not adjective stacks
 - keep Creative as default unless fragility requires Standard
-- default every package to multi-ref **15s**, **Audio ON / no score requested**, naturalism-first
+- default every package to multi-ref **15s**, **Audio ON / soundscape named**, naturalism-first
 - declare look medium so texture rules route correctly
 - keep creative room open after identity lock; do not over-cage references
 - forbid generic visual glue between unrelated scenes
-- forbid BGM/score language in packages and prompts
+- require the package to name the intended soundscape
 
 Must not:
 - write final prompt text before Camera + Physics are set
@@ -94,13 +94,13 @@ Must not:
 - dump random VFX menus
 - use repeated light-match transitions as default scene glue
 - replace missing action with style adjectives
-- pad emptiness with BGM or score suggestions
+- pad emptiness with unmotivated sound
 
 ## Prompt Composer
 
 Owns:
 - final visual-only English prompt
-- settings fields (default 15s multi-ref; Audio: ON; diegetic SFX/room tone via prompt, no score; look medium; ratio/resolution)
+- settings fields (default 15s multi-ref; Audio: ON; soundscape directed in the prompt; look medium; ratio/resolution)
 - exit composition sentence and next-scene handoff line
 - package assembly into the shared schema
 - naturalism/texture notes field
@@ -110,21 +110,21 @@ Must:
 - keep 700–1800 chars preferred, ≤3500 hard limit
 - preserve sheet identity: face silhouette, hair mass, age impression, costume, prop handling
 - keep names, captions, provenance, and QC language out of the Runway prompt
-- write `15s multi-ref; Audio: ON; diegetic SFX/room tone via prompt, no score` unless an explicit exception is documented
+- write `15s multi-ref; Audio: ON; soundscape directed in the prompt` unless an explicit exception is documented
 - include medium-aware texture/naturalism language when the look is live-action
 
 Must not:
 - invent missing references
 - rewrite camera family or physics without returning to owning roles
 - claim the package is production-complete
-- insert BGM, score, or unexplained dialogue
+- insert unexplained dialogue
 
 ## Prompt Critic
 
 Owns:
 - READY / REVISE verdict
 - creative QA gate
-- pollution scan (names, captions, provenance, model names, generic negatives, BGM language)
+- pollution scan (names, captions, provenance, model names, generic negatives)
 - duration-budget feasibility check (15s default)
 - naturalism/texture check by look medium
 - package completeness against handoff schema
@@ -133,7 +133,7 @@ Must:
 - fail mood-only drafts
 - fail missing character-sheet gates
 - fail multi-family camera chaos and empty physics
-- fail packages whose settings line is missing `Audio: ON`, says audio off, or silently uses non-15s duration
+- fail packages whose settings line is missing `Audio: ON`, says audio off, or silently uses non-15s duration; do not fail a package for requesting music
 - fail live-action packages with no texture/naturalism attention
 - name the owning role(s) for each revision item
 

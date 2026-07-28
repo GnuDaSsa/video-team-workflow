@@ -1,5 +1,7 @@
 # Character sheet prompt standard for video-team image lanes
 
+For live-action casting and anti-AI QC, also read `/Users/gnudas/wiki/concepts/live-action-character-authenticity-casting-standard.md`. This stable I2V runtime uses these sheets to generate and verify sheet-conditioned production styleframes, and also attaches the clean production sheet to Seedance alongside those styleframes whenever the character appears. Dense Bible/master pages are never Runway inputs.
+
 Research basis:
 - A model sheet / character sheet is used in animation, comics, and games to standardize a character's appearance, poses, and gestures across multiple artists and scenes; it prevents off-model drift and supports continuity.
 - Production character sheets are not beauty key art or narrative scene frames. They are neutral design references: repeated same character, same proportions, same costume, clean background, orthographic/controlled views, and detail callouts.
@@ -26,7 +28,7 @@ Every character sheet prompt must specify:
 
 ### CHAR_TURNAROUND
 Prompt should request:
-- full-body turnaround sheet, 4 orthographic poses in a row: front view, 3/4 front view, profile side view, back view;
+- full-body turnaround sheet: front, 3/4 front, profile, 3/4 back, back;
 - neutral standing pose or relaxed A-pose, arms visible, legs visible, feet on same baseline;
 - same head size, same height, same outfit, same accessories in every view;
 - no perspective exaggeration, no action pose, no cropped limbs, no background scene.
@@ -38,6 +40,9 @@ Prompt should request:
 - mouth mostly closed or minimally open unless dialogue is required;
 - identical hair silhouette, eye shape, face shape, skin tone, accessories;
 - neutral background and even lighting.
+
+### CHAR_HEAD_FACE
+Prompt should request neutral front, 3/4, profile, mouth-open/speaking, smile, surprise, concern and blink/closed-eyes close-ups while preserving face silhouette, eye spacing, nose/jaw, ears, hairline and age impression.
 
 ### CHAR_POSE_ACTION
 Prompt should request:
@@ -51,32 +56,50 @@ Prompt should request:
 - close-up callouts on neutral background;
 - hands must be anatomically plausible and consistent with the heroine's age/style.
 
+### CHAR_HAND_PROP
+Prompt should request relaxed hands plus story-specific grips from useful angles. Preserve five fingers, thumb direction, knuckles, wrist connection, nail shape, hand scale and prop contact.
+
+### CHAR_COSTUME_FRONT_BACK
+Prompt should request front/back construction, silhouette, fit, seams, closures, fabric behavior, accessories and forbidden changes under neutral light.
+
+### CHAR_SCALE_ROLE
+Prompt should request recurring characters at a common baseline next to relevant objects, preserving height, body volume and role separation. Each identity must already be locked independently.
+
 ## Negative prompt block
 
 Do not create: cinematic scene, rain background, street background, multiple different girls, alternate costumes, changed hairstyle, changed eye color, changed age, chibi version, glamour portrait only, random props, readable text, logos, watermarks, labels, speech bubbles, captions, cropped limbs, inconsistent scale, fisheye/perspective distortion, heavy shadows, colored lighting that changes palette, wet hair redesign, duplicate faces with different identities.
 
 ## Base template
 
-Create exactly one 16:9 landscape production character model sheet for an anime music-video pipeline.
+Create exactly one landscape production character model sheet for a video-production pipeline.
 
 SHEET_TYPE: {sheet_type}
 REFERENCE_ID: {reference_id}
 ROLE: {role}
 
-Purpose: lock the recurring heroine's identity for downstream reference-image generation and Seedance I2V continuity. This is a production design sheet, not cinematic key art.
+Purpose: lock the recurring character's identity for downstream reference-conditioned production image generation, continuity QC, **and direct attachment to Seedance as the identity anchor**. This is a production design sheet, not cinematic key art. Being text-free and flat-lit is what makes it safe to upload.
 
 Character identity lock:
-- teenage Japanese anime heroine, consistent face shape, consistent eye shape/color, consistent hair silhouette, consistent body proportions;
+- {character_identity}, consistent face shape, eye spacing/shape/color, nose/jaw, ear placement, hairline/mass, age impression and body proportions;
 - outfit: {outfit_details}; accessories: {accessory_details}; palette: {palette_details};
-- mood motif may be rainy-night / warm paper-lantern amber, but the sheet itself must use neutral studio lighting and neutral background so colors and shapes are readable.
+- project style: {project_style}; the sheet itself must use neutral studio lighting and neutral background so colors and shapes remain readable.
 
 Sheet layout:
 {layout_requirements}
 
 Rendering:
-- clean Japanese animation model-sheet style, crisp linework, production reference quality;
+- {rendering_style}, production reference quality;
 - flat/even studio lighting, neutral off-white background, clean whitespace between views;
 - same single character repeated, same scale where applicable, no labels/text.
 
 Negative constraints:
 {negative_block}
+
+## Naming and provenance
+
+Use `CHAR_<ID>_<SHEET_TYPE>_R<n>`. Record imagegen generation ID, prompt hash, attached source reference paths/hashes, dimensions, bytes and output SHA256. If the approved identity reference attachment cannot be verified, mark `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED`.
+
+## Route boundary
+
+- Stable I2V runtime: these assets are identity sources for Codex imagegen styleframes **and are attached to Seedance with those styleframes** when the character appears (2026-07-28). Only the clean, text-free production sheet or a deterministic crop of it may be uploaded — never the dense Bible page.
+- No-I2V Reference-Native runtime: governed separately by `/Users/gnudas/Documents/Codex/no-i2v-team-runtime/runtime/references/character_reference_standard.md`; only its locked `PROVIDER_SAFE_REF` tier may be uploaded directly.

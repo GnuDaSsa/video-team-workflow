@@ -2,7 +2,7 @@
 
 - Default card: **multi-reference, 15 seconds**
 - Creative room open after identity lock; refs are anchors, not cages
-- **No BGM / score / music bed**; diegetic SFX + room tone only
+- **Audio ON**; the prompt names the soundscape (diegetic SFX + room tone by default, music when wanted)
 - Naturalism over spectacle; medium-aware texture fidelity
   - live-action/photoreal: stable materials, no plastic/waxy/crawling texture
   - 2D/stylized: medium-true material (paper/ink/gouache/cel), not fake photoreal pores
@@ -105,8 +105,8 @@ Naturalism is the default aesthetic goal even inside Creative Mode.
 - Avoid line boiling and texture crawl when those break the chosen medium; otherwise keep tactile material consistency.
 
 ### Audio naturalism
-- No BGM.
-- Prefer room tone and contact SFX that match the physical layers (footfall, cloth, fire crackle, wind, water) only when diegetic.
+- The audio toggle stays ON; name what should be heard.
+- Default to room tone and contact SFX matching the physical layers (footfall, cloth, fire crackle, wind, water). Ask for music when the shot genuinely wants it.
 - Silence/near-silence is valid; do not pad with score.
 
 
@@ -119,7 +119,7 @@ Naturalism is the default aesthetic goal even inside Creative Mode.
 5. Optional arc: calm → discovery → transformation/escalation → aftermath
 6. Clear exit composition for next-scene handoff
 7. Default duration is 15s multi-ref with a usable exit for the next card
-8. No BGM; diegetic/room only
+8. Audio ON; soundscape named in the prompt
 9. Naturalism/texture notes match the look medium
 
 ## Creative reference freedom
@@ -159,7 +159,7 @@ Before READY:
 10. Prompt has no names/captions/provenance/model/folder pollution
 11. Real-person/IP cameos from community examples are absent
 12. Package schema fields are complete
-13. Settings line says `Audio: ON`; the prompt requests diegetic SFX/room tone and no score, unless `@Audio1` is explicit
+13. Settings line says `Audio: ON`; the prompt names the intended soundscape (`@Audio1` for spoken dialogue)
 14. Look medium is declared; live-action texture naturalism or 2D medium-true material is addressed
 15. Creative room is open (refs as anchors) unless Standard mode is justified
 

@@ -25,20 +25,27 @@ User standing preference for ordinary Seedance work:
 
 - **Shape:** multi-reference × **15 seconds** by default. Do not ask whether to use multi-ref. Shorter only with an explicit override for that shot.
 - **Creative room:** open after identity lock. References are anchors (identity/environment/texture/prop), not start/middle/end cages.
-- **Audio:** the Runway **Audio setting stays ON**. Seedance's generated audio is wanted; what is unwanted is *scored music*. Steer that with prompt wording (ask for diegetic SFX and room tone, do not ask for BGM/score/music bed), never by disabling audio. Spoken dialogue only with a verified performed `@Audio1` guide. See "Audio is a prompt concern, not a switch" below.
+- **Audio:** the Runway **Audio setting stays ON**, always. The prompt names the soundscape for that shot — ambience, contact SFX, room tone, or music. Spoken dialogue only with a verified performed `@Audio1` guide. See "Audio: toggle always ON" below.
 - **Naturalism:** believable body mechanics and ordinary contact physics over glossy AI spectacle.
 - **Texture:** medium-aware. Live-action/photoreal requires stable materials and rejects plastic/waxy/crawling texture; 2D/stylized preserves medium-true material and does not force photoreal pores.
 
 These defaults apply to both the single-agent prompting branch and `$seedance-creative-prompt-team`.
 
-## Audio is a prompt concern, not a switch — 2026-07-28
+## Audio: toggle always ON, soundscape directed by the prompt — 2026-07-28
 
-The Runway/Seedance audio control is **one binary toggle covering generated SFX and music together**. There is no "music off, SFX on" control in the UI.
+The Runway/Seedance audio control is **one binary toggle covering generated SFX and music together**. There is no "music off, SFX on" control.
 
-- **Never turn the audio toggle off.** It stays ON for every generation. `Audio: ON` is a settings-line value and belongs in the preflight check.
-- "No BGM" is a **prompt-authoring rule**: do not ask for score, music bed, piano/strings/pads, jingles, or a rhythmic soundtrack. Ask for the diegetic world — footfall, cloth, fire crackle, wind, water, room tone.
-- Writing `no BGM` into the settings/handoff line is what caused generations to come back silent: an operator reading a settings field reaches for the switch. Keep the audio intent in the prompt text and keep the settings line reporting the real UI value.
-- If a clip returns with unwanted scored music, that is a **prompt revision**, not a reason to disable audio.
+- **The audio toggle is always ON.** It is not a per-shot decision and never gets switched off. `Audio: ON` is a settings-line value, checked once in the Generate preflight.
+- **The prompt decides the soundscape** — that is the whole point of leaving audio on. Direct it explicitly per shot: ambient bed, specific SFX, room tone, or background music when the shot wants music. Naming the sound you want is normal prompt authoring, not a rule violation.
+- There is **no standing "no BGM" rule**. Ask for score when the shot calls for it and ask for diegetic-only when it doesn't. Write what you want to hear.
+- Spoken dialogue still needs a verified performed `@Audio1` guide.
+- If a clip comes back with the wrong soundscape, that is a **prompt revision** — never a reason to touch the switch.
+
+### How this went wrong
+
+A preference for diegetic-only audio was written into the **settings/handoff field** instead of the prompt rules. An operator reconciling "settings match the package" read `no BGM` as a UI value and reached for the switch, which killed the SFX and room tone the same rules asked for. The corruption then hardened: the 15-minute observer was told to re-verify **"Audio Off settings"** on every wake, so the silence got actively maintained.
+
+Audio intent belongs in the prompt text. The settings line reports the real UI value and nothing else.
 
 ## Universal multi-reference and character-sheet gate
 
@@ -60,10 +67,23 @@ Promoted from the operating rules that were actually producing clips in the inde
 - `@ImageN` numbering is **not** a narrative sequence. Ordered references are independent anchors for look, palette, space, props, and plausible action — never a storyboard to interpolate, match-cut, or replay in order (`GENERAL_REFERENCE_MODE`).
 - This gate **supersedes any rule that forbids uploading character sheets to Runway.** Sheets are required multi-reference inputs when a recurring character appears.
 
+### Which sheet may be uploaded
+
+The character-sheet standard produces two outputs, and only one of them is a Runway input.
+
+| Output | Upload to Runway? |
+|---|---|
+| Dense AAA character **bible page** — hero pose, callouts, labels, lore, palette blocks | **Never.** Its text, labels, and panel grid corrupt the generation. Approval and design-lock only. |
+| **Clean production sheet** — neutral/off-white background, flat lighting, no readable text, crop-safe | **Yes — this is what it was made for.** Attach it, or a deterministic crop of it, as the identity anchor. |
+
+Same bar as the reference-native runtime's `PROVIDER_SAFE_REF` tier: no text, no labels, flat-lit, derived from the approved master.
+
+The clean sheet **does not replace** the per-cut styleframe. Attach `styleframe(s) + clean sheet` together — the styleframe carries the scene, the sheet carries the identity.
+
 ## Generate-ready queue observer protocol
 
 - After the prompt and all required references are visibly loaded, inspect the visible Generate control. If it is gray/disabled, do not click it and start one 15-minute observer schedule for that staged package.
-- On each 15-minute wake, re-query the same visible Runway Generate board and verify that the staged prompt, ordered references, Multi-reference mode, 15s duration, ratio, and **Audio ON** settings are still present. Do not rely on a previous screenshot or stale element index.
+- On each 15-minute wake, re-query the same visible Runway Generate board and verify that the staged prompt, ordered references, Multi-reference mode, 15s duration, and ratio are still present. Audio is a standing ON default and is checked once in the Generate preflight, not re-verified on every wake. Do not rely on a previous screenshot or stale element index.
 - If Generate is still gray, leave the package untouched and schedule the next 15-minute wake. Do not spin-poll, re-upload, rewrite the prompt, open another browser route, or create a second observer.
 - If Generate is blue, click it **exactly once**. Immediately verify the resulting scene card itself—`In queue`, `Generating`, `Processing`, or `Completed`—and match its scene ID/prompt before recording the queue submission. A blue button alone is not completion evidence.
 - If one click does not produce a matching accepted card, stop automatic retries and record `BLOCKED_GENERATE_ACCEPTANCE_NOT_VERIFIED`; do not click again for that scene.
@@ -76,7 +96,7 @@ Promoted from the operating rules that were actually producing clips in the inde
 - Creative mode does not permit generic visual glue. Fire/torch/lamp/light matches are reserved for explicit character-transition beats or a cause that exists in the shot; repeated light matches between unrelated scenes are a QC failure.
 - References are anchors, not mandatory start/middle/end storyboard frames. The model may invent the in-between motion and exit composition when the prompt asks for creative freedom.
 - Every clip still needs a physical cause → contact → response, a clear subject action, and a usable exit composition.
-- Default package duration is 15s multi-ref with Audio ON; the prompt asks for diegetic SFX/room tone and never for score, unless the package records an explicit exception.
+- Default package duration is 15s multi-ref with Audio ON; the prompt states the intended soundscape (ambience, SFX, room tone, or music) for that shot.
 
 ### 2D/stylized continuity architecture
 
@@ -100,7 +120,7 @@ Ordered references:
   ImageN = approved character sheet/identity crop when applicable
 Character-sheet gate: required | not applicable
 Naturalism / texture notes:
-Expected duration/audio/settings: 15s multi-ref; Audio: ON; diegetic SFX/room tone via prompt, no score; ...
+Expected duration/audio/settings: 15s multi-ref; Audio: ON; soundscape directed in the prompt; ...
 Exit composition / next-scene handoff:
 Source root and exact file paths:
 ```

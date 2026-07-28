@@ -61,7 +61,7 @@ These are project standing rules, not one-off notes. Apply on every package unle
 
 1. **Default generation shape = multi-reference × 15s.** Assume Seedance multi-ref and target **15 seconds** by default. Do not ask whether to use multi-ref. Shorter durations only when the user or a fragile shot explicitly requires them.
 2. **Open creative room.** Creative Mode is default. References are anchors for identity, environment, texture, and key props — not start/middle/end cages. Invent in-between motion, camera discovery, and exit composition after identity is locked.
-3. **No background music. Ever.** Default audio is **visual + diegetic SFX / room tone only**. No BGM, score, piano, strings, pads, jingles, music bed, or rhythmic soundtrack. Spoken dialogue only if a verified performed `@Audio1` guide is attached; otherwise no dialogue generation request.
+3. **Audio toggle always ON; the prompt directs the sound.** Name the soundscape for each shot — ambience, contact SFX, room tone, or music when the shot wants it. Diegetic-only is a sensible default, not a prohibition. Spoken dialogue only if a verified performed `@Audio1` guide is attached.
 4. **Naturalism first.** Prefer believable body mechanics, ordinary contact physics, imperfect micro-motion, and lived-in environments over glossy AI spectacle. One dominant camera family; no multi-trick chaos in a single 15s card.
 5. **Texture naturalness is medium-aware.**
    - **Live-action / photoreal / real-world plates:** texture fidelity is a first-class QC axis. Prefer stable material response (skin pores/oil only when already in refs, fabric weave, wood grain, wet/dry surfaces, dust, grit) and reject plastic skin, crawling noise, boiling lines, waxy faces, over-sharpened edges, and synthetic film-grain soup.
@@ -70,7 +70,7 @@ These are project standing rules, not one-off notes. Apply on every package unle
 
 Package fields must record:
 - `Duration: 15s` (or explicit override)
-- `Audio: ON` (toggle never disabled) + prompt asks diegetic SFX/room tone, no score (or explicit `@Audio1` exception)
+- `Audio: ON` (toggle never disabled); the prompt states the intended soundscape (`@Audio1` still required for spoken dialogue)
 - `Look medium: live-action | 2D/stylized | mixed`
 - `Naturalism/texture notes:` medium-appropriate
 
@@ -80,7 +80,7 @@ Package fields must record:
 - When the source references are 2D/stylized, use the immutable `STYLE LOCK → CONTINUITY → DIRECTION` blocks and change only the per-shot `SHOT` block. Do not rewrite the medium, character/world rules, or camera language inside individual shot prompts.
 - Default package is **multi-reference + 15 seconds**. No single-reference exception and no silent shorter duration unless the user overrides that exact shot.
 - Open creative room after identity lock: invent transitions, camera discovery, and exit composition; do not cage the model to literal storyboard interpolation.
-- **No BGM / score / music bed.** Audio default is visual + diegetic SFX/room tone only. No spoken dialogue request unless a verified performed `@Audio1` is attached.
+- **Audio toggle always ON.** The prompt names the soundscape; music is allowed when the shot calls for it. No spoken dialogue request unless a verified performed `@Audio1` is attached.
 - Naturalism over spectacle. Believable cause → contact → response, ordinary micro-imperfections, lived-in motion.
 - Texture naturalness is mandatory for live-action/photoreal packages; for 2D/stylized, preserve medium-true material instead of fake photoreal pores.
 - If an approved character appears, the relevant character sheet / identity crop is mandatory on every generation and must appear in the ordered role map.
@@ -112,7 +112,7 @@ Do not start production, queue observation, browser automation, or an external w
 ## Role summary
 
 ### 1. Creative Director
-Owns the shot's creative thesis. Decides Creative vs Standard. Declares look medium. Names the clip role: identity / reveal / speed / action / product proof / UGC hook / atmosphere / montage / transition. Defaults the budget to **15s multi-ref, Audio ON with no score requested**, naturalism-first. Sets the calm → discovery → transformation → aftermath need only when useful. Outputs a one-paragraph visible premise, not style adjectives.
+Owns the shot's creative thesis. Decides Creative vs Standard. Declares look medium. Names the clip role: identity / reveal / speed / action / product proof / UGC hook / atmosphere / montage / transition. Defaults the budget to **15s multi-ref, Audio ON with the soundscape named**, naturalism-first. Sets the calm → discovery → transformation → aftermath need only when useful. Outputs a one-paragraph visible premise, not style adjectives.
 
 ### 2. Reference Architect
 Owns the multi-reference deck for 15s throughput. Orders environment/action anchors first, then identity sheets. Labels each `@ImageN` with a visible role sentence. Enforces `Character-sheet gate: required | not applicable`. Re-checks approved sheet paths against the manifest; memory is not verification. After every five packages, refresh sheet context as an auxiliary review.
@@ -124,7 +124,7 @@ through-aperture/reveal · mounted-object · handheld intimate track · dolly/pa
 States subject motion state (normal-speed / micro / static / frozen / vehicle-mounted) and one motivated camera evolution with a clear exit. Translates any preset name into camera physics. Never relies on a motion-id alone.
 
 ### 4. Motion Physicist
-Owns physicality and medium-aware naturalism. Adds 2–4 layers motivated by camera + action: smoke/steam, fabric/hair, reflections, foreground occlusion, parallax, dust/particles, vibration, focus breathing, wind, water. For live-action, protect texture stability; for 2D, protect medium-true material. Forbids unmotivated spectacle, BGM padding, and repeated generic light-match glue between unrelated scenes. Fire/torch/lamp matches only for explicit transition beats or a cause present in the shot.
+Owns physicality and medium-aware naturalism. Adds 2–4 layers motivated by camera + action: smoke/steam, fabric/hair, reflections, foreground occlusion, parallax, dust/particles, vibration, focus breathing, wind, water. For live-action, protect texture stability; for 2D, protect medium-true material. Forbids unmotivated spectacle and repeated generic light-match glue between unrelated scenes. Fire/torch/lamp matches only for explicit transition beats or a cause present in the shot.
 
 ### 5. Prompt Composer
 Owns the final English visual prompt and production handoff fields. Assembles in this order:
@@ -141,10 +141,10 @@ For 2D/stylized sources:
 
 For live-action/mixed sources, use the normal visible premise → reference roles → camera/action → physical layers → exit composition order.
 
-Defaults settings to `15s multi-ref; Audio: ON; diegetic SFX/room tone via prompt, no score`. Does not invent missing references or skip the character-sheet gate.
+Defaults settings to `15s multi-ref; Audio: ON; soundscape directed in the prompt`. Does not invent missing references or skip the character-sheet gate.
 
 ### 6. Prompt Critic
-Owns READY / REVISE. Checks the creative QA list in `references/creative-directing-grammar.md` and package schema completeness. Rejects mood-only wording, missing sheet gates, multi-camera chaos, empty physics, storyboard-cage references, silent non-15s duration, BGM language, missing naturalism/texture attention on live-action, and prompt pollution (names, captions, provenance). Production-branch readiness is separate and not claimed here.
+Owns READY / REVISE. Checks the creative QA list in `references/creative-directing-grammar.md` and package schema completeness. Rejects mood-only wording, missing sheet gates, multi-camera chaos, empty physics, storyboard-cage references, silent non-15s duration, an unstated soundscape, missing naturalism/texture attention on live-action, and prompt pollution (names, captions, provenance). Production-branch readiness is separate and not claimed here.
 
 ## Duration-to-complexity budget
 
@@ -179,7 +179,7 @@ Physical motion layers:
   2. ...
 Naturalism / texture notes:
 Exit composition / next-scene handoff:
-Expected duration/audio/settings: 15s multi-ref; Audio: ON; diegetic SFX/room tone via prompt, no score; ...
+Expected duration/audio/settings: 15s multi-ref; Audio: ON; soundscape directed in the prompt; ...
 Source root and exact file paths:
 Critic verdict: READY | REVISE
 Revision notes (if any):
