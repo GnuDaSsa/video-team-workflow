@@ -25,7 +25,7 @@ Physical motion layers:
   4. 
 Naturalism / texture notes:
 Exit composition / next-scene handoff:
-Expected duration/audio/settings: 15s multi-ref; no BGM; diegetic/room only; 16:9; Seedance 2.0
+Expected duration/audio/settings: 15s multi-ref; Audio: ON; diegetic SFX/room tone via prompt, no score; 16:9; Seedance 2.0
 Source root and exact file paths:
 Critic verdict: READY | REVISE
 Revision notes (if any):
@@ -56,7 +56,7 @@ Revision notes (if any):
 
 ### Prompt Composer
 - Character count:
-- Audio policy: no BGM / diegetic-room only
+- Audio policy: toggle ON; prompt requests diegetic SFX/room tone only, no score
 - 2D block integrity: STYLE LOCK / CONTINUITY / DIRECTION unchanged; SHOT is one unique beat
 - Pollution scan: clean / dirty
 

@@ -19,7 +19,7 @@ The prompting team must emit this package before any production branch work.
 | Character-sheet gate | `required` or `not applicable` |
 | Physical motion layers | 2–4 bullets |
 | Exit composition / next-scene handoff | Final frame + what the next scene receives |
-| Expected duration/audio/settings | Default **15s multi-ref**; **no BGM**; diegetic/room only unless `@Audio1` |
+| Expected duration/audio/settings | Default **15s multi-ref**; **Audio: ON**; prompt requests diegetic SFX/room tone, no score, unless `@Audio1` |
 | Source root and exact file paths | Machine-usable paths |
 | Critic verdict | `READY` or `REVISE` |
 | Revision notes | Owning role + fix list when REVISE |
@@ -46,7 +46,7 @@ Default every package to:
 - **Duration:** 15s
 - **References:** multi-reference (ordered `@ImageN`)
 - **Creative room:** open after identity lock; refs are anchors, not cages
-- **Audio:** no BGM / score / music bed; visual + diegetic SFX / room tone only
+- **Audio:** toggle stays ON. Prompt must not request BGM/score/music bed; ask for visual + diegetic SFX / room tone
 - **Dialogue:** none unless a verified performed `@Audio1` speech guide is attached
 - **Naturalism:** believable physics and imperfect micro-motion over glossy spectacle
 - **Texture:**
@@ -69,7 +69,7 @@ Shorter duration, BGM, or dialogue is an explicit exception and must be written 
 Unless the package explicitly includes a verified performed `@Audio1` speech guide:
 
 - visual + diegetic SFX / room tone only
-- no BGM, score, piano, strings, pads, jingles, or music bed
+- do not request BGM, score, piano, strings, pads, jingles, or music bed in the prompt (the audio toggle still stays ON)
 - no spoken dialogue generation request
 
 If the user later attaches `@Audio1`, revise through Prompt Composer + Critic; production still verifies the visible audio asset.
@@ -105,7 +105,7 @@ Physical motion layers:
   3. foreground branch occlusion and path parallax
   4. breath vapor / cold air in the ridge check
 Exit composition / next-scene handoff: medium ridge check facing deeper forest; next scene receives his eyeline and torch as continuity anchors
-Expected duration/audio/settings: 15s multi-ref; no BGM; diegetic/room only; 16:9; Seedance 2.0
+Expected duration/audio/settings: 15s multi-ref; Audio: ON; diegetic SFX/room tone via prompt, no score; 16:9; Seedance 2.0
 Source root and exact file paths: /project/refs/...
 Critic verdict: READY
 Revision notes: none

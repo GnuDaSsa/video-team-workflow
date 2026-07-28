@@ -58,7 +58,7 @@ These are project standing rules, not one-off notes. Apply on every package unle
 
 Package fields must record:
 - `Duration: 15s` (or explicit override)
-- `Audio: no BGM; diegetic/room only` (or explicit `@Audio1` exception)
+- `Audio: ON` (toggle never disabled) + prompt asks diegetic SFX/room tone, no score (or explicit `@Audio1` exception)
 - `Look medium: live-action | 2D/stylized | mixed`
 - `Naturalism/texture notes:` medium-appropriate
 
@@ -100,7 +100,7 @@ Do not start production, queue observation, browser automation, or an external w
 ## Role summary
 
 ### 1. Creative Director
-Owns the shot's creative thesis. Decides Creative vs Standard. Declares look medium. Names the clip role: identity / reveal / speed / action / product proof / UGC hook / atmosphere / montage / transition. Defaults the budget to **15s multi-ref, no BGM**, naturalism-first. Sets the calm → discovery → transformation → aftermath need only when useful. Outputs a one-paragraph visible premise, not style adjectives.
+Owns the shot's creative thesis. Decides Creative vs Standard. Declares look medium. Names the clip role: identity / reveal / speed / action / product proof / UGC hook / atmosphere / montage / transition. Defaults the budget to **15s multi-ref, Audio ON with no score requested**, naturalism-first. Sets the calm → discovery → transformation → aftermath need only when useful. Outputs a one-paragraph visible premise, not style adjectives.
 
 ### 2. Reference Architect
 Owns the multi-reference deck for 15s throughput. Orders environment/action anchors first, then identity sheets. Labels each `@ImageN` with a visible role sentence. Enforces `Character-sheet gate: required | not applicable`. Re-checks approved sheet paths against the manifest; memory is not verification. After every five packages, refresh sheet context as an auxiliary review.
@@ -129,7 +129,7 @@ For 2D/stylized sources:
 
 For live-action/mixed sources, use the normal visible premise → reference roles → camera/action → physical layers → exit composition order.
 
-Defaults settings to `15s multi-ref; no BGM; diegetic/room only`. Does not invent missing references or skip the character-sheet gate.
+Defaults settings to `15s multi-ref; Audio: ON; diegetic SFX/room tone via prompt, no score`. Does not invent missing references or skip the character-sheet gate.
 
 ### 6. Prompt Critic
 Owns READY / REVISE. Checks the creative QA list in `references/creative-directing-grammar.md` and package schema completeness. Rejects mood-only wording, missing sheet gates, multi-camera chaos, empty physics, storyboard-cage references, silent non-15s duration, BGM language, missing naturalism/texture attention on live-action, and prompt pollution (names, captions, provenance). Production-branch readiness is separate and not claimed here.
@@ -167,7 +167,7 @@ Physical motion layers:
   2. ...
 Naturalism / texture notes:
 Exit composition / next-scene handoff:
-Expected duration/audio/settings: 15s multi-ref; no BGM; diegetic/room only; ...
+Expected duration/audio/settings: 15s multi-ref; Audio: ON; diegetic SFX/room tone via prompt, no score; ...
 Source root and exact file paths:
 Critic verdict: READY | REVISE
 Revision notes (if any):

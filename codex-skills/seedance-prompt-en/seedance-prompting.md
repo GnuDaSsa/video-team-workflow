@@ -2,7 +2,7 @@
 
 This branch authors the visual prompt and the ordered multi-reference package. It does not click Runway, monitor cards, download files, or claim production completion.
 For multi-agent Creative authoring with explicit role separation, prefer `$seedance-creative-prompt-team` (`~/.codex/skills/seedance-creative-prompt-team/SKILL.md`). This file remains the single-agent Creative/Standard branch.
-Standing defaults: **multi-reference × 15s**, Creative Mode open after identity lock, **no BGM** (diegetic/room only), naturalism-first, medium-aware texture. Shorter duration, BGM, or dialogue only with an explicit per-shot override.
+Standing defaults: **multi-reference × 15s**, Creative Mode open after identity lock, **Audio ON** with no score requested in the prompt (diegetic SFX/room tone), naturalism-first, medium-aware texture. Shorter duration, requested score, or dialogue only with an explicit per-shot override. Never switch audio off.
 
 ## Prompt-authoring isolation gate — 2026-07-26
 
@@ -29,13 +29,13 @@ Ordered references:
   ImageN = character sheet/identity crop when a corresponding character appears
 Character-sheet gate: required | not applicable
 Naturalism / texture notes:
-Expected duration/audio/settings: 15s multi-ref; no BGM; diegetic/room only; ...
+Expected duration/audio/settings: 15s multi-ref; Audio: ON; diegetic SFX/room tone via prompt, no score; ...
 Exit composition / next-scene handoff:
 Source root and exact file paths:
 ```
 
 The prompt must remain visual-only and within Runway's visible character limit. Do not include captions, narration, contest copy, hidden metadata, source provenance, folder/QC language, or image-generation model names.
-Default settings line unless overridden: `15s multi-ref; no BGM; diegetic/room only`.
+Default settings line unless overridden: `15s multi-ref; Audio: ON; diegetic SFX/room tone via prompt, no score`.
 
 ## Reference-role design
 
@@ -83,7 +83,7 @@ Use Creative when the user asks for creative, experimental, dreamlike, transform
 4. Add 2–4 physical motion layers such as smoke, steam, fabric, reflections, foreground occlusion, parallax, dust, particles, vibration, or focus breathing.
 5. Build calm → discovery → transformation/escalation → aftermath only when the shot needs that arc.
 6. End on a clear exit composition that hands off to the next scene.
-7. Keep the card at 15s multi-ref with no BGM unless explicitly overridden.
+7. Keep the card at 15s multi-ref with Audio ON; do not request score in the prompt unless explicitly overridden.
 8. Naturalism first; apply live-action texture stability or 2D medium-true material.
 
 For 2D/stylized references, replace the generic creative assembly with the four-block architecture above and keep one unique beat in `SHOT`; use the fixed direction grammar for the camera and pacing.
@@ -102,7 +102,7 @@ For live-action/photoreal packages, also protect texture naturalness (stable mat
 - 2–4 motivated motion layers;
 - no generic negative wall;
 - final composition and next-scene handoff are clear;
-- default 15s multi-ref and no-BGM audio policy are recorded;
+- default 15s multi-ref recorded, and the settings line reads `Audio: ON` (never Off);
 - naturalism/texture notes match the look medium.
 
 ## Current continuation package

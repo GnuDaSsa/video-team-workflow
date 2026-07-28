@@ -159,7 +159,7 @@ Before READY:
 10. Prompt has no names/captions/provenance/model/folder pollution
 11. Real-person/IP cameos from community examples are absent
 12. Package schema fields are complete
-13. Audio policy is no-BGM / diegetic-or-room only unless `@Audio1` is explicit
+13. Settings line says `Audio: ON`; the prompt requests diegetic SFX/room tone and no score, unless `@Audio1` is explicit
 14. Look medium is declared; live-action texture naturalism or 2D medium-true material is addressed
 15. Creative room is open (refs as anchors) unless Standard mode is justified
 

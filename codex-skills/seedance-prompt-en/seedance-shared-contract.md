@@ -25,11 +25,20 @@ User standing preference for ordinary Seedance work:
 
 - **Shape:** multi-reference × **15 seconds** by default. Do not ask whether to use multi-ref. Shorter only with an explicit override for that shot.
 - **Creative room:** open after identity lock. References are anchors (identity/environment/texture/prop), not start/middle/end cages.
-- **Audio:** **no BGM / score / music bed**. Visual + diegetic SFX / room tone only. Spoken dialogue only with a verified performed `@Audio1` guide.
+- **Audio:** the Runway **Audio setting stays ON**. Seedance's generated audio is wanted; what is unwanted is *scored music*. Steer that with prompt wording (ask for diegetic SFX and room tone, do not ask for BGM/score/music bed), never by disabling audio. Spoken dialogue only with a verified performed `@Audio1` guide. See "Audio is a prompt concern, not a switch" below.
 - **Naturalism:** believable body mechanics and ordinary contact physics over glossy AI spectacle.
 - **Texture:** medium-aware. Live-action/photoreal requires stable materials and rejects plastic/waxy/crawling texture; 2D/stylized preserves medium-true material and does not force photoreal pores.
 
 These defaults apply to both the single-agent prompting branch and `$seedance-creative-prompt-team`.
+
+## Audio is a prompt concern, not a switch — 2026-07-28
+
+The Runway/Seedance audio control is **one binary toggle covering generated SFX and music together**. There is no "music off, SFX on" control in the UI.
+
+- **Never turn the audio toggle off.** It stays ON for every generation. `Audio: ON` is a settings-line value and belongs in the preflight check.
+- "No BGM" is a **prompt-authoring rule**: do not ask for score, music bed, piano/strings/pads, jingles, or a rhythmic soundtrack. Ask for the diegetic world — footfall, cloth, fire crackle, wind, water, room tone.
+- Writing `no BGM` into the settings/handoff line is what caused generations to come back silent: an operator reading a settings field reaches for the switch. Keep the audio intent in the prompt text and keep the settings line reporting the real UI value.
+- If a clip returns with unwanted scored music, that is a **prompt revision**, not a reason to disable audio.
 
 ## Universal multi-reference and character-sheet gate
 
@@ -41,10 +50,20 @@ These defaults apply to both the single-agent prompting branch and `$seedance-cr
 - If a required sheet is missing, mismatched, or not visibly verifiable, stop with `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED` and do not Generate.
 - The five-image refresh rule remains a secondary context-refresh habit; it never substitutes for the per-generation attachment gate.
 
+### What the sheet is allowed to do — 2026-07-28
+
+Promoted from the operating rules that were actually producing clips in the independence-activist project. Attaching the sheet is mandatory; misreading it is the failure mode.
+
+- **Attachment order:** scene references first, approved character sheet(s) after. Record the order.
+- The sheet fixes **face silhouette, hair mass, costume, age impression, body proportion, and signature props** — nothing else.
+- The sheet is **not** a scene-order instruction, not a transition cue, and not a pose instruction. A sheet must never push the character into a frontal poster stance; the shot's action, camera, and mid-motion state are specified separately.
+- `@ImageN` numbering is **not** a narrative sequence. Ordered references are independent anchors for look, palette, space, props, and plausible action — never a storyboard to interpolate, match-cut, or replay in order (`GENERAL_REFERENCE_MODE`).
+- This gate **supersedes any rule that forbids uploading character sheets to Runway.** Sheets are required multi-reference inputs when a recurring character appears.
+
 ## Generate-ready queue observer protocol
 
 - After the prompt and all required references are visibly loaded, inspect the visible Generate control. If it is gray/disabled, do not click it and start one 15-minute observer schedule for that staged package.
-- On each 15-minute wake, re-query the same visible Runway Generate board and verify that the staged prompt, ordered references, Multi-reference mode, 15s duration, ratio, and Audio Off settings are still present. Do not rely on a previous screenshot or stale element index.
+- On each 15-minute wake, re-query the same visible Runway Generate board and verify that the staged prompt, ordered references, Multi-reference mode, 15s duration, ratio, and **Audio ON** settings are still present. Do not rely on a previous screenshot or stale element index.
 - If Generate is still gray, leave the package untouched and schedule the next 15-minute wake. Do not spin-poll, re-upload, rewrite the prompt, open another browser route, or create a second observer.
 - If Generate is blue, click it **exactly once**. Immediately verify the resulting scene card itself—`In queue`, `Generating`, `Processing`, or `Completed`—and match its scene ID/prompt before recording the queue submission. A blue button alone is not completion evidence.
 - If one click does not produce a matching accepted card, stop automatic retries and record `BLOCKED_GENERATE_ACCEPTANCE_NOT_VERIFIED`; do not click again for that scene.
@@ -57,7 +76,7 @@ These defaults apply to both the single-agent prompting branch and `$seedance-cr
 - Creative mode does not permit generic visual glue. Fire/torch/lamp/light matches are reserved for explicit character-transition beats or a cause that exists in the shot; repeated light matches between unrelated scenes are a QC failure.
 - References are anchors, not mandatory start/middle/end storyboard frames. The model may invent the in-between motion and exit composition when the prompt asks for creative freedom.
 - Every clip still needs a physical cause → contact → response, a clear subject action, and a usable exit composition.
-- Default package duration is 15s multi-ref with no BGM unless the package records an explicit exception.
+- Default package duration is 15s multi-ref with Audio ON; the prompt asks for diegetic SFX/room tone and never for score, unless the package records an explicit exception.
 
 ### 2D/stylized continuity architecture
 
@@ -81,7 +100,7 @@ Ordered references:
   ImageN = approved character sheet/identity crop when applicable
 Character-sheet gate: required | not applicable
 Naturalism / texture notes:
-Expected duration/audio/settings: 15s multi-ref; no BGM; diegetic/room only; ...
+Expected duration/audio/settings: 15s multi-ref; Audio: ON; diegetic SFX/room tone via prompt, no score; ...
 Exit composition / next-scene handoff:
 Source root and exact file paths:
 ```

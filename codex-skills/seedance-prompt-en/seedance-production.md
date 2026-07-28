@@ -29,7 +29,7 @@ Before one Generate, verify:
 3. all expected reference thumbnails and order are visible;
 4. visual prompt is present and within 3500 characters;
 5. Video / Seedance 2.0 / Multi-reference are visible;
-6. audio, ratio, resolution, duration, and Unlimited settings match the package;
+6. **Audio is ON** (never disable it — it is one toggle for SFX and music together; unwanted score is fixed in the prompt, not with the switch), and ratio, resolution, duration, and Unlimited settings match the package;
 7. no visible wait/Credits blocker;
 8. the exact Generate button is blue.
 
