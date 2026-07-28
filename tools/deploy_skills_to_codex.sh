@@ -17,39 +17,52 @@ ARCHIVE="$HOME/.codex/archive/${STAMP}_skill_deploy"
 # of the repo (4-file seedance split + seedance-creative-prompt-team existed
 # only live), so a deploy would have silently deleted them.
 # Refuse to deploy while live is ahead of the repo. Run --check first.
+# Only DESTRUCTIVE drift blocks: a file that exists live but not in the repo is
+# deleted by --delete and is gone. Content differences are expected — deploying
+# repo->live is the whole point, and the previous version is archived first.
 preflight_drift_check() {
-  drift=0
+  destructive=0
   for live in "$DEST"/*/; do
     name="${$(basename "$live")}"
-    [ -d "$REPO_DIR/codex-skills/$name" ] || continue
+    case "$name" in
+      seedance*|videodirector|music-video-production-team|music-director|grok-i2v-batch-producer|jeongseon-video-typography) ;;
+      *) continue ;;
+    esac
+    if [ ! -d "$REPO_DIR/codex-skills/$name" ]; then
+      echo "WOULD DELETE: skill '$name' exists live but not in the repo"
+      destructive=1
+      continue
+    fi
+    # files present live, absent in repo
+    orphans="$(cd "$live" && find . -type f | while read -r f; do
+        [ -e "$REPO_DIR/codex-skills/$name/$f" ] || echo "$f"; done)"
+    if [ -n "$orphans" ]; then
+      echo "WOULD DELETE: files in '$name' exist live but not in the repo:"
+      echo "$orphans" | sed 's|^\./|       |'
+      destructive=1
+    fi
     if ! diff -rq "$REPO_DIR/codex-skills/$name" "$live" >/dev/null 2>&1; then
-      echo "DRIFT: $name differs between repo and live"
-      diff -rq "$REPO_DIR/codex-skills/$name" "$live" 2>&1 | sed 's/^/       /'
-      drift=1
+      echo "note: '$name' content differs (expected when deploying repo -> live)"
     fi
   done
-  # A video-team skill that exists live but not in the repo would be deleted.
-  for live in "$DEST"/*/; do
-    name="${$(basename "$live")}"
-    case "$name" in seedance*|videodirector|music-video-production-team|music-director|grok-i2v-batch-producer|jeongseon-video-typography)
-      [ -d "$REPO_DIR/codex-skills/$name" ] || { echo "DRIFT: $name exists live but NOT in repo — deploy would delete it"; drift=1; };;
-    esac
-  done
-  return $drift
+  return $destructive
 }
 
 if [ "${1:-}" = "--check" ]; then
-  preflight_drift_check && echo "no drift: repo and live match" || exit 1
-  exit 0
+  if preflight_drift_check; then
+    echo "safe to deploy: nothing live would be destroyed"
+    exit 0
+  fi
+  exit 1
 fi
 
 if ! preflight_drift_check; then
   echo ""
-  echo "REFUSING TO DEPLOY: live ~/.codex is ahead of / diverged from the repo."
-  echo "Commit the live state into the repo first, then deploy."
-  echo "Override only if you are certain: DEPLOY_FORCE=1 $0"
+  echo "REFUSING TO DEPLOY: the listed live files are not in the repo and"
+  echo "'rsync --delete' would destroy them. Commit them first, then deploy."
+  echo "Override only if you truly want them gone: DEPLOY_FORCE=1 $0"
   [ "${DEPLOY_FORCE:-0}" = "1" ] || exit 1
-  echo "DEPLOY_FORCE=1 set — proceeding despite drift."
+  echo "DEPLOY_FORCE=1 set — proceeding, live-only files will be deleted."
 fi
 # --------------------------------------------------------------------------
 
