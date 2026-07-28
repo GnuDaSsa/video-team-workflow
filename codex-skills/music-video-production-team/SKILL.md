@@ -23,8 +23,8 @@ Do not spawn delegated lanes, subagents, external sidecars, schedulers/monitors,
 
 The MV workflow is split into these roles:
 
-1. **Music Director** — already exists as `$music-director`; owns song interpretation and musical taste.
-2. **Planner** — owns MV concept, story, scene structure, and production plan.
+1. **Planner** — owns MV concept, story, scene structure, and production plan. Direction is settled before a track exists.
+2. **Music Director** — already exists as `$music-director`; owns song generation, interpretation, and musical taste. Runs after direction, and the cut map is built from the locked result.
 3. **Character Creator** — owns protagonists/recurring characters and character sheets.
 4. **Image Creator** — owns GPT image prompts, still frames, and image QA.
 5. **Image-to-Video Producer** — owns Seedance/I2V prompts, clip generation, motion QA, and edit handoff.
@@ -286,15 +286,20 @@ Subtitle policy:
 
 ## Standard workflow
 
-1. **Music Director** interprets the song and taste.
-2. **Planner** creates the project brief and cut structure.
-3. If needed, **Character Creator** creates protagonist candidates and gets approval.
-4. **Character Creator** creates the character sheet and gets approval.
-5. **Image Creator** creates styleframes/stills in batches.
-6. User approves the overall look.
-7. **Image-to-Video Producer** creates short clips from selected stills.
-8. **Image-to-Video Producer** prepares final clip order and edit handoff.
-9. User approves final candidates.
+Direction comes first, music is generated to serve it, and **every production stage ends with its own QC** — not one review at the end. This mirrors the runtime rail (`director → music → planner → image_creator → image_qc → seedance → seedance_qc → editor → package`); if the two ever disagree, the runtime rail wins.
+
+1. **기획 / Direction** — purpose, mode, audience, story spine, visual concept, must-avoid list, approval plan. Nothing is generated yet.
+2. **음악 생성 / Music** — Music Director generates and downloads the actual track, then **Music Lock**: real audio verified by listening, duration/codec recorded, structure mapped. A placeholder or an unheard file is not a lock.
+3. **컷맵 / Cut map** — Planner builds the cut structure **from the locked music**: beat, accents, phrase changes, lyric hooks, energy curve, ending cadence. Concept was decided in step 1; timing is decided here, against real audio.
+4. **캐릭터 / 스타일** → **QC**: identity sheets and style lock produced, then reviewed against the approved design before anything depends on them. The provider-safe sheet (`CHAR_<ID>_PROVIDER_REF_R<n>`) must exist.
+5. **이미지 / Styleframes** → **QC**: each still reviewed for identity match, composition, and whether it is actually usable as an I2V source (a poster-like frozen frame fails even if it is a nice picture). Only passed stills continue.
+6. **I2V / Clips** → **QC**: each generated clip reviewed for motion, identity drift, texture, crop preservation, and duplicate impressions against the clips already accepted.
+7. **편집 / Edit** — timeline, typography, music integration, using only QC-passed clips and locked music.
+8. **패키지 / Package** — final export verified, self-contained delivery assembled.
+
+Each QC step is a gate, not a formality: a stage that has not passed its QC does not feed the next stage. A failed item goes back to the stage that produced it, not forward.
+
+User approval gates sit on top of this where the project needs them (see Approval gates above) — QC is the team checking its own work; approval is the user deciding.
 
 ## Project brief template
 

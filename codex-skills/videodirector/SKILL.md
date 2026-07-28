@@ -59,13 +59,17 @@ If the request is underspecified but execution can still proceed, choose sensibl
 
 ## Standard workflow
 
-1. Confirm concept and goal
-2. Break the project into scenes
-3. Define character references if needed
-4. Write start-frame prompts for each scene
-5. Write Seedance/I2V motion prompts (Grok only if user named Grok)
-6. Plan Suno BGM tracks
-7. Produce narration/subtitle/edit sheets
+Direction first, the audio spine second, and **QC after each production stage** — never one review at the end. Cut timing is decided against real audio, not planned in the abstract and scored afterwards.
+
+1. **Direction** — concept, goal, audience, mode, must-avoid list. Nothing generated yet.
+2. **Audio spine** — settle what the cuts will be timed to and produce it: the Suno track for music-led work, or the narration/VO pass for narration-led work. Verify the real file by listening before it becomes the spine.
+3. **Cut map** — break into scenes/cuts **against that spine**: beats and phrase changes for music, sentence and breath boundaries for narration.
+4. **Character / style references** if needed → **QC** against the approved design before anything depends on them.
+5. **Start-frame prompts → styleframes** → **QC**: identity, composition, and whether the frame is actually usable as an I2V source.
+6. **Seedance/I2V motion prompts → clips** → **QC**: motion, identity drift, texture, crop preservation, duplicate impressions. (Grok only if the user named Grok.)
+7. **Narration/subtitle/edit sheets** and edit handoff, using only QC-passed material.
+
+A stage that has not passed its QC does not feed the next stage; a failure returns to the stage that produced it. Ordering BGM after the visuals is the old, wrong shape — it produced edits that had to be forced onto music that arrived last.
 
 ## Tool routing hard rule for this user
 
