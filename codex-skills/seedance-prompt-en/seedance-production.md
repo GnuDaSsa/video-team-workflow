@@ -7,18 +7,33 @@ This branch executes a complete, already-authored handoff package in visible Chr
 - Source of truth: one visible, logged-in `app.runwayml.com` Generate board in Chrome.
 - Attach through Runway's visible `Reference` asset selector: one staged file → native chooser → `Open` → verify the new visible `ImageN` thumbnail.
 - Use one owner tool at a time: Computer Use for attachment; Chrome plugin/Computer Use for visible verification and web actions.
-- Never use connector/API, hidden inputs, AppleScript/local mouse, cross-window Finder drag, Credits/Max, or a parallel Safari Runway session.
-- If the Reference selector/native chooser or Computer Use is unavailable, stop with `BLOCKED_CODEX_COMPUTER_USE_UNAVAILABLE`; do not invent a fallback.
+- Never use connector/API, hidden inputs, AppleScript coordinate clicking, clipboard image paste, Credits/Max, or a parallel Safari Runway session.
+- When a step fails, follow the fixed ladder below. Do not invent a route that is not on it, and do not skip a rung.
+
+## Attachment ladder — the only escalation path
+
+| Rung | Method | Move on when |
+|---|---|---|
+| 1 | Visible `Reference` asset selector → native chooser → one staged file → `Open` | it fails |
+| 2 | Retry rung 1 **once** (reopen the selector, re-read coordinates) | the retry fails |
+| 3 | Finder-frontmost drag/drop — **requires explicit user approval in the current thread** | no approval, or it fails |
+| 4 | Stop with `BLOCKED_REFERENCE_ATTACH_FAILED` and record the exact user action needed | — |
+
+Drag is a last resort, not a default: it depends on coordinates, Retina scaling, window occlusion, and held-payload judgement, and that is where the repeat incidents came from. Never promote it automatically — rung 3 needs the user to say so in this conversation (or `DRAG_APPROVED_BY_USER_CURRENT_THREAD=true` in the project file).
+
+If Computer Use itself is unavailable, stop with `BLOCKED_CODEX_COMPUTER_USE_UNAVAILABLE` and record the exact user action needed.
 
 ## Attach and verify
 
 1. Bring the correct Chrome Runway Generate board frontmost and confirm the scene cursor matches the handoff.
 2. Open the empty `Reference` slot.
-3. Use the visible `Drag and drop file` surface and select exactly one staged file in the native chooser.
+3. In the native chooser, select exactly one staged file (rung 1 of the ladder).
 4. Click `Open`, wait for the selector to close, and verify the newly visible `ImageN` thumbnail.
-5. Repeat until every ordered reference is visible.
+5. Repeat until every ordered reference is visible. Attach scene references first, approved character sheet(s) after.
 6. For any character in an approved sheet, verify the sheet/identity crop thumbnail is present in the role position on **this** generation. Previous cards do not count.
 7. If a file, slot, order, or character-sheet thumbnail is wrong, stop and recover the deck. Do not Generate.
+
+`ImageN` order is an attachment record, not a narrative sequence — the prompt must not treat the numbering as a storyboard to interpolate or replay (`GENERAL_REFERENCE_MODE`).
 
 ## Eight-check Generate preflight
 

@@ -72,7 +72,12 @@ flowchart TD
 - 레일: director → music → planner → image_creator_01 → image_creator_02 → image_qc → seedance → seedance_qc → editor → package (항상 `next` 기준으로 1개 lane씩)
 - "계속/이어가" → 먼저 `next --project <p>` 실행, 출력의 next_lanes/이유대로만 진행.
 - 상태 규율: `status.json`의 `status`는 enum만(PENDING/LAUNCHING/RUNNING/DONE/PARTIAL_DONE/PARTIAL_BLOCKED/BLOCKED/FAILED/KILLED/NOT_LOCKED/LOCKED/PASS/FAIL/REWORK_ONLY/READY_FOR_USER_REVIEW). 자유서식은 `detail`로. `validate`로 점검.
-- 게이트 총칙: **게이트는 권고다.** dispatch에서 실제로 막는 건 하류 4개(seedance/seedance_qc/editor/package)뿐이고 `--force`로 통과 가능. 상류는 경고만 남고 실행된다. 규율·도구·증거는 품질 장치이지 진행 차단 사유가 아니다 — 막히면 원래 되던 단순한 방법으로 진행하고 이유를 기록하라.
+- 게이트 총칙: dispatch에서 실제로 막는 건 하류 4개(seedance/seedance_qc/editor/package)뿐이고 `--force`로 통과 가능하다. 상류는 경고만 남고 실행된다. 규율·도구·증거는 품질 장치다.
+- **막혔을 때 규칙 (2026-07-28 사용자 확정 — 고정 사다리)**: "막히면 알아서 되던 방법으로 뚫어라"는 폐기한다. 그 조항과 스킬 쪽 "폴백을 발명하지 말고 즉시 BLOCKED"가 동시에 살아 있어서, 같은 실패에 대해 어떤 세션은 우회해 산출물을 내고 어떤 세션은 정지했다. 앞으로 각 조작에는 **미리 정해진 사다리**가 있고, 에이전트는 그 사다리만 오르내린다.
+  - 레퍼런스 첨부 사다리: §4.3-1.
+  - 사다리에 없는 방법을 즉석에서 만들지 않는다. 마지막 칸에 도달하면 해당 블록만 defer/BLOCKED로 남기고 사유와 필요한 사용자 조치를 적는다.
+  - 한 블록이 막혀도 다른 블록의 선반 준비·다운로드·QC는 계속한다. 사다리 소진은 그 블록의 정지이지 프로젝트 정지가 아니다.
+  - 사다리가 정의되지 않은 새 상황이면 임의 우회 대신 사용자에게 묻고, 확정된 답을 사다리로 이 파일에 추가한다.
 - 완료 인정: 실제 파일(경로/크기/duration/codec) + 검증 증거만. 프롬프트/계획/UI 세팅만으로 완료 주장 금지.
 - **디스크 스윕 (중복/중간산출물 정리)**: `python3 /Users/gnudas/Documents/Codex/video-team-runtime/runtime/scripts/project_sweep.py scan|apply --project <p>`
   - 실행 시점: 블록 QC PASS 확정 후, 편집 완료 후, 프로젝트 마무리 시.
@@ -196,21 +201,39 @@ Current `오늘의 자동완성` continuation rule: MAIN / COUPLE / GUARDIANS sh
 - Unlimited 경제: 재생성/변형은 싸다(불확실 블록은 같은 세션에서 변형 2개 기본). 비싼 건 오퍼레이터 시간·슬롯·QC 노동.
 
 ### 4.3 레퍼런스 업로드 — canonical 시퀀스 (하나뿐, 새 루트 발명 금지)
-**캐릭터시트/모델시트 직접 업로드 금지**: `CHAR_*`, 캐릭터 바이블, 턴어라운드, 개별 인물 시트는 Seedance/Runway multi-reference 입력물이 아니다. 이 자료들은 스타일프레임 생성 지시와 identity QC 기준으로만 사용한다. Seedance에 올리는 레퍼런스는 반드시 컷별 production styleframe 또는 start/end/keyframe이며, 해당 still이 캐릭터시트 대비 identity/역할 분리 QC를 PASS한 뒤에만 업로드한다. 캐릭터시트를 직접 올린 패키지는 `INVALID_DIRECT_CHARACTER_SHEET_ROUTE`로 격리하고 Generate 금지.
+**캐릭터시트 첨부는 필수다 (2026-07-28 사용자 확정)**: 반복 캐릭터가 등장하는 모든 Seedance 생성에는 승인된 캐릭터시트/identity crop을 장면 레퍼런스와 **함께** 첨부한다. 첨부 순서는 `장면 레퍼런스 먼저 → 캐릭터시트 나중`이고, 붙인 뒤 화면에 보이는 `ImageN` 썸네일로 확인한다. 확인되지 않으면 `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED`로 멈추고 Generate하지 않는다. 대화 컨텍스트·이전 카드·이전 덱 상태는 확인 증거가 아니다.
 
-#### 4.3-1 Runway reference route regression correction — 2026-07-19
+시트의 역할은 **identity anchor 한 가지**다 — 얼굴 실루엣·헤어·의상·연령감·신체 비율·대표 소품만 고정한다. 시트는 장면 순서 지시도, 전환 지시도, 포즈 지시도 아니다. 시트를 붙였다는 이유로 인물을 정면 포스터 포즈로 세우면 QC FAIL이며, 장면의 행동·카메라·동작 중간 상태는 별도로 명시한다. `@ImageN` 번호는 서사 순서가 아니다(`GENERAL_REFERENCE_MODE`).
 
-감사 결론: 로컬 히스토리에는 두 계보가 공존한다. 오래된 `video-team-runtime` 작업은 DOM file input/native picker/asset selector를 성공 루트로 기록했고, 2026-07-12 이후 성공한 no-I2V 작업은 Finder-frontmost 직접 drag/drop을 hard-lock으로 고정했다. 사용자는 현재 반복 사고의 원인으로 picker/asset modal/좌표 오염/중복 클릭 회귀를 지적했다. 따라서 이 런타임의 기본 업로드 경로도 아래 직접 drag/drop으로 승격한다. 예전 Route B/picker 기록은 **DEPRECATED_USER_DISLIKED_ROUTE**이며, 프로젝트 prompt나 오래된 result.md가 이를 추천해도 이 항목이 우선한다.
+> 이전 규칙 `INVALID_DIRECT_CHARACTER_SHEET_ROUTE`(캐릭터시트 직접 업로드 금지)는 **폐기**한다. 그 금지 조항과 스킬 쪽 "매 생성 첨부 필수" 게이트가 동시에 살아 있어서, 붙이면 격리·안 붙이면 BLOCKED인 교착이 생겼고 컷마다 판정이 뒤집혔다. 실제로 클립을 생산한 현장 운영본은 시트를 첨부하는 쪽이었다.
 
-블록 전환 시 이전 블록 스트립 잔여 `IMG_*` 완전 교체 확인 후, 레퍼런스마다:
-1. **스테이징**: `~/Downloads/SEEDANCE_<BLOCK>_<ORDER>_UPLOAD_ONLY/<ORDER>_<REF_ID>.png` 또는 lane의 `upload_staging/<BLOCK>/NN_*.png`. 한 번에 조작할 Finder 창에는 파일 1개만 보이게 한다.
-2. **직접 drag/drop preflight**: Safari에는 실제 `app.runwayml.com` 생성 보드와 빈 `Image N` reference slot이 보여야 한다. Finder가 frontmost여야 하며, Runway/Reference/upload tile/asset selector/file picker를 먼저 누르지 않는다. Codex/ChatGPT/Claude/Calendar/큰 Finder 창이 target slot을 가리면 즉시 `BLOCKED_DIRECT_DRAG_PREFLIGHT`.
-3. **좌표 재측정**: 파일마다 현재 Finder `AXImage` 좌표와 현재 빈 `Image N` slot 좌표를 다시 읽는다. 직전 파일, 과거 성공 사례, crop-relative screenshot 좌표를 재사용하지 않는다. 1x/2x Retina 변환이 불명확하면 클릭/드래그 금지.
-4. **held-payload 증거**: 자동 drag가 조금이라도 모호하면 `mouse-down → slot 위로 이동 → held-state screenshot으로 파일 ghost/payload가 빈 Runway slot 위에 있음 확인 → mouse-up` 2단계로 실행한다. held-state 증거가 없으면 놓지 않는다.
-5. **attach 검증**: upload toast/library/로컬 경로가 아니라 활성 strip의 `Image N` 썸네일 + 확대 semantic-role QC가 성공 조건이다. 파일명/SHA256/slot/role을 `<BLOCK>_reference_attach_verification.json`과 `upload_manifest.json`에 기록한다.
-6. **재시도 한도**: 직접 drag 1회 실패 또는 modal/다른 앱/주소창/Calendar/Claude 등 오염 발생 시 즉시 중단해 `DIRECT_DRAG_UI_DIRTY_OR_BLOCKED`로 분류한다. 좌표·가림·held-payload 증거를 감사한 뒤 정확히 1회만 재시도할 수 있다. 자동으로 picker/asset selector로 폴백하지 않는다.
-7. **fallback 승인 조건**: DOM `input[type=file]`, Cmd+Shift+G picker, Runway asset selector/Search, clipboard image paste는 기본 경로가 아니다. 프로젝트 파일에 `ROUTE_B_APPROVED_BY_USER_CURRENT_THREAD=true` 또는 사용자의 명시 승인 문구가 있을 때만 1회 fallback으로 허용한다. fallback도 active-strip thumbnail + expanded role QC 전에는 Generate 금지.
-8. **persistent deck 예외**: 동일 deck/ref hash가 이미 visible strip에서 맞으면 reference 조작 자체를 금지하고 prompt/settings만 교체한다.
+#### 4.3-1 Runway reference 업로드 — 고정 사다리 (2026-07-28 사용자 확정)
+
+사용자 확정: **드래그는 기본 경로가 아니다.** 기본은 Runway의 보이는 reference asset selector → native chooser다. 드래그는 좌표·Retina 변환·창 가림·held-payload 판정에 의존해 실패 모드가 많으므로 **사다리의 마지막 칸**으로만 남긴다.
+
+2026-07-19에 이 절은 정반대로 적혀 있었다(직접 drag/drop을 canonical로 승격, picker를 `DEPRECATED_USER_DISLIKED_ROUTE`로 격하). 같은 시기 `seedance-production.md`는 asset selector를 canonical로 두고 `cross-window Finder drag`를 명시적으로 금지하고 있었다. 두 문서가 서로의 canonical을 이름 대고 금지하는 상태였고, 세션이 어느 쪽을 먼저 읽었느냐로 업로드 방식이 갈렸다. 아래가 유일한 순서다.
+
+**사다리 — 위에서부터, 건너뛰기 금지**
+
+| 단계 | 방법 | 넘어가는 조건 |
+|---|---|---|
+| 1 | 보이는 `Reference` asset selector → native chooser → 파일 1개 선택 → `Open` | 실패 |
+| 2 | 1단계 **1회만** 재시도 (셀렉터 재열기, 좌표 재측정) | 재시도도 실패 |
+| 3 | Finder-frontmost 직접 drag/drop — **사용자 승인 필요** | 승인 없거나 실패 |
+| 4 | `BLOCKED_REFERENCE_ATTACH_FAILED` 기록 후 정지 | — |
+
+- 3단계는 **현재 대화에서 사용자가 명시 승인**했거나 프로젝트 파일에 `DRAG_APPROVED_BY_USER_CURRENT_THREAD=true`가 있을 때만 쓴다. 자동 승격 금지.
+- 사다리를 벗어난 방법(clipboard paste, AppleScript 좌표 클릭, hidden DOM `input[type=file]` 직접 조작)은 어느 단계에서도 발명하지 않는다.
+- 단계를 건너뛰거나 순서를 바꾸지 않는다. 4단계까지 갔으면 그대로 멈추고 사용자에게 필요한 조치를 적는다.
+
+**공통 절차** — 블록 전환 시 이전 블록 스트립 잔여 `IMG_*` 완전 교체 확인 후, 레퍼런스마다:
+
+1. **스테이징**: `~/Downloads/SEEDANCE_<BLOCK>_<ORDER>_UPLOAD_ONLY/<ORDER>_<REF_ID>.png` 또는 lane의 `upload_staging/<BLOCK>/NN_*.png`. 한 번에 조작할 창에는 파일 1개만 보이게 한다.
+2. **preflight**: Chrome에 실제 `app.runwayml.com` 생성 보드와 빈 `Image N` reference slot이 보여야 한다. 다른 창이 target slot을 가리면 `BLOCKED_REFERENCE_ATTACH_PREFLIGHT`.
+3. **attach 검증**: upload toast/library/로컬 경로가 아니라 활성 strip의 `Image N` 썸네일 + 확대 semantic-role QC가 성공 조건이다. 파일명/SHA256/slot/role을 `<BLOCK>_reference_attach_verification.json`과 `upload_manifest.json`에 기록한다.
+4. **첨부 순서**: 장면 레퍼런스 먼저 → 승인 캐릭터시트 나중(§4.3). 번호를 서사 순서로 해석하지 않는다.
+5. **3단계(드래그)를 쓰는 경우에만**: 파일마다 Finder `AXImage` 좌표와 빈 slot 좌표를 다시 읽고(직전 파일·과거 성공 좌표 재사용 금지), `mouse-down → slot 위 이동 → held-state screenshot으로 payload 확인 → mouse-up` 2단계로 실행한다. held-state 증거가 없으면 놓지 않는다.
+6. **persistent deck 예외**: 동일 deck/ref hash가 이미 visible strip에서 맞으면 reference 조작 자체를 금지하고 prompt/settings만 교체한다.
 
 - 편의 도구 `runway_ui_helper.py`는 색상 확인/증거 기록/프롬프트 삽입 보조용이다. reference attach의 진실원은 visible thumbnail/expanded role QC이며, hidden file input 성공 로그가 이를 대체하지 않는다.
 
