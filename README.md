@@ -14,8 +14,9 @@ Reusable **Codex-native** video-team package: Seedance/Runway operating rules, i
 | `seedance-operations/` | Ops helpers (Finder placement, continuity) |
 | `team-policies/` | Subagent gate, Chrome hybrid operator |
 | `docs/` | Session / version records |
-| `tools/deploy_skills_to_codex.sh` | Deploy skills → `~/.codex/skills` (archives old) |
-| `GLOBAL_AGENTS.md` | Package-side agents mirror (deploy separately if used) |
+| `tools/deploy_skills_to_codex.sh` | Deploy everything → `~/.codex/skills`, `~/.codex/video-team-policies`, `~/.codex/AGENTS.md`, `video-team-runtime/AGENTS.md`, and the two character-sheet standards (archives old first). `--check` reports what a deploy would destroy. |
+| `GLOBAL_AGENTS.md` | Deployed to `~/.codex/AGENTS.md` |
+| `runtime/AGENTS.md` | Deployed to `video-team-runtime/AGENTS.md` — rails, gates, ladders, provider routing |
 
 ## Excluded
 

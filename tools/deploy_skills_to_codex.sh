@@ -89,4 +89,26 @@ echo "deployed: video-team-policies"
 rsync -a --delete "$REPO_DIR/seedance-operations/" "$POLICY_DEST/seedance-operations/"
 echo "deployed: video-team-policies/seedance-operations"
 
+# The two rulebooks that decide behaviour were not deployed by this script, so
+# "deploy" only ever synced half the rules and left the runtime contradicting
+# the skills. Ship them too, archiving each first. (2026-07-28)
+deploy_file() {
+  src="$1"; dst="$2"
+  [ -f "$src" ] || { echo "skip (missing in repo): $src"; return 0; }
+  if [ -f "$dst" ]; then
+    mkdir -p "$ARCHIVE"
+    cp "$dst" "$ARCHIVE/$(basename "$dst").$(echo "$dst" | tr '/' '_')"
+  fi
+  mkdir -p "$(dirname "$dst")"
+  cp "$src" "$dst"
+  echo "deployed: $dst"
+}
+
+deploy_file "$REPO_DIR/GLOBAL_AGENTS.md" "$HOME/.codex/AGENTS.md"
+deploy_file "$REPO_DIR/runtime/AGENTS.md" "$HOME/Documents/Codex/video-team-runtime/AGENTS.md"
+deploy_file "$REPO_DIR/references/character_sheet_prompt_standard.md" \
+            "$HOME/Documents/Codex/video-team-runtime/runtime/references/character_sheet_prompt_standard.md"
+deploy_file "$REPO_DIR/wiki-extract/character-bible-page-prompt-standard.md" \
+            "$HOME/wiki/concepts/character-bible-page-prompt-standard.md"
+
 echo "archived previous versions to: $ARCHIVE"
