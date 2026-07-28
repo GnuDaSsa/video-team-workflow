@@ -62,7 +62,7 @@ flowchart TD
 - 원본: `/Users/gnudas/Documents/Codex/no-i2v-team-runtime/AGENTS.md`
 - 실행: `/Users/gnudas/.local/bin/no-i2v-runtime`
 - 프로젝트 루트: `/Users/gnudas/Documents/Codex/no-i2v-team-runtime/projects/`
-- 이 AGENTS.md §4.3의 캐릭터시트 직접 업로드 금지는 **기존 I2V 팀에는 계속 유효**하다. 직접 시트/reference-native 입력 예외는 `workflow_id=no_i2v_reference_native_v1`인 별도 팀 안에서만 허용한다.
+- 두 팀의 차이는 이제 시트 업로드 가부가 아니다(§4.3에 따라 기존 I2V 팀도 반복 캐릭터가 나오면 시트를 항상 첨부한다). 차이는 **컷별 styleframe의 필요 여부**다: 기존 I2V 팀은 컷별 styleframe/start frame을 만들어 그것과 시트를 함께 올리고, no-I2V 팀은 styleframe 없이 시트+배경 레퍼런스만으로 native 후보를 뽑는다.
 - 두 팀의 queue event, provider provenance, 결과 파일을 섞지 않는다. 기존 팀은 `BLOCK_READY_FOR_I2V`, 새 팀은 `REFERENCE_PACK_READY_FOR_NATIVE_VIDEO`를 사용한다.
 
 ## 1. 런타임과 레일
@@ -88,7 +88,8 @@ flowchart TD
 
 ## 2. 프롬프트 저작 = GPT-5.6 Sol 전담
 
-- **비캐릭터 이미지 프롬프트**는 `gpt-5.6-sol` 전담이고, **Seedance 최종 비디오 프롬프트 저작**은 사용자 최신 교정에 따라 `gpt-5.6-terra` high 전담이다. `5.6 Sol`과 `5.6 Terra`는 Codex 모델 경로로 처리한다.
+- **비캐릭터 이미지 프롬프트와 Seedance 최종 비디오 프롬프트 저작은 모두 `gpt-5.6-sol` 전담이다 (2026-07-28 사용자 확정).** `5.6 Sol`은 Codex 모델 경로로 처리한다.
+- 이전에 §2.1이 비디오 프롬프트를 `gpt-5.6-terra` high 전담으로 지정했으나, 제출 전 attestation은 `model=gpt-5.6-sol`을 요구한다. 규칙대로 terra로 저작하면 attestation이 `NOT_ATTESTED`가 되어 제출이 영구 차단되는 한 파일 안의 데드락이었다. Sol로 통일해 해소한다.
 - 호출 주체는 런타임이다: `video-codex-runtime prompts --project <p>`가 READY인데 팩이 없는 블록을 찾아 `runtime/scripts/sol_prompt_bridge.py`를 실행한다. 특정 블록은 `--block <B>`, 재저작은 `--force`.
 - bridge는 identity lock verbatim·음악·블록스펙·이웃 프롬프트·QC 실패이력·룰북 TIER를 하나의 패킷으로 조립하고 `codex exec --model gpt-5.6-sol` + `model_reasoning_effort="high"`로 저작한다. 산출물은 `*_sol_prompt_pack.json`, `*.sol_provenance.json`, 이미지용 `*.prompt.txt`다.
 - **캐릭터시트(`CHAR_*`)는 Sol bridge 금지**: §3a의 캐릭터시트 표준을 image lane이 직접 적용한다. 캐릭터시트와 장면/모션 프롬프트의 저자 책임을 섞지 않는다.
@@ -98,9 +99,11 @@ flowchart TD
 - bridge가 1회 자동 교정 후에도 JSON/규칙 검증에 실패하면 `SOL_OUTPUT_INVALID`로 차단한다. 자유서식으로 대체하지 않는다.
 - 블록맵에 정보가 부족하면 모델에 손편지를 보내지 말고 `lanes/seedance/prompts/<BLOCK>_block_spec.json`에 `block_id/duration_s/aspect/references/story_beat/contracts/avoid`를 구조화해 추가한다. 상세 기계 계약은 `runtime/references/sol_prompting_handoff_standard.md`를 따른다.
 
-### 2.1 Seedance video prompt director — 5.6 Terra high / creative latitude contract — 2026-07-19
+### 2.1 Seedance video prompt director — Sol high / creative latitude contract
 
-사용자 교정: Seedance 최종 비디오 프롬프트는 잠금/네거티브/템플릿 반복으로 Seedance의 구도·카메라·장면 생성능력을 억누르면 실패다. **비디오 프롬프팅만큼은 반드시 `gpt-5.6-terra` + reasoning effort `high` 전담 패스**로 처리한다. 이미지 프롬프트·캐릭터시트·CapCut 자막 저작과 섞지 않는다.
+사용자 교정: Seedance 최종 비디오 프롬프트는 잠금/네거티브/템플릿 반복으로 Seedance의 구도·카메라·장면 생성능력을 억누르면 실패다. **비디오 프롬프팅은 `gpt-5.6-sol` + reasoning effort `high` 전용 패스**로 처리한다(2026-07-28 모델 확정). 이미지 프롬프트·캐릭터시트·CapCut 자막 저작과 저자 책임을 섞지 않는다 — 같은 모델을 쓰되 패스를 분리한다.
+
+아래의 creative latitude 계약(레퍼런스=앵커, 부분적 lock, 하나의 샷 아크)은 원문 그대로 유효하다. 바뀐 것은 저작 모델뿐이다.
 
 - 제출용 Seedance 프롬프트는 Terra high가 `video_prompt_director_high` 역할로 최종 작성/재작성한다. 사람이 임시로 만든 템플릿, Gongnyang 이미지 프롬프트 문장, “Preserve crop/composition… slow push…” 반복문은 제출 전 그대로 쓰지 않는다.
 - 목표 길이: **700–1,500자 권장 목표, Runway 하드 최대 3,500자**. Runway 3,500자는 비상 상한일 뿐이다. 긴 운영 지침·파일 경로·중복 네거티브는 provenance/manifest에 두고 생성 프롬프트에 넣지 않는다.
@@ -108,7 +111,7 @@ flowchart TD
 - `preserve exact crop/composition`, `camera locked`, `minimal motion only`는 태극기·얼굴 클로즈업·손/폰/문자/매크로·자글자글 안정화 재시도처럼 필요한 컷에만 부분 적용한다. 일반 역사/장소/군중/풍경 컷에는 `preserve story motif and identity; allow cinematic reframing`을 기본으로 한다.
 - 15초 블록은 “네 장의 정지 이미지 순서 재생”이 아니라 **하나의 영상 장면 아크**로 쓴다: `establish → approach/reveal → tactile/action detail → resolution/hold`. 각 비트는 shot header + action + camera + sensory physics + transition을 가진다.
 - 안전 tail은 짧게 유지한다: no readable text/logo/watermark, no gore/torture, no malformed or extra Taegeukgi/trigrams, no modern object drift, no texture crawling/line boiling. 금지문은 필수 위험만 남긴다.
-- Seedance UI 제출 전 attestation에 `prompt_style_version=creative_seedance_5_6terra_high_20260719`, prompt char count, prompt sha, source ref manifest sha를 기록한다. 이 버전이 없으면 업로드/Generate보다 먼저 프롬프트 재작성부터 한다.
+- Seedance UI 제출 전 attestation에 `prompt_style_version=creative_seedance_sol_high_20260728`, prompt char count, prompt sha, source ref manifest sha를 기록한다. 이 버전이 없으면 업로드/Generate보다 먼저 프롬프트 재작성부터 한다. attestation의 `model`은 §2와 동일하게 `gpt-5.6-sol`이어야 PASS다.
 
 
 
@@ -163,9 +166,9 @@ Current `오늘의 자동완성` continuation rule: MAIN / COUPLE / GUARDIANS sh
 ## 4. Seedance 실행 (Runway UI-only)
 
 ### 4.1 경로 고정
-- **Runway는 절대 MCP/커넥터/API 금지.** 제출·폴링·다운로드 전부 검증된 Safari `app.runwayml.com` 생성 보드 탭에서 Codex Computer Use로만. 세션 시작 시 보이는 UI(모델 Seedance 2.0/Multi-reference/Unlimited relaxed 모드)를 `provider_route_verification.json`에 기록.
+- **Runway는 절대 MCP/커넥터/API 금지.** 제출·폴링·다운로드 전부 로그인된 **Chrome** `app.runwayml.com` 생성 보드 탭 하나에서만. 같은 프로젝트로 Safari Runway 세션을 병행해 열지 않는다. 세션 시작 시 보이는 UI(모델 Seedance 2.0/Multi-reference/Unlimited relaxed 모드)를 `provider_route_verification.json`에 기록.
 - 로그인/토큰 만료 = `BLOCKED_RUNWAY_LOGIN_REQUIRED` (API 우회 금지).
-- **인증 판단의 신호원은 오직 보이는 웹 UI다**: Safari에서 `app.runwayml.com` 생성 보드가 열리고 계정/팀이 보이면 인증 OK. 로그인 페이지가 보일 때만 BLOCKED. **Runway MCP/커넥터의 토큰 상태를 확인하는 행위 자체를 금지한다** — 커넥터 `oauth_token_invalid_grant`류는 웹 세션과 무관하며, 이를 Runway 블로커의 근거로 쓰는 것은 허위 블로커다(오늘의 자동완성 사례: 커넥터 토큰 만료를 3회 확인하고 Grok 전량 폴백 — 웹 세션은 멀쩡했음).
+- **인증 판단의 신호원은 오직 보이는 웹 UI다**: Chrome에서 `app.runwayml.com` 생성 보드가 열리고 계정/팀이 보이면 인증 OK. 로그인 페이지가 보일 때만 BLOCKED. **Runway MCP/커넥터의 토큰 상태를 확인하는 행위 자체를 금지한다** — 커넥터 `oauth_token_invalid_grant`류는 웹 세션과 무관하며, 이를 Runway 블로커의 근거로 쓰는 것은 허위 블로커다(오늘의 자동완성 사례: 커넥터 토큰 만료를 3회 확인하고 Grok 전량 폴백 — 웹 세션은 멀쩡했음).
 - **`System Status` 배너 단독 차단 금지**: `We've identified a problem...` 같은 전역 배너가 보여도 로그인된 생성 보드·실제 file input·Generate 버튼이 살아 있으면 먼저 §4.3의 현재 canonical 업로드를 그대로 실행한다. 배너만 보고 `BLOCKED_PROVIDER_OUTAGE`로 분류하거나 Asset selector/파일명 검색/임의 루트를 만들지 않는다. 현재 canonical은 2026-07-19 회귀 교정 이후 **Finder-frontmost 직접 drag/drop**이다. 예전 `input[type=file] → picker-go → 업로드` 성공 기록은 historical fallback evidence일 뿐 기본 경로가 아니다. canonical 레퍼런스 1개 업로드가 실제로 실패하고, 다시 fresh capture한 보드에서도 업로드/Generate 오류가 보일 때만 provider incident blocker로 승격한다.
 
 ### 4.2 Seedance 단일 lane 큐 운용 (Kanban/profile 에이전트 아님)
@@ -245,7 +248,7 @@ Current `오늘의 자동완성` continuation rule: MAIN / COUPLE / GUARDIANS sh
 - `<block>_submit.json`에 attestation의 `prompt_sha256`을 포함할 것. attestation 없는 제출 기록은 무효 제출로 간주한다.
 - **Computer Use로 Claude/ChatGPT 등 채팅 화면 접속 금지.** 이 단계의 브라우저 Computer Use 허용 대상은 Runway뿐이다. 채팅 화면 복붙은 Sol pack provenance가 아니다(§2).
 - 프롬프트는 Sol 팩 텍스트 그대로. **700~1,500자 권장, Runway UI 하드 최대는 3,500자**다. 1,500자 초과는 품질 검토/압축 권고이지 검증 실패가 아니며, 3,500자를 넘을 때만 제출 금지로 재작성한다. 최종 검증은 보이는 카운터로 하고(커스텀 에디터라 AX tree는 empty 오판), 장문 keystroke 타이핑은 금지한다.
-- Route A: 같은 osascript에서 `Safari activate + delay 0.3` → 필드 클릭·caret 확인 → Cmd+V → 카운터 검증 (최대 2회).
+- Route A: 같은 osascript에서 `Chrome activate + delay 0.3` → 필드 클릭·caret 확인 → Cmd+V → 카운터 검증 (최대 2회).
 - Route B: `do JavaScript`로 에디터 focus 후 `document.execCommand('insertText', false, <JSON-escaped>)` (stale 텍스트는 selectAll 후). 실패 시 defer + 수동 요청.
 - 수동 트림은 트림 우선순위(레퍼런스 순서/identity > 모션·카메라 > 스타일 형용사)대로, `prompt_rules_used`에 기록.
 
@@ -277,7 +280,7 @@ Current `오늘의 자동완성` continuation rule: MAIN / COUPLE / GUARDIANS sh
 
 ### 4.0-1. Seedance UI/Computer Use only — 2026-07-06 correction
 
-Do not use the Runway MCP/app connector/API for production Seedance actions or for deciding whether the project is blocked. If Safari shows the Runway web UI is logged in, operate that visible UI with Codex Computer Use. Connector OAuth errors such as `oauth_token_invalid_grant` are irrelevant to the web UI route and must not stop the lane. Evidence must be visible UI state: reference thumbnails/order, prompt field, settings, Generate state, queue/result cards, and downloads after UI completion.
+Do not use the Runway MCP/app connector/API for production Seedance actions or for deciding whether the project is blocked. If Chrome shows the Runway web UI is logged in, operate that visible UI with Codex Computer Use. Connector OAuth errors such as `oauth_token_invalid_grant` are irrelevant to the web UI route and must not stop the lane. Evidence must be visible UI state: reference thumbnails/order, prompt field, settings, Generate state, queue/result cards, and downloads after UI completion.
 
 Current correction: when the user says Runway is open in the web browser, treat that as the active route. Do not request connector reauthentication, do not poll connector auth, and do not report `BLOCKED_CONNECTOR_REAUTH` for Seedance. Use Computer Use against the visible `app.runwayml.com` UI only.
 

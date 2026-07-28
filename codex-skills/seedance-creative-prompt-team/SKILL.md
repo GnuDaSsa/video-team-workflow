@@ -7,6 +7,18 @@ description: "Sequential Creative Seedance prompt authoring team. Use when the u
 
 A cloned and restructured version of the Creative Seedance Mode from `seedance-prompt-en`. This skill owns **prompt and reference-package authoring only**. It does not click Runway, attach files, Generate, monitor queues, or claim media completion. The six named roles are a sequential reasoning checklist, not six automatically spawned agents.
 
+## Relationship to the Sol prompt bridge — 2026-07-28
+
+Inside the video-team runtime (`Documents/Codex/video-team-runtime`), the **final submitted Seedance prompt is authored by the `gpt-5.6-sol` bridge at reasoning effort `high`**, and the pre-submit attestation requires `model=gpt-5.6-sol`. A hand-written or chat-authored prompt has no Sol provenance and will fail attestation.
+
+So this skill is a **pre-Sol thinking pass, not the final author**:
+
+- run the six roles to decide premise, reference roles, camera family, physical layers, and exit composition;
+- write that decision into the structured block spec (`lanes/seedance/prompts/<BLOCK>_block_spec.json`);
+- let the Sol bridge compose the submitted prompt from it.
+
+Outside the runtime — ad-hoc requests, exploration, a one-off clip with no lane — this skill may emit the final prompt directly. When in doubt, if the work lives in a runtime project, Sol writes the prompt.
+
 Start responses with `[seedance-creative-prompt-team]` when this skill is active.
 
 ## Authority split
