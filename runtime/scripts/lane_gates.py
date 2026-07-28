@@ -55,6 +55,9 @@ QUEUES = [
 # AGENTS.md §1 already states the rule ("완료 인정: 실제 파일 + 검증 증거만"),
 # so this is the code catching up to the written contract.
 
+import re as _re_mod
+_re_v = _re_mod.compile(r'_v\\d+')
+
 MEDIA_EXT = {'.png', '.jpg', '.jpeg', '.webp', '.mp4', '.mov', '.wav', '.mp3', '.m4a'}
 VIDEO_EXT = {'.mp4', '.mov'}
 IMAGE_EXT = {'.png', '.jpg', '.jpeg', '.webp'}
@@ -123,6 +126,36 @@ def audit_artifacts(project: Path) -> dict:
         problems.append(
             f'CLAIM_WITHOUT_MEDIA: seedance_qc claims approved_for_edit_count={claimed} '
             f'but assets/i2v_clips holds no video file.')
+
+    # Ordered-library discipline: one library, edited in place.
+    lib = project / 'assets' / 'images_approved'
+    if lib.exists():
+        import re as _re
+        seq = _re.compile(r'^(\d{3,4})_')
+        nums = [int(seq.match(p.name).group(1)) for p in lib.iterdir()
+                if p.is_file() and seq.match(p.name)]
+        if nums:
+            dupes = sorted({n for n in nums if nums.count(n) > 1})
+            gaps = [n for n in range(1, max(nums) + 1) if n not in nums]
+            stats['ordered_library_count'] = len(nums)
+            if dupes:
+                problems.append(f'SEQUENCE_DUPLICATE_SLOTS: {dupes} in assets/images_approved — '
+                                f'renumber with sequence_manager.py')
+            if gaps:
+                warnings.append(f'sequence gaps {gaps[:10]} in assets/images_approved — '
+                                f'run sequence_manager.py renumber to re-pack')
+    # Sibling "ordered image" folders are how the 68-folder sprawl started.
+    rival = []
+    for d in (project / 'lanes').rglob('*') if (project / 'lanes').exists() else []:
+        n = d.name.lower()
+        if d.is_dir() and ('ordered_image' in n or n.startswith('redesign_')
+                           or 'restructured' in n or _re_v.search(n)):
+            rival.append(str(d.relative_to(project)))
+    if rival:
+        warnings.append(f'{len(rival)} versioned/ordered image folders under lanes/ '
+                        f'(e.g. {rival[0]}) — the ordered library is assets/images_approved, '
+                        f'edited in place with sequence_manager.py, not copied to a new folder')
+        stats['rival_ordered_folders'] = rival[:5]
 
     for lane, folder, exts, label in (
         ('image_qc', 'images_approved', IMAGE_EXT, 'approved images'),

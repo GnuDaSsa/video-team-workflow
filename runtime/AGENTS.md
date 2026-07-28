@@ -97,6 +97,31 @@ flowchart TD
   - 한 블록이 막혀도 다른 블록의 선반 준비·다운로드·QC는 계속한다. 사다리 소진은 그 블록의 정지이지 프로젝트 정지가 아니다.
   - 사다리가 정의되지 않은 새 상황이면 임의 우회 대신 사용자에게 묻고, 확정된 답을 사다리로 이 파일에 추가한다.
 - 완료 인정: 실제 파일(경로/크기/duration/codec) + 검증 증거만. 프롬프트/계획/UI 세팅만으로 완료 주장 금지.
+
+### 1-A. 순서 있는 이미지 라이브러리 — 한 프로젝트 한 폴더, 제자리 수정 (2026-07-28)
+
+**정규 라이브러리는 `assets/images_approved/` 하나뿐이다.** 파일명은 `NNN_<SCENE_ID>_<slug>.<ext>`이고 번호는 항상 1부터 빈칸 없이 이어진다.
+
+문제의 실체: 이름 규칙은 원래 멀쩡했다(`001_S01-01_modern_pangyo_daily_life.png`). 깨진 건 **수정 방법**이다. 중간 이미지를 바꾸면 뒤 번호를 전부 밀어야 하는데, 손으로 밀면 그 파일명을 적어둔 매니페스트·큐·프롬프트 팩이 조용히 깨진다. 그래서 에이전트는 문제를 피했다 — 기존 세트를 그대로 두고 옆에 새 폴더를 팠다. `redesign_20260724/ordered_images_v6_s01_restructured`가 그렇게 태어났고, 한 프로젝트가 68개 폴더 + 빈 `assets/`가 됐다.
+
+**그래서 재넘버링은 도구로만 한다** — 참조를 파일과 함께 옮겨야 안전하다:
+
+```
+python3 runtime/scripts/sequence_manager.py <command> --project <p> [--apply]
+
+  check                                 번호 중복·빈칸·순서 점검
+  replace --slot N --file F             같은 슬롯 교체 (파일명 유지 → 참조 그대로 유효)
+  insert  --at N --file F --slug S      중간 삽입 → 뒤 전부 +1 밀고 참조 갱신
+  remove  --slot N                      제거 후 빈칸 메움 + 참조 갱신
+  renumber                              1..N 연속으로 재정렬
+```
+
+- `--apply` 없으면 **드라이런**이다. 무엇이 어떻게 바뀌는지 먼저 보고 실행한다.
+- 교체된 구버전은 삭제하지 않고 `_superseded/<timestamp>/`로 보관하며, 그 폴더에 `operation.json`이 남아 되돌릴 수 있다.
+- 도구는 프로젝트 안의 `.json/.jsonl/.md/.txt/.csv`에서 옛 파일명을 찾아 새 이름으로 바꾼다. **손으로 `mv` 하지 않는다** — 참조가 끊긴다.
+- **버전 폴더 금지**: `ordered_images_v6`, `redesign_YYYYMMDD`, `*_restructured` 같은 형제 폴더를 만들어 순서 세트를 복제하지 않는다. 변경은 정규 라이브러리에서 제자리로 한다. `validate`가 이런 폴더를 경고로 잡는다.
+- `lanes/<lane>/`은 **작업 중간물**만 둔다. 승인된 컷은 정규 라이브러리로 승격하고, 거기서만 순서를 관리한다.
+- `validate`가 번호 중복은 `SEQUENCE_DUPLICATE_SLOTS` problem으로, 빈칸은 warning으로 보고한다.
 - **레일 준수는 이제 코드가 검사한다 (2026-07-28)**: 지금까지 모든 게이트는 상태 문자열·큐 이벤트·레인이 스스로 쓴 카운트만 봤고 파일을 한 번도 확인하지 않았다. `init`이 `assets/*`를 만들어놓고 그 뒤 아무도 읽지 않아, 독립운동가 프로젝트가 `lanes/` 아래 607개 미디어를 쌓고 `assets/`를 비운 채 `validate PASS`를 받았다.
   - `validate`에 **artifact 감사**가 붙었다: `assets/`가 비었는데 `lanes/`에 미디어가 쌓여 있으면 `RAIL_BYPASSED` **problem**(ok=false), 비율이 크게 기울면 warning, DONE 레인의 정규 폴더가 비면 warning. 출력에 `artifacts` 통계(승인 이미지 수·클립 수·산재 파일 수·상위 폴더)가 포함된다.
   - `editor`/`package` **하드 게이트가 실제 파일을 요구한다**: `approved_for_edit_count`가 0보다 커도 프로젝트에 비디오 파일이 하나도 없으면 `CLAIM_WITHOUT_MEDIA`로 막는다. 게이트는 "미디어가 존재하는가"만 보고 위치는 따지지 않는다(위치 규율은 `validate` 몫) — 진행 중 프로젝트를 정리 때문에 막지 않기 위해서다.
