@@ -32,6 +32,7 @@ If Computer Use itself is unavailable, stop with `BLOCKED_CODEX_COMPUTER_USE_UNA
 5. Repeat until every ordered reference is visible. Attach scene references first, approved character sheet(s) after.
 6. For any character in an approved sheet, verify the sheet/identity crop thumbnail is present in the role position on **this** generation. Previous cards do not count.
 7. If a file, slot, order, or character-sheet thumbnail is wrong, stop and recover the deck. Do not Generate.
+8. **Deck-overlap check:** compare the visible strip against the previous block's deck. More than one shared scene reference means two near-identical clips are about to be produced — rebuild the deck before Generate.
 
 `ImageN` order is an attachment record, not a narrative sequence — the prompt must not treat the numbering as a storyboard to interpolate or replay (`GENERAL_REFERENCE_MODE`).
 
@@ -56,10 +57,24 @@ The blue state means eligible after all eight checks; it is not permission to cl
 - Wait for a visible accepted card (`In queue`, `Generating`, `Processing`, or `Completed`) belonging to that scene.
 - Record the accepted card and increment the in-flight count. Then advance the UI deck to the next prepared package; never re-click the accepted scene.
 - Target two in-flight cards whenever two eligible packages exist. While cards render, pre-arm the next package and process completed cards; do not idle.
+- The two in-flight slots must hold **two different scenes**. Filling both with the same scene, or with two decks that overlap by more than one reference, just buys two versions of one shot. Two slots is throughput, not redundancy — if only one scene is genuinely ready, run one slot and prepare the next.
 - If the button is gray or shows a wait/Credits state, keep the current package staged and use the approved 15-minute observer. Do not click.
-- If one click produces no accepted card, hold the scene for review and do not automatically retry.
+- If one click produces no accepted card, run the `ACTIVE_CLICK_NO_CARD` protocol below. Do not declare a blocker on a short look.
 - The observer is allowed only while a queue is active. When the queue empties, **first fill it**: if a prepared block remains, pre-arm and submit it before anything else. Retire the observer only once the queue is empty and the shelf is exhausted, and say so explicitly.
 - An observer watching a composer with 0 references is a staging failure. Generate cannot turn blue on an empty board, so pre-arm before observing.
+
+## ACTIVE_CLICK_NO_CARD — clicked an eligible button, no card appeared
+
+A card can lag well behind the button. Ported from the runtime contract 2026-07-28 because this file only said "hold the scene", with no observation window, so a 15-second look was being reported as `BLOCKED_GENERATE_ACCEPTANCE_NOT_VERIFIED` while the submission may have gone through.
+
+1. **Keep watching.** Poll for the card every 5s for up to **60s**. The button briefly disabling and returning is not a verdict. Still nothing at 60s → classify `ACTIVE_CLICK_NO_CARD`.
+2. **Check for a hidden success before re-clicking.** Refresh the same tab (Cmd+R, keep the verified session URL) and look in the session feed for a new job matching this block by time and reference count. If it is there, the submit succeeded — record the card evidence and never re-click.
+3. **Re-preflight.** A refresh can reset the composer; re-verify the whole eight-check from the top and rebuild through the canonical route if anything was lost.
+4. **One conditional second click**, only when all three hold: (a) refresh+feed confirmed no duplicate job, (b) every preflight item green, (c) 2 minutes since the first click. One second attempt per block per session — that is the cap.
+5. **Still no card** → `BLOCKED_SUBMIT_NOT_REGISTERING`, defer that block, keep filling the queue and preparing the shelf, report to the user. No API/MCP detour, no Credits Mode, no extra clicks.
+6. **Evidence** (`ui_evidence.jsonl`): `state`, `ts_click`, `button_pre` (visible colour), `card_poll` (interval/total/result), `refresh_done`, `feed_duplicate_check`, `preflight_after_refresh`, `second_click`, `final_classification`.
+
+A deferred block never blocks the others: keep the remaining shelf moving.
 
 ## Completion evidence
 
