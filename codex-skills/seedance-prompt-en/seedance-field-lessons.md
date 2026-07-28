@@ -73,7 +73,8 @@ Do not auto-append conservative boilerplate such as `no sudden cuts`, `no exagge
 - One logged-in Chrome `app.runwayml.com` Generate board per project.
 - Attach one reference at a time through the native chooser, then confirm the visible `ImageN` thumbnail.
 - **Reset is not the X.** It is the circular arrow at the image's top right — `button[aria-label="Reset settings"]`, icon `lucide-rotate-ccw`.
-- Generate eligibility: the button must be visibly blue **and** `data-soft-disabled="false"`. `primaryBlue` class with `data-soft-disabled="true"` is inactive. Never judge by position.
+- Generate eligibility is decided by the **visible button colour**: blue = clickable, gray = wait. Never judge by button position, and do not let AX `disabled` / `aria-disabled` / DOM guesses override the colour — that override rule exists because DOM heuristics produced false negatives on a genuinely clickable button.
+- Known trap: a `primaryBlue` button carrying `data-soft-disabled="true"` looks blue but does nothing. Colour still decides *eligibility*; if a single click on a blue button yields no accepted card, do not re-click — follow the `ACTIVE_CLICK_NO_CARD` protocol.
 - Click Generate once per scene. A click is not a submission — only a visible `In queue` / `Generating` / `Processing` / `Completed` card for that scene counts as accepted.
 - Every block: 15s, Creative, Multi-reference, 16:9, **Audio ON**.
 
