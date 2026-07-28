@@ -28,7 +28,7 @@ Start responses with `[seedance-creative-prompt-team]` when this skill is active
 | Creative prompt + ordered multi-ref package | **this skill** |
 | Shared Seedance invariants / block codes | `~/.codex/skills/seedance-prompt-en/seedance-shared-contract.md` |
 | Visible Runway attach / Generate / download | `~/.codex/skills/seedance-prompt-en/seedance-production.md` |
-| Story purpose / scene brief | `videodirector` / `music-video-production-team` |
+| Story purpose / scene brief | `videodirector` |
 
 Read the shared contract before authoring. If production execution is requested after the package is ready, hand off to `seedance-prompt-en` and do not improvise UI steps here.
 

@@ -348,7 +348,7 @@ This block is the tie-breaker. Previously this file said "Seedance follows the s
 | 1 | `~/Documents/Codex/video-team-runtime/AGENTS.md` | rails, lane order, gates, escalation ladders, provider assignment, prompt-authoring routing, safety gates |
 | 2 | `~/.codex/skills/seedance-prompt-en/` | Seedance prompt spec, Runway UI operation, attach/Generate/queue/download |
 | 3 | `~/.codex/video-team-policies/` | spawn approval gate, Chrome operator model |
-| 4 | `videodirector` / `music-video-production-team` | story, direction, quality bars — **never execution procedure** |
+| 4 | `videodirector` | story, direction, quality bars — **never execution procedure** |
 
 Within rank 2's scope (Seedance UI and prompt spec), rank 2 wins over rank 1. Within rank 1's scope (rails, gates, safety), rank 1 wins. Do not restate a rule in two places; leave a pointer instead.
 

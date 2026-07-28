@@ -9,7 +9,7 @@
 | 1 | **이 파일 (`runtime/AGENTS.md`)** | 레일·lane 순서·게이트·막혔을 때 사다리·프로바이더 배정·프롬프트 저작 라우팅·안전 게이트 |
 | 2 | `~/.codex/skills/seedance-prompt-en/` | Seedance 프롬프트 규격, Runway UI 조작, 첨부/Generate/큐/다운로드 절차 |
 | 3 | `~/.codex/video-team-policies/` | 스폰 승인 게이트, Chrome 오퍼레이터 모델 |
-| 4 | `videodirector` / `music-video-production-team` | 기획·연출·품질 기준. **실행 절차를 정의하지 않는다** |
+| 4 | `videodirector` | 기획·연출·품질 기준. **실행 절차를 정의하지 않는다** |
 
 - 2번 범위(Seedance UI·프롬프트 규격) 안에서는 **2번이 이 파일보다 우선**한다. 이 파일에 UI 절차를 새로 쓰지 말고 2번을 고쳐라.
 - 1번 범위(레일·게이트·안전) 안에서는 이 파일이 우선한다.
@@ -201,7 +201,7 @@ Seedance final prompts must contain only video-relevant viewing instructions. Do
 
 1. **1순위 — 사용자 승인 최신 표준**: `/Users/gnudas/wiki/concepts/character-bible-page-prompt-standard.md` — AAA 바이블 페이지 표준 + **2종 출력 규칙**(① 고밀도 캐릭터 디자인 바이블 페이지: hero pose·turnaround·expression·의상/소품 callout·팔레트·lore, ② Seedance/I2V identity lock용 클린 프로덕션 시트: 중립 배경·플랫 조명·무텍스트).
 2. **2순위 — 클린 프로덕션 시트 세부 규격**: `/Users/gnudas/Documents/Codex/video-team-runtime/runtime/references/character_sheet_prompt_standard.md` (CHAR_TURNAROUND/EXPRESSIONS/POSE_ACTION/PROP_COSTUME 레이아웃, 네거티브 블록).
-3. **역할 계약 참고**: `~/.codex/skills/videodirector/SKILL.md`·`~/.codex/skills/music-video-production-team/SKILL.md`의 Character Creator 항목.
+3. **역할 계약 참고**: `~/.codex/skills/videodirector/references/role-split.md`의 Character Creator 항목.
 
 규칙: 프롬프트 저작은 위 표준대로 lane이 직접(Sol bridge 금지 — bridge도 CHAR_*를 거부한다). **실행 경로는 §3의 표준 CLI 백그라운드 생성** — 스킬 문서에 남은 "ChatGPT Image 2 웹 브라우저" 문구는 legacy이며 본 파일이 이긴다.
 

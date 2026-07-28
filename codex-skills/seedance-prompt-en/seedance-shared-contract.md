@@ -7,7 +7,7 @@ This document contains rules that both the prompting and production branches mus
 - `SKILL.md` dispatches the workflow; this file defines the shared invariants.
 - `seedance-prompting.md` owns visual prompt and reference-package authoring.
 - `seedance-production.md` owns visible Runway operation, queue monitoring, downloads, and media verification.
-- `videodirector` and `music-video-production-team` may define story and shot purpose, but do not replace these Seedance rules.
+- `videodirector` may define story and shot purpose, but do not replace these Seedance rules.
 - Still images are produced with Codex imagegen/Gongnyang. This contract covers Seedance videoization only.
 - Default provider is Seedance. Grok is used only when the user explicitly names it for the specific job.
 
