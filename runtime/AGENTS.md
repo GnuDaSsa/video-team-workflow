@@ -97,6 +97,10 @@ flowchart TD
   - 한 블록이 막혀도 다른 블록의 선반 준비·다운로드·QC는 계속한다. 사다리 소진은 그 블록의 정지이지 프로젝트 정지가 아니다.
   - 사다리가 정의되지 않은 새 상황이면 임의 우회 대신 사용자에게 묻고, 확정된 답을 사다리로 이 파일에 추가한다.
 - 완료 인정: 실제 파일(경로/크기/duration/codec) + 검증 증거만. 프롬프트/계획/UI 세팅만으로 완료 주장 금지.
+- **레일 준수는 이제 코드가 검사한다 (2026-07-28)**: 지금까지 모든 게이트는 상태 문자열·큐 이벤트·레인이 스스로 쓴 카운트만 봤고 파일을 한 번도 확인하지 않았다. `init`이 `assets/*`를 만들어놓고 그 뒤 아무도 읽지 않아, 독립운동가 프로젝트가 `lanes/` 아래 607개 미디어를 쌓고 `assets/`를 비운 채 `validate PASS`를 받았다.
+  - `validate`에 **artifact 감사**가 붙었다: `assets/`가 비었는데 `lanes/`에 미디어가 쌓여 있으면 `RAIL_BYPASSED` **problem**(ok=false), 비율이 크게 기울면 warning, DONE 레인의 정규 폴더가 비면 warning. 출력에 `artifacts` 통계(승인 이미지 수·클립 수·산재 파일 수·상위 폴더)가 포함된다.
+  - `editor`/`package` **하드 게이트가 실제 파일을 요구한다**: `approved_for_edit_count`가 0보다 커도 프로젝트에 비디오 파일이 하나도 없으면 `CLAIM_WITHOUT_MEDIA`로 막는다. 게이트는 "미디어가 존재하는가"만 보고 위치는 따지지 않는다(위치 규율은 `validate` 몫) — 진행 중 프로젝트를 정리 때문에 막지 않기 위해서다.
+  - 산출물을 `assets/`로 승격하는 것은 여전히 레인의 책임이다. 감사는 안 했을 때 보이게 만들 뿐이다.
 - **디스크 스윕 (중복/중간산출물 정리)**: `python3 /Users/gnudas/Documents/Codex/video-team-runtime/runtime/scripts/project_sweep.py scan|apply --project <p>`
   - 실행 시점: 블록 QC PASS 확정 후, 편집 완료 후, 프로젝트 마무리 시.
   - `scan` = 리포트만. `apply` = **가역 격리** — 완전 동일(sha256) 중복 사본과 내용물이 프로젝트에 전부 존재하는 오래된 스테이징 폴더(Downloads/SEEDANCE_*, CapCutImport)만 `_sweep_trash_<date>/`로 이동(manifest로 `restore` 가능). 에이전트는 apply까지 자율 실행 가능.
