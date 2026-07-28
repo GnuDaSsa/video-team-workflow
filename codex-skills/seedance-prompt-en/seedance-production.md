@@ -58,7 +58,8 @@ The blue state means eligible after all eight checks; it is not permission to cl
 - Target two in-flight cards whenever two eligible packages exist. While cards render, pre-arm the next package and process completed cards; do not idle.
 - If the button is gray or shows a wait/Credits state, keep the current package staged and use the approved 15-minute observer. Do not click.
 - If one click produces no accepted card, hold the scene for review and do not automatically retry.
-- The observer is allowed only while a queue is active and must be removed when the queue ends.
+- The observer is allowed only while a queue is active. When the queue empties, **first fill it**: if a prepared block remains, pre-arm and submit it before anything else. Retire the observer only once the queue is empty and the shelf is exhausted, and say so explicitly.
+- An observer watching a composer with 0 references is a staging failure. Generate cannot turn blue on an empty board, so pre-arm before observing.
 
 ## Completion evidence
 
@@ -79,3 +80,40 @@ A UI card, thumbnail, prompt, or source image is never final media completion. M
 - `UPLOAD_100_PERCENT_STALLED`: cancel only the stalled upload, preserve the rest of the deck, and record it.
 - `UI_ONLY_NOT_DOWNLOADED`: card exists but media file is not verified.
 - `DUPLICATE_GENERATE_PREVENTED`: accepted card already exists; do not click again.
+
+---
+
+# Board and queue specifics
+
+Moved here 2026-07-28 from the prompting field-lessons file, where UI and queue procedure did not belong.
+
+## Runway board specifics
+
+- One logged-in Chrome `app.runwayml.com` Generate board per project.
+- Attach one reference at a time through the native chooser, then confirm the visible `ImageN` thumbnail.
+- **Reset is not the X.** It is the circular arrow at the image's top right — `button[aria-label="Reset settings"]`, icon `lucide-rotate-ccw`.
+- Generate eligibility is decided by the **visible button colour**: blue = clickable, gray = wait. Never judge by button position, and do not let AX `disabled` / `aria-disabled` / DOM guesses override the colour — that override rule exists because DOM heuristics produced false negatives on a genuinely clickable button.
+- Known trap: a `primaryBlue` button carrying `data-soft-disabled="true"` looks blue but does nothing. Colour still decides *eligibility*; if a single click on a blue button yields no accepted card, do not re-click — follow the `ACTIVE_CLICK_NO_CARD` protocol.
+- Click Generate once per scene. A click is not a submission — only a visible `In queue` / `Generating` / `Processing` / `Completed` card for that scene counts as accepted.
+- Every block: 15s, Creative, Multi-reference, 16:9, **Audio ON**.
+
+## Two-slot queue
+
+- Keep two jobs in flight. When the first card is accepted, immediately attach → verify → preflight the second.
+- Once both are running, stop clicking Generate; prepare the next deck's references, prompt, and settings instead.
+- Gray button means wait and keep preparing. When it returns to blue, redo the eight-check preflight before clicking.
+- Never advance the cursor or re-click just because the button looks blue while no accepted card appeared.
+- No extra agent, scheduler, or second browser loop. A single 15-minute status check, only while the queue is genuinely active.
+
+## Queue stall stop rule
+
+If the same submitted card reads `In queue` on **three consecutive** 15-minute checks, record `BLOCKED_RUNWAY_QUEUE_STALLED` and stop that monitor. Judge only on the third; checks one and two get a short status note. Any change — `Generating`, `Processing`, `Completed`, failure, error, card disappearance — resets the counter to zero.
+
+This blocks that external queue, not the project. Resume when the card moves to `Generating`/`Completed` in the same session, or when the user clears the stall and says to resume.
+
+## Completion evidence
+
+- Completion is the **downloaded file**, never a card or thumbnail.
+- Record `scene_id`, provider, absolute path, bytes, duration, codec, and QC verdict per file.
+- A generated-but-undownloaded result is `UI_ONLY_NOT_DOWNLOADED` and is never reported as complete. Recover it from the session board before judging it missing.
+- If a card vanishes, fails, shows a different deck, or a blocker appears: record `BLOCKED` and stop.

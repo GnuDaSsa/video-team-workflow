@@ -23,7 +23,7 @@ This document contains rules that both the prompting and production branches mus
 
 User standing preference for ordinary Seedance work:
 
-- **Shape:** multi-reference × **15 seconds** by default. Do not ask whether to use multi-ref. Shorter only with an explicit override for that shot.
+- **Shape:** **15 seconds** by default; shorter only with an explicit override for that shot. Reference count comes from the request, not a rule — see the reference/character-sheet gate below.
 - **Creative room:** open after identity lock. References are anchors (identity/environment/texture/prop), not start/middle/end cages.
 - **Audio:** the Runway **Audio setting stays ON**, always. The prompt names the soundscape for that shot — ambience, contact SFX, room tone, or music. Spoken dialogue only with a verified performed `@Audio1` guide. See "Audio: toggle always ON" below.
 - **Naturalism:** believable body mechanics and ordinary contact physics over glossy AI spectacle.
@@ -47,9 +47,10 @@ A preference for diegetic-only audio was written into the **settings/handoff fie
 
 Audio intent belongs in the prompt text. The settings line reports the real UI value and nothing else.
 
-## Universal multi-reference and character-sheet gate
+## Reference deck and character-sheet gate
 
-- Every Seedance generation in this project uses visible multi-reference assets. The prompt package must contain an ordered `@ImageN` role map.
+- **Reference count follows the user's request for that job.** Typical is 3–4, but the user may direct a shot from a character sheet plus a background alone, or hand over a larger deck. Do not enforce a fixed count and do not ask whether to use multi-reference — read the request.
+- Whatever the count, the prompt package must contain an ordered `@ImageN` role map naming each reference's visible function.
 - When a visible person/character corresponds to an approved character/model/identity sheet, attach the scene reference(s) **and that character sheet or approved identity crop every time**.
 - If multiple approved characters appear, attach every relevant sheet/crop. Scene image presence never replaces the sheet.
 - Character sheets are identity anchors, not storyboard replacements. They do not authorize inventing a different costume, face, age, or role.
@@ -88,7 +89,10 @@ The clean sheet **does not replace** the per-cut styleframe. Attach `styleframe(
 - If Generate is blue, click it **exactly once**. Immediately verify the resulting scene card itself—`In queue`, `Generating`, `Processing`, or `Completed`—and match its scene ID/prompt before recording the queue submission. A blue button alone is not completion evidence.
 - If one click does not produce a matching accepted card, stop automatic retries and record `BLOCKED_GENERATE_ACCEPTANCE_NOT_VERIFIED`; do not click again for that scene.
 - After a matching card is visible, and only if the Generate control remains blue/eligible, advance to the next prepared prompt and reference package. Attach and visibly verify that next package first, then click Generate once. Repeat this staged-package → blue-button → one-click → matching-card cycle.
-- Keep the observer alive only while at least one submitted card or a gray staged package remains active. Remove it when the queue is empty and no package is waiting. The observer never downloads, deletes, publishes, or submits external forms.
+- **An empty queue is a cue to submit, not a cue to quit.** Before retiring anything, check whether a prepared block remains. If one does: pre-arm it (attach the ordered references, paste the prompt, set duration/ratio/**Audio ON**), run the eight-check preflight, click Generate once, and confirm the accepted card. Only then resume observing.
+- Retire the observer only when the queue is empty **and** no prepared block remains. Report that the shelf is exhausted; do not silently disappear while work is still queued upstream.
+- **Never observe an empty composer.** Generate stays gray when nothing is loaded, so a watcher on an empty board waits forever no matter how many slots free up. If the composer shows 0 references, pre-arm first — that is a staging failure, not a wait state.
+- The observer never downloads, deletes, publishes, or submits external forms.
 
 ## Creative mode and continuity
 

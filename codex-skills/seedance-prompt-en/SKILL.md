@@ -15,7 +15,7 @@ Seedance is intentionally split into two phases so prompt authoring does not blo
 
 ## Non-negotiable gates
 
-- Every Seedance generation is multi-reference in this user's pipeline; no single-reference exception unless the user explicitly overrides the specific shot.
+- Reference count is per-request (commonly 3–4, sometimes just a character sheet plus a background). Never enforce a fixed count; every reference still needs a named role in the ordered `@ImageN` map.
 - Creative Seedance Mode is the default authoring branch unless fragile continuity or the user requests Standard mode.
 - If an approved character/model/identity-sheet character appears, attach the relevant character sheet or identity crop **on every generation**, together with scene references. A previous card or conversational memory does not count.
 - Missing, mismatched, or unverified character-sheet thumbnail means `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED`; never click Generate.
@@ -33,7 +33,8 @@ Seedance is intentionally split into two phases so prompt authoring does not blo
 - `seedance-shared-contract.md` — invariants, handoff contract, and block codes.
 - `seedance-prompting.md` — Creative/Standard prompt authoring and reference-role packages. No UI operation.
 - `seedance-production.md` — Runway visible UI, queue, download, and verification. No prompt improvisation.
-- `seedance-field-lessons.md` — corrections proven in production: `GENERAL_REFERENCE_MODE`, source frames that are actually filmable, creative mode without light-match glue, board specifics, queue stall rule. Read with the contract.
+- `seedance-field-lessons.md` — prompt-authoring corrections proven in production: `GENERAL_REFERENCE_MODE`, what the character sheet may and may not do, creative mode without light-match glue, no generic negative wall.
+- `image-qc-source-frame-standard.md` — **image QC lane, not prompting**: whether a still is usable as an I2V source (`VIDEO_FRAME_STATIC_POSTER_FAIL`, `EMOTION_CAUSALITY_FAIL`, duplicate protagonists).
 - Optional sibling: `../seedance-creative-prompt-team/SKILL.md` — multi-agent Creative prompt team. Authoring only; production remains here.
 
 Older combined guidance is retained only in `archive/` and is not live.

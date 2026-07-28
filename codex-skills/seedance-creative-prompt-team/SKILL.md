@@ -59,7 +59,7 @@ No role may rewrite another role's ownership without an explicit conflict note f
 
 These are project standing rules, not one-off notes. Apply on every package unless the user overrides that exact shot.
 
-1. **Default generation shape = multi-reference × 15s.** Assume Seedance multi-ref and target **15 seconds** by default. Do not ask whether to use multi-ref. Shorter durations only when the user or a fragile shot explicitly requires them.
+1. **Default duration = 15s.** Shorter only when the user or a fragile shot explicitly requires it. **Reference count is not fixed** — take it from the request (commonly 3–4; a character sheet plus a background is a legitimate full deck). Never ask whether to use multi-reference and never pad a deck to hit a number.
 2. **Open creative room.** Creative Mode is default. References are anchors for identity, environment, texture, and key props — not start/middle/end cages. Invent in-between motion, camera discovery, and exit composition after identity is locked.
 3. **Audio toggle always ON; the prompt directs the sound.** Name the soundscape for each shot — ambience, contact SFX, room tone, or music when the shot wants it. Diegetic-only is a sensible default, not a prohibition. Spoken dialogue only if a verified performed `@Audio1` guide is attached.
 4. **Naturalism first.** Prefer believable body mechanics, ordinary contact physics, imperfect micro-motion, and lived-in environments over glossy AI spectacle. One dominant camera family; no multi-trick chaos in a single 15s card.
@@ -78,7 +78,7 @@ Package fields must record:
 
 - Creative Seedance Mode is the default unless the user requests Standard or the shot is fragile-continuity-first.
 - When the source references are 2D/stylized, use the immutable `STYLE LOCK → CONTINUITY → DIRECTION` blocks and change only the per-shot `SHOT` block. Do not rewrite the medium, character/world rules, or camera language inside individual shot prompts.
-- Default package is **multi-reference + 15 seconds**. No single-reference exception and no silent shorter duration unless the user overrides that exact shot.
+- Default duration is **15 seconds**; no silent shorter duration unless the user overrides that exact shot. Reference count is whatever the request calls for — commonly 3–4, sometimes a character sheet plus a background.
 - Open creative room after identity lock: invent transitions, camera discovery, and exit composition; do not cage the model to literal storyboard interpolation.
 - **Audio toggle always ON.** The prompt names the soundscape; music is allowed when the shot calls for it. No spoken dialogue request unless a verified performed `@Audio1` is attached.
 - Naturalism over spectacle. Believable cause → contact → response, ordinary micro-imperfections, lived-in motion.
