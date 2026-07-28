@@ -31,7 +31,25 @@ TIER1_KEYS = {
     'ad': ['ad', 'product', 'commercial', 'hero shot'],
     'anime': ['anime', '2d', 'cel'],
 }
-LEAK_PATTERN = re.compile(r'(/Users/|\.md\b|docs/|lanes/|Status:\s*(DONE|BLOCKED|RUNNING)|Key V\d+ docs|# Director Result)', re.IGNORECASE)
+# The prompt box takes the VISUAL PROMPT only. The handoff package around it
+# (Scene ID / Mode / REFERENCE ROLES / gates / EXPECTED settings / EXIT) is
+# operator-facing and must never be pasted into Runway — Seedance reads it as
+# instructions for the picture. Observed 2026-07-28: a whole package went in,
+# including "Audio ON in UI" and "CHARACTER-SHEET GATE: required and visibly
+# verified", and passed this check because it contained no file paths.
+LEAK_PATTERN = re.compile(
+    r'(/Users/|\.md\b|docs/|lanes/|Status:\s*(DONE|BLOCKED|RUNNING)|Key V\d+ docs|# Director Result'
+    # handoff-package field labels
+    r'|\bScene ID\s*:|\bLook medium\s*:|\bMode\s*:\s*(Creative|Standard)\b|\bREFERENCE ROLES\s*:'
+    r'|\bEXPECTED\s*:|\bEXIT\s*:|\bPrompt file\s*:|\bSource root\b|\bOrdered references\s*:'
+    # gate / QC / operational language
+    r'|\b[A-Z-]*GATE\s*:|\bvisibly verified\b|\bvisibly attached\b|\bmust be visibly\b'
+    r'|\bcharacter[- ]sheet gate\b|\bscene[- ]reference gate\b'
+    # UI settings talk
+    r'|\bin UI\b|\bAudio (ON|OFF)\b|\bmulti-?reference\b|\b\d+s full Seedance\b|\bSeedance generation\b'
+    # provenance about how a still was made
+    r'|\bgenerated styleframe\b|\bstyleframe for\b|\bapproved production sheet\b|\bCHAR_[A-Z0-9_]+)',
+    re.IGNORECASE)
 
 
 def read(path: Path, limit: int = 6000) -> str:

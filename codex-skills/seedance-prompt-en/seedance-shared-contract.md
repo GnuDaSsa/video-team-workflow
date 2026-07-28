@@ -135,6 +135,26 @@ Source root and exact file paths:
 
 The production branch may reject an incomplete package, but it must not silently rewrite the visual prompt. Return the package to prompting for revision.
 
+### Only the `Visual prompt:` field goes into Runway — 2026-07-28
+
+The package above is **operator-facing**. Runway's prompt box takes the contents of `Visual prompt:` and nothing else.
+
+Observed failure: an entire package was pasted into the box — `Scene ID`, `Mode`, `REFERENCE ROLES:`, `CHARACTER-SHEET GATE: required and visibly verified`, `EXPECTED: 15s full Seedance generation; multi-reference; Audio ON in UI`, `EXIT:`. Seedance reads all of that as description of the picture, so gate wording and UI settings become part of what it tries to render.
+
+- Never paste field labels, gates, role maps, expected settings, provenance, or exit notes.
+- The reference role map is how **you** attach files in the right order. It is not prompt text.
+- Naming a reference as `generated styleframe for E19` describes production history, which the prompt must never contain. If a reference matters to the image, describe what is visible in it.
+- Before pasting, read the box back: if it contains a colon-led field label or the word "gate", it is the package, not the prompt.
+
+### Never attach the same image twice
+
+Duplicate references do not add information; they multiply one look and produce a clip built from a single frame.
+
+- The visible strip must hold **distinct images**. Two identical thumbnails is a preflight failure, not a full deck.
+- Do not duplicate a file to satisfy a count — no rule requires a minimum reference count, and any prompt-side wording that demands "at least N distinct styleframes" is invented and must be deleted rather than satisfied.
+- If only one usable frame exists for the shot, attach that one plus the character sheet and submit. That is a complete deck.
+- Each `@ImageN` role must describe a genuinely different image. If two roles would describe the same picture, one of them should not be attached.
+
 ## Completion and blockers
 
 - UI card, prompt text, local source image, or a Generate click is not final media completion.
