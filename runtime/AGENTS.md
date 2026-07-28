@@ -162,8 +162,9 @@ Seedance final prompts must contain only video-relevant viewing instructions. Do
 ### 3-1. 고용량 이미지 생성 — 4 worker + 1 orchestrator fan-in contract
 
 - **트리거**: 이미지 생성 대상이 기본 **8개 이상**인 대량 배치. 1–7개는 4세션으로 쪼개지 않고 단일 image lane에서 처리한다. 이 규칙은 이미지 생성 단계에만 적용하며 Seedance/CapCut 실행을 병렬화하지 않는다.
-- **세션 구조**: 현재 세션은 하나의 **오케스트레이터**로 유지하고, 순서가 고정된 불변 manifest를 최대 **4개의 격리된 worker 세션**(`shard_01`–`shard_04`)으로 분배한다. 사용자가 말하는 “세션 4개”는 worker 4개이며, 오케스트레이터 세션은 별도로 유지한다.
-- **worker 격리**: 각 worker는 자기 샤드의 `lanes/<image_lane>/shards/shard_NN/` 안에만 출력·result·provenance·failure를 기록한다. 1컷=1프롬프트=1 standalone image를 지키며, 공용 planner/manifest 수정, 다른 샤드 파일 수정, Seedance 제출, CapCut 실행, 프로젝트 완료 선언을 하지 않는다. 런타임 CLI를 사용할 때 이 모드의 동시 실행 상한은 `--max-parallel 4`로 맞춘다.
+- **이것은 에이전트 팬아웃이 아니다 (2026-07-28 명확화)**: 여기서 worker는 별도 Codex 챗/에이전트 표면이 아니라, 런타임이 `image_creator_lane_runner.py`를 **분리 실행하는 CLI 프로세스**다. 하나의 image lane 안에서만 일어나는 병렬화이므로 §0.1 스폰 승인 게이트(에이전트/lane/모니터/브라우저 루프 확산)의 대상이 아니다. 다만 **자동 발동도 아니다** — `next`는 샤딩을 제안하지 않고, 사람이 `dispatch-image-shards`를 명시적으로 실행해야 시작된다.
+- **세션 구조**: 현재 세션은 하나의 **오케스트레이터**로 유지하고, 순서가 고정된 불변 manifest를 최대 **4개의 격리된 worker 프로세스**(`shard_01`–`shard_04`)로 분배한다.
+- **worker 격리**: 각 worker는 자기 샤드의 `lanes/<image_lane>/shards/shard_NN/` 안에만 출력·result·provenance·failure를 기록한다. 1컷=1프롬프트=1 standalone image를 지키며, 공용 planner/manifest 수정, 다른 샤드 파일 수정, Seedance 제출, CapCut 실행, 프로젝트 완료 선언을 하지 않는다. 런타임 CLI의 동시 실행 상한은 `--max-parallel 4`이며 이것이 코드 기본값이다. `--shard-size`는 기본 auto(= 대기 수 ÷ 병렬 수)라 8개 배치도 실제로 4워커로 갈라진다 — 예전 고정값 10에서는 8개 배치가 샤드 1개가 되어 병렬이 전혀 걸리지 않았다.
 - **오케스트레이터 preflight**: 시작 전에 cut ID/파일명/순서, prompt·reference hash, 샤드 할당, character-sheet attachment 여부를 고정한다. worker 결과를 주기적으로 수집하되, 경로·파일 크기·dimensions·provenance·prompt hash·중복 파일명/콘텐츠를 실제로 검증한다.
 - **fan-in gate**: 검증된 결과만 하나의 ordered manifest와 `image_review_queue`로 합치고, contact sheet 및 QC summary를 생성한다. 성공한 샤드를 통째로 재실행하지 말고 실패 ID만 재샤딩한다. 부분 실패는 반드시 `PARTIAL_BLOCKED`와 failure list로 남긴다.
 - **one-way 복귀**: fan-in과 Image QC PASS 전에는 어떤 worker도 Seedance를 제출하지 않는다. fan-in 이후 worker 세션을 종료하고, 오케스트레이터가 정상 순차 흐름 `image_qc → Seedance → Seedance QC → editor`로 복귀한다.
