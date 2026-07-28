@@ -33,6 +33,7 @@ Seedance is intentionally split into two phases so prompt authoring does not blo
 - `seedance-shared-contract.md` — invariants, handoff contract, and block codes.
 - `seedance-prompting.md` — Creative/Standard prompt authoring and reference-role packages. No UI operation.
 - `seedance-production.md` — Runway visible UI, queue, download, and verification. No prompt improvisation.
+- `seedance-field-lessons.md` — corrections proven in production: `GENERAL_REFERENCE_MODE`, source frames that are actually filmable, creative mode without light-match glue, board specifics, queue stall rule. Read with the contract.
 - Optional sibling: `../seedance-creative-prompt-team/SKILL.md` — multi-agent Creative prompt team. Authoring only; production remains here.
 
 Older combined guidance is retained only in `archive/` and is not live.

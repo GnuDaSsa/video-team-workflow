@@ -339,9 +339,24 @@ Workflow:
 4. Sending is an externally visible action: do not click final Send/전송 until the user explicitly approves that exact prepared email.
 5. If the user simply says “메일 보내라” after approving the final video in this project, interpret the recipient as `sajw1994@korea.kr` unless the user states another recipient.
 
+## Video-team authority order — 2026-07-28
+
+This block is the tie-breaker. Previously this file said "Seedance follows the skill" while `video-team-runtime/AGENTS.md` said "this file wins over everything" — circular authority, so behaviour depended on which file a session loaded first.
+
+| Rank | Document | Owns |
+|---|---|---|
+| 1 | `~/Documents/Codex/video-team-runtime/AGENTS.md` | rails, lane order, gates, escalation ladders, provider assignment, prompt-authoring routing, safety gates |
+| 2 | `~/.codex/skills/seedance-prompt-en/` | Seedance prompt spec, Runway UI operation, attach/Generate/queue/download |
+| 3 | `~/.codex/video-team-policies/` | spawn approval gate, Chrome operator model |
+| 4 | `videodirector` / `music-video-production-team` | story, direction, quality bars — **never execution procedure** |
+
+Within rank 2's scope (Seedance UI and prompt spec), rank 2 wins over rank 1. Within rank 1's scope (rails, gates, safety), rank 1 wins. Do not restate a rule in two places; leave a pointer instead.
+
+Never write a rules copy inside a project folder. Project exceptions go in that project's `docs/project_overrides.md`, citing the clause number.
+
 ## Seedance execution authority
 
-Seedance prompt authoring and all Runway UI operation follow only `/Users/gnudas/.codex/skills/seedance-prompt-en/SKILL.md`. Do not add UI upload/click/queue/scheduler rules here.
+Seedance prompt authoring and all Runway UI operation follow only `/Users/gnudas/.codex/skills/seedance-prompt-en/`. Do not add UI upload/click/queue/scheduler rules here.
 
 ## Gongnyang image-prompt compiler default — 2026-07-12
 

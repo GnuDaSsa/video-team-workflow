@@ -1,6 +1,6 @@
 ---
 name: music-video-production-team
-description: "Use this skill for a simple agentized music-video production workflow across any song or style. It divides the work into five roles: Music Director (existing `music-director` skill), Planner, Character Creator, Image Creator, and Image-to-Video Producer. Trigger on requests like 뮤직비디오 제작, MV 기획, 영상화, 에이전트화, 기획자, 캐릭터 생성가, 이미지 생성자, 이미지투비디오, GPT 이미지, Grok 영상화, 캐릭터시트, 주인공 검수, 컷리스트."
+description: "Use this skill for a simple agentized music-video production workflow across any song or style. It divides the work into five roles: Music Director (existing `music-director` skill), Planner, Character Creator, Image Creator, and Image-to-Video Producer. Trigger on requests like 뮤직비디오 제작, MV 기획, 영상화, 에이전트화, 기획자, 캐릭터 생성가, 이미지 생성자, 이미지투비디오, GPT 이미지, 시댄스 영상화, 캐릭터시트, 주인공 검수, 컷리스트."
 ---
 
 # Music Video Production Team
@@ -27,7 +27,7 @@ The MV workflow is split into these roles:
 2. **Planner** — owns MV concept, story, scene structure, and production plan.
 3. **Character Creator** — owns protagonists/recurring characters and character sheets.
 4. **Image Creator** — owns GPT image prompts, still frames, and image QA.
-5. **Image-to-Video Producer** — owns Grok/I2V prompts, clip generation, motion QA, and edit handoff.
+5. **Image-to-Video Producer** — owns Seedance/I2V prompts, clip generation, motion QA, and edit handoff.
 
 Use these roles for any MV project, not only the current project.
 
@@ -36,9 +36,9 @@ Use these roles for any MV project, not only the current project.
 For the user's normal MV production team, this routing is a standing rule:
 
 - **Images / styleframes / character sheets / start frames = Codex `imagegen` / built-in `image_gen` by default.**
-- **Video generation / image-to-video clips = Grok/Runway/Seedance I2V only, using the selected Codex imagegen output as the input frame.**
+- **Video generation / image-to-video clips = Seedance (Runway) by default, using the selected Codex imagegen output as the input frame. Grok only when the user names it for that job.**
 - **Do not use Grok for image generation in this workflow** unless the user explicitly overrides the rule for that specific job.
-- **Do not start Grok video generation before the image is generated, saved, QA'd, and given an organized filename.**
+- **Do not start I2V generation before the image is generated, saved, QA'd, and given an organized filename.**
 - **For every new MV/video project, generate character sheets/styleframes through Codex imagegen first.** ChatGPT web generation is fallback/manual only when imagegen is unavailable or explicitly requested.
 - **Never request 2x2 grids, collages, contact sheets, multi-panel sheets, or multiple images in one Codex imagegen production prompt.** Generate each production styleframe as a single standalone image: one cut, one prompt, one saved file. Character/model sheets may be multi-panel references.
 - Work sequentially by version/cut when the user asks for sequential execution; do not silently parallelize versions.
@@ -170,7 +170,7 @@ Fable/modern fairy-tale animation prompts still require symbolic object logic, c
 
 ### 5. Image-to-Video Producer
 
-The Image-to-Video Producer turns selected stills into short clips, usually with Grok or another I2V tool.
+The Image-to-Video Producer turns selected stills into short clips. Default provider is **Seedance**; Grok only when the user names it.
 
 Owns:
 - image-to-video prompts
@@ -181,15 +181,15 @@ Owns:
 - edit handoff
 
 Outputs:
-- Grok/I2V prompts in English
+- Seedance/I2V prompts in English
 - camera tags or movement instructions
 - per-clip duration
 - failure criteria and regeneration notes
 - final clip order / handoff timeline
 
 Rules:
-- For the user's MV pipeline, use **Grok Imagine for image-to-video only**. The input frame should come from the Image Creator's Codex imagegen stills.
-- Do not use Grok to invent replacement images when the task is I2V; if the wrong mode is active, switch to video/I2V and upload the correct still.
+- For the user's MV pipeline, **default I2V is Seedance** via `seedance-prompt-en` (Chrome Runway board). Grok Imagine is used only when the user explicitly names Grok for that job. The input frame comes from the Image Creator's Codex imagegen stills.
+- Do not let any I2V tool invent replacement images; if the wrong mode is active, switch to video/I2V and upload the correct still.
 - Preserve the input image identity and composition.
 - For music videos, motion should follow the beat and section energy.
 - Do not over-morph characters or environments.
@@ -255,7 +255,7 @@ The user's project feedback is cumulative team memory. When the user says a prod
 
 Current standing rules learned from the `mv-low-signal` workflow:
 
-0. **Tool routing is fixed for MV production.** Image/styleframe generation belongs to Codex `imagegen` / built-in `image_gen` through the file-backed non-GUI route. Grok is reserved for image-to-video generation from those saved stills. Do not open/activate a browser for image generation, and do not let Grok become the image generator unless the user explicitly says so for that job.
+0. **Tool routing is fixed for MV production.** Image/styleframe generation belongs to Codex `imagegen` / built-in `image_gen` through the file-backed non-GUI route. I2V generation runs on Seedance by default (Grok only when the user names it) from those saved stills. Do not open/activate a browser for image generation, and do not let Grok become the image generator unless the user explicitly says so for that job.
 1. **Prevent missing media by default.** Deliver self-contained packages: final master MP4, clean/no-subtitle master when relevant, `segments/`, `audio/`, `edit_decision_list.csv`, review contact sheet, key review frames, and notes. CapCut drafts should reference draft-local or package-local media, not temporary downloads/cache.
 2. **Do not arbitrarily limit scene count.** Decide cut count from song length, beat density, lyric sections, and story needs. For a full ~100s MV, 35 cuts may be too few; prefer enough segments to make the edit feel dynamic, while preserving longer story-anchor shots where needed.
 3. **Convert liked shots into structural anchors.** If the user identifies a shot as especially good, reuse its underlying creative principle as a story beat/chorus anchor/visual motif, not just a decorative insert.
@@ -384,7 +384,7 @@ Current standing rules learned from the `hito body / neko brain` Suno MV review:
 
 ## Additional hard rule: no false microcutting
 
-A cut must be felt. Do not split one visual moment into multiple cuts unless there is a real musical, narrative, action, or transition reason. If three seconds read better as one held shot, hold it. Different crops, small framing changes, or repeated Grok outputs are not valid cut structure.
+A cut must be felt. Do not split one visual moment into multiple cuts unless there is a real musical, narrative, action, or transition reason. If three seconds read better as one held shot, hold it. Different crops, small framing changes, or repeated I2V outputs are not valid cut structure.
 
 If an I2V output visually collapses into the same scene as another cut, or does not match the intended source image, reject it and regenerate/merge; do not treat it as complete media.
 
@@ -426,5 +426,5 @@ Newest user override: still-image generation for this video team should use Code
 - Reference-conditioned styleframes must use the approved character sheet(s) as actual image inputs/references where the route supports it, and must record those sheet paths in the manifest/provenance.
 - If imagegen cannot verify/reference the sheet input, stop that cut as `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED` or `BLOCKED_IMAGEGEN_EDIT_FAILED`; never proceed from text memory only.
 - ChatGPT browser generation is fallback/manual only when imagegen is unavailable or explicitly requested by the user.
-- Grok remains I2V/videoization only.
+- Default I2V is Seedance; Grok is I2V-only and used only when the user explicitly names it.
 - One cut = one standalone image; no grids/contact sheets/collages for production styleframes.
