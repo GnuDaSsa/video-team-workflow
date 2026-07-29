@@ -49,7 +49,18 @@ Audio intent belongs in the prompt text. The settings line reports the real UI v
 
 ## Reference deck and character-sheet gate
 
-- **Reference count follows the user's request for that job.** Typical is 3–4, but the user may direct a shot from a character sheet plus a background alone, or hand over a larger deck. Do not enforce a fixed count and do not ask whether to use multi-reference — read the request.
+### What the user says wins
+
+**An explicit instruction from the user overrides every default in this contract** — mode, reference count, duration, ratio, audio, provider. Apply it as stated, and if it conflicts with a default, say which default you are overriding rather than quietly splitting the difference.
+
+Defaults exist for what the user did *not* specify. They are never a reason to ignore what they did.
+
+### Mode and count are different things
+
+- **Multi-reference is the mode**, the Runway tab opposite Keyframe. It is the **default mode** for this pipeline and stays selected unless the user asks for Keyframe. If the user says "multi-reference", that is a mode instruction — honour it exactly, do not treat it as a comment about how many images.
+- **Reference count** is how many files go in that mode. It follows the request: typically 3–4, sometimes a character sheet plus a background, sometimes a larger deck.
+- *The agent* must not invent a fixed count or pad a deck to reach a number. That restriction is on the agent, **not on the user** — a count the user asks for is an instruction, not a number to second-guess.
+- Do not ask whether to use multi-reference; it is already the default. Asking is different from ignoring a stated one.
 - Whatever the count, the prompt package must contain an ordered `@ImageN` role map naming each reference's visible function.
 - **Build each deck from that shot's own material.** Do not pad a deck with the previous or next scene's frames to reach a count. A sliding window like `E19: E18·E19·E20` then `E20: E19·E20·E21` makes consecutive blocks share most of their references, and the model returns two clips that read as the same shot — the exact "why are you making the same video twice" failure.
 - If a block genuinely has only one usable frame of its own, submit it with that one frame plus the character sheet. **A smaller honest deck beats a padded one.**

@@ -2,6 +2,46 @@
 
 This branch executes a complete, already-authored handoff package in visible Chrome Runway. It does not improvise or rewrite the visual prompt. If the package is incomplete, return to `seedance-prompting.md`.
 
+## The production cycle
+
+One loop, run until it genuinely cannot continue. **Arm first, then read the button** — an empty composer is always gray, so checking before arming reads "cannot generate" when the truth is "nothing loaded yet".
+
+```
+   ┌─────────────────────────────────────────────┐
+   │  1. ARM      attach refs → paste prompt →    │
+   │              settings (mode/duration/ratio/  │
+   │              Audio ON)                       │
+   │  2. READ     now look at Generate            │
+   │        gray  → queue is full: this is the    │
+   │                wait point. Stay armed,       │
+   │                schedule the next check       │
+   │        blue  → continue                      │
+   │  3. PREFLIGHT  eight checks + deck overlap   │
+   │                + duplicates + role-map truth │
+   │  4. GENERATE   once, for this scene          │
+   │  5. CONFIRM    matching card appears         │
+   │                (no card → ACTIVE_CLICK_NO_CARD)│
+   │  6. NEXT       take the next eligible        │
+   │                package ─────────────────────┼──┐
+   └─────────────────────────────────────────────┘  │
+              ▲                                      │
+              └──────────────────────────────────────┘
+```
+
+Exit only on one of these, and say which:
+
+- **queue full** — armed and waiting; schedule the next check and stop for now
+- **shelf exhausted** — nothing left to arm; report it
+- **everything left is blocked** — list each item and its reason
+
+### Rules of the loop
+
+- **Arm before reading the button, always.** Step 2 has no meaning before step 1. Watching an unarmed board is how a queue sits idle while packages wait.
+- **A confirmed card is not the end of the turn.** It is the trigger for step 6. Advance immediately while a slot is free.
+- **Gray is the only wait.** Every other stop is either exhaustion or a listed blocker. Gray with a package armed means the queue is genuinely full — that is the moment to schedule, not before.
+- **A blocked package leaves the loop, the loop does not stop.** Mark it, take the next eligible package, keep cycling.
+- **Never schedule with an unarmed shelf.** Arm the next package first, then let the schedule watch a meaningful gray.
+
 ## Keep producing until nothing is left to produce
 
 This branch's job is **throughput**. A wake-up means: make as many valid submissions as the board allows, then stop — not "attempt one thing and report."

@@ -59,7 +59,8 @@ No role may rewrite another role's ownership without an explicit conflict note f
 
 These are project standing rules, not one-off notes. Apply on every package unless the user overrides that exact shot.
 
-1. **Default duration = 15s.** Shorter only when the user or a fragile shot explicitly requires it. **Reference count is not fixed** — take it from the request (commonly 3–4; a character sheet plus a background is a legitimate full deck). Never ask whether to use multi-reference and never pad a deck to hit a number.
+1. **Default card = Multi-reference mode, 15s.** Multi-reference is the Runway mode (opposite Keyframe) and stays selected unless the user asks for Keyframe. Duration shortens only when the user or a fragile shot requires it. **Reference count** is separate and comes from the request (commonly 3–4; a character sheet plus a background is a legitimate full deck) — the agent never pads a deck to hit a number, and a count the user states is an instruction, not a suggestion.
+   **Anything the user states explicitly overrides these defaults.**
 2. **Open creative room.** Creative Mode is default. References are anchors for identity, environment, texture, and key props — not start/middle/end cages. Invent in-between motion, camera discovery, and exit composition after identity is locked.
 3. **Audio toggle always ON; the prompt directs the sound.** Name the soundscape for each shot — ambience, contact SFX, room tone, or music when the shot wants it. Diegetic-only is a sensible default, not a prohibition. Spoken dialogue only if a verified performed `@Audio1` guide is attached.
 4. **Naturalism first.** Prefer believable body mechanics, ordinary contact physics, imperfect micro-motion, and lived-in environments over glossy AI spectacle. One dominant camera family; no multi-trick chaos in a single 15s card.

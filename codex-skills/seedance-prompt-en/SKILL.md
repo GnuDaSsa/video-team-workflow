@@ -15,7 +15,9 @@ Seedance is intentionally split into two phases so prompt authoring does not blo
 
 ## Non-negotiable gates
 
-- Reference count is per-request (commonly 3–4, sometimes just a character sheet plus a background). Never enforce a fixed count; every reference still needs a named role in the ordered `@ImageN` map.
+- **An explicit user instruction overrides every default here** — mode, count, duration, ratio, audio, provider.
+- **Multi-reference is the default mode** (the Runway tab opposite Keyframe) and stays selected unless the user asks otherwise. "Use multi-reference" is a mode instruction, not a remark about image count.
+- Reference count is per-request (commonly 3–4, sometimes a character sheet plus a background). *The agent* never invents a fixed count or pads to reach one; a count the user states is an instruction. Every reference still needs a named role in the ordered `@ImageN` map.
 - Creative Seedance Mode is the default authoring branch unless fragile continuity or the user requests Standard mode.
 - If an approved character/model/identity-sheet character appears, attach the relevant character sheet or identity crop **on every generation**, together with scene references. A previous card or conversational memory does not count.
 - Missing, mismatched, or unverified character-sheet thumbnail means `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED`; never click Generate.
