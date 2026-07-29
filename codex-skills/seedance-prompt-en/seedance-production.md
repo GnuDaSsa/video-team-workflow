@@ -2,6 +2,20 @@
 
 This branch executes a complete, already-authored handoff package in visible Chrome Runway. It does not improvise or rewrite the visual prompt. If the package is incomplete, return to `seedance-prompting.md`.
 
+## Keep producing until nothing is left to produce
+
+This branch's job is **throughput**. A wake-up means: make as many valid submissions as the board allows, then stop — not "attempt one thing and report."
+
+- **A blocker blocks that item, never the session.** Mark the item, move to the next eligible package, keep going. The session stops when *every* remaining item is blocked or the shelf is empty — not at the first one.
+- **`exactly once` is per scene, not per session.** One click per scene prevents double-submitting that scene. After a scene's card is confirmed, immediately advance to the next scene while a slot is free.
+- **A free slot is unfinished work.** If a card was accepted and the board still has capacity, the next package goes in during the same wake. Stopping with an open slot is a failure, not caution.
+- **Exhaust the shelf before scheduling.** Schedule the next check only when nothing further can be submitted right now. Scheduling while work remains just adds 15 minutes of nothing.
+- When you do stop, say which of the two it is: *shelf exhausted* or *every remaining item blocked, here is each reason*.
+
+The block codes in this file exist to stop **bad submissions**, not to stop the run. Recording a blocker and continuing is the normal path; recording a blocker and halting is only correct when there is genuinely nothing else to submit.
+
+The fixed ladders elsewhere restrict **which methods** you may use. They do not restrict **how long you keep working** — do not read "don't invent a new route" as "give up early".
+
 ## Approved route
 
 - Source of truth: one visible, logged-in `app.runwayml.com` Generate board in Chrome.
@@ -55,7 +69,7 @@ The blue state means eligible after all eight checks; it is not permission to cl
 
 ## Queue operation
 
-- Click Generate exactly once for the current scene after preflight.
+- Click Generate exactly once **for that scene** after preflight — this prevents duplicate submissions of the same scene, and is not a limit on how many scenes you submit this session.
 - Wait for a visible accepted card (`In queue`, `Generating`, `Processing`, or `Completed`) belonging to that scene.
 - Record the accepted card and increment the in-flight count. Then advance the UI deck to the next prepared package; never re-click the accepted scene.
 - Target two in-flight cards whenever two eligible packages exist. While cards render, pre-arm the next package and process completed cards; do not idle.
@@ -163,7 +177,7 @@ Moved here 2026-07-28 from the prompting field-lessons file, where UI and queue 
 - **Reset is not the X.** It is the circular arrow at the image's top right — `button[aria-label="Reset settings"]`, icon `lucide-rotate-ccw`.
 - Generate eligibility is decided by the **visible button colour**: blue = clickable, gray = wait. Never judge by button position, and do not let AX `disabled` / `aria-disabled` / DOM guesses override the colour — that override rule exists because DOM heuristics produced false negatives on a genuinely clickable button.
 - Known trap: a `primaryBlue` button carrying `data-soft-disabled="true"` looks blue but does nothing. Colour still decides *eligibility*; if a single click on a blue button yields no accepted card, do not re-click — follow the `ACTIVE_CLICK_NO_CARD` protocol.
-- Click Generate once per scene. A click is not a submission — only a visible `In queue` / `Generating` / `Processing` / `Completed` card for that scene counts as accepted.
+- Click Generate once per scene, then move on to the next scene while a slot is free. A click is not a submission — only a visible `In queue` / `Generating` / `Processing` / `Completed` card for that scene counts as accepted.
 - Every block: 15s, Creative, Multi-reference, 16:9, **Audio ON**.
 
 ## Two-slot queue

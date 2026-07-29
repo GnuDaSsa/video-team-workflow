@@ -20,7 +20,8 @@ Seedance is intentionally split into two phases so prompt authoring does not blo
 - If an approved character/model/identity-sheet character appears, attach the relevant character sheet or identity crop **on every generation**, together with scene references. A previous card or conversational memory does not count.
 - Missing, mismatched, or unverified character-sheet thumbnail means `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED`; never click Generate.
 - Runway visible Chrome is the source of truth. Do not use connector/API, hidden input, AppleScript/local mouse, or a second browser route.
-- A Generate click is exactly one transaction after preflight. Completion requires a downloaded file and verified duration/codec, not a card or thumbnail.
+- A Generate click is exactly one transaction **per scene** after preflight — not one per session. Keep submitting eligible packages while slots are free; stop only when the shelf is empty or every remaining item is blocked.
+- Completion requires a downloaded file and verified duration/codec, not a card or thumbnail.
 
 ## Prompting isolation gate
 
