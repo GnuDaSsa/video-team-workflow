@@ -156,10 +156,45 @@ For every completed card:
 
 A UI card, thumbnail, prompt, or source image is never final media completion. Missing download is `UI_ONLY_NOT_DOWNLOADED`.
 
+## Repair vs blocked — check who can fix it
+
+Most stops in this file were never stops. A defect in something **you produced and control** is a repair task with a budget; only a defect you **cannot fix from here** is a blocker.
+
+Ask one question: *can I fix this myself, right now, with a documented method?*
+
+| | Meaning | Action |
+|---|---|---|
+| **REPAIR** | the input is mine and the fix is known | fix it now, up to 2 attempts, then generate |
+| **DEFER** | repair attempts used up | mark the item, take the next package, report at session end |
+| **BLOCKED** | needs a person or an external system | record once with the exact action, escalate, skip the item, keep working |
+
+Never poll a BLOCKED condition — polling cannot log in, cannot pay, cannot type. Never *wait* on a REPAIR — waiting cannot fix what your own hands broke.
+
+### Repairs, not blockers
+
+| Symptom | Repair |
+|---|---|
+| prompt text missing, truncated, or garbled — Korean especially | re-insert via the prompt route below, verify by the **visible character counter**, then generate |
+| a required character sheet is not attached | attach it and verify the thumbnail |
+| no `PROVIDER_REF` sheet exists | generate one from the approved master |
+| a source frame fails as an I2V source (poster-like, wrong emotion) | regenerate that frame |
+| the deck duplicates an image or overlaps the previous block | rebuild the deck from this shot's own material |
+
+### Korean and other non-ASCII prompt text
+
+Synthetic keystrokes drop CJK characters. That is a known input failure, not a reason to stop.
+
+1. Load the prompt into the clipboard and paste it (`Chrome activate` → click the field → confirm caret → `Cmd+V`), then check the **visible counter** — never the AX tree, which misreports on this editor.
+2. If the text is still wrong, focus the editor and use `document.execCommand('insertText', …)`, selecting all first to clear stale text.
+3. Two failed attempts → DEFER this package with the exact text that would not go in, move to the next package, and report it at the end.
+
+Generating with a prompt you know is incomplete is worse than deferring — it burns a slot and produces a clip that must be thrown away. But *waiting* on it while other packages are ready is worse still.
+
 ## Block and recovery codes
 
 - `BLOCKED_CODEX_COMPUTER_USE_UNAVAILABLE`: visible Chrome/Computer Use route unavailable; record the exact user action needed.
-- `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED`: required character sheet/crop absent, mismatched, or not visibly verified; no Generate.
+- `REPAIR_CHARACTER_SHEET_NOT_ATTACHED`: attach the sheet and verify the thumbnail, then continue. Only after two failed attach attempts does it become `DEFER_CHARACTER_SHEET_UNRESOLVED` — mark the package and take the next one.
+- `REPAIR_PROMPT_TEXT_INCOMPLETE`: prompt missing/truncated/garbled (typically CJK). Re-insert by clipboard, verify the visible counter. Two failures → `DEFER_PROMPT_TEXT_UNRESOLVED`, next package.
 - `UPLOAD_100_PERCENT_STALLED`: cancel only the stalled upload, preserve the rest of the deck, and record it.
 - `UI_ONLY_NOT_DOWNLOADED`: card exists but media file is not verified.
 - `DUPLICATE_GENERATE_PREVENTED`: accepted card already exists; do not click again.
