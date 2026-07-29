@@ -17,7 +17,8 @@ This document contains rules that both the prompting and production branches mus
 - While authoring, do not start delegated prompt workers, background schedulers, queue observers, browser loops, or external sidecars.
 - The prompting branch is non-GUI and browser-free: no Chrome/Safari/Runway activation, Computer Use, `osascript`, AppleScript, `open -a`, native file chooser, or browser automation. It writes the local handoff package and then stops.
 - Visible browser operation, Generate, queue monitoring, and downloads belong only to the production branch after an explicit handoff. A production observer must not be launched by the prompting branch.
-- A 15-minute Generate-queue observer scheduler is permitted only in the production branch, only after a prompt/reference package is fully staged and a queue is active or the staged Generate button is waiting for eligibility. It must be a single sequential observer, not a parallel browser loop, sidecar, cron, or second agent surface.
+- The 15-minute Generate-queue check belongs to the production branch. Once a package is staged and the queue is full or the staged Generate button is waiting for eligibility, **scheduling that check is a required part of the cycle** — the operator does it unprompted, and stopping at a full queue without one leaves the next slot unused.
+- It is the same single operator resuming its own loop, not a new agent surface, so the spawn gate's approval requirement does not apply to it. It must remain one sequential check — never a parallel browser loop, sidecar, cron, or second agent.
 
 ## Standing generation defaults — 2026-07-25
 

@@ -9,6 +9,7 @@ User correction: after the video team is invoked, work must not fan out into sub
 - Default execution model is **single-agent, sequential, in the main conversation**. Parallel lanes are an exception the user grants per project/turn, not the default.
 - Wherever an older rule, template, or manifest says lanes "may run in parallel", read it as "may run in parallel **once the user approves that lane set**".
 - Role names in skills (Planner, Image Creator, Seedance Operator, etc.) define **responsibilities**, not standing permission to instantiate agents. One agent may play multiple roles sequentially without approval; instantiating a separate agent per role requires approval.
+- **Carve-out, so this gate does not stall production:** the Seedance queue-continuation check (one sequential 15-minute check while a queue is active, with a package armed) is **pre-approved and required** — it is the same operator resuming its own loop, not an additional agent surface. This gate governs *proliferation*: second browser loops, sidecars, cron, parallel watchers, extra agents. Do not read it as a reason to skip the check the production cycle depends on.
 - Schedulers/monitors additionally follow `seedance-operations/scene_advancement_policy_20260719.md`: never spawn a retry/heartbeat loop as a side effect of a blocker.
 - If unsure whether something counts as a spawn: it does — ask first.
 

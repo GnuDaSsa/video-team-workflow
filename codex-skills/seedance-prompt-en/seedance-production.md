@@ -34,6 +34,20 @@ Exit only on one of these, and say which:
 - **shelf exhausted** — nothing left to arm; report it
 - **everything left is blocked** — list each item and its reason
 
+### Scheduling the next check is mandatory, not optional
+
+When the loop reaches **gray with a package armed**, scheduling the next check is a **required step of the cycle**, not a discretionary spawn. Do it without being asked. A run that stops at a full queue without a scheduled check has not paused — it has quietly ended, and the freed slot goes unused until a human notices.
+
+Every mention of schedulers elsewhere is a prohibition (no second loop, no sidecar, no cron, no extra agent surface). That framing is about *proliferation*. It was never meant to discourage the one check this cycle depends on, and reading it that way is what leaves queues idle.
+
+- **The queue-continuation check is not a new agent surface.** It is the same single operator resuming its own loop, and it is pre-approved by the spawn gate. It does not need per-run permission.
+- **Arm first.** Never schedule against an unarmed board — gray then means "nothing loaded", and the check will be meaningless every time it fires.
+- **One check only**, at the standing interval, while the queue is genuinely active. Not a second browser loop, not a parallel watcher, not a cron.
+- **Scene-agnostic instruction.** No scene ID, no prompt text to verify, no reference list — those live in the staged package and project state, read at wake.
+- **Retire it** when the shelf is exhausted or every remaining item is blocked, and say which.
+
+If you are stopping and have not either scheduled a check or reported the shelf exhausted, the cycle is incomplete.
+
 ### Rules of the loop
 
 - **Arm before reading the button, always.** Step 2 has no meaning before step 1. Watching an unarmed board is how a queue sits idle while packages wait.
