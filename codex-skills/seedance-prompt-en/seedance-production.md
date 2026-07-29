@@ -65,6 +65,58 @@ The blue state means eligible after all eight checks; it is not permission to cl
 - The observer is allowed only while a queue is active. When the queue empties, **first fill it**: if a prepared block remains, pre-arm and submit it before anything else. Retire the observer only once the queue is empty and the shelf is exhausted, and say so explicitly.
 - An observer watching a composer with 0 references is a staging failure. Generate cannot turn blue on an empty board, so pre-arm before observing.
 
+## The recurring observer instruction — keep it scene-agnostic
+
+A 15-minute observer is a **recurring** job. Anything scene-specific written into its instruction becomes permanent: the task re-reads that same text every wake, forever.
+
+Observed failure: an observer was scheduled with `E24` in the text, the exact Korean line it had to see, E24's five-reference list, and the phrase *"keep waiting for user repair."* E24's prompt was missing its Korean sentence, so every wake found the same defect and waited again — eight cycles, no progress, no episode after E24 attempted. The instruction had made one broken scene into a permanent stop.
+
+**Never put these in a recurring observer instruction:** a scene ID, prompt text to match, a reference list, per-scene settings, or any "wait for repair" wording. Those live in the staged package and the project state, which the observer reads at wake time. The instruction says *what to do*, the state says *what is current*.
+
+The observer's whole job is: **is a submission possible right now, and if so, submit the next eligible one.**
+
+```
+Every interval:
+  1. Read the visible board: queue depth, in-flight cards, Generate colour.
+  2. Slot free?  no  -> record state, wait for next interval.
+  3. Take the NEXT ELIGIBLE package from the shelf.
+     eligible = staged, self-verified, not already marked blocked.
+  4. Preflight -> Generate once -> confirm a matching card.
+  5. Package fails its own verification?
+     -> mark THAT package blocked with the reason and the repair needed
+     -> SKIP it and take the next eligible package in the same wake
+  6. No eligible package left? -> report shelf state and retire.
+```
+
+- **A blocked package is skipped, never waited on.** One bad scene must never hold the queue. Its repair is separate work, tracked in project state.
+- **A blocker that needs a human is not a polling target.** Polling cannot type a missing line. Record it once with the exact repair action, escalate to the user, and stop re-checking that condition — re-polling an unchanged human-action blocker is a stall, not monitoring.
+- The observer never authors prompts or attaches references. If the shelf is empty, that is a report ("shelf exhausted"), not something to wait out.
+
+### Template
+
+```
+Seedance queue observer for <project>. Every 15 minutes, check the visible Chrome
+Runway board and the project's staged shelf.
+
+If Generate is gray or the queue is full, record the board state and wait.
+If a slot is free, take the next eligible staged package — eligible means staged,
+self-verified, and not already marked blocked — run the preflight, click Generate
+once, and confirm a matching scene card.
+
+If a package fails its own preflight, mark that package blocked with the reason
+and the repair required, skip it, and try the next eligible package in the same
+wake. Never wait on one scene.
+
+If a blocker requires user action, record it once with the exact action needed,
+report it, and stop monitoring that condition.
+
+If no eligible package remains, report the shelf as exhausted and retire.
+Do not open a second browser loop or create another observer. Never claim media
+completion without a verified downloaded file.
+```
+
+No scene ID appears anywhere in it. That is the point.
+
 ## ACTIVE_CLICK_NO_CARD — clicked an eligible button, no card appeared
 
 A card can lag well behind the button. Ported from the runtime contract 2026-07-28 because this file only said "hold the scene", with no observation window, so a 15-second look was being reported as `BLOCKED_GENERATE_ACCEPTANCE_NOT_VERIFIED` while the submission may have gone through.
