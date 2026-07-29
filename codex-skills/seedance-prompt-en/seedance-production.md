@@ -182,11 +182,43 @@ Never poll a BLOCKED condition — polling cannot log in, cannot pay, cannot typ
 
 ### Korean and other non-ASCII prompt text
 
-Synthetic keystrokes drop CJK characters. That is a known input failure, not a reason to stop.
+**Root cause, diagnosed 2026-07-29: the macOS input method eats synthetic keystrokes.**
 
-1. Load the prompt into the clipboard and paste it (`Chrome activate` → click the field → confirm caret → `Cmd+V`), then check the **visible counter** — never the AX tree, which misreports on this editor.
-2. If the text is still wrong, focus the editor and use `document.execCommand('insertText', …)`, selecting all first to clear stale text.
-3. Two failed attempts → DEFER this package with the exact text that would not go in, move to the next package, and report it at the end.
+If the active input source is a Korean IME (`com.apple.inputmethod.Korean.2SetKorean`), every `keystroke` from System Events is routed *through* it before reaching the page. Measured on the live board:
+
+| Attempt | What actually happened |
+|---|---|
+| `keystroke "ZZTEST123"` | came out as Hangul fragments (`떻게`) |
+| `keystroke "v" using {command down}` | modifier swallowed; a single character was typed instead of pasting |
+| Korean text typed directly | jamo composition broken, characters lost |
+
+That is how a 3,201-character prompt ended up with **zero** Hangul. It was never truncated — the IME consumed it. This is not a Runway bug and not a Lexical bug.
+
+**The prompt field is a Lexical editor** (`data-lexical-editor="true"`, `[contenteditable].textbox-*`). Lexical renders from its own state model, so it ignores `execCommand('insertText')` and direct DOM mutation — both return success and change nothing. It *does* handle real `paste` events.
+
+**Working route — inject a paste event, use no keystrokes at all:**
+
+```js
+const el = document.querySelector('[contenteditable="true"][data-lexical-editor="true"]');
+el.focus();
+const sel = window.getSelection(), r = document.createRange();
+r.selectNodeContents(el); r.collapse(false);      // caret to end; omit collapse to replace all
+sel.removeAllRanges(); sel.addRange(r);
+const dt = new DataTransfer();
+dt.setData('text/plain', text);
+el.dispatchEvent(new ClipboardEvent('paste', {clipboardData: dt, bubbles: true, cancelable: true}));
+```
+
+Verified: 3,201 → 3,229 characters with the Korean line present and correct. No keystroke is involved, so the IME cannot interfere and no window-focus race exists.
+
+Helper: `runway_ui_helper.py paste-prompt --file F [--replace]`.
+
+**Always verify by the visible character counter afterwards.** Two cautions learned the hard way on this editor:
+
+- A select-all + paste **appended instead of replacing** in one observed run, leaving five copies of the same line and a 6,545-character prompt — well over the 3,500 limit. Re-read the counter after any replace; never assume it replaced.
+- Requires Chrome's *Allow JavaScript from Apple Events* (View ▸ 개발자 정보). Without it this route fails with `-1723`, which reads like a permission error but is often the wrong AppleScript dialect — Chrome uses `execute <tab> javascript <text>`, not Safari's `do JavaScript … in <tab>`.
+
+**One writer per board.** Two sessions editing the same composer will clobber each other; that is how the five-copy state above was produced. Before writing, confirm no other session is driving this board.
 
 Generating with a prompt you know is incomplete is worse than deferring — it burns a slot and produces a clip that must be thrown away. But *waiting* on it while other packages are ready is worse still.
 

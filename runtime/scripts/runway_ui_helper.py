@@ -85,9 +85,16 @@ TARGET_APP = resolve_target_app()
 
 
 def browser_js(js: str) -> tuple[int, str, str]:
-    """Run JS in the Runway tab using the target browser's own AppleScript dialect."""
+    """Run JS in the Runway tab using the target browser's own AppleScript dialect.
+
+    ensure_ascii=False is required, not cosmetic: json.dumps would otherwise turn
+    every non-ASCII character into a \\uXXXX escape, and AppleScript has no \\u
+    escape — it fails with "syntax error ... (-2741)". That silently broke both
+    reading Hangul out of the editor and pasting Hangul into it. (2026-07-29)
+    """
     tmpl = _BROWSERS[TARGET_APP]['tmpl']
-    return osa(f'tell application "{TARGET_APP}" to ' + tmpl.format(js=json.dumps(js)))
+    return osa(f'tell application "{TARGET_APP}" to '
+               + tmpl.format(js=json.dumps(js, ensure_ascii=False)))
 
 
 def evidence(args, action: str, expected: str, observed: str, verdict: str) -> None:
@@ -305,6 +312,86 @@ def read_generate_state() -> dict:
     return st
 
 
+
+# Attribute selector written without inner quotes: the JS is embedded in an
+# AppleScript string, and nested double quotes survive escaping unreliably.
+PROMPT_SEL = '[contenteditable][data-lexical-editor]'
+
+
+def cmd_paste_prompt(args) -> int:
+    """Insert prompt text without any keystroke.
+
+    The prompt box is a Lexical editor: execCommand and DOM writes are ignored,
+    but real paste events are handled. Going through System Events instead is
+    what broke Korean input — macOS routes synthetic keystrokes through the
+    active input method, so with the 2-set Hangul IME on, "ZZTEST123" arrived as
+    Hangul fragments and Cmd+V typed a literal character instead of pasting.
+    A dispatched ClipboardEvent bypasses the IME entirely. (2026-07-29)
+    """
+    text = Path(args.file).expanduser().read_text(encoding='utf-8')
+    payload = json.dumps({'text': text, 'replace': bool(args.replace), 'sel': PROMPT_SEL})
+    js = """(() => {
+  const cfg = %s;
+  const el = document.querySelector(cfg.sel) || document.querySelector('[contenteditable]');
+  if (!el) return JSON.stringify({ok:false, error:'NO_PROMPT_EDITOR'});
+  const before = (el.innerText || '').length;
+  el.focus();
+  const sel = window.getSelection(), r = document.createRange();
+  r.selectNodeContents(el);
+  if (!cfg.replace) r.collapse(false);
+  sel.removeAllRanges(); sel.addRange(r);
+  const dt = new DataTransfer();
+  dt.setData('text/plain', cfg.text);
+  el.dispatchEvent(new ClipboardEvent('paste', {clipboardData: dt, bubbles: true, cancelable: true}));
+  const after = (el.innerText || '');
+  return JSON.stringify({
+    ok: true, before, after: after.length, expected: cfg.replace ? cfg.text.length : before + cfg.text.length,
+    hangul_runs: (after.match(/[가-힣]+/g) || []).length,
+    over_limit: after.length > 3500,
+    tail: after.slice(-60)
+  });
+})()""" % payload
+    rc, out, err = browser_js(js)
+    if rc != 0:
+        evidence(args, 'paste-prompt', 'lexical paste', err[-200:], 'APPLESCRIPT_ERROR')
+        return 3
+    try:
+        st = json.loads(out)
+    except Exception:
+        evidence(args, 'paste-prompt', 'lexical paste', out[:200], 'PARSE_ERROR')
+        return 3
+    if not st.get('ok'):
+        evidence(args, 'paste-prompt', 'lexical paste', out, 'NO_PROMPT_EDITOR')
+        return 1
+    # Replace has been seen to append on this editor; trust the measured length.
+    drift = st['after'] != st['expected']
+    verdict = ('OVER_3500_LIMIT' if st['over_limit']
+               else 'LENGTH_MISMATCH_VERIFY_COUNTER' if drift else 'OK')
+    st['verdict'] = verdict
+    evidence(args, 'paste-prompt', f"expect {st['expected']} chars", json.dumps(st, ensure_ascii=False), verdict)
+    print(json.dumps(st, ensure_ascii=False))
+    return 0 if verdict == 'OK' else 1
+
+
+def cmd_read_prompt(args) -> int:
+    """Report what is actually in the prompt box."""
+    rc, out, err = browser_js("""(() => {
+  const el = document.querySelector('%s') || document.querySelector('[contenteditable]');
+  if (!el) return JSON.stringify({ok:false, error:'NO_PROMPT_EDITOR'});
+  const t = el.innerText || '';
+  return JSON.stringify({ok:true, len:t.length, over_limit:t.length>3500,
+    hangul_runs:(t.match(/[가-힣]+/g)||[]).length,
+    head:t.slice(0,60), tail:t.slice(-60)});
+})()""" % PROMPT_SEL)
+    if rc != 0:
+        evidence(args, 'read-prompt', 'read editor', err[-200:], 'APPLESCRIPT_ERROR')
+        return 3
+    st = json.loads(out)
+    evidence(args, 'read-prompt', 'read editor', out, 'OK' if st.get('ok') else 'FAIL')
+    print(json.dumps(st, ensure_ascii=False))
+    return 0
+
+
 def cmd_check_generate(args) -> int:
     st = read_generate_state()
     evidence(args, 'check-generate', 'read visible button color via CSS', json.dumps(st, ensure_ascii=False), st['verdict'])
@@ -389,6 +476,11 @@ def main() -> int:
     p = sub.add_parser('js-click-file-input'); p.add_argument('--index', type=int, default=0); p.set_defaults(fn=cmd_js_click_file_input)
     p = sub.add_parser('js-insert-prompt'); p.add_argument('--file', required=True); p.add_argument('--clear', action='store_true'); p.set_defaults(fn=cmd_js_insert_prompt)
     p = sub.add_parser('picker-go'); p.add_argument('--path', required=True); p.set_defaults(fn=cmd_picker_go)
+    p = sub.add_parser('paste-prompt', help='insert prompt text into the Lexical editor via a dispatched paste event (no keystrokes, IME-safe)')
+    p.add_argument('--file', required=True)
+    p.add_argument('--replace', action='store_true', help='replace all existing text instead of appending')
+    p.set_defaults(fn=cmd_paste_prompt)
+    sub.add_parser('read-prompt').set_defaults(fn=cmd_read_prompt)
     sub.add_parser('check-generate').set_defaults(fn=cmd_check_generate)
     p = sub.add_parser('watch-generate'); p.add_argument('--interval', type=int, default=900); p.add_argument('--max-hours', type=float, default=6); p.add_argument('--event-queue', default=None); p.add_argument('--immediate', action='store_true', help='fire even if button is already blue at start'); p.set_defaults(fn=cmd_watch_generate)
     sub.add_parser('recover').set_defaults(fn=cmd_recover)
