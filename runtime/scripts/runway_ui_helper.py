@@ -392,6 +392,62 @@ def cmd_read_prompt(args) -> int:
     return 0
 
 
+
+OBSERVER_INSTRUCTION = """Seedance queue observer for {project}.
+
+Every 15 minutes, check the visible Chrome Runway board and this project's staged shelf.
+
+Scope: decide whether a submission is possible right now, and if so submit the next
+eligible package. Read what is current from the project state and the staged packages —
+this instruction deliberately names no scene, no prompt text, no reference list and no
+reference count, because a recurring task re-reads its own text every wake and any scene
+pinned here becomes a permanent stop.
+
+Cycle each wake:
+  1. Read the board: queue depth, in-flight cards, Generate colour.
+  2. Generate gray or queue full -> record the state, keep the armed package untouched,
+     schedule the next check, stop with QUEUE_FULL_WAITING.
+  3. Slot free -> take the next eligible staged package (staged, self-verified, not
+     already marked blocked), run the preflight, click Generate once for that scene.
+  4. Confirm a matching scene card.
+     No card -> run the ACTIVE_CLICK_NO_CARD protocol in seedance-production.md:
+     poll every 5s up to 60s, then refresh and check the session feed for a hidden
+     success before ever re-clicking, then re-preflight, then at most one conditional
+     second click. Do not declare a blocker inside the first minute.
+  5. Card confirmed -> arm the next package, then read the button again and continue
+     the cycle. A confirmed card is not the end of the turn.
+
+Failures:
+  - A package failing its own preflight is marked blocked with the reason and the repair
+    needed, then SKIPPED — take the next eligible package in the same wake. One scene
+    never holds the queue.
+  - A defect you can fix yourself (prompt text missing or garbled, sheet not attached,
+    deck duplicated) is a repair: fix it, up to two attempts, then generate. Do not wait.
+  - A blocker needing a person (login, payment, permission, provider outage) is recorded
+    once with the exact action, reported, and then stops being polled.
+
+Ending: a turn ends only by declaring QUEUE_FULL_WAITING (with the next check scheduled),
+SHELF_EXHAUSTED, or ALL_REMAINING_BLOCKED (with each reason). Nothing else ends it, and
+never end by simply not continuing.
+
+Do not open a second browser loop or create another observer. Do not switch to Credits
+Mode. Never claim media completion without a downloaded file verified for path, size,
+duration, codec and resolution."""
+
+
+def cmd_observer_instruction(args) -> int:
+    """Print the canonical observer instruction.
+
+    Recurring observer text kept being hand-written, and each rewrite re-introduced
+    stop-early semantics the skill had already fixed — one instruction pinned E24 and
+    its Korean line, another defined "condition missing -> report BLOCKED", which is
+    why a run stopped 8 seconds after a Generate click instead of polling 60s.
+    Generate the instruction instead of composing it. (2026-07-30)
+    """
+    print(OBSERVER_INSTRUCTION.format(project=args.project))
+    return 0
+
+
 def cmd_check_generate(args) -> int:
     st = read_generate_state()
     evidence(args, 'check-generate', 'read visible button color via CSS', json.dumps(st, ensure_ascii=False), st['verdict'])
@@ -481,6 +537,9 @@ def main() -> int:
     p.add_argument('--replace', action='store_true', help='replace all existing text instead of appending')
     p.set_defaults(fn=cmd_paste_prompt)
     sub.add_parser('read-prompt').set_defaults(fn=cmd_read_prompt)
+    p = sub.add_parser('observer-instruction', help='print the canonical scene-agnostic observer instruction to schedule with')
+    p.add_argument('--project', required=True)
+    p.set_defaults(fn=cmd_observer_instruction)
     sub.add_parser('check-generate').set_defaults(fn=cmd_check_generate)
     p = sub.add_parser('watch-generate'); p.add_argument('--interval', type=int, default=900); p.add_argument('--max-hours', type=float, default=6); p.add_argument('--event-queue', default=None); p.add_argument('--immediate', action='store_true', help='fire even if button is already blue at start'); p.set_defaults(fn=cmd_watch_generate)
     sub.add_parser('recover').set_defaults(fn=cmd_recover)

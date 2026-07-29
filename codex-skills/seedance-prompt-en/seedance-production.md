@@ -182,7 +182,30 @@ Every interval:
 - **A blocker that needs a human is not a polling target.** Polling cannot type a missing line. Record it once with the exact repair action, escalate to the user, and stop re-checking that condition — re-polling an unchanged human-action blocker is a stall, not monitoring.
 - The observer never authors prompts or attaches references. If the shelf is empty, that is a report ("shelf exhausted"), not something to wait out.
 
-### Template
+### Do not compose the instruction — generate it
+
+```
+python3 runtime/scripts/runway_ui_helper.py observer-instruction --project <p>
+```
+
+Schedule that output verbatim. Hand-written observer text has failed twice for the same
+reason: each rewrite re-introduces stop-early semantics the skill had already fixed.
+
+- One instruction pinned `E24` and the exact Korean line it had to see, so eight
+  consecutive wakes re-found the same defect and no later episode was ever attempted.
+- Another defined its own failure semantics — *"조건이 하나라도 없으면 Generate하지 말고
+  BLOCKED를 알린다"* — and the run stopped **8 seconds** after a Generate click instead of
+  polling 60s, skipped the refresh-and-feed check entirely, paused the scheduler, and
+  reported a code (`BLOCKED_ACTIVE_CLICK_NO_CARD`) that does not exist here.
+
+A recurring instruction re-reads its own text every wake. Whatever stop condition it
+contains becomes permanent, and it silently outranks this file because the agent is
+following the task it was given. Generating the text is what keeps the two in sync.
+
+If a run needs a constraint this instruction does not express, that belongs in the staged
+package or the project state — not in the recurring text.
+
+### Template (what the generator prints)
 
 ```
 Seedance queue observer for <project>. Every 15 minutes, check the visible Chrome
