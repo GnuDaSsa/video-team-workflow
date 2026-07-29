@@ -82,6 +82,56 @@ def _project_video_count(project: Path) -> int:
     return _count_media(project / 'lanes', VIDEO_EXT)
 
 
+TERMINAL_STATES = {'QUEUE_FULL_WAITING', 'SHELF_EXHAUSTED', 'ALL_REMAINING_BLOCKED'}
+
+
+def cycle_status(project: Path) -> dict:
+    """Is this run legitimately stopped, or did it just trail off?
+
+    Rule sets drift toward halting by omission: every incident adds a "do not",
+    nothing adds a "keep going", and eventually stopping is what happens when no
+    rule says otherwise. Prose cannot hold that line — the sentence that says
+    "then continue" is exactly the one that gets forgotten.
+
+    So the contract is positive: a run ends only by declaring one of
+    TERMINAL_STATES in the seedance lane status. Anything else, with work still
+    available, is an incomplete stop and is reported as a problem. (2026-07-29)
+    """
+    project = Path(project)
+    st = _json(project / 'lanes' / 'seedance' / 'status.json', {}) or {}
+    declared = str(st.get('terminal_state') or '').upper()
+    running = str(st.get('status', '')).upper() == 'RUNNING'
+
+    shelf = 0
+    prompts = project / 'lanes' / 'seedance' / 'prompts'
+    if prompts.exists():
+        shelf = len([p for p in prompts.glob('*_prompt.txt')])
+    queued = _queue_has_event(project, 'seedance_block_queue',
+                              (BLOCK_READY_EVENT,) + LEGACY_BLOCK_READY)
+
+    out = {'declared_terminal_state': declared or None, 'lane_running': running,
+           'staged_prompts': shelf, 'block_ready_events': queued}
+
+    if running:
+        out['verdict'] = 'RUNNING'
+        return out
+    if declared in TERMINAL_STATES:
+        out['verdict'] = 'STOPPED_DECLARED'
+        if declared == 'QUEUE_FULL_WAITING' and not st.get('next_check_scheduled'):
+            out['verdict'] = 'STOPPED_INCOMPLETE'
+            out['problem'] = ('QUEUE_FULL_WAITING declared without next_check_scheduled — '
+                              'a full queue with no pending check is a silent end, not a pause')
+        return out
+    if shelf or queued:
+        out['verdict'] = 'STOPPED_INCOMPLETE'
+        out['problem'] = (f'lane is not running and declared no terminal state, but work is available '
+                          f'({shelf} staged prompt(s), block-ready={queued}). Declare one of '
+                          f'{sorted(TERMINAL_STATES)} or resume the cycle.')
+        return out
+    out['verdict'] = 'IDLE_NO_WORK'
+    return out
+
+
 def audit_artifacts(project: Path) -> dict:
     """Compare what the lanes claim against what is actually on disk."""
     project = Path(project)
@@ -409,5 +459,8 @@ def validate_project(project: Path) -> dict:
     art = audit_artifacts(project)
     problems.extend(art['problems'])
     warnings.extend(art['warnings'])
+    cyc = cycle_status(project)
+    if cyc.get('problem'):
+        problems.append(cyc['problem'])
     return {'project': str(project), 'ok': not problems, 'problems': problems,
-            'warnings': warnings, 'artifacts': art['stats']}
+            'warnings': warnings, 'artifacts': art['stats'], 'cycle': cyc}

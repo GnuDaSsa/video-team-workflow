@@ -1,5 +1,27 @@
 # Seedance production branch
 
+## Continuing is the default. Stopping requires a named reason.
+
+Read this before anything else in this file, and apply it to every rule here — including ones written later, and ones that forgot to say it.
+
+**Silence means continue.** If a rule tells you not to do something, that is a restriction on *that action*, never permission to end the run. A rule that describes a failure without saying what happens next means: record it and keep going.
+
+**A turn ends only by emitting one of these three states.** There is no fourth, and there is no ending by simply not continuing:
+
+| Terminal state | Means | Must include |
+|---|---|---|
+| `QUEUE_FULL_WAITING` | slots are full, next package is armed | the scheduled next check |
+| `SHELF_EXHAUSTED` | nothing left to arm | what was completed |
+| `ALL_REMAINING_BLOCKED` | every remaining item is blocked | each item and its reason |
+
+If you are about to stop and none of the three fits, **you are not finished** — go back to the cycle. Reaching the end of a rule, hitting a block code, finishing one generation, or running out of instructions are none of them.
+
+Block codes exist to stop **a bad action**, not the run. `BLOCKED_*` on one item means that item leaves the loop; the loop continues with the next eligible package.
+
+This inverts the usual failure. Rules accumulate prohibitions faster than permissions — every incident adds a "do not", and nothing adds a "keep going". Left alone, a rule set drifts toward halting by omission. This clause is the standing correction: an omission means continue, and any future rule that forgets to say so is covered by it.
+
+
+
 This branch executes a complete, already-authored handoff package in visible Chrome Runway. It does not improvise or rewrite the visual prompt. If the package is incomplete, return to `seedance-prompting.md`.
 
 ## The production cycle
