@@ -83,6 +83,15 @@ If the request depends on current artists/charts/tools/platform norms, browse or
 - For culturally specific music, name tradition/region/language/function/instrument/rhythm context; avoid generic labels like "Asian flavor" or "ethnic vibe".
 - For AI music tools such as Suno, Udio, or MIDI generators, write prompts/specs that describe craft variables rather than asking for a living artist clone.
 
+### Suno BGM duration gate (user correction, 2026-07-26)
+
+- For duration-critical BGM/score/backing music, do **not** default to Simple Mode: Suno may return clips that are much shorter than the requested picture length.
+- Use **Advanced/Custom Mode**, select the **Instrumental** lyrics mode, place arrangement/style instructions in the Style field, and set the UI **Duration** field explicitly to the target length before generating.
+- Enter Duration as the underlying **number of seconds** in the Duration control (for example `40` or `150`); Suno may display the same value as `0:40` or `2:30` after commit. Record both the numeric target and the displayed/file duration.
+- Treat the Duration setting as a target rather than a guarantee: after download, verify actual duration/codec with `ffprobe` and reject or re-generate undersized candidates.
+- Simple Mode remains acceptable only for quick sketches where exact duration is not important.
+- For film/contest BGM, record both the requested UI duration and the measured file duration in the candidate manifest; do not claim Music Lock from a prompt or duration setting alone.
+
 ## Quick commands the user may use
 
 - "음악감독 모드로 이 가사 봐줘"

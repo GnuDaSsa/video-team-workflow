@@ -18,7 +18,7 @@ Live operating model for Runway/Seedance after the cleanup session. Supersedes �
 
 | Phase | Owner tool | Actions |
 |---|---|---|
-| `ATTACH` | Desktop **Computer Use** (drag only) | Finder → Chrome Multi-ref **one file drag** |
+| `ATTACH` | **Chrome Codex plugin / Computer Use** | Visible `Reference` asset selector → native chooser, one file at a time (see attachment ladder) |
 | `VERIFY_REFS` | **Chrome Codex plugin** | Count/order of visible Multi-ref thumbnails |
 | `WEB` | **Chrome Codex plugin** | Prompt paste, settings, Generate once, queue/card read, download clicks |
 | `WAIT` | Poll / observer (no VLM spam) | 15-min observer may re-check **current** gray→blue prearm only |
@@ -27,9 +27,9 @@ Live operating model for Runway/Seedance after the cleanup session. Supersedes �
 ### Phase lock rules
 
 1. Only one owner tool is active at a time.
-2. During `ATTACH`, Chrome plugin must not click Runway.
+2. During `ATTACH`, only the tool performing the attach acts on Runway.
 3. During `WEB`, Computer Use must not move the mouse except explicit user recovery.
-4. Attach **PASS** = Chrome-visible thumbnail count/order, not “drag returned OK”.
+4. Attach **PASS** = Chrome-visible thumbnail count/order, not “the tool returned OK”.
 5. Generate is **Chrome plugin only** (never dual-click with Computer Use).
 
 ## Dual in-flight (mandatory capacity)
@@ -53,13 +53,13 @@ when a slot frees:
 If Chrome Codex plugin is unavailable:
 
 1. Prefer fixing the plugin/native host (preferred path).
-2. Temporary fallback: full **Computer Use** on the **same Chrome** Runway tab (not Safari), still one-file drag + eight-check Generate.
-3. Never invent a method ladder (picker → path type → AppleScript → coordinates).
+2. Temporary fallback: full **Computer Use** on the **same Chrome** Runway tab (not Safari), still one file at a time + eight-check Generate.
+3. Follow the fixed attachment ladder in `seedance-production.md` — asset selector → one retry → drag only with explicit user approval → `BLOCKED_REFERENCE_ATTACH_FAILED`. Do not invent a rung that is not on it (AppleScript coordinates, clipboard paste, hidden DOM input).
 
-If desktop drag is unavailable:
+If the asset selector is unavailable:
 
 1. `BLOCKED_CODEX_COMPUTER_USE_UNAVAILABLE` once with exact missing capability.
-2. Do not open Finder, do not Generate, do not spawn a helper.
+2. Do not Generate and do not spawn a helper. Drag is rung 3 and needs explicit user approval — it is not an automatic substitute.
 
 ## Relation to other files
 
