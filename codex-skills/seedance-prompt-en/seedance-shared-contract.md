@@ -113,46 +113,41 @@ The sheet **does not replace** the per-cut styleframe. Attach `styleframe(s) + P
 
 ## Handoff contract
 
-The prompting branch must hand the production branch:
+Two artifacts, and the split is the point:
+
+| File | Contents | Destination |
+|---|---|---|
+| `<BLOCK>_prompt.txt` | **the prompt only** — what will be visible | pasted whole into Runway's prompt box |
+| `<BLOCK>_package.md` | scene id, mode, reference roles and paths, gates, settings, handoff notes | read by the operator; **never enters Runway** |
+
+Keeping metadata out of the prompt file makes the paste accident structurally impossible. Put both in one file and it eventually gets pasted whole — which is exactly how 1,100 of 3,207 characters (34%) ended up in a live prompt.
+
+**Prompts are written in Korean** (2026-07-29), creative prompts included, so the user can read, approve and correct them. Spoken lines stay verbatim Korean; proper nouns, on-screen text and format tokens (`15s`, `9:16`) keep their original form.
+
+### Package (`<BLOCK>_package.md`)
 
 ```text
 Scene ID:
 Mode: Creative | Standard
 Look medium: live-action | 2D/stylized | mixed
-Prompt file:
-Visual prompt:
+Prompt file: <BLOCK>_prompt.txt
 Ordered references:
-  Image1 = ...
-  Image2 = ...
-  ImageN = approved character sheet/identity crop when applicable
+  Image1 = <path> — <what it contributes to this shot>
+  ImageN = <path> — approved clean sheet (CHAR_<ID>_PROVIDER_REF_R<n>) when that character appears
 Character-sheet gate: required | not applicable
 Naturalism / texture notes:
-Expected duration/audio/settings: 15s multi-ref; Audio: ON; soundscape directed in the prompt; ...
+Expected settings: 15s; Audio: ON; 9:16 | 16:9
 Exit composition / next-scene handoff:
 Source root and exact file paths:
 ```
 
-The production branch may reject an incomplete package, but it must not silently rewrite the visual prompt. Return the package to prompting for revision.
+The production branch may reject an incomplete package, but it must not silently rewrite the visual prompt. Send it back to prompting for revision.
 
-### Only the `Visual prompt:` field goes into Runway — 2026-07-28
+### Never in the prompt file
 
-The package above is **operator-facing**. Runway's prompt box takes the contents of `Visual prompt:` and nothing else.
+`Scene ID` · `Mode` · `Look medium` · `REFERENCE ROLES` · gate wording · `EXPECTED` · `EXIT` · file paths · project names · status values · production provenance such as `generated styleframe for E23`.
 
-Observed failure: an entire package was pasted into the box — `Scene ID`, `Mode`, `REFERENCE ROLES:`, `CHARACTER-SHEET GATE: required and visibly verified`, `EXPECTED: 15s full Seedance generation; multi-reference; Audio ON in UI`, `EXIT:`. Seedance reads all of that as description of the picture, so gate wording and UI settings become part of what it tries to render.
-
-- Never paste field labels, gates, role maps, expected settings, provenance, or exit notes.
-- The reference role map is how **you** attach files in the right order. It is not prompt text.
-- Naming a reference as `generated styleframe for E19` describes production history, which the prompt must never contain. If a reference matters to the image, describe what is visible in it.
-- Before pasting, read the box back: if it contains a colon-led field label or the word "gate", it is the package, not the prompt.
-
-### Never attach the same image twice
-
-Duplicate references do not add information; they multiply one look and produce a clip built from a single frame.
-
-- The visible strip must hold **distinct images**. Two identical thumbnails is a preflight failure, not a full deck.
-- Do not duplicate a file to satisfy a count — no rule requires a minimum reference count, and any prompt-side wording that demands "at least N distinct styleframes" is invented and must be deleted rather than satisfied.
-- If only one usable frame exists for the shot, attach that one plus the character sheet and submit. That is a complete deck.
-- Each `@ImageN` role must describe a genuinely different image. If two roles would describe the same picture, one of them should not be attached.
+That last one describes **how a still was produced**. There is nothing in it for a video model to render — it only consumes characters.
 
 ## Completion and blockers
 

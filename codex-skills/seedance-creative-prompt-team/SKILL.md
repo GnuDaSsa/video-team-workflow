@@ -87,7 +87,8 @@ Package fields must record:
 - Physical cause → contact → response is mandatory. No mood-only prompts.
 - Exactly one dominant camera family per 15s card unless the package is an explicit montage.
 - Negative tail is role-specific and short. No generic negative wall.
-- Visual-only prompt. No captions, narration, contest copy, provenance, folder/QC language, imagegen model names, proper names, or political labels inside the Runway prompt.
+- **The prompt is written in Korean** (2026-07-29), creative prompts included, so the user can review and approve it. Spoken lines verbatim Korean; proper nouns, on-screen text and format tokens (`15s`, `9:16`) unchanged.
+- Visual-only prompt. Never include `Scene ID`, `Mode`, `Look medium`, `REFERENCE ROLES`, gate wording, `EXPECTED` settings, `EXIT` notes, file paths, provenance such as `generated styleframe for E23`, captions, contest copy, or model names. Those belong to the package file, which never enters Runway — on E24 that contamination was 34% of the prompt.
 - Stay within Runway's visible 3500-character limit; prefer 700–1800 characters.
 - This skill never claims production completion. Completion requires the production branch's downloaded + ffprobe-verified file.
 

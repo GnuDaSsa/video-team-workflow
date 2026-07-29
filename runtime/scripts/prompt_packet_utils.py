@@ -173,7 +173,7 @@ SEEDANCE_SCHEMA = '''{
   "reference_role_map": {"@Image1": "anchor role; essential lock; creative latitude"}, "shot_count": 0,
   "motion_budget": ["..."],
   "audio_route": "NO_AUDIO1_SFX_ONLY | AUDIO1_GUIDE | NATIVE_CANDIDATE_S1_S2",
-  "prompt": "700-1400 chars preferred, <=3500 Runway hard limit; references are anchors, not cages; cinematic reframing allowed except fragile details",
+  "prompt": "KOREAN ONLY. 700-1500 chars preferred, <=3500 Runway hard limit. Describes ONLY what appears on screen: scene, action, emotion shown as behaviour, one camera move, 2-4 caused physical layers, sound, time split, closing frame. NEVER include Scene ID / Mode / Look medium / REFERENCE ROLES / gate wording / EXPECTED settings / EXIT notes / file paths / how a still was produced. References are anchors, not cages; cinematic reframing allowed except fragile details. Keep spoken lines verbatim Korean; keep proper nouns, on-screen text and format tokens (15s, 9:16) as written.",
   "prompt_s2": "only when NATIVE_CANDIDATE_S1_S2, else omit",
   "constraints_tail": "short essential safety tail only", "prompt_rules_used": ["creative_seedance_sol_high_20260728", "anchor_not_cage"],
   "retry_if_failed": "..."
@@ -206,7 +206,11 @@ def build_packet(project: Path, task: str, block: str, refs: list[str]) -> str:
         'The generation prompt is for the video/image model only: no file paths, statuses, or project-management text. '
     )
     if task == 'seedance':
-        task_rules += ('Author as video_prompt_director_high at reasoning effort high; use the creative Seedance style version; '
+        task_rules += ('Write the prompt in KOREAN, including creative prompts — the user reviews and approves it. '
+                       'The prompt contains only what is visible on screen; operational fields (scene id, mode, reference '
+                       'role map, gates, expected settings, exit notes, file paths, how a still was made) belong to the '
+                       'handoff package and are never part of the prompt text. '
+                       'Author as video_prompt_director_high at reasoning effort high; use the creative Seedance style version; '
                        'references are visible story anchors, not production artifacts; allow cinematic reframing/camera/blocking/transitions '
                        'except fragile symbol/face/hand/crop locks.')
     sections = [

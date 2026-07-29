@@ -1,5 +1,7 @@
 # Handoff schema
 
+**The prompt is Korean and prompt-only.** Package fields (scene id, mode, reference roles, gates, expected settings, exit) live in `<BLOCK>_package.md` and never enter Runway; the prompt lives in `<BLOCK>_prompt.txt`.
+
 The prompting team must emit this package before any production branch work.
 
 ## Required fields
