@@ -2,7 +2,21 @@
 
 Reusable **Codex-native** video-team package: Seedance/Runway operating rules, image/I2V QC, typography, submission safety, and curated knowledge.
 
-**Version line (2026-07-21 v2):** Chrome hybrid operator + dual in-flight queue + single Seedance contract + subagent approval gate + Hermes removed.
+**Version line (2026-07-29 v3):** one video skill + wiki pointers · Korean prompt output · prompt/package split · repair-vs-blocked · rail enforced in code · IME-safe prompt input.
+
+v3 arbitrated a rule set that had grown five authority layers (~3,000 lines) each declaring itself final. Symptoms were non-deterministic runs: Seedance silently disabling audio, uploads that worked one day failing the next, one project running 14 days across 68 session folders with its canonical asset folders empty.
+
+What changed:
+
+- **Audio** — the toggle stays ON; the prompt names the soundscape. The old "no BGM" preference sat in the settings field, so operators reached for the switch; the 15-minute observer was even told to verify "Audio Off".
+- **Character sheets** — always attached when a recurring character appears. The producer now emits `CHAR_<ID>_PROVIDER_REF_R<n>`, a text-free single-figure sheet, so downstream selects by filename instead of judging which sheet is safe.
+- **Upload** — one fixed ladder: asset selector → one retry → drag only with explicit approval → blocked. Drag was demoted from canonical to last resort.
+- **Persistence** — a blocker stops an item, never the session; "exactly once" is per scene. Work continues until the shelf is exhausted, then schedules.
+- **Repair vs blocked** — five "blockers" were repair tasks. Fix what you own, defer after two attempts, escalate only what needs a human, and never poll a human-action blocker.
+- **Prompts** — written in Korean, and prompt-only: `<BLOCK>_prompt.txt` versus `<BLOCK>_package.md`. Operational text was 34% of a measured live prompt.
+- **Skills** — `videodirector` and `music-video-production-team` merged; MV/promo/shortform are modes, depth moved to `references/` and the wiki.
+- **The rail is enforced** — gates checked self-reported JSON and never looked at a file. `validate` now audits artifacts, and `sequence_manager.py` renumbers the ordered library while rewriting references.
+- **Tooling** — the Generate watcher polled Safari after the move to Chrome; Korean input failed because macOS routes synthetic keystrokes through the active IME. Both fixed, with an IME-safe `paste-prompt`.
 
 ## Included
 
