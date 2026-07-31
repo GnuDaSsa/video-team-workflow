@@ -97,6 +97,53 @@ def browser_js(js: str) -> tuple[int, str, str]:
                + tmpl.format(js=json.dumps(js, ensure_ascii=False)))
 
 
+
+# --- input-method guard ----------------------------------------------------
+# macOS routes System Events keystrokes through the active input method. With a
+# CJK IME selected, "ZZTEST123" arrives as Hangul fragments and Cmd+V loses its
+# modifier and types a literal character — silently. That is how a 3,201-char
+# prompt ended up with zero Hangul while every step reported success.
+#
+# Silent corruption is the worst failure mode available, so any keystroke path
+# stops here instead. paste-prompt does not use keystrokes and is unaffected.
+# (2026-07-31)
+
+CJK_IME_MARKERS = ('Korean', 'Japanese', 'SCIM', 'TCIM', 'TYIM', 'Chinese', 'Pinyin', 'Zhuyin')
+
+
+def ime_state() -> dict:
+    rc, out, _ = osa('do shell script "defaults read com.apple.HIToolbox AppleSelectedInputSources"')
+    if rc != 0:
+        return {'readable': False, 'cjk_active': False, 'raw': ''}
+    tail = out[-1200:]
+    hit = next((m for m in CJK_IME_MARKERS if m.lower() in tail.lower()), None)
+    mode = ''
+    for line in tail.splitlines():
+        if '"Input Mode"' in line or '"KeyboardLayout Name"' in line:
+            v = line.split('=', 1)[-1].strip().strip('";, ')
+            if v and v not in ('Input Mode', 'KeyboardLayout Name'):
+                mode = v
+    return {'readable': True, 'cjk_active': bool(hit), 'marker': hit, 'input_mode': mode}
+
+
+IME_REMEDY = ('BLOCKED_IME_ACTIVE — a CJK input method is selected, so synthetic keystrokes '
+              'would be mangled (Cmd+V loses its modifier; typed text becomes jamo). '
+              'Either switch the input source to ABC/English for this operation, or use a '
+              'route that sends no keystrokes: `paste-prompt --file F [--replace]` for prompt '
+              'text. Do not retry the keystroke path while a CJK IME is active.')
+
+
+def cmd_ime_check(args) -> int:
+    st = ime_state()
+    st['verdict'] = 'CJK_IME_ACTIVE_KEYSTROKES_UNSAFE' if st['cjk_active'] else 'OK_KEYSTROKES_SAFE'
+    if st['cjk_active']:
+        st['required_action'] = IME_REMEDY
+    evidence(args, 'ime-check', 'input source safe for keystrokes',
+             json.dumps(st, ensure_ascii=False), st['verdict'])
+    print(json.dumps(st, ensure_ascii=False))
+    return 1 if st['cjk_active'] else 0
+
+
 def evidence(args, action: str, expected: str, observed: str, verdict: str) -> None:
     row = {'ts': dt.datetime.now().isoformat(timespec='seconds'), 'tool': 'runway_ui_helper',
            'state': getattr(args, 'state', None), 'action': action,
@@ -121,7 +168,17 @@ if fm is not "{TARGET_APP}" then error "ABORT_FOCUS_NOT_{TARGET_APP.upper()}: " 
 
 
 def run_verified(args, action: str, tail: str, pre: str = '') -> int:
-    """pre (e.g. clipboard load) + activate + frontmost verify + tail action, ONE osascript."""
+    """pre (e.g. clipboard load) + activate + frontmost verify + tail action, ONE osascript.
+
+    Refuses to fire keys while a CJK IME is active — see the input-method guard.
+    """
+    if 'keystroke' in tail or 'key code' in tail:
+        st = ime_state()
+        if st.get('cjk_active'):
+            evidence(args, action, 'input source safe for keystrokes',
+                     json.dumps({**st, 'required_action': IME_REMEDY}, ensure_ascii=False),
+                     'BLOCKED_IME_ACTIVE')
+            return 4
     rc, out, err = osa(pre + VERIFY_BLOCK + tail)
     if rc != 0:
         verdict = 'FOCUS_ABORT' if 'ABORT_FOCUS' in err else 'APPLESCRIPT_ERROR'
@@ -537,6 +594,7 @@ def main() -> int:
     p.add_argument('--replace', action='store_true', help='replace all existing text instead of appending')
     p.set_defaults(fn=cmd_paste_prompt)
     sub.add_parser('read-prompt').set_defaults(fn=cmd_read_prompt)
+    sub.add_parser('ime-check', help='is the active input source safe for synthetic keystrokes?').set_defaults(fn=cmd_ime_check)
     p = sub.add_parser('observer-instruction', help='print the canonical scene-agnostic observer instruction to schedule with')
     p.add_argument('--project', required=True)
     p.set_defaults(fn=cmd_observer_instruction)

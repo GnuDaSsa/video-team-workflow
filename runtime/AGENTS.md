@@ -354,6 +354,7 @@ Current `오늘의 자동완성` continuation rule: MAIN / COUPLE / GUARDIANS sh
 - `<block>_submit.json`에 attestation의 `prompt_sha256`을 포함할 것. attestation 없는 제출 기록은 무효 제출로 간주한다.
 - **Computer Use로 Claude/ChatGPT 등 채팅 화면 접속 금지.** 이 단계의 브라우저 Computer Use 허용 대상은 Runway뿐이다. 채팅 화면 복붙은 Sol pack provenance가 아니다(§2).
 - 프롬프트는 Sol 팩 텍스트 그대로. **700~1,500자 권장, Runway UI 하드 최대는 3,500자**다. 1,500자 초과는 품질 검토/압축 권고이지 검증 실패가 아니며, 3,500자를 넘을 때만 제출 금지로 재작성한다. 최종 검증은 보이는 카운터로 하고(커스텀 에디터라 AX tree는 empty 오판), 장문 keystroke 타이핑은 금지한다.
+- **키입력 전 IME 확인 (2026-07-31)**: `runway_ui_helper.py ime-check`. 한/일/중 입력기가 켜져 있으면 합성 키입력이 변환되어 조용히 망가진다 — `Cmd+V`는 수식키를 잃고 글자 하나가 타이핑되며, 한글은 자모로 흩어진다. 헬퍼가 이 상태에서 키 발사를 거부하고 `BLOCKED_IME_ACTIVE`를 반환한다(`paste-image`·`paste-text`·`picker-go` 전부 정지). 입력소스를 ABC로 바꾸거나, 키입력 없는 `paste-prompt`를 쓴다. **IME가 켜진 채로 키입력을 재시도하지 않는다** — 매번 같은 방식으로, 그리고 모든 단계가 성공을 보고하면서 실패한다.
 - Route A: 같은 osascript에서 `Chrome activate + delay 0.3` → 필드 클릭·caret 확인 → Cmd+V → 카운터 검증 (최대 2회).
 - Route B: `do JavaScript`로 에디터 focus 후 `document.execCommand('insertText', false, <JSON-escaped>)` (stale 텍스트는 selectAll 후). 실패 시 defer + 수동 요청.
 - 수동 트림은 트림 우선순위(레퍼런스 순서/identity > 모션·카메라 > 스타일 형용사)대로, `prompt_rules_used`에 기록.

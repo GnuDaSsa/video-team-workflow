@@ -295,6 +295,16 @@ That is how a 3,201-character prompt ended up with **zero** Hangul. It was never
 
 **The prompt field is a Lexical editor** (`data-lexical-editor="true"`, `[contenteditable].textbox-*`). Lexical renders from its own state model, so it ignores `execCommand('insertText')` and direct DOM mutation — both return success and change nothing. It *does* handle real `paste` events.
 
+**Check the input source before any keystroke path:**
+
+```
+python3 runtime/scripts/runway_ui_helper.py ime-check
+```
+
+`CJK_IME_ACTIVE_KEYSTROKES_UNSAFE` means keystrokes will be mangled. The helper now refuses to fire keys in that state and returns `BLOCKED_IME_ACTIVE` rather than corrupting the field — `paste-image`, `paste-text` and `picker-go` all stop, since each one sends `Cmd+V` or `Cmd+Shift+G`. Either switch the input source to ABC/English for that operation, or use the keystroke-free route below.
+
+Do not retry a keystroke path while a CJK IME is active. It will fail the same way every time, and it fails *silently* — every step reports success while the text never arrives.
+
 **Working route — inject a paste event, use no keystrokes at all:**
 
 ```js
