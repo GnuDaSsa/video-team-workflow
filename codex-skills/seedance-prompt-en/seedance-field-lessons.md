@@ -17,12 +17,15 @@ Project-specific content (1907 costume research, that project's filenames, sheet
 - Never write the prompt so the numbering becomes a sequence to move through, a match-cut instruction, or an order to replay.
 - One generation = **one coherent shot with one camera flow**, newly composed. The model must not copy several references in turn inside a single clip.
 - Do not force interpolation between reference compositions that were never meant to connect.
+- When a distinction between background, identity, action, or prop materially protects the result, state it in one concise, natural Korean sentence **inside the visual prompt**: e.g. `@Image1은 장소 배경, @Image2는 인물의 얼굴·체형을 고정하는 캐릭터 시트, @Image3은 손·의상·소품 동작을 고정하는 시트다.` This names a visible function, not a file path, scene ID, or operator procedure.
+- The sentence must explicitly say that the references are independent anchors, not time order. Do not rely on the thumbnail strip or the handoff package alone for this semantic distinction.
 
 ## Character sheet as identity anchor
 
 - Attach the approved sheet whenever a recurring character appears — always, in addition to the scene references.
 - Order: scene references first, character sheet(s) after.
 - The sheet fixes face silhouette, hair mass, costume, age impression, body proportion, and signature props. Nothing else.
+- When the approved character lock has two sheets, attach and name their separate jobs: the turnaround/face sheet fixes facial structure and body identity; the action/prop sheet fixes clothing, hands, and signature-object handling. Do not silently substitute a provider-safe single portrait or treat the pair as duplicates.
 - The sheet is **not** a scene-order cue, a transition cue, or a pose instruction. A character must never end up in a frontal poster stance merely because a sheet was attached — the shot's action, camera, and mid-motion state are specified separately.
 - Verify by the visible `ImageN` thumbnail on **this** generation. Conversation context and previous decks are not verification.
 - Stale thumbnails from an earlier deck: do not Generate until the strip is fully replaced.
@@ -51,8 +54,14 @@ When the user explicitly prefers their own short, natural-language Runway cards 
 - Write one cohesive Korean paragraph, not a label list or compressed schema.
 - For one coherent 15-second beat, **about 180–450 Korean characters is valid** when it still names the visible setup, one action, one camera direction, only the motivated physical reactions, sound, and the final composition.
 - Do not fake concision by dropping identity, contact physics, sound, or the ending frame. A genuinely complex or explicitly storyboarded sequence may stay longer.
-- Keep reference roles, model choice, settings, attestation, and QC in the handoff package. They never enter the visual prompt.
+- Keep model choice, settings, attestation, QC, file paths, and operator gates in the handoff package. The **visible-function `@ImageN` role sentence** is the narrow exception: it belongs in the visual prompt when it disambiguates background versus identity versus action/prop anchors.
 - Treat this as a user-preference route, not a new provider, model, agent, or automation branch. Verify the result in media QC before promoting it as a broadly proven quality rule.
+
+## Audio ON, explicit per-shot sound route
+
+- Keep Runway Audio **On**. It controls generated SFX and music together, so no-BGM must never be encoded by switching Audio Off.
+- For every audio-active production prompt, name the allowed soundscape. When the project or user requires diegetic-only audio, explicitly write both sides in the prompt: the permitted ambience/contact SFX **and** `음악·배경음악·노래·나레이션은 생성하지 않는다.` Do not leave this intent only in a package field.
+- Do not make no-BGM a universal aesthetic default: score remains available when the current user/shot calls for it. The durable rule is that the prompt, not the UI toggle, carries the sound decision.
 
 ## No generic negative wall
 
