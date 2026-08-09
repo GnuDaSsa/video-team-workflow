@@ -84,6 +84,13 @@ Emit a concise labeled update before starting a meaningful phase and when switch
 - Capsules are staging records. Promote reusable lessons into canonical wiki pages/seeds/skills/memory; do not leave important knowledge only in chat or in the capsule.
 - Never record secrets, passwords, tokens, payment info, personal form data, or unnecessary private message bodies. Summarize sensitive context by role/path only.
 
+## Video-Team Workflow Default and Feedback Promotion
+
+- Treat every non-trivial video request as a run of the user's canonical video-team workflow, not an ad-hoc media pipeline. Start from the current project state and the authority order in `/Users/gnudas/Documents/Codex/video-team-runtime/AGENTS.md`; use the repository source at `/Users/gnudas/Documents/Codex/video-team-workflow` for durable rule changes.
+- Capture material process feedback as project evidence first. Promote it only when the user explicitly asks for a standing rule or when it is a repeated, verified cross-project failure; route it to the one canonical owner rather than copying rules into project folders.
+- After a durable promotion, verify the smallest relevant checks, make an isolated Git commit that excludes unrelated working-tree changes, and sync it to `GnuDaSsa/video-team-workflow`. Do not create a background writer, scheduler, or extra agent to do this.
+- Follow `/Users/gnudas/Documents/Codex/video-team-workflow/docs/video-feedback-promotion-protocol.md` for the evidence, routing, privacy, and release procedure.
+
 
 ## Video Agent Memory Routing — MV vs Public Contest — 2026-05-10
 
