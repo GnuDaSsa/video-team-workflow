@@ -60,7 +60,7 @@ When the user explicitly prefers their own short, natural-language Runway cards 
 ## Audio ON, explicit per-shot sound route
 
 - Keep Runway Audio **On**. It controls generated SFX and music together, so no-BGM must never be encoded by switching Audio Off.
-- For every audio-active production prompt, name the allowed soundscape. When the project or user requires diegetic-only audio, explicitly write both sides in the prompt: the permitted ambience/contact SFX **and** `음악·배경음악·노래·나레이션은 생성하지 않는다.` Do not leave this intent only in a package field.
+- When the project or user requires action-SFX-only audio, the **Korean production prompt itself** must literally state: `오디오는 배경음·음악·노래·나레이션·대사·지속적인 환경음을 생성하지 않는다.` Then name only the short diegetic effects caused by visible on-screen actions (for example a zipper, cup contact, footstep, or cloth friction). Do **not** call for ambience, room tone, wind, rain bed, environmental bed, or any music. Never leave this intent only in a package field.
 - Do not make no-BGM a universal aesthetic default: score remains available when the current user/shot calls for it. The durable rule is that the prompt, not the UI toggle, carries the sound decision.
 
 ## No generic negative wall
