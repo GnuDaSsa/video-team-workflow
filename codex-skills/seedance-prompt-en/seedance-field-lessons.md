@@ -44,6 +44,16 @@ Record in the manifest: `batch_id`, `image_batch_index`, `character_sheet_refres
 - Do not force `calm → discovery → transformation` or a through-aperture opening onto every scene.
 - If the same light device repeats in adjacent scenes, or a transition effect outweighs the scene's real action, fail it as `CREATIVE_MOTIF_OVERUSE_FAIL`.
 
+## User-directed compact natural-language prompts
+
+When the user explicitly prefers their own short, natural-language Runway cards over an expanded template, that preference overrides the normal prompt-length target for the affected package.
+
+- Write one cohesive Korean paragraph, not a label list or compressed schema.
+- For one coherent 15-second beat, **about 180–450 Korean characters is valid** when it still names the visible setup, one action, one camera direction, only the motivated physical reactions, sound, and the final composition.
+- Do not fake concision by dropping identity, contact physics, sound, or the ending frame. A genuinely complex or explicitly storyboarded sequence may stay longer.
+- Keep reference roles, model choice, settings, attestation, and QC in the handoff package. They never enter the visual prompt.
+- Treat this as a user-preference route, not a new provider, model, agent, or automation branch. Verify the result in media QC before promoting it as a broadly proven quality rule.
+
 ## No generic negative wall
 
 Do not auto-append conservative boilerplate such as `no sudden cuts`, `no exaggerated camera movement`, `no camera drift`. Keep only the role-specific essential locks — face, crop, hand/product contact, text/logo. General defects are caught in QC afterwards, not by padding every prompt.

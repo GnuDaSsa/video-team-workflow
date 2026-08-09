@@ -84,7 +84,7 @@ Do not attach a habitual list of prohibitions.
 
 ## Length
 
-**Target 700–1,500 characters; 3,500 is the hard limit.** Stripping operational text usually lands you inside the target on its own. If you are approaching the ceiling, suspect operational contamination before assuming the description is too detailed.
+**Target 700–1,500 characters; 3,500 is the hard limit.** Stripping operational text usually lands you inside the target on its own. If you are approaching the ceiling, suspect operational contamination before assuming the description is too detailed. When the user explicitly selects compact natural-language cards, follow the user-directed exception in `seedance-field-lessons.md` rather than padding the visual prompt to this default.
 
 ## Authoring isolation
 
