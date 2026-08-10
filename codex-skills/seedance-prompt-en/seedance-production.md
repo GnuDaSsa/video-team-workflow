@@ -376,3 +376,12 @@ This blocks that external queue, not the project. Resume when the card moves to 
 - Record `scene_id`, provider, absolute path, bytes, duration, codec, and QC verdict per file.
 - A generated-but-undownloaded result is `UI_ONLY_NOT_DOWNLOADED` and is never reported as complete. Recover it from the session board before judging it missing.
 - If a card vanishes, fails, shows a different deck, or a blocker appears: record `BLOCKED` and stop.
+
+### Completed-card download blocked by Chrome client
+
+If a verified completed Runway card's **visible** Download opens its Runway CDN and Chrome shows `ERR_BLOCKED_BY_CLIENT`, classify the card as `BLOCKED_CHROME_CLIENT_CDN_DOWNLOAD` and `UI_ONLY_NOT_DOWNLOADED`. Keep the card's prompt/deck/settings evidence, but do **not** call it a video candidate or final media.
+
+- Verify that no local non-empty media file appeared before declaring the block; the board's `Download all` control is not evidence by itself.
+- Do not bypass the block with the raw CDN URL, `curl`, API/MCP, Credits Mode, a second browser, or a re-generation.
+- Tell the user to allow the Runway CDN only in their Chrome blocking/privacy client, then resume the **same session** and download the already-completed card. Do not re-submit it.
+- A lost Chrome tab may be reopened to its exact verified Runway session URL only with the user's explicit instruction; that restores the board, not a new Runway session or a second browser loop.
