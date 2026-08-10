@@ -377,6 +377,13 @@ This blocks that external queue, not the project. Resume when the card moves to 
 - A generated-but-undownloaded result is `UI_ONLY_NOT_DOWNLOADED` and is never reported as complete. Recover it from the session board before judging it missing.
 - If a card vanishes, fails, shows a different deck, or a blocker appears: record `BLOCKED` and stop.
 
+### Seedance QC normalization children
+
+- Keep the downloaded provider file immutable as the raw candidate. Any freeze repair or audio removal becomes a parent-linked child asset; never overwrite the raw download.
+- When an effects-only prompt still yields music or sustained ambience, remove the provider audio stream completely. Do not preserve it with a noise gate or partial mute; later rebuild only the approved BGM, real narration, and short visible-action foley in the editor.
+- Run `freezedetect` on the raw candidate, remove each confirmed bad interval with explicit trim/concat edits, and run the same threshold again on the child. Record both the removed intervals and the zero-result recheck.
+- Before calling the child edit-ready, verify SHA-256, `ffprobe`, zero audio streams, the freeze recheck, and a visual contact sheet, then register the child and contact sheet under the canonical numbered `media/` tree. Keep both in `candidate` state until full playback and edit-context QC pass; normalization alone is never approval.
+
 ### Completed-card download blocked by Chrome client
 
 If a verified completed Runway card's **visible** Download opens its Runway CDN and Chrome shows `ERR_BLOCKED_BY_CLIENT`, classify the card as `BLOCKED_CHROME_CLIENT_CDN_DOWNLOAD` and `UI_ONLY_NOT_DOWNLOADED`. Keep the card's prompt/deck/settings evidence, but do **not** call it a video candidate or final media.
