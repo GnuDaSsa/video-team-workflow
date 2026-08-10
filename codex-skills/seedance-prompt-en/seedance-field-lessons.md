@@ -61,6 +61,7 @@ When the user explicitly prefers their own short, natural-language Runway cards 
 
 - Keep Runway Audio **On**. It controls generated SFX and music together, so no-BGM must never be encoded by switching Audio Off.
 - When the project or user requires action-SFX-only audio, the **Korean production prompt itself** must literally state: `오디오는 배경음·음악·노래·나레이션·대사·지속적인 환경음을 생성하지 않는다.` Then name only the short diegetic effects caused by visible on-screen actions (for example a zipper, cup contact, footstep, or cloth friction). Do **not** call for ambience, room tone, wind, rain bed, environmental bed, or any music. Never leave this intent only in a package field.
+- **Effects-only QC is a separate gate:** prompt compliance is not audio compliance. For an action-SFX-only job, inspect the actual downloaded clip (audible preview plus waveform/spectrogram when available). Any sustained score, room-tone/ambience bed, narration, dialogue, or continuous environmental layer fails the route even when the prompt was correct. Keep the video as a candidate only; either mute that provider track and rebuild strictly discrete synchronized foley in the edit, or regenerate. Do not promote the generated audio.
 - Do not make no-BGM a universal aesthetic default: score remains available when the current user/shot calls for it. The durable rule is that the prompt, not the UI toggle, carries the sound decision.
 
 ## No generic negative wall
