@@ -37,3 +37,10 @@ Record notable technical or product decisions here so they do not live only in c
 - Decision: Before attesting block N, the Seedance lane must compare it with the preceding story block and record `incoming_story_state`, `narrative_delta`, `causal_bridge`, and `outgoing_story_state`. A repeated location, prop, or mood without new information, changed action/relationship, complication, or resolution is repaired before submission.
 - Consequences: Queue order, card count, visual polish, and a new background cannot satisfy the story gate. Each opening action must follow from the previous block, and each closing frame must hand off a concrete state to the next block.
 - Follow-up: Add machine validation for the `story_progression` package fields when the prompt-pack schema next changes; until then, enforce them in the Seedance authoring/critic pass.
+
+### 2026-08-10 - Enforce declared scene density with immutable cut ownership
+
+- Context: The Fiji international-cooperation project has 46 picture cuts plus a CapCut-only final-title hold. The user requested roughly two planned scenes per 15-second Seedance clip, with editorial speed handled later, and explicitly prohibited regenerating scenes already covered by existing jobs.
+- Decision: Treat a user-declared scenes-per-clip value as a prompt-complexity budget for all unsubmitted blocks. Maintain a cut-ownership ledger in which each cut ID belongs to exactly one queued, accepted, completed, or planned generation intent. Existing submitted jobs keep ownership; supplemental blocks use uncovered cuts only, and a retry requires `QC_FAILED_RETRY_ALLOWED`.
+- Consequences: The 32 picture cuts already reserved by B01–B08 remain locked, while the 14 uncovered cuts are paired into seven supplemental 15-second clips, B09–B15. Editorial retiming no longer justifies overpacking prompts, and edit-only title beats remain in CapCut rather than becoming AI-rendered text scenes.
+- Follow-up: Add schema validation for scene-density, `covered_cuts`, prior owner, duplicate-check verdict, and retry state when the prompt-pack schema next changes.

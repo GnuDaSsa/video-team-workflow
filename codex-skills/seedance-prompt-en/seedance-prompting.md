@@ -80,6 +80,29 @@ the handoff package with four items: `incoming_story_state`,
   sentence, return to the block map and repair the prompt before attestation or
   Runway submission.
 
+## Scene-density and cut-ownership gate
+
+When the user or project declares a provider scene budget—for example, two
+planned scenes in each 15-second clip—that instruction overrides the ordinary
+one-event default for every unsubmitted block. This is a prompt-complexity
+budget, not a claim about final edit duration.
+
+- Create a cut-ownership ledger before authoring supplemental blocks.
+- Each cut ID may have only one active owner among queued, accepted, completed,
+  or planned supplemental generation intents.
+- Existing submitted jobs retain ownership. Do not cancel, reinterpret, or
+  recreate them merely to fit a newly declared scene density.
+- Build supplemental blocks only from uncovered cut IDs and stay within the
+  declared scenes-per-clip budget.
+- Editorial speed changes and retiming happen after QC; they are not permission
+  to overpack a provider prompt.
+- A reserved cut may be regenerated only after its current source is explicitly
+  marked `QC_FAILED_RETRY_ALLOWED`.
+- Edit-only typography or final-title beats stay in CapCut and must not become a
+  Seedance text-rendering scene.
+- Before attestation, record `covered_cuts`, the previous owner if any, the
+  duplicate-check verdict, and retry state in the handoff package or ledger.
+
 ## Sound
 
 Leave the audio toggle ON and **write the sound you want**: room tone, contact sounds, footsteps, cloth, wind. Ask for music when the shot wants music — it is not forbidden.
