@@ -61,6 +61,25 @@ A change of medium, character rules or camera grammar starts a new sequence — 
 - Specify the closing frame — stable enough for the next cut to take over.
 - Do not name emotions; show them. Not "he is sad" but "his gaze drops and his shoulders lower."
 
+## Sequence progression gate
+
+A valid standalone shot is not enough. Before attesting block N, compare it with
+the immediately preceding story block and record a `story_progression` note in
+the handoff package with four items: `incoming_story_state`,
+`narrative_delta`, `causal_bridge`, and `outgoing_story_state`.
+
+- The visible event must reveal new information, change an action or
+  relationship, complicate a prior cause, or resolve it. A repeated location,
+  prop, or mood without one of those changes is a prompt repair, not a new
+  story block.
+- The opening action must be understandable as a consequence of the previous
+  block, and the closing frame must create a concrete handoff to the next one.
+- Queue order, accepted-card count, visual polish, and a new background never
+  substitute for narrative progress.
+- If the causal bridge or narrative delta cannot be stated in one plain
+  sentence, return to the block map and repair the prompt before attestation or
+  Runway submission.
+
 ## Sound
 
 Leave the audio toggle ON and **write the sound you want**: room tone, contact sounds, footsteps, cloth, wind. Ask for music when the shot wants music — it is not forbidden.

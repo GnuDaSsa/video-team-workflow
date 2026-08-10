@@ -30,3 +30,10 @@ Record notable technical or product decisions here so they do not live only in c
   7. I2V defaults to Seedance; Grok only when the user names it. music-video-production-team's role 5 was still Grok-first.
 - Consequences: each contested behaviour now has exactly one owner, and an explicit authority order sits in both AGENTS.md files. Valid corrections from the project-local rules file were promoted to `seedance-field-lessons.md`; project-specific content stayed with the project. Local rules copies inside project folders are banned — exceptions go to `docs/project_overrides.md`.
 - Follow-up: `runtime/AGENTS.md` is now tracked here but the live copy is still at `~/Documents/Codex/video-team-runtime/AGENTS.md`; deploying it is not yet automated. Nothing has been deployed to `~/.codex` — the fixes are on `fix/rule-arbitration-20260726` awaiting review. The deploy script now refuses to run while live is ahead of the repo.
+
+### 2026-08-10 - Treat story progression as a pre-attestation gate
+
+- Context: In the Fiji international-cooperation project, individually valid and visually consistent Seedance blocks filled the Runway queue, but the user correctly judged that the story itself was not advancing. Standalone shot quality, tropical art direction, and accepted-card throughput had been mistaken for narrative progress.
+- Decision: Before attesting block N, the Seedance lane must compare it with the preceding story block and record `incoming_story_state`, `narrative_delta`, `causal_bridge`, and `outgoing_story_state`. A repeated location, prop, or mood without new information, changed action/relationship, complication, or resolution is repaired before submission.
+- Consequences: Queue order, card count, visual polish, and a new background cannot satisfy the story gate. Each opening action must follow from the previous block, and each closing frame must hand off a concrete state to the next block.
+- Follow-up: Add machine validation for the `story_progression` package fields when the prompt-pack schema next changes; until then, enforce them in the Seedance authoring/critic pass.
