@@ -9,6 +9,7 @@ Seedance is intentionally split into two phases so prompt authoring does not blo
 
 1. Read `seedance-shared-contract.md` first.
 2. For prompt design, reference mapping, or CLI handoff, read `seedance-prompting.md`.
+   Also read `xazinga-prompting-adapter.md` to apply the compatible source-scope, camera/light, transition, and critic additions distilled from XAZINGA skills. It is an adapter, not a second authority.
 3. For Chrome/Runway attachment, Generate, queue monitoring, download, or `ffprobe`, read `seedance-production.md`.
 4. When both are requested, finish the prompting package first, then hand it to the production branch. Do not rewrite prompts during UI execution; return to the prompting branch if the prompt needs revision.
 5. Optional Creative authoring: `$seedance-creative-prompt-team` runs the six roles as one sequential authoring checklist (Director / Reference / Camera / Physics / Composer / Critic). Do not spawn or parallelize those roles by default; production UI still stays in this skill.
