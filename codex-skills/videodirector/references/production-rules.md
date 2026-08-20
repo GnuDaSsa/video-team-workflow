@@ -56,8 +56,8 @@ Additional hard check: a CapCut draft is not valid merely because JSON inspectio
 
 For recurring people/characters the sheet stage is a hard gate, not a polish step.
 
-- Before any production styleframe batch, create and QC the required sheets: the approval bible page where useful, the clean production sheet `CHAR_<ID>_PROVIDER_REF_R<n>` for identity lock, and mini-sheets for recurring supporting pairs/groups.
-- Every dependent image prompt must attach or explicitly reference the approved sheet(s). A previous styleframe or a text-only memory is not an identity source.
+- Before any production styleframe batch, create and QC `CHAR_<ID>_TRIPTYCH_R<n>`: left headless front body, middle back body with head, right large 3/4 portrait, all text-free on neutral gray. Optional hand/prop/scale assets are story-specific, not the default package.
+- Every dependent image prompt must attach the approved triptych or the minimum deterministic `_FACE` / `_FRONT_BODY` / `_BACK_BODY` crop. A previous styleframe or text-only memory is not an identity source; the prompt must bind each attached panel/crop to its exact face/body/wardrobe role.
 - Styleframes generated **before** the sheet lock are `HOLD_LOOKDEV_ONLY`: composition/lookdev reference only, excluded from I2V handoff, and regenerated with the sheets attached before they can be used.
 - If the generator cannot verify the attachment, record `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED` or `BLOCKED_IMAGEGEN_EDIT_FAILED` — never proceed from memory.
 - QC compares regenerated frames to the sheets for face, hair mass, age impression, outfit/materials, hands/props, and role separation.

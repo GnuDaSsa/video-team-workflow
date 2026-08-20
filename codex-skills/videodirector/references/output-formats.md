@@ -22,15 +22,18 @@ Use a table with these columns:
 }
 ```
 
-### Character sheet JSON
+### Three-panel character identity JSON
 
 ```json
 {
   "character": "[name]",
-  "purpose": "character expression and angle sheet",
-  "attach_instruction": "attach [name] reference image as base character",
-  "prompt": "same face same hair same outfit across all panels, front view, side profile, back view, close-up neutral, close-up emotion A, close-up emotion B, white background, high consistency",
-  "negative": "different character, style change, costume change, chibi"
+  "asset_id": "CHAR_<ID>_TRIPTYCH_R1",
+  "purpose": "recurring-character identity and body/wardrobe construction lock",
+  "attach_instruction": "attach the approved identity/casting source and verify its hash",
+  "layout": ["left: headless front full body", "middle: back full body with head", "right: large 3/4 face portrait"],
+  "rendering": "text-free neutral mid-gray, neutral studio light, true skin/material color, 16:9",
+  "stress_gate": "10 varied generations, same recognizable identity 10/10",
+  "derivatives": ["_FACE", "_FRONT_BODY", "_BACK_BODY"]
 }
 ```
 

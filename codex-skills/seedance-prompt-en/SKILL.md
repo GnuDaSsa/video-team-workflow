@@ -10,6 +10,7 @@ Seedance is intentionally split into two phases so prompt authoring does not blo
 1. Read `seedance-shared-contract.md` first.
 2. For prompt design, reference mapping, or CLI handoff, read `seedance-prompting.md`.
    Also read `xazinga-prompting-adapter.md` to apply the compatible source-scope, camera/light, transition, and critic additions distilled from XAZINGA skills. It is an adapter, not a second authority.
+   Also read `hell-grind-production-prompting-adapter.md` for the two-layer shot contract, exact entity/space locks, three-panel identity binding, performance beats, and one-clause revision discipline distilled from the public Hell Grind package. It is an adapter, not a second authority.
 3. For Chrome/Runway attachment, Generate, queue monitoring, download, or `ffprobe`, read `seedance-production.md`.
 4. When both are requested, finish the prompting package first, then hand it to the production branch. Do not rewrite prompts during UI execution; return to the prompting branch if the prompt needs revision.
 5. Optional Creative authoring: `$seedance-creative-prompt-team` runs the six roles as one sequential authoring checklist (Director / Reference / Camera / Physics / Composer / Critic). Do not spawn or parallelize those roles by default; production UI still stays in this skill.
@@ -38,6 +39,7 @@ Seedance is intentionally split into two phases so prompt authoring does not blo
 - `seedance-prompting.md` — Creative/Standard prompt authoring and reference-role packages. No UI operation.
 - `seedance-production.md` — Runway visible UI, queue, download, and verification. No prompt improvisation.
 - `seedance-field-lessons.md` — prompt-authoring corrections proven in production: `GENERAL_REFERENCE_MODE`, what the character sheet may and may not do, creative mode without light-match glue, no generic negative wall.
+- `hell-grind-production-prompting-adapter.md` — two-layer shot contract, exact entity/space locks, triptych role binding, physical performance beats, and one-clause revision discipline. No UI operation.
 - `image-qc-source-frame-standard.md` — **image QC lane, not prompting**: whether a still is usable as an I2V source (`VIDEO_FRAME_STATIC_POSTER_FAIL`, `EMOTION_CAUSALITY_FAIL`, duplicate protagonists).
 - Optional sibling: `../seedance-creative-prompt-team/SKILL.md` — multi-agent Creative prompt team. Authoring only; production remains here.
 

@@ -32,7 +32,7 @@ Direction first, the audio spine second, and **QC after every production stage**
 1. **기획 / Direction** — purpose, mode, audience, story spine, must-avoid list. Nothing generated yet.
 2. **음악·오디오 / Audio spine** — generate and verify the real file: Suno track for music-led work, narration/VO for narration-led. Listen to it. A placeholder or an unheard file is not a spine.
 3. **컷맵 / Cut map** — built **against that spine**: beats, accents, phrase changes, lyric hooks and cadence for music; sentence and breath boundaries for narration. Concept was decided in step 1; timing is decided here, against real audio.
-4. **캐릭터 / 스타일** → **QC** against the approved design. The provider-safe sheet `CHAR_<ID>_PROVIDER_REF_R<n>` must exist before anything depends on it.
+4. **캐릭터 / 스타일** → **QC** against the approved design. The three-panel master `CHAR_<ID>_TRIPTYCH_R<n>` or its minimum deterministic crop must exist before anything depends on it.
 5. **이미지 / Styleframes** → **QC**: identity, composition, and whether the frame is usable as an I2V source at all.
 6. **I2V / Clips** → **QC**: motion, identity drift, texture, crop preservation, duplicate impressions.
 7. **편집 / Edit** → **패키지 / Package** — QC-passed clips and locked audio only.

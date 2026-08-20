@@ -84,17 +84,17 @@ Promoted from the operating rules that were actually producing clips in the inde
 - `@ImageN` numbering is **not** a narrative sequence. Ordered references are independent anchors for look, palette, space, props, and plausible action — never a storyboard to interpolate, match-cut, or replay in order (`GENERAL_REFERENCE_MODE`).
 - This gate **supersedes any rule that forbids uploading character sheets to Runway.** Sheets are required multi-reference inputs when a recurring character appears.
 
-### Which sheet to attach
+### Which character identity asset to attach
 
-Attach the file named **`CHAR_<ID>_PROVIDER_REF_R<n>`**. Select it by name, not by eye.
+The canonical master is **`CHAR_<ID>_TRIPTYCH_R<n>`**: a text-free neutral 16:9 strip whose left panel is a headless front full body, middle panel is a back full body with head, and right panel is one large 3/4 portrait. Select it by registered name/hash, not by eye. Its approved deterministic derivatives are `_FACE`, `_FRONT_BODY`, and `_BACK_BODY`; they inherit the master identity and record crop coordinates.
 
-The character-sheet standard produces one sheet built specifically for provider upload — single figure, neutral background, flat lighting, zero text or panel borders — plus several multi-panel design sheets (turnaround, expressions, prop/costume, bible page) whose labels, callouts and gutters a video model would try to draw. Only the `PROVIDER_REF` file leaves that stage.
+Attach the minimum asset that proves the current shot. Use the full triptych for general identity/body binding, `_FACE` for fragile close-ups, and a body crop only when wardrobe orientation or full-body proportion is visible. Every full-triptych attachment requires Korean role binding that assigns face identity to the right portrait, front body/wardrobe to the left panel, and rear silhouette/wardrobe to the middle panel, while excluding the gray background, seams, and missing front head from scene content.
 
-If no `PROVIDER_REF` sheet exists for a character you need, that is an upstream gap: stop with `BLOCKED_NO_PROVIDER_SAFE_SHEET` and have it generated. Do not improvise by attaching a turnaround, or by cropping a panel out of a multi-panel sheet.
+If no QC-passed triptych or appropriate derivative exists, stop with `BLOCKED_NO_PROVIDER_SAFE_SHEET`. Do not improvise from beauty key art, a text-heavy bible, or an unverified crop.
 
-Spec and generation rules: `runtime/references/character_sheet_prompt_standard.md`.
+Spec and generation rules: `runtime/references/character_sheet_prompt_standard.md`. Compatible compile additions live in `hell-grind-production-prompting-adapter.md`.
 
-The sheet **does not replace** the per-cut styleframe. Attach `styleframe(s) + PROVIDER_REF` — the styleframe carries the scene, the sheet carries the identity.
+The identity asset **does not replace** the per-cut styleframe. Attach `styleframe(s) + minimum required TRIPTYCH/crop` — the styleframe carries the scene and the character asset carries identity/body construction.
 
 ## Generate-ready queue observer protocol
 
@@ -145,7 +145,7 @@ Look medium: live-action | 2D/stylized | mixed
 Prompt file: <BLOCK>_prompt.txt
 Ordered references:
   Image1 = <path> — <what it contributes to this shot>
-  ImageN = <path> — approved clean sheet (CHAR_<ID>_PROVIDER_REF_R<n>) when that character appears
+  ImageN = <path> — approved CHAR_<ID>_TRIPTYCH_R<n> or minimum deterministic identity crop when that character appears
 Character-sheet gate: required | not applicable
 Naturalism / texture notes:
 Expected settings: 15s; Audio: ON; 9:16 | 16:9

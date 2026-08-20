@@ -122,7 +122,7 @@ Do not attach a habitual list of prohibitions.
 - Count follows the request — commonly 3–4, sometimes a character sheet plus a background. There is no minimum, and a file is never attached twice to reach a number.
 - `@ImageN` numbering is **not a narrative order**. Each reference is an independent anchor for look, space, props and plausible action, not a sequence to replay.
 - Build the deck from **this shot's own material**. Padding with neighbouring cuts' frames makes adjacent clips look like the same shot.
-- When a recurring character appears, attach the approved clean sheet (`CHAR_<ID>_PROVIDER_REF_R<n>`) alongside the scene references.
+- When a recurring character appears, attach the approved `CHAR_<ID>_TRIPTYCH_R<n>` or minimum deterministic `_FACE` / body crop alongside the scene references, and bind its exact role in the Korean prompt.
 
 ## Length
 

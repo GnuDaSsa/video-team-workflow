@@ -279,44 +279,26 @@ Required safeguards:
 - If Voice mode or “음성으로 연결 중” is accidentally opened, cancel/close it immediately and record the incident in the local run notes before retrying.
 - For fallback ChatGPT web image production only, prefer this safe sequence: set composer text via direct DOM setter/computer-use `set_value`/direct typing → verify composer contains expected text → verify `send-button` identity → click once → verify a normal chat turn started. Do not use `pbcopy`, AppleScript clipboard, or clipboard paste for Codex GUI prompt insertion on this Mac; it can fail silently or return exit 1. Do not use coordinate clicks for ChatGPT submit unless there is no DOM alternative and the user has approved a manual fallback.
 
-## MV character sheet standard — 2026-05-07
+## Three-panel character identity standard
 
-For future MV/video-agent projects with recurring characters, a single front-view character reference is not enough for production consistency. Do not retroactively apply this requirement to the already-progressed 2026-05-07 Seongnam Environment Day V4 project, but apply it to new projects and major new character-lock phases.
+Apply this to every new video-team/MV/public-contest/institution project with recurring people or characters. The canonical details live only in `runtime/references/character_sheet_prompt_standard.md`.
 
-Research basis: animation/model-sheet references are used to keep proper proportions; industry-style model sheets function as blueprints for constructing consistent 2D/3D characters; production character teams provide sheets showing characters in varied attitudes and angles. References consulted: Concept Art Empire model-sheet gallery, Character Design References model-sheet/full-figure guidance, Character Design References visual library categories for turnarounds/poses, and AnimationResources notes on Disney model sheets from various attitudes and angles.
+- Before production styleframes, create and QC one `CHAR_<ID>_TRIPTYCH_R<n>` per recurring identity: **left headless front full body, middle back full body with head, right large 3/4 portrait**, text-free on neutral mid-gray in neutral light.
+- The front body's deliberate head omission prevents tiny full-body faces from competing with the large portrait. It must read as a clean, non-graphic studio-reference crop; never injury, gore, or a mannequin.
+- The sheet is intentionally plain. Do not bake cinematic lighting, rain, smoke, film grain, LUT, typography, scene background, or beauty retouch into the identity master.
+- Identity is an immutable descriptor plus a verified image reference. Every materially different state—wet, wounded, transformed, coat on/off, damaged costume, age stage—is a separately registered derivative made one change at a time.
+- Stress-test the triptych across 10 varied pose/light/distance/action generations, including multi-character scenes when relevant. Lock only at 10/10 recognizable identity.
+- Deterministic `_FACE`, `_FRONT_BODY`, and `_BACK_BODY` crops may be made from the approved master with source hash and crop coordinates. They are not new generated identities.
+- Attach the approved triptych or minimum required crop to every dependent image/video generation. The model-facing prompt must bind face identity to the right portrait, front body/wardrobe to the left panel, and rear silhouette/wardrobe to the middle panel, while excluding the gray background, panel seams, and missing front head from the scene.
+- Supporting recurring people receive their own triptych. Hand/prop, scale/chemistry, expression, or construction sheets are optional story-specific QC assets, not a mandatory seven-sheet package.
+- Production styleframes remain one cut = one prompt = one standalone image. A triptych is an identity-design exception, never a production frame, final edit image, or storyboard sequence.
+- Styleframes made before identity lock remain `HOLD_LOOKDEV_ONLY` / `INVALID_PRE_CHARACTER_LOCK_SOURCE` and must be regenerated from the approved triptych before I2V. If attachment cannot be verified, mark `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED`.
 
-Minimum character-sheet package before batch styleframes/I2V:
-1. **Turnaround sheet**: front, 3/4 front, side/profile, 3/4 back, back view; full body whenever the character appears as a full-body actor.
-2. **Head/face sheet**: neutral front, 3/4, profile, mouth-open/speaking, smile, surprise, concern, blink/closed-eyes; keep muzzle/nose/jaw/eye spacing locked.
-3. **Expression sheet**: 6-9 emotionally useful expressions matched to the script, not random emojis.
-4. **Pose/action sheet**: 4-8 story-relevant poses such as holding a mic, pointing, walking/running, sitting/riding, bending, stamping, pedaling, drawing, carrying props.
-5. **Hand/paw/prop interaction sheet**: close-ups for hands/paws gripping signature props, because I2V often drifts there.
-6. **Costume/prop sheet**: front/back of core outfit and signature props, with color/material notes and forbidden changes.
-7. **Scale sheet**: character height/volume relative to partner characters and common objects when multiple characters interact.
+### Existing-project continuity — 오늘의 자동완성
 
-Production rule:
-- Generate/approve these sheets with Codex imagegen before the main styleframe batch. One sheet can contain multiple reference panels because it is a design reference, but production styleframes remain one cut = one prompt = one standalone image.
-- Attach/pass the relevant sheets as actual image references/inputs to every dependent Codex imagegen styleframe when supported. For fragile shots, attach only the most relevant angle/expression/prop sheets to avoid overloading references; if reference attachment cannot be verified, mark BLOCKED rather than proceeding from memory.
-- QC must check identity across angle, silhouette, nose/muzzle/jaw, eye spacing, hair/fur mass, costume, body scale, hand/paw shape, and prop handling. If a later frame only matches color but not structure, reject/regenerate.
-- Do not accept “front-view only” as a final character lock for a new recurring-character video unless the character appears in one static front-facing shot only.
-
-## Character-sheet-first correction — 2026-07-06
-
-Apply this to every video-team/MV/public-contest/institution animation project with recurring people or characters.
-
-- Character/model sheets must be created, saved, QC'd, and treated as the identity source **before** production styleframes/start frames for any recurring protagonist, couple, guardian pair, mascot, performer, or repeated citizen character.
-- The required minimum is still the full character-sheet standard: approval-oriented bible page when useful, plus clean production model sheet/crops for downstream identity lock. A single attractive hero/reference image is not enough for recurring-character production.
-- Production Codex imagegen prompts for dependent cuts must explicitly use/reference the relevant approved sheet(s) and state the identity lock. Do not merely describe the character from memory.
-- If styleframes were generated before the required sheets were attached, mark those frames `HOLD_LOOKDEV_ONLY` or `INVALID_PRE_CHARACTER_LOCK_SOURCE`; do not send them to Seedance/Runway/Grok as final I2V sources. Regenerate the affected styleframes from the approved sheets.
-- Supporting recurring people such as a driving couple or guardian pair need mini model sheets before their linked cuts. One-off extras may use scene-specific locks, but repeated people must not drift cut to cut.
-- QC must explicitly compare each regenerated styleframe against the sheet: face shape, eye spacing, nose/jaw, hair mass, age impression, outfit/materials, hand/prop handling, and role separation. If the output only matches “general style” but not identity, reject/regenerate.
-
-### Current project hard gate — 오늘의 자동완성 / 3D animation — 2026-07-06
-
-- For the current `오늘의 자동완성` shortform and any continuation of it, the saved MAIN / COUPLE / GUARDIANS character sheets are mandatory source references for all dependent styleframe regeneration. Do not treat first-pass styleframes as production sources.
-- Each regenerated cut prompt/manifest must name which character sheet(s) were attached or explicitly referenced. If the sheet cannot be attached or verified in the active image-generation route, mark the cut `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED` instead of pretending the sheet was used.
-- Pre-character-lock images remain `HOLD_LOOKDEV_ONLY`; they may guide composition/style only and must not be sent to Seedance/Runway/Grok as final I2V references.
-- Seedance/Runway should receive only post-character-lock, QC-passed production styleframes/start/end frames. Do not upload raw character sheets to Seedance as the video reference strip unless the user explicitly orders that exception.
+- Existing approved MAIN / COUPLE / GUARDIANS sheets remain the required identity sources for the current project; do not invalidate completed assets retroactively.
+- At the next major character-lock revision, migrate each recurring identity to the three-panel standard and register provenance from the last approved source.
+- Seedance/Runway receives only post-lock, QC-passed styleframes plus the minimum approved identity reference. Never upload an unapproved design sheet or pretend an attachment was used.
 
 ## MV typography/editing lesson — 교차 문구 편집 호흡 — 2026-05-10
 - In Korean MV/public-contest typography, when transforming phrase A into phrase B in the same position, give B an equivalent solo reading breath to A before introducing any subordinate/lower explanatory line.

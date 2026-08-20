@@ -124,7 +124,7 @@ If Computer Use itself is unavailable, stop with `BLOCKED_CODEX_COMPUTER_USE_UNA
 7. If a file, slot, order, or character-sheet thumbnail is wrong, stop and recover the deck. Do not Generate.
 8. **Deck-overlap check:** compare the visible strip against the previous block's deck. More than one shared scene reference means two near-identical clips are about to be produced — rebuild the deck before Generate.
 9. **Duplicate check:** no two thumbnails in the strip may be the same image. Identical thumbnails mean a file was attached repeatedly to fill a count — remove the duplicates and submit the honest deck.
-10. **Role-map truth check:** each visible thumbnail must actually be what the role map claims. Three roles pointing at one picture, or a multi-panel sheet where a single-scene composition should be, means the map is fiction — stop and rebuild. The identity slot holds the `CHAR_<ID>_PROVIDER_REF_R<n>` file; a grid of panels in that slot is the wrong file.
+10. **Role-map truth check:** each visible thumbnail must actually be what the role map claims. Three roles pointing at one picture, or a multi-panel sheet where a single-scene composition should be, means the map is fiction — stop and rebuild. The identity slot holds the approved `CHAR_<ID>_TRIPTYCH_R<n>` or minimum deterministic crop. The canonical triptych is allowed only with explicit face/front-body/back-body role binding and explicit exclusion of gray background, seams, and the missing front head from scene content; an arbitrary grid remains wrong.
 
 `ImageN` order is an attachment record, not a narrative sequence — the prompt must not treat the numbering as a storyboard to interpolate or replay (`GENERAL_REFERENCE_MODE`).
 
@@ -275,7 +275,7 @@ Never poll a BLOCKED condition — polling cannot log in, cannot pay, cannot typ
 |---|---|
 | prompt text missing, truncated, or garbled — Korean especially | re-insert via the prompt route below, verify by the **visible character counter**, then generate |
 | a required character sheet is not attached | attach it and verify the thumbnail |
-| no `PROVIDER_REF` sheet exists | generate one from the approved master |
+| no approved `TRIPTYCH`/minimum identity crop exists | generate and QC the triptych upstream |
 | a source frame fails as an I2V source (poster-like, wrong emotion) | regenerate that frame |
 | the deck duplicates an image or overlaps the previous block | rebuild the deck from this shot's own material |
 

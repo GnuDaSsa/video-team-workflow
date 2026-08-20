@@ -11,6 +11,8 @@ Use this file for durable context that should survive across threads.
 
 - Coding style choices that are stable over time.
 - Review preferences or release expectations.
+- Default recurring-character identity asset is `CHAR_<ID>_TRIPTYCH_R<n>`: left headless front body, middle back body with head, right large 3/4 portrait. Bind those roles explicitly in the model-facing prompt, use deterministic crops for fragile shots, keep state changes as separate assets, and require a 10/10 stress gate.
+- Use the Hell Grind prompting adapter as a bounded shot-contract compiler: exact entity count, source roles, locked geography, complex-shot occupancy, timed physical beats, acting/audio, positive proof constraints, and one-clause revisions. It never overrides Korean prompts, duration/length limits, or Seedance UI authority.
 
 ## Known Pitfalls
 
