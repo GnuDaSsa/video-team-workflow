@@ -1,7 +1,7 @@
 interface:
   display_name: "Music Director"
-  short_description: "작사·작곡을 함께 설계하는 음악감독"
+  short_description: "최신 Suno 코퍼스로 작사·작곡을 설계하는 음악감독"
   brand_color: "#7C3AED"
-  default_prompt: "Use $music-director to help me develop this song idea into lyrics, chords, topline, and arrangement directions."
+  default_prompt: "Use $music-director to turn this song idea into a corpus-grounded Suno style prompt, lyrics, chords, topline, and arrangement direction."
 policy:
   allow_implicit_invocation: true
