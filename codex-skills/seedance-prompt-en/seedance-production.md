@@ -95,8 +95,10 @@ The fixed ladders elsewhere restrict **which methods** you may use. They do not 
 ## Approved route
 
 - Source of truth: one visible, logged-in `app.runwayml.com` Generate board in Aside.
+- Primary control path: `aside repl` → `listBrowserTabs()` → exact existing Runway `targetId` → `attachBrowserTab(targetId)`. Reuse that borrowed tab; never call `openTab()` for an existing project transaction.
+- Apple Events JavaScript is not required for the Aside CLI binding. Use Aside AppleScript only when its developer toggle is already enabled; an AppleScript permission error does not block production while `attachBrowserTab` succeeds.
 - Attach through Runway's visible `Reference` asset selector: one staged file → native chooser → `Open` → verify the new visible `ImageN` thumbnail.
-- Use one owner tool at a time on the same Aside tab: Computer Use for attachment; Aside AppleScript/Computer Use for visible verification and web actions.
+- Use one owner tool at a time on the same Aside tab: Aside CLI/repl is primary for tab binding and visible Playwright interaction; Computer Use handles a native chooser when required; Aside AppleScript is an optional enabled fallback.
 - Never use connector/API, hidden inputs, AppleScript coordinate clicking, clipboard image paste, Credits/Max, Chrome, Safari, the Codex in-app browser, or any second Runway session.
 - When a step fails, follow the fixed ladder below. Do not invent a route that is not on it, and do not skip a rung.
 

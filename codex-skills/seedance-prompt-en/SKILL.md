@@ -24,7 +24,7 @@ Seedance is intentionally split into two phases so prompt authoring does not blo
 - Creative Seedance Mode is the default authoring branch unless fragile continuity or the user requests Standard mode.
 - If an approved character/model/identity-sheet character appears, attach the relevant character sheet or identity crop **on every generation**, together with scene references. A previous card or conversational memory does not count.
 - Missing, mismatched, or unverified character-sheet thumbnail means `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED`; never click Generate.
-- Runway visible Aside is the source of truth. Operate one logged-in Aside Runway tab only; do not use Chrome, Safari, the Codex in-app browser, connector/API, hidden input, coordinate clicking, or a second browser route.
+- Runway visible Aside is the source of truth. Attach `aside repl` to the existing Runway tab by exact `targetId` and use that Aside CLI binding as the primary controller. Aside AppleScript is optional only when Apple Events JavaScript is already enabled; macOS Accessibility/Computer Use is a same-tab fallback. A disabled Apple Events toggle is not a blocker while Aside CLI can bind. Do not use Chrome, Safari, the Codex in-app browser, connector/API, hidden input, coordinate clicking, a new Aside tab, or a second browser route.
 - A Generate click is exactly one transaction **per scene** after preflight — not one per session. Keep submitting eligible packages while slots are free; stop only when the shelf is empty or every remaining item is blocked.
 - Completion requires a downloaded file and verified duration/codec, not a card or thumbnail.
 

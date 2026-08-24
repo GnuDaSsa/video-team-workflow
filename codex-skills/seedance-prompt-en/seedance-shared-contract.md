@@ -165,6 +165,6 @@ That last one describes **how a still was produced**. There is nothing in it for
 
 - UI card, prompt text, local source image, or a Generate click is not final media completion.
 - Final completion requires an exact downloaded video path, file size, duration, codec/container evidence, scene ID, provider, and QC verdict.
-- If Aside control or the visible Reference selector is unavailable, use `BLOCKED_ASIDE_CONTROL_UNAVAILABLE` and record the exact user action needed. Do not switch to Chrome, Safari, the in-app browser, or connector/API as a fallback.
+- Aside CLI/repl binding to the exact existing Runway `targetId` is the primary production control. A disabled Apple Events JavaScript toggle alone is not a blocker. Only when Aside CLI binding and the permitted same-tab fallbacks cannot operate the visible Reference selector may production use `BLOCKED_ASIDE_CONTROL_UNAVAILABLE`; record the exact user action and do not switch to Chrome, Safari, the in-app browser, or connector/API.
 - If an upload stalls at 100%, cancel only that upload, preserve the rest of the deck, and record the event in lane `status.json` and `result.md`.
 - No duplicate Generate: once the scene's accepted card is visible, do not click Generate again for that scene.

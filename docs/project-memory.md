@@ -27,4 +27,5 @@ Use this file for durable context that should survive across threads.
 ## Runway Browser Owner
 
 - Seedance production uses one visible, logged-in Aside `app.runwayml.com` tab only. Never fall back to Chrome, Safari, the Codex in-app browser, connector/API, or a second browser session.
+- Primary controller is `aside repl` with `listBrowserTabs()` and `attachBrowserTab(exactTargetId)` on the existing tab. AppleScript is optional, not a prerequisite.
 - If Aside control is unavailable, stop that UI route with `BLOCKED_ASIDE_CONTROL_UNAVAILABLE` and the exact required user action; do not reinterpret `어사이드` as `알아서`.

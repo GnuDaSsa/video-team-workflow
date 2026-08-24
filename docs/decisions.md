@@ -56,5 +56,5 @@ Record notable technical or product decisions here so they do not live only in c
 
 - Context: The user explicitly corrected the Seedance browser route after the operator misread `어사이드` and opened Chrome. The old live contract still named Chrome as the source of truth.
 - Decision: `codex-skills/seedance-prompt-en/` now assigns Runway production to one visible, logged-in Aside tab only. Chrome, Safari, the Codex in-app browser, connector/API, and any second browser route are prohibited fallbacks.
-- Consequences: If Aside control or its visible Reference selector is unavailable, production records `BLOCKED_ASIDE_CONTROL_UNAVAILABLE` with one exact user action instead of silently changing browsers.
+- Consequences: Prior 2026-08-22/23 daemon logs prove repeated successful `CliBinding`/`cli.replRun` use. Production therefore binds the exact existing Runway tab through `aside repl` first; a disabled Apple Events JavaScript toggle is not a blocker while that binding succeeds. Only after CLI and permitted same-tab fallbacks fail does it record `BLOCKED_ASIDE_CONTROL_UNAVAILABLE`.
 - Follow-up: Keep browser-owner wording and enforcement only in the canonical Seedance skill; do not duplicate it in project rules or other role skills.

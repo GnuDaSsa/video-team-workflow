@@ -10,6 +10,8 @@ class SeedanceAsideOwnerRouteTests(unittest.TestCase):
     def test_dispatcher_names_aside_as_source_of_truth(self):
         text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("Runway visible Aside is the source of truth", text)
+        self.assertIn("`aside repl`", text)
+        self.assertIn("exact `targetId`", text)
         self.assertRegex(text, r"(?:one|single) visible Aside route")
         self.assertNotIn("Runway visible Chrome is the source of truth", text)
         self.assertNotIn("separate visible Chrome route", text)
@@ -17,6 +19,8 @@ class SeedanceAsideOwnerRouteTests(unittest.TestCase):
     def test_production_has_one_aside_owner_and_no_positive_chrome_owner(self):
         text = (SKILL / "seedance-production.md").read_text(encoding="utf-8")
         self.assertIn("Generate board in Aside", text)
+        self.assertIn("attachBrowserTab(targetId)", text)
+        self.assertIn("Apple Events JavaScript is not required", text)
         self.assertIn(
             "One logged-in Aside `app.runwayml.com` Generate board per project",
             text,
@@ -38,9 +42,10 @@ class SeedanceAsideOwnerRouteTests(unittest.TestCase):
     def test_shared_contract_prohibits_browser_fallback(self):
         text = (SKILL / "seedance-shared-contract.md").read_text(encoding="utf-8")
         self.assertIn("BLOCKED_ASIDE_CONTROL_UNAVAILABLE", text)
+        self.assertIn("Aside CLI/repl binding", text)
         self.assertIn(
-            "Do not switch to Chrome, Safari, the in-app browser, or connector/API",
-            text,
+            "do not switch to chrome, safari, the in-app browser, or connector/api",
+            text.lower(),
         )
         self.assertNotIn("If Chrome Computer Use", text)
 
