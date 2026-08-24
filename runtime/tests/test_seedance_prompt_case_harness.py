@@ -49,6 +49,18 @@ class SeedancePromptCaseHarnessTests(unittest.TestCase):
             }],
         })
 
+    def add_user_reference_superior_authority(self, pack: dict) -> None:
+        pack['prompt_rules_used'].append(harness.USER_REFERENCE_SUPERIOR_RULE)
+        pack['semantic_contract']['authority'] = {
+            'mode': 'user_reference_superior',
+            'source': 'user_examples_2026_08_24',
+            'overrides': [
+                'brevity_default', 'one_action_default', 'one_camera_default',
+                'performed_audio_default'],
+            'mechanical_gates_preserved': [
+                'safety', 'provider_capability', 'verified_attachment', 'user_settings'],
+        }
+
     def add_timed_one_take_effect_contract(self, pack: dict) -> None:
         pack['prompt_rules_used'].extend([
             harness.TIMED_PERFORMANCE_RULE,
@@ -96,6 +108,38 @@ class SeedancePromptCaseHarnessTests(unittest.TestCase):
         self.add_timed_one_take_effect_contract(pack)
 
         self.assertEqual(harness.validate_case_contract(pack), [])
+
+    def test_user_examples_outrank_old_one_camera_and_cut_tempo_defaults(self) -> None:
+        pack = self.base_pack()
+        self.add_timed_one_take_effect_contract(pack)
+        self.add_user_reference_superior_authority(pack)
+        pack['prompt'] += (
+            ' 빠른 컷 전환 템포처럼 행동과 핸드헬드 재구도가 빠르게 이어지지만 '
+            '실제 편집 컷은 없는 원테이크다.'
+        )
+        pack['semantic_contract']['continuity'][
+            'tempo_interpretation'] = 'rapid_performance_handheld_no_edits'
+
+        self.assertEqual(harness.validate_case_contract(pack), [])
+
+        unresolved = copy.deepcopy(pack)
+        del unresolved['semantic_contract']['continuity']['tempo_interpretation']
+        errors = harness.validate_case_contract(unresolved)
+        self.assertTrue(any('one_take_conflicts_with_cut_direction' in item for item in errors))
+
+    def test_user_reference_authority_must_preserve_only_mechanical_top_gates(self) -> None:
+        pack = self.base_pack()
+        pack['prompt_rules_used'].append(harness.USER_REFERENCE_SUPERIOR_RULE)
+        pack['semantic_contract']['authority'] = {
+            'mode': 'user_reference_superior',
+            'source': 'user_examples_2026_08_24',
+            'overrides': ['brevity_default'],
+            'mechanical_gates_preserved': ['safety'],
+        }
+
+        errors = harness.validate_case_contract(pack)
+
+        self.assertTrue(any('authority.mechanical_gates_missing' in item for item in errors))
 
     def test_corrected_multi_character_timed_dialogue_contract_passes(self) -> None:
         pack = {
@@ -288,8 +332,34 @@ class SeedancePromptCaseHarnessTests(unittest.TestCase):
         del bad['semantic_contract']['dialogue'][0]['audio_reference_token']
         bad['semantic_contract']['on_screen_text'][0]['exact_text'] = '다른 글자'
         errors = harness.validate_case_contract(bad)
-        self.assertIn('dialogue_1_performed_audio_reference_required', errors)
+        self.assertIn(
+            'dialogue_1_audio_route_required:'
+            'performed_@AudioN_or_native_seedance_user_reference', errors)
         self.assertIn('on_screen_text_1_literal_missing_from_prompt', errors)
+
+    def test_user_reference_superior_allows_native_korean_dialogue_without_audio_file(self) -> None:
+        pack = self.base_pack()
+        pack['prompt'] += ' 검객이 "물러서."라고 낮고 정확한 한국어로 말한다.'
+        pack['prompt_rules_used'].append(harness.EXACT_TEXT_DIALOGUE_RULE)
+        pack['semantic_contract'] = {
+            'dialogue': [{
+                'speaker_entity_id': 'CHAR_SWORDSWOMAN',
+                'exact_text': '물러서.',
+                'language': 'ko-KR',
+                'delivery': '낮고 절제된 한마디',
+                'audio_route': 'native_seedance_user_reference',
+                'qc_route': '다운로드 후 한국어 발음·청감·입모양 검수',
+            }],
+            'on_screen_text': [],
+        }
+        self.add_user_reference_superior_authority(pack)
+
+        self.assertEqual(harness.validate_case_contract(pack), [])
+
+        bad = copy.deepcopy(pack)
+        del bad['semantic_contract']['dialogue'][0]['qc_route']
+        errors = harness.validate_case_contract(bad)
+        self.assertIn('dialogue_1_native_route_qc_required', errors)
 
     def test_rejects_required_forbidden_and_flare_contradictions(self) -> None:
         pack = self.base_pack()

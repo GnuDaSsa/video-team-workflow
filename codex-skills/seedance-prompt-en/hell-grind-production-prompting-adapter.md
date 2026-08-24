@@ -115,14 +115,30 @@ Compile the shot-critical subset in this order:
 
 Keep the prompt concrete, Korean-first, and within the live skill's current target and hard limit. Remove repeated adjectives before removing spatial, count, contact, timing, or source-role facts.
 
-## User-reference case compiler — 2026-08-24
+## User-reference superior compiler — 2026-08-24
 
 Five user-supplied examples established a useful high-detail grammar for
 multi-character dialogue, single-take action, intimate handheld performance,
-master-audio lipsync, and exact on-screen Hangul. Treat them as **case
-evidence**, not paste-ready prompts. Keep the structure below, repair their
-token, language, timing, and constraint defects, then compile the final prompt
-in Korean.
+master-audio lipsync, and exact on-screen Hangul. They are the **superior
+creative and prompt-construction authority**, not optional inspiration. When
+`user_reference_superior_v1` is active, their directing density, temporal
+specificity, performance detail, camera path, physical causality, audio logic,
+and constraint precision override older general defaults.
+
+Authority order inside prompt authoring:
+
+1. the user's current explicit instruction and project brief;
+2. these user-supplied examples;
+3. project identity/story/music/continuity locks;
+4. general prompting defaults and adapters.
+
+Safety/rights restrictions, visible provider capability limits, verified source
+attachment, and exact user-selected settings remain mechanical gates. Translate
+external placeholder syntax to the provider-visible token and split an
+unsupported duration only at a causal boundary, but do not use those mechanical
+steps as permission to simplify the examples into an older house template.
+Chinese/English source wording may be compiled into Korean for user review while
+preserving its structure and directing force.
 
 ### 1. Canonical reference and cast ledger
 
@@ -163,13 +179,18 @@ Choose one of two structures:
 - **Single continuous take:** contiguous **phases**, not shots. Lock camera side,
   subject off-center placement, lead room, screen direction, and forbidden axis
   crossing once, then describe setup → escalation → arrest → consequence → end
-  state. A heading or time range does not imply a cut.
+  state. A heading or time range does not imply a cut. The examples authorize a
+  motivated compound path—push-in, same-side arc, pullback, rise—when it remains
+  one physically continuous camera trajectory; the older one-dominant-move
+  default cannot flatten it.
 
-Never combine `원테이크/one-shot/一镜到底` with a positive direction such as
-`빠른 컷 전환`, `하드 컷`, `rapid cuts`, or `快切`. If the desired energy is
-handheld and fast but uncut, ask for quick performance beats, reactive
-reframing, footwork, focus recovery, and natural handheld acceleration instead
-of edit cuts.
+When `원테이크/one-shot/一镜到底` appears with `빠른 컷 전환 템포`, `rapid-cut
+tempo`, or `快切节奏`, preserve both by compiling the latter as quick performance
+beats, reactive reframing, footwork, focus recovery, and natural handheld
+acceleration **without actual edits**. Record
+`tempo_interpretation: rapid_performance_handheld_no_edits`. Only an unresolved
+request for literal hard cuts and literal no-cuts at the same moment is a
+conflict.
 
 ### 3. Performance is observable
 
@@ -181,7 +202,12 @@ lands. Preserve restraint unless one explicitly named climax owns the outburst.
 For exact dialogue:
 
 - record speaker `entity_id`, literal Korean string, time range, delivery,
-  non-speakers, and the verified performed `@AudioN` guide;
+  non-speakers, and one declared audio route;
+- the examples authorize `audio_route: native_seedance_user_reference` without
+  `@AudioN`; require a listening/lipsync QC route and never let the older
+  performed-guide default veto it;
+- when a verified performed `@AudioN` guide exists, use it as the higher-fidelity
+  cadence/phoneme source without changing the literal line;
 - keep the literal Korean unchanged in the model-facing prompt;
 - give one speaker each beat and keep reaction mouths silent;
 - do not infer that a quoted line alone satisfies audio quality—the downloaded
@@ -231,8 +257,10 @@ legibility.
 
 ### 7. Constraint consistency pass
 
-End with only shot-specific locks. Normalize required and forbidden concepts in
-the package before compiling prose. A concept cannot appear in both sets. Check
+End with the examples' shot-specific locks even when they are more detailed than
+the old compact-negative default. Normalize required and forbidden concepts in
+the package before compiling prose. A concept cannot remain unresolved in both
+sets. Check
 the entire prompt, including the final frame: `렌즈 플레어 없음` cannot coexist
 with a requested final sun/lens flare; `음악 없음` cannot coexist with an
 invented score; `인물 한 명` cannot coexist with unnamed students, dancers, or
@@ -243,6 +271,7 @@ passersby.
 Activate only the rules needed by the current block in `prompt_rules_used`:
 
 ```text
+user_reference_superior_v1
 reference_cast_ledger_v1
 timed_performance_map_v1
 one_take_axis_lock_v1
@@ -257,6 +286,11 @@ prompt attestation, run:
 
 ```yaml
 semantic_contract:
+  authority:
+    mode: user_reference_superior
+    source: user_examples_2026_08_24
+    overrides: [brevity_default, one_action_default, one_camera_default, performed_audio_default]
+    mechanical_gates_preserved: [safety, provider_capability, verified_attachment, user_settings]
   visible_entity_count_total: 0
   entities:
     - entity_id: CHAR_ID
@@ -325,6 +359,7 @@ If the same failure survives repeated bounded attempts, simplify the action, spl
 Before attestation, verify:
 
 - [ ] exact visible entity count and named roles;
+- [ ] `user_reference_superior_v1` is declared and older defaults only fill gaps;
 - [ ] all source notation is normalized to canonical `@ImageN/@VideoN/@AudioN` tokens;
 - [ ] aliases and reference tokens map to one immutable entity each;
 - [ ] every attached token has one model-facing role;

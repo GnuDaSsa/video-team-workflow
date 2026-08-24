@@ -18,6 +18,7 @@ Seedance is intentionally split into two phases so prompt authoring does not blo
 ## Non-negotiable gates
 
 - **An explicit user instruction overrides every default here** — mode, count, duration, ratio, audio, provider.
+- **User-reference superior authority:** the five Seedance examples supplied on 2026-08-24 are the default creative/prompt-construction authority for future authoring when `user_reference_superior_v1` is declared. They outrank general brevity, one-action, one-camera, generic audio-route, and house-style defaults. Existing rules may fill gaps but must not dilute the examples. Only the current explicit instruction/brief and non-bypassable safety, provider-capability, verified-reference, and settings gates remain above them. Apply the exact precedence contract in `hell-grind-production-prompting-adapter.md`.
 - **Multi-reference is the default mode** (the Runway tab opposite Keyframe) and stays selected unless the user asks otherwise. "Use multi-reference" is a mode instruction, not a remark about image count.
 - Reference count is per-request (commonly 3–4, sometimes a character sheet plus a background). *The agent* never invents a fixed count or pads to reach one; a count the user states is an instruction. Every reference still needs a named role in the ordered `@ImageN` map.
 - Creative Seedance Mode is the default authoring branch unless fragile continuity or the user requests Standard mode.

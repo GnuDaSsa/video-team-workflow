@@ -15,6 +15,7 @@ import re
 from typing import Any
 
 
+USER_REFERENCE_SUPERIOR_RULE = 'user_reference_superior_v1'
 REFERENCE_CAST_LEDGER_RULE = 'reference_cast_ledger_v1'
 TIMED_PERFORMANCE_RULE = 'timed_performance_map_v1'
 ONE_TAKE_AXIS_RULE = 'one_take_axis_lock_v1'
@@ -44,6 +45,10 @@ def _rules(pack: dict[str, Any]) -> set[str]:
 def _contract(pack: dict[str, Any]) -> dict[str, Any]:
     value = pack.get('semantic_contract') or {}
     return value if isinstance(value, dict) else {}
+
+
+def _user_reference_superior(pack: dict[str, Any]) -> bool:
+    return USER_REFERENCE_SUPERIOR_RULE in _rules(pack)
 
 
 def _prompt_text(pack: dict[str, Any]) -> str:
@@ -91,6 +96,30 @@ def _validate_reference_token_forms(pack: dict[str, Any]) -> list[str]:
         token = match.group(0)
         if not CANONICAL_REFERENCE_RE.fullmatch(token):
             errors.append(f'unresolved_reference_alias:{token}')
+    return errors
+
+
+def _validate_user_reference_authority(pack: dict[str, Any]) -> list[str]:
+    authority = _contract(pack).get('authority')
+    if not isinstance(authority, dict):
+        return ['semantic_contract.authority_required']
+    errors: list[str] = []
+    if authority.get('mode') != 'user_reference_superior':
+        errors.append('authority.mode_must_be:user_reference_superior')
+    if not str(authority.get('source') or '').strip():
+        errors.append('authority.source_required')
+    overrides = authority.get('overrides')
+    if not isinstance(overrides, list) or not overrides:
+        errors.append('authority.overrides_required')
+    preserved = {
+        str(value).strip() for value in (authority.get('mechanical_gates_preserved') or [])
+        if str(value).strip()
+    }
+    required_preserved = {
+        'safety', 'provider_capability', 'verified_attachment', 'user_settings'}
+    missing = sorted(required_preserved - preserved)
+    if missing:
+        errors.append('authority.mechanical_gates_missing:' + ','.join(missing))
     return errors
 
 
@@ -255,7 +284,12 @@ def _validate_one_take_axis(pack: dict[str, Any]) -> list[str]:
                 errors.append(f'continuity.camera_axis_missing:{field}')
     cut_direction = _contains_positive_cut_direction(_prompt_text(pack))
     if cut_direction:
-        errors.append(f'one_take_conflicts_with_cut_direction:{cut_direction}')
+        interpretation = str(continuity.get('tempo_interpretation') or '').strip()
+        if not (
+            _user_reference_superior(pack)
+            and interpretation == 'rapid_performance_handheld_no_edits'
+        ):
+            errors.append(f'one_take_conflicts_with_cut_direction:{cut_direction}')
     return errors
 
 
@@ -356,8 +390,17 @@ def _validate_exact_text_dialogue(pack: dict[str, Any]) -> list[str]:
         if exact and exact not in prompt:
             errors.append(f'dialogue_{index}_literal_missing_from_prompt')
         audio_token = _canonical_token(row.get('audio_reference_token'))
-        if not re.fullmatch(r'@Audio\d+', audio_token, re.IGNORECASE):
-            errors.append(f'dialogue_{index}_performed_audio_reference_required')
+        native_route = (
+            _user_reference_superior(pack)
+            and row.get('audio_route') == 'native_seedance_user_reference'
+        )
+        if native_route:
+            if not str(row.get('qc_route') or '').strip():
+                errors.append(f'dialogue_{index}_native_route_qc_required')
+        elif not re.fullmatch(r'@Audio\d+', audio_token, re.IGNORECASE):
+            errors.append(
+                f'dialogue_{index}_audio_route_required:'
+                'performed_@AudioN_or_native_seedance_user_reference')
         elif audio_token.casefold() not in known_refs:
             errors.append(f'dialogue_{index}_unknown_audio_reference:{audio_token}')
 
@@ -404,6 +447,7 @@ def validate_case_contract(pack: dict[str, Any]) -> list[str]:
     errors = _validate_reference_token_forms(pack)
     rules = _rules(pack)
     validators = (
+        (USER_REFERENCE_SUPERIOR_RULE, _validate_user_reference_authority),
         (REFERENCE_CAST_LEDGER_RULE, _validate_reference_cast_ledger),
         (TIMED_PERFORMANCE_RULE, _validate_timed_beats),
         (ONE_TAKE_AXIS_RULE, _validate_one_take_axis),
