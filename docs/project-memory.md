@@ -23,3 +23,8 @@ Use this file for durable context that should survive across threads.
 ## Open Questions Worth Tracking
 
 - Questions that are not blockers today but should not disappear.
+
+## Runway Browser Owner
+
+- Seedance production uses one visible, logged-in Aside `app.runwayml.com` tab only. Never fall back to Chrome, Safari, the Codex in-app browser, connector/API, or a second browser session.
+- If Aside control is unavailable, stop that UI route with `BLOCKED_ASIDE_CONTROL_UNAVAILABLE` and the exact required user action; do not reinterpret `어사이드` as `알아서`.

@@ -51,3 +51,10 @@ Record notable technical or product decisions here so they do not live only in c
 - Decision: New recurring identities use one text-free neutral 16:9 `CHAR_<ID>_TRIPTYCH_R<n>`: headless front body at left, back body with head at center, and one large 3/4 portrait at right. The front head omission prevents a tiny full-body face from competing with the portrait and must remain a clean non-graphic studio crop. Optional deterministic face/front/back crops inherit the master hash; story-specific hand/prop/scale sheets are created only when needed. Lock requires 10 varied identity tests at 10/10.
 - Prompting consequence: Seedance receives the full triptych or the minimum crop with explicit Korean role binding and exclusion of the gray background, seams, and missing head from scene content. A bounded adapter adds exact entity counts, reusable GEO locks, complex-shot first-frame occupancy, timed physical beats, performance/audio blocks, positive proof constraints, and one-clause revision logs without replacing the Korean prompt, duration, length, or UI authority.
 - Release boundary: Existing approved assets remain valid until their next major lock revision. The old vertical editorial-bible presets in the local Korean-women skill were moved to a dated archive rather than deleted.
+
+### 2026-08-24 - Make Aside the sole Runway production owner
+
+- Context: The user explicitly corrected the Seedance browser route after the operator misread `어사이드` and opened Chrome. The old live contract still named Chrome as the source of truth.
+- Decision: `codex-skills/seedance-prompt-en/` now assigns Runway production to one visible, logged-in Aside tab only. Chrome, Safari, the Codex in-app browser, connector/API, and any second browser route are prohibited fallbacks.
+- Consequences: If Aside control or its visible Reference selector is unavailable, production records `BLOCKED_ASIDE_CONTROL_UNAVAILABLE` with one exact user action instead of silently changing browsers.
+- Follow-up: Keep browser-owner wording and enforcement only in the canonical Seedance skill; do not duplicate it in project rules or other role skills.

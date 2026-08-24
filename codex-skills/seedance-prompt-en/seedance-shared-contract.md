@@ -15,8 +15,8 @@ This document contains rules that both the prompting and production branches mus
 
 - Prompt authoring is single-agent and sequential. The Creative six-role structure is a checklist, not a default parallel spawn.
 - While authoring, do not start delegated prompt workers, background schedulers, queue observers, browser loops, or external sidecars.
-- The prompting branch is non-GUI and browser-free: no Chrome/Safari/Runway activation, Computer Use, `osascript`, AppleScript, `open -a`, native file chooser, or browser automation. It writes the local handoff package and then stops.
-- Visible browser operation, Generate, queue monitoring, and downloads belong only to the production branch after an explicit handoff. A production observer must not be launched by the prompting branch.
+- The prompting branch is non-GUI and browser-free: no Aside/Chrome/Safari/Runway activation, Computer Use, `osascript`, AppleScript, `open -a`, native file chooser, or browser automation. It writes the local handoff package and then stops.
+- Visible browser operation, Generate, queue monitoring, and downloads belong only to the production branch after an explicit handoff and use one logged-in Aside Runway tab only. A production observer must not be launched by the prompting branch.
 - The 15-minute Generate-queue check belongs to the production branch. Once a package is staged and the queue is full or the staged Generate button is waiting for eligibility, **scheduling that check is a required part of the cycle** — the operator does it unprompted, and stopping at a full queue without one leaves the next slot unused.
 - It is the same single operator resuming its own loop, not a new agent surface, so the spawn gate's approval requirement does not apply to it. It must remain one sequential check — never a parallel browser loop, sidecar, cron, or second agent.
 
@@ -165,6 +165,6 @@ That last one describes **how a still was produced**. There is nothing in it for
 
 - UI card, prompt text, local source image, or a Generate click is not final media completion.
 - Final completion requires an exact downloaded video path, file size, duration, codec/container evidence, scene ID, provider, and QC verdict.
-- If Chrome Computer Use or the visible Reference selector is unavailable, use `BLOCKED_CODEX_COMPUTER_USE_UNAVAILABLE` and record the exact user action needed. Do not use connector/API as a fallback.
+- If Aside control or the visible Reference selector is unavailable, use `BLOCKED_ASIDE_CONTROL_UNAVAILABLE` and record the exact user action needed. Do not switch to Chrome, Safari, the in-app browser, or connector/API as a fallback.
 - If an upload stalls at 100%, cancel only that upload, preserve the rest of the deck, and record the event in lane `status.json` and `result.md`.
 - No duplicate Generate: once the scene's accepted card is visible, do not click Generate again for that scene.

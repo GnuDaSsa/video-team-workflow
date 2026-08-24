@@ -11,7 +11,7 @@ Seedance is intentionally split into two phases so prompt authoring does not blo
 2. For prompt design, reference mapping, or CLI handoff, read `seedance-prompting.md`.
    Also read `xazinga-prompting-adapter.md` to apply the compatible source-scope, camera/light, transition, and critic additions distilled from XAZINGA skills. It is an adapter, not a second authority.
    Also read `hell-grind-production-prompting-adapter.md` for the two-layer shot contract, exact entity/space locks, three-panel identity binding, performance beats, and one-clause revision discipline distilled from the public Hell Grind package. It is an adapter, not a second authority.
-3. For Chrome/Runway attachment, Generate, queue monitoring, download, or `ffprobe`, read `seedance-production.md`.
+3. For Aside/Runway attachment, Generate, queue monitoring, download, or `ffprobe`, read `seedance-production.md`.
 4. When both are requested, finish the prompting package first, then hand it to the production branch. Do not rewrite prompts during UI execution; return to the prompting branch if the prompt needs revision.
 5. Optional Creative authoring: `$seedance-creative-prompt-team` runs the six roles as one sequential authoring checklist (Director / Reference / Camera / Physics / Composer / Critic). Do not spawn or parallelize those roles by default; production UI still stays in this skill.
 
@@ -24,15 +24,15 @@ Seedance is intentionally split into two phases so prompt authoring does not blo
 - Creative Seedance Mode is the default authoring branch unless fragile continuity or the user requests Standard mode.
 - If an approved character/model/identity-sheet character appears, attach the relevant character sheet or identity crop **on every generation**, together with scene references. A previous card or conversational memory does not count.
 - Missing, mismatched, or unverified character-sheet thumbnail means `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED`; never click Generate.
-- Runway visible Chrome is the source of truth. Do not use connector/API, hidden input, AppleScript/local mouse, or a second browser route.
+- Runway visible Aside is the source of truth. Operate one logged-in Aside Runway tab only; do not use Chrome, Safari, the Codex in-app browser, connector/API, hidden input, coordinate clicking, or a second browser route.
 - A Generate click is exactly one transaction **per scene** after preflight — not one per session. Keep submitting eligible packages while slots are free; stop only when the shelf is empty or every remaining item is blocked.
 - Completion requires a downloaded file and verified duration/codec, not a card or thumbnail.
 
 ## Prompting isolation gate
 
 - Prompt authoring is single-agent and sequential. Do not launch parallel prompt workers, background schedulers, queue observers, browser loops, or external sidecars while the prompt package is being written.
-- The prompting branch is non-GUI: no Chrome/Safari/Runway activation, Computer Use, `osascript`, AppleScript, `open -a`, native file chooser, or browser automation. Write the local package and hand it to production only after the prompt critic passes.
-- Production may use the separate visible Chrome route after handoff. A production observer must not be started from the prompting branch.
+- The prompting branch is non-GUI: no Aside/Chrome/Safari/Runway activation, Computer Use, `osascript`, AppleScript, `open -a`, native file chooser, or browser automation. Write the local package and hand it to production only after the prompt critic passes.
+- Production may use the one visible Aside route after handoff. A production observer must not be started from the prompting branch.
 
 ## Live branch documents
 

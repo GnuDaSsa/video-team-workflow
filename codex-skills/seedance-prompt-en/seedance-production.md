@@ -22,7 +22,7 @@ This inverts the usual failure. Rules accumulate prohibitions faster than permis
 
 
 
-This branch executes a complete, already-authored handoff package in visible Chrome Runway. It does not improvise or rewrite the visual prompt. If the package is incomplete, return to `seedance-prompting.md`.
+This branch executes a complete, already-authored handoff package in visible Aside Runway. It does not improvise or rewrite the visual prompt. If the package is incomplete, return to `seedance-prompting.md`.
 
 ## The production cycle
 
@@ -94,10 +94,10 @@ The fixed ladders elsewhere restrict **which methods** you may use. They do not 
 
 ## Approved route
 
-- Source of truth: one visible, logged-in `app.runwayml.com` Generate board in Chrome.
+- Source of truth: one visible, logged-in `app.runwayml.com` Generate board in Aside.
 - Attach through Runway's visible `Reference` asset selector: one staged file → native chooser → `Open` → verify the new visible `ImageN` thumbnail.
-- Use one owner tool at a time: Computer Use for attachment; Chrome plugin/Computer Use for visible verification and web actions.
-- Never use connector/API, hidden inputs, AppleScript coordinate clicking, clipboard image paste, Credits/Max, or a parallel Safari Runway session.
+- Use one owner tool at a time on the same Aside tab: Computer Use for attachment; Aside AppleScript/Computer Use for visible verification and web actions.
+- Never use connector/API, hidden inputs, AppleScript coordinate clicking, clipboard image paste, Credits/Max, Chrome, Safari, the Codex in-app browser, or any second Runway session.
 - When a step fails, follow the fixed ladder below. Do not invent a route that is not on it, and do not skip a rung.
 
 ## Attachment ladder — the only escalation path
@@ -111,11 +111,11 @@ The fixed ladders elsewhere restrict **which methods** you may use. They do not 
 
 Drag is a last resort, not a default: it depends on coordinates, Retina scaling, window occlusion, and held-payload judgement, and that is where the repeat incidents came from. Never promote it automatically — rung 3 needs the user to say so in this conversation (or `DRAG_APPROVED_BY_USER_CURRENT_THREAD=true` in the project file).
 
-If Computer Use itself is unavailable, stop with `BLOCKED_CODEX_COMPUTER_USE_UNAVAILABLE` and record the exact user action needed.
+If both approved controls on the same Aside tab are unavailable, stop with `BLOCKED_ASIDE_CONTROL_UNAVAILABLE` and record the exact user action needed. Do not change browsers.
 
 ## Attach and verify
 
-1. Bring the correct Chrome Runway Generate board frontmost and confirm the scene cursor matches the handoff.
+1. Bring the correct Aside Runway Generate board frontmost and confirm the scene cursor matches the handoff.
 2. Open the empty `Reference` slot.
 3. In the native chooser, select exactly one staged file (rung 1 of the ladder).
 4. Click `Open`, wait for the selector to close, and verify the newly visible `ImageN` thumbnail.
@@ -132,7 +132,7 @@ If Computer Use itself is unavailable, stop with `BLOCKED_CODEX_COMPUTER_USE_UNA
 
 Before one Generate, verify:
 
-1. Chrome Runway is frontmost;
+1. Aside Runway is frontmost;
 2. current cursor equals the handoff scene;
 3. all expected reference thumbnails and order are visible;
 4. the prompt box holds the **visual prompt only** — no `Scene ID`/`Mode`/`REFERENCE ROLES`/gate/`EXPECTED` field labels — and is within 3500 characters;
@@ -208,7 +208,7 @@ package or the project state — not in the recurring text.
 ### Template (what the generator prints)
 
 ```
-Seedance queue observer for <project>. Every 15 minutes, check the visible Chrome
+Seedance queue observer for <project>. Every 15 minutes, check the visible Aside
 Runway board and the project's staged shelf.
 
 If Generate is gray or the queue is full, record the board state and wait.
@@ -325,7 +325,7 @@ Helper: `runway_ui_helper.py paste-prompt --file F [--replace]`.
 **Always verify by the visible character counter afterwards.** Two cautions learned the hard way on this editor:
 
 - A select-all + paste **appended instead of replacing** in one observed run, leaving five copies of the same line and a 6,545-character prompt — well over the 3,500 limit. Re-read the counter after any replace; never assume it replaced.
-- Requires Chrome's *Allow JavaScript from Apple Events* (View ▸ 개발자 정보). Without it this route fails with `-1723`, which reads like a permission error but is often the wrong AppleScript dialect — Chrome uses `execute <tab> javascript <text>`, not Safari's `do JavaScript … in <tab>`.
+- Requires Aside's *Allow JavaScript from Apple Events* (View ▸ 개발자 정보). Without it this route fails with `-1723`. Aside uses the Chromium `execute <tab> javascript <text>` dialect, not Safari's `do JavaScript … in <tab>`.
 
 **One writer per board.** Two sessions editing the same composer will clobber each other; that is how the five-copy state above was produced. Before writing, confirm no other session is driving this board.
 
@@ -333,7 +333,7 @@ Generating with a prompt you know is incomplete is worse than deferring — it b
 
 ## Block and recovery codes
 
-- `BLOCKED_CODEX_COMPUTER_USE_UNAVAILABLE`: visible Chrome/Computer Use route unavailable; record the exact user action needed.
+- `BLOCKED_ASIDE_CONTROL_UNAVAILABLE`: the visible Aside/Computer Use route is unavailable; record the exact user action needed and do not switch browsers.
 - `REPAIR_CHARACTER_SHEET_NOT_ATTACHED`: attach the sheet and verify the thumbnail, then continue. Only after two failed attach attempts does it become `DEFER_CHARACTER_SHEET_UNRESOLVED` — mark the package and take the next one.
 - `REPAIR_PROMPT_TEXT_INCOMPLETE`: prompt missing/truncated/garbled (typically CJK). Re-insert by clipboard, verify the visible counter. Two failures → `DEFER_PROMPT_TEXT_UNRESOLVED`, next package.
 - `UPLOAD_100_PERCENT_STALLED`: cancel only the stalled upload, preserve the rest of the deck, and record it.
@@ -348,7 +348,7 @@ Moved here 2026-07-28 from the prompting field-lessons file, where UI and queue 
 
 ## Runway board specifics
 
-- One logged-in Chrome `app.runwayml.com` Generate board per project.
+- One logged-in Aside `app.runwayml.com` Generate board per project.
 - Attach one reference at a time through the native chooser, then confirm the visible `ImageN` thumbnail.
 - **Reset is not the X.** It is the circular arrow at the image's top right — `button[aria-label="Reset settings"]`, icon `lucide-rotate-ccw`.
 - Generate eligibility is decided by the **visible button colour**: blue = clickable, gray = wait. Never judge by button position, and do not let AX `disabled` / `aria-disabled` / DOM guesses override the colour — that override rule exists because DOM heuristics produced false negatives on a genuinely clickable button.
@@ -386,17 +386,17 @@ This blocks that external queue, not the project. Resume when the card moves to 
 - Prompt or storyboard wording is not camera evidence. When the assigned camera contract calls for movement or a composition change, inspect the actual downloaded playback at each scene's start, middle, and end: require a visible change in shot scale, angle, or subject/background geometry plus physical motion proof such as foreground occlusion, multi-plane parallax, changing perspective, or a completed reveal. In a two-scene clip, both scenes must preserve their assigned camera family and the cut must create legible composition contrast; an actor or prop moving inside the same locked framing is not a pass. Missing proof is `QC_FAIL_CAMERA_COMPOSITION_STATIC`: reject the raw parent and normalized child as inactive, reopen only the assigned cuts, and never fake the missing camera move with editorial zoom, crop, or speed change.
 - Before calling the child edit-ready, verify SHA-256, `ffprobe`, zero audio streams, the freeze recheck, and a visual contact sheet, then register the child and contact sheet under the canonical numbered `media/` tree. Keep both in `candidate` state until full playback and edit-context QC pass; normalization alone is never approval.
 
-### Completed-card download blocked by Chrome client
+### Completed-card download blocked by Aside client
 
-If a verified completed Runway card's **visible** Download opens its Runway CDN and Chrome shows `ERR_BLOCKED_BY_CLIENT`, classify the card as `BLOCKED_CHROME_CLIENT_CDN_DOWNLOAD` and `UI_ONLY_NOT_DOWNLOADED`. Keep the card's prompt/deck/settings evidence, but do **not** call it a video candidate or final media.
+If a verified completed Runway card's **visible** Download opens its Runway CDN and Aside shows `ERR_BLOCKED_BY_CLIENT`, classify the card as `BLOCKED_ASIDE_CLIENT_CDN_DOWNLOAD` and `UI_ONLY_NOT_DOWNLOADED`. Keep the card's prompt/deck/settings evidence, but do **not** call it a video candidate or final media.
 
 - Verify that no local non-empty media file appeared before declaring the block; the board's `Download all` control is not evidence by itself.
-- Before asking the user to change Chrome, try one identity-safe recovery inside the **same visible Runway tab**: open `Assets` → `All Generations`, identify the exact completed asset by date/order, model, thumbnail and the already-recorded card evidence, open that asset's visible overflow menu, and choose the exact `Download` item. This is still the official Runway UI route; it is not a second session, raw CDN navigation or bypass.
+- Before asking the user to change Aside, try one identity-safe recovery inside the **same visible Runway tab**: open `Assets` → `All Generations`, identify the exact completed asset by date/order, model, thumbnail and the already-recorded card evidence, open that asset's visible overflow menu, and choose the exact `Download` item. This is still the official Runway UI route; it is not a second session, raw CDN navigation or bypass.
 - Capture the browser's real download event and verify its local path. Do not use an ambiguous player/media extractor such as `downloadMedia()` on a feed or viewer with multiple outputs; it can silently retrieve an older card. `Download all` is not identity-safe **by itself** and needs the bundle checks below.
 - After the Assets download, prove identity before ingest: compare SHA-256 against earlier candidates/known duplicates, run `ffprobe`, and inspect a review contact sheet. Only then resolve `UI_ONLY_NOT_DOWNLOADED` and register the file under the canonical numbered `media/` tree.
 - If the exact `All Generations` asset-menu download also reaches `ERR_BLOCKED_BY_CLIENT`, one final same-tab recovery is allowed: click the visible board-level `Download all` exactly once. Accept it only after Runway reports a completed file count and a non-empty local ZIP exists. Do not repeat the click while it is preparing.
 - Treat the ZIP as an untrusted mixed-session bundle, not as ordered scene output. Match every ingest candidate to the current attested prompt fingerprint plus model/format evidence; verify bytes and SHA-256, register same-prompt variants as separate revisions, and send all variants through QC before selecting one. Exclude unmatched legacy or failed-generation members instead of assigning them by ZIP order or filename alone.
-- If `Download all` also fails to create a verified local bundle, the safe UI ladder is exhausted and the Chrome client unblock below becomes the required human action.
+- If `Download all` also fails to create a verified local bundle, the safe UI ladder is exhausted and the Aside client unblock below becomes the required human action.
 - Do not bypass the block with the raw CDN URL, `curl`, API/MCP, Credits Mode, a second browser, or a re-generation.
-- Tell the user to allow the Runway CDN only in their Chrome blocking/privacy client, then resume the **same session** and download the already-completed card. Do not re-submit it.
-- A lost Chrome tab may be reopened to its exact verified Runway session URL only with the user's explicit instruction; that restores the board, not a new Runway session or a second browser loop.
+- Tell the user to allow the Runway CDN only in their Aside blocking/privacy client, then resume the **same session** and download the already-completed card. Do not re-submit it.
+- A lost Aside tab may be reopened to its exact verified Runway session URL only with the user's explicit instruction; that restores the board, not a new Runway session or a second browser loop.

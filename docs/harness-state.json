@@ -1,13 +1,13 @@
 {
-  "currentGoal": "Deploy the Fable/Grok video-team workflow update without reintroducing Seedance rule overlap or broken policy references.",
+  "currentGoal": "Make Aside the sole visible Runway owner for Seedance production and reject Chrome/Safari/in-app-browser fallback.",
   "status": "complete",
-  "currentContract": "docs/contracts/2026-07-21-workflow-deploy.md",
+  "currentContract": "codex-skills/seedance-prompt-en/seedance-production.md",
   "blockers": [],
-  "nextStep": "Use the deployed Chrome-hybrid Seedance contract on the next approved Runway transaction; do not spawn extra lanes or schedulers without explicit approval.",
-  "lastUpdated": "2026-07-21T09:42:00.000Z",
+  "nextStep": "Resume the current Kim Wooyoung Scene 4 package only in the existing Aside Runway tab.",
+  "lastUpdated": "2026-08-24T13:50:00.000Z",
   "verification": {
-    "lastCommand": "zsh -n tools/deploy_skills_to_codex.sh plus deployed-policy, active-skill-discoverability, and Seedance-contract assertions",
+    "lastCommand": "python3 -m unittest runtime.tests.test_seedance_aside_owner_route -v; git diff --check; zsh -n tools/deploy_skills_to_codex.sh",
     "lastResult": "pass",
-    "notes": "Remote Fable/Grok update deployed. Policy files now deploy with the skills; archived operator skill was moved outside ~/.codex/skills."
+    "notes": "Canonical Seedance docs name Aside as the sole owner and prohibit Chrome/Safari/in-app-browser/API fallback. Live helper smoke separately rejects RUNWAY_BROWSER=Google Chrome with ASIDE_ONLY_RUNWAY_OWNER."
   }
 }
