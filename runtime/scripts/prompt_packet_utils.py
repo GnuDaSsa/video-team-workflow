@@ -6,6 +6,8 @@ import json
 import re
 from pathlib import Path
 
+import seedance_prompt_case_harness
+
 RUNTIME = Path('/Users/gnudas/Documents/Codex/video-team-runtime/runtime')
 RULEBOOK = RUNTIME / 'references' / 'seedance_prompting_rulebook.md'
 MAX_PACKET_CHARS = 32000
@@ -263,6 +265,7 @@ def validate_seedance(pack: dict) -> list[str]:
         match = LEAK_PATTERN.search(pack.get(field) or '')
         if match:
             errors.append(f'{field}_contains_operational_leak:"{match.group(0)}"')
+    errors.extend(seedance_prompt_case_harness.validate_case_contract(pack))
     return errors
 
 
