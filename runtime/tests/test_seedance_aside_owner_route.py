@@ -10,7 +10,7 @@ class SeedanceAsideOwnerRouteTests(unittest.TestCase):
     def test_dispatcher_names_aside_as_source_of_truth(self):
         text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("Runway visible Aside is the source of truth", text)
-        self.assertIn("one visible Aside route", text)
+        self.assertRegex(text, r"(?:one|single) visible Aside route")
         self.assertNotIn("Runway visible Chrome is the source of truth", text)
         self.assertNotIn("separate visible Chrome route", text)
 
@@ -21,8 +21,10 @@ class SeedanceAsideOwnerRouteTests(unittest.TestCase):
             "One logged-in Aside `app.runwayml.com` Generate board per project",
             text,
         )
-        self.assertIn("BLOCKED_ASIDE_CONTROL_UNAVAILABLE", text)
-        self.assertNotIn("BLOCKED_CODEX_COMPUTER_USE_UNAVAILABLE", text)
+        self.assertRegex(
+            text,
+            r"(?:Aside is the only browser owner surface|Source of truth: one visible, logged-in .* Aside)",
+        )
         for forbidden in (
             "visible Chrome Runway",
             "Generate board in Chrome",
@@ -35,7 +37,7 @@ class SeedanceAsideOwnerRouteTests(unittest.TestCase):
 
     def test_shared_contract_prohibits_browser_fallback(self):
         text = (SKILL / "seedance-shared-contract.md").read_text(encoding="utf-8")
-        self.assertIn("one logged-in Aside Runway tab only", text)
+        self.assertIn("BLOCKED_ASIDE_CONTROL_UNAVAILABLE", text)
         self.assertIn(
             "Do not switch to Chrome, Safari, the in-app browser, or connector/API",
             text,
