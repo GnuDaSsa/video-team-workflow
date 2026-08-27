@@ -29,3 +29,9 @@ Use this file for durable context that should survive across threads.
 - Seedance production uses one visible, logged-in Aside `app.runwayml.com` tab only. Never fall back to Chrome, Safari, the Codex in-app browser, connector/API, or a second browser session.
 - Primary controller is `aside repl` with `listBrowserTabs()` and `attachBrowserTab(exactTargetId)` on the existing tab. AppleScript is optional, not a prerequisite.
 - If Aside control is unavailable, stop that UI route with `BLOCKED_ASIDE_CONTROL_UNAVAILABLE` and the exact required user action; do not reinterpret `어사이드` as `알아서`.
+
+## Generated-vocal naturalness preference
+
+- The user explicitly rejects the vocal sound of `링크 업!` and `리와인드 없는 오늘` as obvious AI output. Those performances are negative references only.
+- Use `/Users/gnudas/.codex/skills/music-director/references/vocal-naturalness-qc.md` as the canonical listening gate. Male and female vocals are both allowed; stable human identity, fluent Korean diction, breathing, dynamics, tuning, and restrained vibrato determine acceptance.
+- ASR, stems, onset timing, waveforms, and prompt quality cannot produce a PASS without full-track playback.

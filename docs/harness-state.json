@@ -9,5 +9,20 @@
     "lastCommand": "python3 -m unittest runtime.tests.test_seedance_aside_owner_route -v; git diff --check; zsh -n tools/deploy_skills_to_codex.sh",
     "lastResult": "pass",
     "notes": "Canonical Seedance docs name Aside as the sole owner and prohibit Chrome/Safari/in-app-browser/API fallback. Live helper smoke separately rejects RUNWAY_BROWSER=Google Chrome with ASIDE_ONLY_RUNWAY_OWNER."
-  }
+  },
+  "recentCloseouts": [
+    {
+      "id": "2026-08-28-ai-vocal-naturalness-gate",
+      "status": "complete",
+      "contract": "codex-skills/music-director/SKILL.md",
+      "commit": "00dcfa7",
+      "deployment": "/Users/gnudas/.codex/skills/music-director",
+      "verification": {
+        "lastCommand": "zsh -n tools/deploy_one_skill_to_codex.sh; targeted deploy smoke; marker assertions; git diff --check; source/live diff and SHA-256",
+        "lastResult": "PASS",
+        "notes": "Rejected Link Up and Rewind vocal families as negative references; automated audio analysis cannot certify naturalness; full-track playback gate deployed."
+      },
+      "nextStep": "Apply the full-track vocal listening gate before recommending any new Suno vocal candidate."
+    }
+  ]
 }
