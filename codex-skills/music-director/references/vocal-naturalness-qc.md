@@ -17,6 +17,21 @@ Only the first status permits a recommendation. Composition, hook quality, intro
 
 These names identify rejected generated performances, not genres to imitate. Never prompt toward, recommend, or reuse their vocal character. Use them only to calibrate the unacceptable level of AI-vocal obviousness.
 
+## Pre-generation vocal contract
+
+Put these requirements into every ordinary generated-vocal prompt before producing candidates:
+
+- one stable native-Korean lead singer identity across the complete song;
+- deliberate male or female lead selection, with neither treated as inherently more natural;
+- clear conversational consonants, vowels, batchim, and phrase stress;
+- natural phrase breathing and meaning-driven dynamic variation;
+- restrained pitch correction, portamento, and vibrato;
+- dry to moderately forward lead vocal that remains exposed enough to audit.
+
+Default to one lead identity. Do not request mixed relay singers, persona/gender swaps, glossy choir stacks, whispered pickups, hums, sighs, chants, call-outs, or improvised ad-libs unless the creative brief truly needs them and each element will receive separate playback QC. Avoid overloading the prompt with “perfect,” “crystalline,” “ethereal,” “soaring,” or “ultra-polished” vocal adjectives and abrupt genre/persona changes. These commonly invite the exact synthetic gloss and identity drift this gate rejects.
+
+Prompt prevention reduces risk; it cannot create a PASS. Generated audio must still complete the listening procedure below.
+
 ## Listening procedure
 
 1. Play the complete song at normal speed through ordinary speakers or headphones. Do not decide from a contact sheet, waveform, transcript, or a few seconds of preview.
