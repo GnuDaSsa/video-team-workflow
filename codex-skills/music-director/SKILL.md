@@ -134,6 +134,17 @@ Provide:
 - Simple Mode remains acceptable only for quick sketches where exact duration is not important.
 - For film/contest BGM, record both the requested UI duration and the measured file duration in the candidate manifest; do not claim Music Lock from a prompt or duration setting alone.
 
+### AI vocal naturalness hard gate (user correction, 2026-08-28)
+
+- Treat the generated vocals in **`링크 업!`** and **`리와인드 없는 오늘`** as explicit user-rejected negative references. Never use their vocal sound as an anchor, recommendation, or acceptable fallback. Retain them only as examples of what must not pass.
+- Male and female vocals are both allowed. The singer's gender is not the issue; the non-negotiable target is one stable, recognizably human vocal identity with natural Korean diction, phrasing, breath, dynamics, tuning, and restrained vibrato.
+- Immediately reject a candidate when any conspicuous synthetic tell is heard: metallic or watery formants, phasey/doubled timbre, singer identity/gender/age drift, pitch snapping, loop-like vibrato or breaths, smeared vowels, clipped or invented Korean syllables, unnatural batchim/stress, uniformly forced intensity, fake sigh/hum/`ah`/chant/ad-lib pickups, or glossy choir stacking that disguises the lead.
+- When an instrumental intro was requested, any early whispered, hummed, chanted, or non-lexical vocal pickup also fails the intro gate. Do not count it as a valid instrumental prelude merely because the written lyric has not started.
+- A prompt, waveform, ASR transcript, stem split, onset estimate, or technical metric can screen a candidate but can never certify vocal naturalness. Listen to the full vocal performance at normal playback, with mandatory checks of the intro, first verse line, verse-to-chorus transition, highest/longest chorus note, final chorus, and outro. Follow `references/vocal-naturalness-qc.md`.
+- If qualified playback listening is unavailable, mark the candidate **`HOLD_FOR_HUMAN_VOCAL_QC`**. Never claim that the vocal passed based only on metadata or automated analysis.
+- On failure, mark **`REJECT_AI_VOCAL_ARTIFACT`** and regenerate or replace the performance. Do not hide the problem with reverb, chorus, saturation, backing layers, heavy tuning, or a louder instrumental mix; do not recommend a musically strong composition whose lead vocal fails this gate.
+- The user's direct listening verdict overrides prompt intent and automated scores. A rejected vocal stays rejected unless the user explicitly approves a newly regenerated performance after listening.
+
 ## Quick commands the user may use
 
 - "음악감독 모드로 이 가사 봐줘"
