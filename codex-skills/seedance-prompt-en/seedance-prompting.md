@@ -61,6 +61,51 @@ A change of medium, character rules or camera grammar starts a new sequence — 
 - Specify the closing frame — stable enough for the next cut to take over.
 - Do not name emotions; show them. Not "he is sad" but "his gaze drops and his shoulders lower."
 
+## Explicit option — Toonkit 2D Snappy Grammar
+
+Activate `toonkit_2d_snappy_v1` only when the user explicitly asks to apply
+**Toonkit 문법**, **12 laws**, or the equivalent analysed snappy-animation
+grammar. It is an opt-in directing profile for 2D/stylized animation; it is
+not a default for live action, a global negative block, or a reason to replace
+the project's locked duration, identity, style, audio, or story requirements.
+
+Record `motion_grammar_profile: toonkit_2d_snappy_v1` in the package and add
+`toonkit_2d_snappy_v1` to `prompt_rules_used`. Keep that metadata out of the
+model-facing Korean prompt. Translate it into the following visible direction
+instead:
+
+1. **Timed pose beat.** For each planned scene, define a clear start pose, one
+   bounded principal motion beat, and a clear final pose. Within the scene,
+   hold still before the beat, execute one short readable beat (normally
+   0.5–0.7 seconds, including preparation and settle), then hold the final pose
+   long enough to read. Scale holds and cuts to the workflow-owned duration;
+   never copy the source experiment's 10-second/four-shot layout unless the
+   current cut map calls for it.
+2. **Animation mechanics.** Write the beat as `anticipation → sudden
+   acceleration → controlled overshoot → sharp settle → delayed
+   follow-through`. Specify the body orientation, planted/contacting limbs and
+   silhouette so the model cannot turn it into walking, sliding, or a second
+   action. Use modest squash-and-stretch, a brief smear/afterimage or speed
+   line only when the action earns it; hair and loose sleeves may settle one
+   beat after the body. Preserve center of gravity, contacts, anatomy and
+   costume continuity.
+3. **Camera separation.** Give each scene one simple, physically stated camera
+   path (for example a constant slow push or rise) that is independent of the
+   character's snap. Do not combine the beat with handheld shake, whip pan,
+   snap zoom, roll, or a second camera move unless the current brief explicitly
+   overrides this profile.
+4. **Rhythmic edit.** When a source has multiple planned scenes, state the
+   exact cut boundaries and use motivated hard cuts by default. Each scene owns
+   one readable action; a new pose, expression, or climax starts the next
+   scene rather than leaking an additional action into the hold.
+
+For a single scene, this profile produces a strong pose-to-pose accent rather
+than four mini-shots. For a 15-second `PLANNED_MULTI_SHOT_SOURCE`, retain the
+approved 2–4 contiguous scene plan and apply the same one-beat/hold rule to
+each scene. The Korean visual prompt stays concrete and visual; do not paste
+the profile name, these numbered rules, package fields, or Toonkit branding
+into Runway.
+
 ## Sequence progression gate
 
 A valid standalone shot is not enough. Before attesting block N, compare it with

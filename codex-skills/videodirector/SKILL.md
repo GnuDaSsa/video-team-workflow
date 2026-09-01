@@ -25,6 +25,16 @@ Pick one and say which. They share the workflow and differ in obligations.
 
 Mode detail: `references/modes.md`.
 
+## Explicit animation option
+
+When the user says **`툰킷 문법을 적용해봐`**, `Toonkit 문법`, or an
+equivalent request for the analysed snappy 2D-animation grammar, enable the
+opt-in profile `toonkit_2d_snappy_v1` for the affected 2D/stylized animation
+blocks. State that it is active in the planning/package note, then hand the
+prompt construction to `seedance-prompt-en`, which owns the model-facing
+prompt rules. Do not apply this profile by default, to live action, or to a
+quiet/continuous acting beat unless the user explicitly asks for it.
+
 ## Workflow
 
 Direction first, the audio spine second, and **QC after every production stage** — never one review at the end.
@@ -75,6 +85,7 @@ Do not write these from memory; the wiki holds the worked-out version.
 | design a character sheet or bible page | `wiki/concepts/character-bible-page-prompt-standard.md` |
 | diagnose a clip that broke in videoization | `wiki/concepts/video-image-qc-style-continuity.md` |
 | cast or QC a live-action-looking person | `wiki/concepts/live-action-character-authenticity-casting-standard.md` |
+| apply Toonkit/"12 laws" snappy 2D animation grammar | `seedance-prompt-en/seedance-prompting.md` → **Explicit option — Toonkit 2D Snappy Grammar** |
 
 ## References
 
