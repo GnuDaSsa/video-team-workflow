@@ -65,3 +65,10 @@ Record notable technical or product decisions here so they do not live only in c
 - Decision: The canonical owner is `codex-skills/music-director/SKILL.md` with the listening checklist at `references/vocal-naturalness-qc.md`. Automated analysis may screen but cannot certify vocal naturalness.
 - Consequences: Prior recommendations for those performances are invalid. A candidate with obvious synthesis artifacts is rejected regardless of composition quality; unlistened vocal candidates remain on hold.
 - Follow-up: Do not duplicate the checklist in project folders; keep only user-feedback evidence and a pointer to the canonical skill.
+
+### 2026-09-05 - Route explicit Seedance 2.5 work through a separate skill
+
+- Context: The user wants to request Seedance 2.5 deliberately without weakening the established 2.0 default, and wants only prompting and production to branch. The immediate quality target is animation that avoids generic AI motion, weightless contact, uniform whole-frame movement, identity drift, and line/texture crawl.
+- Decision: Add `seedance25-prompt-en` as a narrow natural-language version route. Explicit 2.5 requests use its `prompting.md` and `production.md`; explicit 2.0 and unversioned Seedance requests remain on `seedance-prompt-en`. Runtime rails, media, safety, approvals, one Aside tab, and foreground queue waits stay shared. The 2.5 executable is a thin model-policy adapter over the existing Runway helper, not a second UI/queue implementation.
+- Consequences: Every 2.5 package names `provider_model` and `provider_skill`, production freshly proves the visible 2.5 selector before Generate, and the prompt compiler chooses Reference/Keyframe/Edit/Extend from the actual continuity or repair problem. The 2.0 guard remains fail-closed against 2.5.
+- Follow-up: Judge 2.5 against real generated animation QC. Promote only repeated, verified failures into the 2.5 prompting branch; do not widen generic Seedance routing from a single project.

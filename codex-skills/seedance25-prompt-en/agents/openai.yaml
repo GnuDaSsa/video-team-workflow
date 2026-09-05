@@ -1,0 +1,6 @@
+interface:
+  display_name: "Seedance 2.5 Prompt & Production"
+  short_description: "Explicit Seedance 2.5 prompting and production"
+  default_prompt: "Use $seedance25-prompt-en when I explicitly request Seedance 2.5."
+policy:
+  allow_implicit_invocation: true

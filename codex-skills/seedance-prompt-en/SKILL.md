@@ -1,9 +1,17 @@
 ---
 name: seedance-prompt-en
-description: Seedance workflow dispatcher. Load the shared contract, then use the prompting branch for prompt/reference-package authoring and the production branch for visible Runway operation, queue monitoring, download, and media verification.
+description: Seedance 2.0/default workflow dispatcher for one owning lane. Use for explicit 2.0 requests or generic Seedance work when 2.5 was not named; explicit Seedance 2.5 requests belong to seedance25-prompt-en.
 ---
 
 # Seedance workflow dispatcher
+
+## Version boundary
+
+- Explicit `Seedance 2.5` / `씨댄스 2.5` → stop this path and load
+  `../seedance25-prompt-en/SKILL.md`.
+- Explicit 2.0 or generic Seedance with no version selection → continue here.
+- Never load both version-specific prompting or production branches for one
+  block.
 
 Seedance is intentionally split into two phases so prompt authoring does not block Runway production:
 

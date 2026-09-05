@@ -35,3 +35,10 @@ Use this file for durable context that should survive across threads.
 - The user explicitly rejects the vocal sound of `링크 업!` and `리와인드 없는 오늘` as obvious AI output. Those performances are negative references only.
 - Use `/Users/gnudas/.codex/skills/music-director/references/vocal-naturalness-qc.md` as the canonical listening gate. Male and female vocals are both allowed; stable human identity, fluent Korean diction, breathing, dynamics, tuning, and restrained vibrato determine acceptance.
 - ASR, stems, onset timing, waveforms, and prompt quality cannot produce a PASS without full-track playback.
+
+## Explicit Seedance 2.5 branch — 2026-09-05
+
+- Natural-language `Seedance 2.5`/`씨댄스 2.5` requests route to `seedance25-prompt-en`; explicit 2.0 and unversioned Seedance remain on `seedance-prompt-en`. Never load both version branches for one block.
+- Only prompting and production diverge. Runtime rails, media registry, safety and approval gates, duration lock, one existing Aside tab, and same-turn foreground queue handling remain shared.
+- Every 2.5 package records `provider_model: Seedance 2.5` and `provider_skill: seedance25-prompt-en`. Production uses the 2.5 adapter to prove the freshly visible model and duration; the adapter imports the shared helper and may not grow separate browser/upload/queue/recovery code.
+- For low-AI animation, prompts specify opening balance/contact, anticipation, one primary action, weight transfer, causal secondary motion, settle, one motivated camera path, and an editor-usable held end state. 2D prompts additionally specify key-pose timing, spacing, line/style stability, and restrained parallax/effects.

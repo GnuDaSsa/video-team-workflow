@@ -335,7 +335,7 @@ This block is the tie-breaker. Previously this file said "Seedance follows the s
 | Rank | Document | Owns |
 |---|---|---|
 | 1 | `~/Documents/Codex/video-team-runtime/AGENTS.md` | rails, lane order, gates, escalation ladders, provider assignment, prompt-authoring routing, safety gates |
-| 2 | `~/.codex/skills/seedance-prompt-en/` | Seedance prompt spec, Runway UI operation, attach/Generate/queue/download |
+| 2 | `~/.codex/skills/seedance-prompt-en/` (2.0/default) and `~/.codex/skills/seedance25-prompt-en/` (explicit 2.5) | Versioned Seedance prompt spec and Runway UI operation; the 2.5 adapter reuses the shared helper |
 | 3 | `~/.codex/video-team-policies/` | spawn approval gate, Chrome operator model |
 | 4 | `videodirector` | story, direction, quality bars — **never execution procedure** |
 
@@ -345,7 +345,7 @@ Never write a rules copy inside a project folder. Project exceptions go in that 
 
 ## Seedance execution authority
 
-Seedance prompt authoring and all Runway UI operation follow only `/Users/gnudas/.codex/skills/seedance-prompt-en/`. Do not add UI upload/click/queue/scheduler rules here.
+Seedance prompt authoring and Runway UI operation follow the selected version skill: explicit Seedance 2.5 requests use `/Users/gnudas/.codex/skills/seedance25-prompt-en/`; explicit 2.0 and unversioned Seedance requests use `/Users/gnudas/.codex/skills/seedance-prompt-en/`. Do not load both for one block or add UI upload/click/queue/scheduler rules here.
 
 ## Gongnyang image-prompt compiler default — 2026-07-12
 

@@ -7,9 +7,11 @@
 | 순위 | 문서 | 소유 범위 |
 |---|---|---|
 | 1 | **이 파일 (`runtime/AGENTS.md`)** | 레일·lane 순서·게이트·막혔을 때 사다리·프로바이더 배정·프롬프트 저작 라우팅·안전 게이트 |
-| 2 | `~/.codex/skills/seedance-prompt-en/` | Seedance 프롬프트 규격, Runway UI 조작, 첨부/Generate/큐/다운로드 절차 |
+| 2 | `~/.codex/skills/seedance-prompt-en/` (2.0/기본) 또는 `~/.codex/skills/seedance25-prompt-en/` (사용자가 2.5 명시) | 선택된 버전의 Seedance 프롬프트 규격과 Runway UI 조작 |
 | 3 | `~/.codex/video-team-policies/` | 스폰 승인 게이트, Chrome 오퍼레이터 모델 |
 | 4 | `videodirector` | 기획·연출·품질 기준. **실행 절차를 정의하지 않는다** |
+
+- 사용자가 현재 요청에서 `Seedance 2.5`/`씨댄스 2.5`를 명시하면 `~/.codex/skills/seedance25-prompt-en/`을 선택한다. 명시적 2.0 또는 버전 없는 Seedance 요청은 `~/.codex/skills/seedance-prompt-en/`을 선택하며, 한 block에서 두 버전 스킬을 함께 읽지 않는다.
 
 - 2번 범위(Seedance UI·프롬프트 규격) 안에서는 **2번이 이 파일보다 우선**한다. 이 파일에 UI 절차를 새로 쓰지 말고 2번을 고쳐라.
 - 1번 범위(레일·게이트·안전) 안에서는 이 파일이 우선한다.
