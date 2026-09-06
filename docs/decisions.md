@@ -101,3 +101,8 @@ Record notable technical or product decisions here so they do not live only in c
 - The user explicitly changed image and video prompt authorship from 5.6 Sol to Astra. The three creative routes now use `gpt-6-astra` at existing `xhigh`; flow/QC/edit and Seedance production routes retain Luna high.
 - This is an authoring-model preference, not a change to image_gen/Seedance providers or permission to spawn another owner. The current conversation continues sequentially.
 - Canonical routing: `runtime/scripts/model_routing.py`; acceptance: `docs/contracts/2026-09-06-astra-prompt-routing.md`.
+
+## Role-aware reference overlap
+
+- Live two-character cycle exposed a contradiction between mandatory per-generation identity sheets and the previous raw-image overlap limit. The canonical Seedance shared contract now counts scene/action duplication separately from required approved identity anchors; four same-owner good/bad review fixtures preserve attachment and anti-padding gates.
+- No automatic agent, reduced identity test, provider action, or video-quality claim is introduced.

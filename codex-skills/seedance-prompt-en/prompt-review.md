@@ -17,6 +17,12 @@ Package: 목적, 시작 상태 → 원인/접촉 → 반응 → 끝 상태, 음�
 
 ## 2. 레퍼런스는 기여 범위만
 
+인접 deck 비교는 shared contract의 역할별 overlap 기준을 따른다. 검토 fixture:
+- PASS: 서로 다른 장면 3장씩 + 동일한 승인 인물시트 2장. 공유 scene/action=0, 필수 identity=2.
+- REPAIR: 서로 같은 장면 2장 + 동일한 승인 인물시트 2장. 공유 scene/action=2.
+- REPAIR: 중복 장면을 identity로 이름만 변경. 승인 identity 자산 종류/등록 hash가 아니므로 예외 불가.
+- BLOCKED: overlap을 줄이려고 등장 인물의 필수 시트를 제거. identity attachment gate 실패.
+
 각 token마다 `가져올 것 / 가져오지 않을 것 / 적용할 scene`을 먼저 결정한다.
 캐릭터 master는 얼굴·체형·의상, 환경은 공간, motion ref는 동선/리듬만 사용한다.
 승인 identity/reference 연결은 생략하지 않되 관련 없는 참조는 추가하지 않는다.

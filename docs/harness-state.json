@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Switch image/video prompt authoring defaults from Sol to Astra per user correction.",
+  "currentGoal": "Correct mandatory identity vs scene-reference overlap contradiction found in live cycle.",
   "status": "complete",
-  "currentContract": "docs/contracts/2026-09-06-astra-prompt-routing.md",
+  "currentContract": "docs/contracts/2026-09-06-reference-role-overlap.md",
   "blockers": [],
-  "nextStep": "Resume current-owner romance-anime 30s cycle. Routing update is complete; real images/Seedance/CapCut production still pending.",
-  "lastUpdated": "2026-09-06T14:10:46.197878+09:00",
+  "nextStep": "Resume current-owner romance-anime production: attest Korean B01/B02 then bind the intended Aside session; no video generated yet.",
+  "lastUpdated": "2026-09-06T14:58:39.693064+09:00",
   "verification": {
-    "lastCommand": "py_compile runtime; unittest 101; zsh -n deploy script; strict 66-file release preflight/apply/check; git diff --check",
+    "lastCommand": "101 unit tests; py_compile; zsh -n; 4 same-owner overlap fixtures; strict 66-file release preflight/apply/check; git diff --check",
     "lastResult": "PASS",
-    "notes": "Three creative routes Astra xhigh; Luna routes and spawn gates preserved. Installed changes verified. No production generation or final media claimed."
+    "notes": "Only two canonical skill documents changed on deployment. Mandatory identity anchors excluded from scene/action overlap count; anti-padding and per-generation attachment remain. No video quality claim."
   },
   "recentCloseouts": [
     {

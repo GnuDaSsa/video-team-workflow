@@ -25,7 +25,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/prompt-review.md",
       "target": ".codex/skills/seedance-prompt-en/prompt-review.md",
-      "sha256": "12486d0498d6dae117bfccfd55c20286d9ea453b4cd036f9364f97994f127a9a"
+      "sha256": "61edc10fbd635f1afd21284ea8c437862fa68d1b08334c1d912952515381eda8"
     },
     {
       "source": "codex-skills/seedance-prompt-en/scripts/aside_bridge.py",
@@ -55,7 +55,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/seedance-shared-contract.md",
       "target": ".codex/skills/seedance-prompt-en/seedance-shared-contract.md",
-      "sha256": "eb1f4325027eeaea4ec476329ce6f0d60088ea082bfd82d9510ba966fbedb57e"
+      "sha256": "9a675264f485edb3e8e72c74e76e437c692a2c83d803ca1ec2b140a76f9d8594"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance2-prompt-patterns.md",
