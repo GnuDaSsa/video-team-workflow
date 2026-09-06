@@ -1050,6 +1050,18 @@ def read_generate_state() -> dict:
 PROMPT_SEL = '[contenteditable][data-lexical-editor]'
 
 
+# innerText of the editor adds CSS paragraph separators; read actual P blocks
+# without collapsing spaces, intentional blank paragraphs, or inline BRs.
+PROMPT_DOM_TEXT_JS = r"""(el => {
+  const nodes = Array.from(el.childNodes);
+  if (nodes.length && nodes.every(n => n.nodeType === 1 && n.tagName === 'P')) {
+    return nodes.map(p => p.childNodes.length === 1 && p.firstChild.nodeName === 'BR'
+      ? '' : (p.innerText || '')).join('\n');
+  }
+  return el.innerText || '';
+})"""
+
+
 def cmd_paste_prompt(args) -> int:
     """Insert prompt text without any keystroke.
 
@@ -1109,8 +1121,8 @@ def cmd_paste_prompt(args) -> int:
     # empty field first. This prevents duplicated prompts after a false replace.
     rc, before_out, before_err = browser_js("""(() => {
   const el = (() => { const a = [...document.querySelectorAll('%s')].filter(e => e.getClientRects().length); return a.length === 1 ? a[0] : null; })();
-  return JSON.stringify(el ? {ok:true, text:(el.innerText || '')} : {ok:false});
-})()""" % PROMPT_SEL)
+  return JSON.stringify(el ? {ok:true, text:(%s)(el)} : {ok:false});
+})()""" % (PROMPT_SEL, PROMPT_DOM_TEXT_JS))
     if rc != 0:
         evidence(args, 'paste-prompt-preflight', 'read empty Lexical editor',
                  before_err[-200:], 'ASIDE_CONTROL_ERROR')
@@ -1165,8 +1177,8 @@ def cmd_paste_prompt(args) -> int:
     for attempt in range(11):
         rc, read_out, read_err = browser_js("""(() => {
   const el = (() => { const a = [...document.querySelectorAll('%s')].filter(e => e.getClientRects().length); return a.length === 1 ? a[0] : null; })();
-  return JSON.stringify(el ? {ok:true, text:(el.innerText || '')} : {ok:false});
-})()""" % PROMPT_SEL)
+  return JSON.stringify(el ? {ok:true, text:(%s)(el)} : {ok:false});
+})()""" % (PROMPT_SEL, PROMPT_DOM_TEXT_JS))
         if rc != 0:
             evidence(args, 'paste-prompt-verify', 'read committed Lexical text',
                      read_err[-200:], 'ASIDE_CONTROL_ERROR')
@@ -1209,18 +1221,27 @@ def cmd_read_prompt(args) -> int:
     rc, out, err = browser_js("""(() => {
   const el = (() => { const a = [...document.querySelectorAll('%s')].filter(e => e.getClientRects().length); return a.length === 1 ? a[0] : null; })();
   if (!el) return JSON.stringify({ok:false, error:'NO_PROMPT_EDITOR'});
-  const t = el.innerText || '';
-  return JSON.stringify({ok:true, len:t.length, over_limit:t.length>3500,
+  const t = (%s)(el);
+  return JSON.stringify({ok:true, text:t, len:t.length, over_limit:t.length>3500,
     hangul_runs:(t.match(/[가-힣]+/g)||[]).length,
     head:t.slice(0,60), tail:t.slice(-60)});
-})()""" % PROMPT_SEL)
+})()""" % (PROMPT_SEL, PROMPT_DOM_TEXT_JS))
     if rc != 0:
         evidence(args, 'read-prompt', 'read editor', err[-200:], 'ASIDE_CONTROL_ERROR')
         return 3
     st = json.loads(out)
-    evidence(args, 'read-prompt', 'read editor', out, 'OK' if st.get('ok') else 'FAIL')
+    actual = str(st.pop('text', ''))
+    st['actual_prompt_sha256'] = prompt_sha256(normalize_prompt(actual))
+    if getattr(args, 'file', None):
+        path = Path(args.file).expanduser().resolve()
+        aside_bridge.require_project(prompt_file=path)
+        expected = normalize_prompt(path.read_text(encoding='utf-8'))
+        st['expected_prompt_sha256'] = prompt_sha256(expected)
+        st['content_match'] = bool(st.get('ok')) and normalize_prompt(actual) == expected
+        st['ok'] = st['content_match']
+    evidence(args, 'read-prompt', 'read editor', json.dumps(st, ensure_ascii=False), 'OK' if st.get('ok') else 'FAIL')
     print(json.dumps(st, ensure_ascii=False))
-    return 0
+    return 0 if st.get('ok') else 1
 
 
 
@@ -2341,7 +2362,7 @@ def main() -> int:
     p.add_argument('--file', required=True)
     p.add_argument('--replace', action='store_true', help='replace all existing text instead of appending')
     p.set_defaults(fn=cmd_paste_prompt)
-    sub.add_parser('read-prompt').set_defaults(fn=cmd_read_prompt)
+    p = sub.add_parser('read-prompt'); p.add_argument('--file'); p.set_defaults(fn=cmd_read_prompt)
     sub.add_parser('ime-check', help='is the active input source safe for synthetic keystrokes?').set_defaults(fn=cmd_ime_check)
     def add_queue_observation_args(parser):
         parser.add_argument('--project', required=True)

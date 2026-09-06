@@ -84,7 +84,7 @@ OS focus atomic with a user's simultaneous click. A focus change means stop the
 input and re-observe, not send more keystrokes. Never upload through hidden DOM
 file inputs, clipboard images, or unapproved drag fallback.
 
-Use `paste-prompt --file <BLOCK>_prompt.txt` once, then `read-prompt` and visible
+Use `paste-prompt --file <BLOCK>_prompt.txt` once, then `read-prompt --file <BLOCK>_prompt.txt` for a non-mutating exact content/hash comparison and visible
 counter/hold inspection. Non-empty or ambiguous editor is a repair state, not
 permission to append, use `--replace`, or inject text into another field.
 An uncertain paste call is followed by a read, not another paste.
