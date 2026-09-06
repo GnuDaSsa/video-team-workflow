@@ -1,14 +1,14 @@
 {
   "currentGoal": "Apply lean video workflow, scoped Seedance prompting and exact-session Aside CLI control with verified source/live release.",
-  "status": "in_progress",
+  "status": "complete",
   "currentContract": "docs/contracts/2026-09-06-lean-workflow-aside-release.md",
   "blockers": [],
-  "nextStep": "Isolated staged-tree test, commit and sync; deploy 66 managed files then verify exact parity.",
-  "lastUpdated": "2026-09-06T13:53:31.158276+09:00",
+  "nextStep": "No implementation blocker. Next production owner should bind the intended existing Aside session, reauthor incompatible unsubmitted packs and measure real generation/playback quality; never auto-resubmit historical jobs.",
+  "lastUpdated": "2026-09-06T13:57:09.406815+09:00",
   "verification": {
+    "lastCommand": "py_compile source/live runtime+skills; unittest 101 tests (working and isolated staged tree); strict deploy --check (66 files); real installed Aside read-only bind; source/live 28-pack shadow parity; git diff --check; origin/main sync",
     "lastResult": "PASS",
-    "lastCommand": "py_compile; unittest 101 tests; actual Aside read-only binding smoke; 28-pack shadow audit",
-    "notes": "Hidden App Server image-agent/API fallback found and retired; image batch now hands off to current-owner built-in imagegen. Isolated recheck/commit/sync/deploy pending."
+    "notes": "Code e1a6367 synced and deployed: 43 files updated, 6 existing obsolete paths archived, 66 managed hashes match. No new agent, upload/Generate, project prompt rewrite, media modification, real generation A/B, full playback or CapCut export QA."
   },
   "recentCloseouts": [
     {

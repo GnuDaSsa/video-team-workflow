@@ -9,7 +9,7 @@
 ## 1. 불필요한 구조 정리
 
 - `seedance-creative-prompt-team`과 설치 skill 내부 구형 통합 규칙을 활성 경로에서
-  퇴역시킨다. 필요한 연출 판단은 같은 owner의 `prompt-review.md`로 통합했다.
+  퇴역시켰다. 필요한 연출 판단은 같은 owner의 `prompt-review.md`로 통합했다.
 - `videodirector/references/role-split.md`: 286 → 21행. 역할별 별도 팀/agent 대신
   단계별 결정·출력·다음 단계의 증거만 남겼다.
 - Seedance 2.0 production 문서: 481 → 97행. 중복 큐·입력·복구 설명을 줄이고,
@@ -23,7 +23,7 @@
   만들고 generation/agent를 시작하지 않는다. 구형 image runner는 안전한
   중단 포인터이며 전용 image CLI 및 symlink는 archive로 퇴역한다.
 - 과거 Editor 특정 작품 강제, Image Creator 외부 Fable bridge, Music Simple
-  강제와 같은 오래된 live template는 현재 source 계약으로 교체한다.
+  강제와 같은 오래된 live template는 현재 source 계약으로 교체했다.
 - approved storyboard 관련 live 추가사항은 먼저 source에 보존했다. 잘라낸
   storyboard panel을 production sourceframe으로 승인하는 예외는 제거했다.
 
@@ -120,3 +120,11 @@ Reference/Keyframe의 설정 노출과 동일하다고 가정하지 않는다.
 첫 생성 승인율, 원인별 재시도 수, 사용 가능 초/생성 초, identity FAIL,
 실제 채택 cut 수를 작은 동조건 A/B로 기록한다. 현재 수정은 **운영 오류와
 명백한 프롬프트 모순을 막는 업그레이드**이며 미디어 품질 개선의 실증은 다음 제작에서 한다.
+
+## 배포 확인
+
+코드 커밋 `e1a6367`을 origin/main에 동기화한 뒤 배포했다. 66개 관리 파일의
+source/live hash가 일치하며, 43개 파일 교체와 6개 실제 존재했던 퇴역 경로의
+archive 이동이 확인됐다. 설치된 helper로 실제 Aside 읽기 시험을 다시 통과했고,
+기존 28개 pack의 source/live verdict 및 입력 hash도 동일하다.
+상세 수치와 로컬 복구 archive 경로는 `verification.json`에 기록했다.

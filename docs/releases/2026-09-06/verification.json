@@ -1,0 +1,22 @@
+{
+  "ok": true,
+  "managed_files": 66,
+  "errors": [],
+  "changed_files": 43,
+  "retired_paths": [
+    ".codex/skills/seedance-creative-prompt-team",
+    ".codex/skills/seedance-prompt-en/archive",
+    ".local/bin/video-image-cli",
+    "Documents/Codex/video-team-runtime/runtime/scripts/codex_app_image_cli.py",
+    "Documents/Codex/video-team-runtime/runtime/scripts/seedance_inflight_monitor.py",
+    "Documents/Codex/video-team-runtime/runtime/scripts/image_qc_lane_runner.py"
+  ],
+  "archive": "/Users/gnudas/.codex/archive/20260906_135432_104903_verified_video_release",
+  "code_commit": "e1a6367d34ccdb11c4bc1e93e63672f82bec7eec",
+  "tests_passed": 101,
+  "isolated_staged_tree_tests_passed": 101,
+  "source_live_28_pack_verdict_hash_parity": true,
+  "provider_generation_or_upload_performed": false,
+  "production_media_modified": false,
+  "manifest_sha256": "96b23687bca79eabea1a12c2efe4fa57a77b4c1a08627516bcc4e5e542593f45"
+}

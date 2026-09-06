@@ -101,6 +101,6 @@ test_visible_model_must_be_read_unambiguously (test_seedance_queue_continuation.
 test_visible_seedance_25_is_rejected_before_generate (test_seedance_queue_continuation.SeedanceQueueContinuationTests) ... ok
 
 ----------------------------------------------------------------------
-Ran 101 tests in 0.700s
+Ran 101 tests in 0.777s
 
 OK

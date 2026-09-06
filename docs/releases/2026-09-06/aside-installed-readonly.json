@@ -1,0 +1,9 @@
+{
+  "ok": true,
+  "installed_bridge_read_only": true,
+  "result": {
+    "ok": true,
+    "title": "Runway",
+    "host": "app.runwayml.com"
+  }
+}
