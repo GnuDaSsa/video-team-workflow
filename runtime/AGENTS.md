@@ -80,8 +80,8 @@ flowchart TD
 
 | 작업 phase | 모델 | reasoning |
 |---|---|---|
-| 이미지 프롬프트 저작 + 이미지 생성 owner (`image_creator_01/02`) | `gpt-5.6-sol` | `xhigh` |
-| Seedance 영상 프롬프트 저작·검증·attest (`seedance:prompting`) | `gpt-5.6-sol` | `xhigh` |
+| 이미지 프롬프트 저작 + 이미지 생성 owner (`image_creator_01/02`) | `gpt-6-astra` | `xhigh` |
+| Seedance 영상 프롬프트 저작·검증·attest (`seedance:prompting`) | `gpt-6-astra` | `xhigh` |
 | Director, Music, Planner, Image QC, Seedance QC, Editor, Package | `gpt-5.6-luna` | `high` |
 | Aside CLI/Runway/Computer Use 실행 (`seedance:production`) | `gpt-5.6-luna` | `high` |
 

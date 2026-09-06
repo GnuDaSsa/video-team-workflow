@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Apply lean video workflow, scoped Seedance prompting and exact-session Aside CLI control with verified source/live release.",
+  "currentGoal": "Switch image/video prompt authoring defaults from Sol to Astra per user correction.",
   "status": "complete",
-  "currentContract": "docs/contracts/2026-09-06-lean-workflow-aside-release.md",
+  "currentContract": "docs/contracts/2026-09-06-astra-prompt-routing.md",
   "blockers": [],
-  "nextStep": "No implementation blocker. Next production owner should bind the intended existing Aside session, reauthor incompatible unsubmitted packs and measure real generation/playback quality; never auto-resubmit historical jobs.",
-  "lastUpdated": "2026-09-06T13:57:09.406815+09:00",
+  "nextStep": "Resume current-owner romance-anime 30s cycle. Routing update is complete; real images/Seedance/CapCut production still pending.",
+  "lastUpdated": "2026-09-06T14:10:46.197878+09:00",
   "verification": {
-    "lastCommand": "py_compile source/live runtime+skills; unittest 101 tests (working and isolated staged tree); strict deploy --check (66 files); real installed Aside read-only bind; source/live 28-pack shadow parity; git diff --check; origin/main sync",
+    "lastCommand": "py_compile runtime; unittest 101; zsh -n deploy script; strict 66-file release preflight/apply/check; git diff --check",
     "lastResult": "PASS",
-    "notes": "Code e1a6367 synced and deployed: 43 files updated, 6 existing obsolete paths archived, 66 managed hashes match. No new agent, upload/Generate, project prompt rewrite, media modification, real generation A/B, full playback or CapCut export QA."
+    "notes": "Three creative routes Astra xhigh; Luna routes and spawn gates preserved. Installed changes verified. No production generation or final media claimed."
   },
   "recentCloseouts": [
     {

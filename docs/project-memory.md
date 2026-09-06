@@ -53,3 +53,9 @@ Use this file for durable context that should survive across threads.
 - Deployment safety preflight and strict installed hash parity are distinct.
   Canonical release mechanism and evidence: `tools/video_release.py` and
   `docs/releases/2026-09-06/`. Never infer video quality from those checks.
+
+## Astra creative prompt routing
+
+- The user explicitly changed image and video prompt authorship from 5.6 Sol to Astra. The three creative routes now use `gpt-6-astra` at existing `xhigh`; flow/QC/edit and Seedance production routes retain Luna high.
+- This is an authoring-model preference, not a change to image_gen/Seedance providers or permission to spawn another owner. The current conversation continues sequentially.
+- Canonical routing: `runtime/scripts/model_routing.py`; acceptance: `docs/contracts/2026-09-06-astra-prompt-routing.md`.

@@ -376,7 +376,7 @@ def _seedance_phase_contract(project: Path, phase: str, route: dict) -> str:
 
 - This foreground owner is `{route['model']}` with `{route['reasoning_effort']}` reasoning.
 - Use only current `ATTESTED` prompt packages. Do not rewrite, improve, or silently replace a
-  prompt; return to the Sol prompting phase when a creative revision is required.
+  prompt; return to the Astra prompting phase when a creative revision is required.
 - Aside is the sole visible Runway owner. Bind the exact existing Runway tab with deterministic
   `aside repl` (`listBrowserTabs()` -> exact targetId -> `attachBrowserTab(targetId)`). Never
   open a new Runway tab or use Chrome, Safari, in-app browser, connector, or API.
@@ -684,7 +684,7 @@ def workflow(args) -> None:
         'model_routing': {
             'policy_version': model_routing.POLICY_VERSION,
             'routes': model_routing.matrix(),
-            'seedance_phase_handoff': 'prompting(Sol xhigh) -> explicit sequential production(Luna high)',
+            'seedance_phase_handoff': 'prompting(Astra xhigh) -> explicit sequential production(Luna high)',
             'auto_spawn_next_phase': False,
         },
         'internal_parallel_exceptions': [
@@ -928,7 +928,7 @@ def main() -> None:
     p.add_argument('--lanes', nargs='+', required=True, help='exactly one lane for dispatch; multi-lane aliases are rejected')
     p.add_argument('--force', action='store_true', help='bypass eligible rail gates with a warning; v4 MEDIA_HARD_GATE is never bypassed')
     p.add_argument('--phase', choices=['auto', 'prompting', 'production'], default='auto',
-                   help='seedance only: auto resolves the next sequential Sol/Luna phase')
+                   help='seedance only: auto resolves the next sequential Astra/Luna phase')
     p.add_argument('--approved-spawn',
                    help='exact current-conversation spawn approval token shown by next/model-route')
     p.set_defaults(func=dispatch)

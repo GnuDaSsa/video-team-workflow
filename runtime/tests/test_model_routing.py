@@ -19,12 +19,12 @@ import video_codex_runtime  # noqa: E402
 
 
 class ModelRoutingTests(unittest.TestCase):
-    def test_creative_generation_routes_to_sol_xhigh(self) -> None:
+    def test_creative_generation_routes_to_astra_xhigh(self) -> None:
         for lane, phase in (
                 ('image_creator_01', None), ('image_creator_02', None),
                 ('seedance', 'prompting')):
             route = model_routing.resolve(lane, phase)
-            self.assertEqual(route['model'], 'gpt-5.6-sol')
+            self.assertEqual(route['model'], 'gpt-6-astra')
             self.assertEqual(route['reasoning_effort'], 'xhigh')
             self.assertEqual(
                 route['required_spawn_approval'],
@@ -72,6 +72,7 @@ class ModelRoutingTests(unittest.TestCase):
             self.assertIn('aside repl', prompt)
             self.assertIn('attachBrowserTab(targetId)', prompt)
             self.assertIn('no second browser loop', prompt)
+            self.assertNotIn('Sol prompting', prompt)
 
     def test_workflow_reports_model_matrix(self) -> None:
         out = io.StringIO()
@@ -81,6 +82,8 @@ class ModelRoutingTests(unittest.TestCase):
         self.assertEqual(
             data['model_routing']['policy_version'], model_routing.POLICY_VERSION)
         self.assertFalse(data['model_routing']['auto_spawn_next_phase'])
+        self.assertNotIn('Sol', data['model_routing']['seedance_phase_handoff'])
+        self.assertIn('Astra', data['model_routing']['seedance_phase_handoff'])
 
     def test_codex_command_carries_model_and_effort(self) -> None:
         route = model_routing.resolve('seedance', 'production')

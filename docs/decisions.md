@@ -95,3 +95,9 @@ Record notable technical or product decisions here so they do not live only in c
 - Evidence and remaining empirical QC: `docs/releases/2026-09-06/`.
 
 - Staged-tree review also found a hidden App Server image-task launcher and automatic reference-image API fallback. Both are retired; image batching now creates an immutable current-owner handoff without starting an agent or provider CLI.
+
+## Astra creative prompt routing
+
+- The user explicitly changed image and video prompt authorship from 5.6 Sol to Astra. The three creative routes now use `gpt-6-astra` at existing `xhigh`; flow/QC/edit and Seedance production routes retain Luna high.
+- This is an authoring-model preference, not a change to image_gen/Seedance providers or permission to spawn another owner. The current conversation continues sequentially.
+- Canonical routing: `runtime/scripts/model_routing.py`; acceptance: `docs/contracts/2026-09-06-astra-prompt-routing.md`.

@@ -8,10 +8,10 @@ an explicit runtime action and only one Codex owner may run at a time.
 from __future__ import annotations
 
 
-POLICY_VERSION = 'video_team_model_routing_v1_20260829'
+POLICY_VERSION = 'video_team_model_routing_v2_20260906'
 
-SOL_MODEL = 'gpt-5.6-sol'
-SOL_EFFORT = 'xhigh'
+ASTRA_MODEL = 'gpt-6-astra'
+ASTRA_EFFORT = 'xhigh'
 LUNA_MODEL = 'gpt-5.6-luna'
 LUNA_EFFORT = 'high'
 
@@ -19,10 +19,10 @@ ROUTES = {
     'director': (LUNA_MODEL, LUNA_EFFORT, 'workflow_direction'),
     'music': (LUNA_MODEL, LUNA_EFFORT, 'music_flow_and_lock'),
     'planner': (LUNA_MODEL, LUNA_EFFORT, 'planning_and_cut_map'),
-    'image_creator_01': (SOL_MODEL, SOL_EFFORT, 'image_prompting_and_generation_owner'),
-    'image_creator_02': (SOL_MODEL, SOL_EFFORT, 'image_prompting_and_generation_owner'),
+    'image_creator_01': (ASTRA_MODEL, ASTRA_EFFORT, 'image_prompting_and_generation_owner'),
+    'image_creator_02': (ASTRA_MODEL, ASTRA_EFFORT, 'image_prompting_and_generation_owner'),
     'image_qc': (LUNA_MODEL, LUNA_EFFORT, 'image_qc'),
-    'seedance:prompting': (SOL_MODEL, SOL_EFFORT, 'video_prompt_authoring'),
+    'seedance:prompting': (ASTRA_MODEL, ASTRA_EFFORT, 'video_prompt_authoring'),
     'seedance:production': (LUNA_MODEL, LUNA_EFFORT, 'aside_cli_and_computer_use'),
     'seedance_qc': (LUNA_MODEL, LUNA_EFFORT, 'video_qc'),
     'editor': (LUNA_MODEL, LUNA_EFFORT, 'capcut_and_edit_flow'),

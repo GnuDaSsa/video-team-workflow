@@ -160,7 +160,7 @@
     {
       "source": "runtime/scripts/model_routing.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/model_routing.py",
-      "sha256": "53c45f0ca7faeb613d54d0b2344f3f03fd1d98a6e057e8a821807d18f7e53e6e"
+      "sha256": "6ef39af8436ad9ed870fe6538a9a185c55a68e955196a723d5c58484051dd220"
     },
     {
       "source": "runtime/scripts/project_sweep.py",
@@ -195,7 +195,7 @@
     {
       "source": "runtime/scripts/video_codex_runtime.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/video_codex_runtime.py",
-      "sha256": "160b315139987c2f5d5d0b36817dda4b0eaaa91b2b043f2364b75ab7c1916497"
+      "sha256": "fa172ee539858d0ff423616b5339db9e2567f7b31ffa3ac33d45630706cceda6"
     },
     {
       "source": "runtime/scripts/video_knowledge_router.py",
@@ -270,7 +270,7 @@
     {
       "source": "runtime/AGENTS.md",
       "target": "Documents/Codex/video-team-runtime/AGENTS.md",
-      "sha256": "2c921ff4c8ae205e3823250ddecc0c5f7a9f460e86e3d76aaac7ea0113d750b2"
+      "sha256": "076655a08e81d343d924680f9b55f95dee2dc6ab50d7a0bb04187a23cd1144b5"
     },
     {
       "source": "references/character_sheet_prompt_standard.md",
