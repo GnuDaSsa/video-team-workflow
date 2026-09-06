@@ -1,16 +1,14 @@
 {
   "currentGoal": "Fix native helper focus-validation ordering without weakening exact-session safety.",
-  "status": "blocked",
+  "status": "complete",
   "currentContract": "docs/contracts/2026-09-07-native-focus-recovery.md",
-  "blockers": [
-    "Native AppleScript live test requires explicit user technology exception; image upload and video generation/QC remain unverified."
-  ],
-  "nextStep": "Obtain one specific native-helper approval, then exact-session activation/chooser live test; no new agent/browser or hidden-input fallback.",
-  "lastUpdated": "2026-09-07T05:47:21.765398+09:00",
+  "blockers": [],
+  "nextStep": "Native Image1 upload is now visually verified. Continue immutable two-block production with keyboard-free picker-select and fresh thumbnail/Generate checks.",
+  "lastUpdated": "2026-09-07T06:01:30.399703+09:00",
   "verification": {
-    "lastCommand": "116 unittest tests; Python compile; zsh -n; video_release freeze/preflight/apply/check (66 files, 3 changed); git diff --check",
-    "lastResult": "PASS_CODE_AND_DEPLOYMENT_GUI_NOT_RUN",
-    "notes": "Optional native helper guard order fixed and tested; no live AppleScript/permissions changes. Sky row/key failure remains unresolved. Harness/contract and private project status updated; unrelated dirty decision/memory files preserved."
+    "lastCommand": "120 unit tests; Python compile; zsh syntax; strict 66-file deployment parity; live native selection/Open/upload/enlarged Image1 comparison; git diff --check",
+    "lastResult": "PASS_NATIVE_IMAGE1_UPLOAD",
+    "notes": "Explicit AppleScript approval received. Modal ownership guard and AXSelected selection work without changing Korean IME. Image1 enlarged content matches approved S01; no Generate/video/QC yet. Browser screenshot saved from returned Buffer because page.screenshot path is session-scoped. Unrelated dirty files preserved."
   },
   "recentCloseouts": [
     {

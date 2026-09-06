@@ -70,6 +70,14 @@ Reference selector to open the native chooser. Computer Use may operate only
 that same Aside chooser; the helper's optional native `picker-go` first requires
 the exact bound tab to be active, activates Aside without input, then rechecks
 the exact active tab in the focused window before macOS frontmost and IME checks.
+When the native picker makes the browser focus flag false, `picker-go` alone may
+instead prove the CLI-bound window ID and exact current URL against native Aside's
+front window/active tab, plus that main window's `open-panel` sheet. That proof is
+repeated immediately before input; an unrelated dialog or changed tab fails closed.
+`picker-select --path <helper-alias>` selects one uniquely named visible file row in the
+verified native ListView without keys or clipboard input; it therefore does not depend
+on an English IME. A changed layout, duplicate/missing row or unapplied selection fails
+closed. Re-read the native Open button and actual uploaded thumbnail before proceeding.
 This does not override the current controller's UI-technology or permission gates.
 Verify the actual chooser before/after native input: no software check can make
 OS focus atomic with a user's simultaneous click. A focus change means stop the

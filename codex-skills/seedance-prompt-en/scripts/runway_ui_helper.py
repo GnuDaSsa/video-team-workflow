@@ -832,7 +832,34 @@ if fm is not "{TARGET_APP}" then error "ABORT_FOCUS_NOT_{TARGET_APP.upper()}: " 
 '''
 
 
-def run_verified(args, action: str, tail: str, pre: str = '') -> int:
+def native_picker_guard() -> str:
+    """Read exact CLI identity; native modal proof never navigates or selects."""
+    binding = aside_bridge.require_project()
+    observed = aside_bridge.repl(aside_bridge.binding_script(
+        binding, '({windowId:matches[0].windowId,url:await page.url()})',
+        require_active=True, require_focused=False), binding.get('account'))
+    window_id = str(observed.get('windowId', ''))
+    if not re.fullmatch(r'[1-9][0-9]*', window_id):
+        raise ValueError('ASIDE_NATIVE_WINDOW_ID_INVALID')
+    current_url = observed.get('url', '')
+    if aside_bridge.session_identity(current_url) != aside_bridge.session_identity(binding['session_url']):
+        raise ValueError('ASIDE_NATIVE_SESSION_MISMATCH')
+    return f'''
+tell application "{TARGET_APP}"
+    if (id of front window as text) is not {json.dumps(window_id)} then error "ABORT_NATIVE_WINDOW_CHANGED"
+    if (URL of active tab of front window) is not {json.dumps(current_url)} then error "ABORT_NATIVE_TAB_CHANGED"
+end tell
+tell application "System Events"
+    tell process "{TARGET_APP}"
+        if (value of attribute "AXMain" of window 1) is not true then error "ABORT_NATIVE_MAIN_WINDOW"
+        if not (exists sheet 1 of window 1) then error "ABORT_NO_PICKER_SHEET"
+        if (value of attribute "AXIdentifier" of sheet 1 of window 1) is not "open-panel" then error "ABORT_NOT_OPEN_PANEL"
+    end tell
+end tell
+'''
+
+
+def run_verified(args, action: str, tail: str, pre: str = '', *, native_picker: bool = False) -> int:
     """Validate/activate/revalidate, then guarded pre + tail in one osascript.
 
     Refuses to fire keys while a CJK IME is active — see the input-method guard.
@@ -851,6 +878,13 @@ def run_verified(args, action: str, tail: str, pre: str = '') -> int:
     # Activation can select another window, and the user may have switched
     # tabs. Re-read both exact identity and focused-window state before input.
     rc, _out, err = aside_bridge.browser_js('true', require_active=True)
+    picker_guard = ''
+    if rc and native_picker and 'ASIDE_NATIVE_BOUND_TAB_NOT_ACTIVE' in err:
+        try:
+            picker_guard = native_picker_guard()
+            rc, _out, err = osa(VERIFY_BLOCK + picker_guard)
+        except (ValueError, OSError, KeyError, TypeError) as exc:
+            rc, err = 2, str(exc)
     if rc:
         evidence(args, action, 'exact bound tab focused after activation', err, 'FOCUS_ABORT')
         return 2
@@ -861,7 +895,7 @@ def run_verified(args, action: str, tail: str, pre: str = '') -> int:
                      json.dumps({**st, 'required_action': IME_REMEDY}, ensure_ascii=False),
                      'BLOCKED_IME_ACTIVE')
             return 4
-    rc, out, err = osa(VERIFY_BLOCK + pre + tail)
+    rc, out, err = osa(VERIFY_BLOCK + picker_guard + pre + tail)
     if rc != 0:
         verdict = 'FOCUS_ABORT' if 'ABORT_FOCUS' in err else 'ASIDE_CONTROL_ERROR'
         evidence(args, action, f'frontmost={TARGET_APP} then action', err or out, verdict)
@@ -900,7 +934,39 @@ tell application "System Events"
     end tell
 end tell
 '''
-    return run_verified(args, f'picker-go {path}', tail, pre=pre)
+    return run_verified(args, f'picker-go {path}', tail, pre=pre, native_picker=True)
+
+
+def cmd_picker_select(args) -> int:
+    """Select one visible helper alias via AX, without keyboard/IME events."""
+    path = Path(os.path.abspath(Path(args.path).expanduser()))
+    if path.parent.resolve() != UPLOAD_ALIAS_ROOT.resolve() or not path.is_symlink() or not path.is_file():
+        raise ValueError('PICKER_SELECT_REQUIRES_LIVE_HELPER_ALIAS')
+    if not re.fullmatch(r'[A-Za-z0-9_]+\.(png|jpg|jpeg|webp|mp4|mov|wav|mp3)', path.name):
+        raise ValueError('PICKER_SELECT_ALIAS_NAME_INVALID')
+    tail = f'''
+tell application "System Events"
+    tell process "{TARGET_APP}"
+        if (value of pop up button 1 of splitter group 1 of sheet 1 of window 1) is not {json.dumps(UPLOAD_ALIAS_ROOT.name)} then error "ABORT_NATIVE_ALIAS_FOLDER"
+        set listView to outline 1 of scroll area 1 of splitter group 1 of splitter group 1 of sheet 1 of window 1
+        if (value of attribute "AXIdentifier" of listView) is not "ListView" then error "ABORT_NATIVE_LIST_LAYOUT"
+        set candidates to {{}}
+        repeat with rr in rows of listView
+            repeat with cell in UI elements of rr
+                repeat with field in text fields of cell
+                    if value of field is {json.dumps(path.name)} then set end of candidates to contents of rr
+                end repeat
+            end repeat
+        end repeat
+        if (count candidates) is not 1 then error "ABORT_NATIVE_UNIQUE_FILE_ROW"
+        set targetRow to item 1 of candidates
+        set value of attribute "AXSelected" of targetRow to true
+        if (value of attribute "AXSelected" of targetRow) is not true then error "ABORT_NATIVE_SELECTION_NOT_APPLIED"
+    end tell
+end tell
+return "ROW_SELECTED_VERIFY_OPEN_AND_THUMBNAIL"
+'''
+    return run_verified(args, f'picker-select {path.name}', tail, native_picker=True)
 
 
 GEN_BTN_JS = r"""
@@ -2270,6 +2336,7 @@ def main() -> int:
     p.add_argument('--detail')
     p.set_defaults(fn=cmd_recovery_resolve)
     p = sub.add_parser('picker-go'); p.add_argument('--path', required=True); p.set_defaults(fn=cmd_picker_go)
+    p = sub.add_parser('picker-select'); p.add_argument('--path', required=True); p.set_defaults(fn=cmd_picker_select)
     p = sub.add_parser('paste-prompt', help='insert prompt text into the Lexical editor via a dispatched paste event (no keystrokes, IME-safe)')
     p.add_argument('--file', required=True)
     p.add_argument('--replace', action='store_true', help='replace all existing text instead of appending')

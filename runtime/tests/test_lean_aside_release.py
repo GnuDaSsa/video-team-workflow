@@ -100,8 +100,14 @@ class AsideBridgeTests(unittest.TestCase):
             self.assertIn('ASIDE_SESSION_CHANGED_BEFORE_DOM',repl.call_args.args[0])
         helper=(ROOT/'codex-skills/seedance-prompt-en/scripts/runway_ui_helper.py').read_text()
         self.assertIn('PROMPT_CHANGED_BEFORE_PASTE',helper)
-        for name in ('def cmd_js_click_file_input','def cmd_paste_image','active tab of front window'):
+        for name in ('def cmd_js_click_file_input','def cmd_paste_image'):
             self.assertNotIn(name,helper)
+        # Native modal ownership may compare the front window to CLI-bound
+        # identity; it must not become a front-tab DOM/control fallback.
+        native_guard = helper.split('def native_picker_guard()', 1)[1].split('def run_verified(', 1)[0]
+        self.assertIn('ABORT_NATIVE_WINDOW_CHANGED', native_guard)
+        self.assertIn('ABORT_NATIVE_TAB_CHANGED', native_guard)
+        self.assertNotIn('active tab of front window', helper.replace(native_guard, ''))
 
 
 class SemanticRegressionTests(unittest.TestCase):

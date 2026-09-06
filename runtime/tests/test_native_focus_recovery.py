@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -40,20 +41,25 @@ class NativeFocusRecoveryTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertIn('TOUCHES=' + str(int(accepted)), result.stdout)
 
-    def invoke(self, observations, *, activation=(0, 'Aside', ''), cjk=False):
+    def invoke(self, observations, *, activation=(0, 'Aside', ''), cjk=False,
+               native_picker=False, modal_result=(0, '', '')):
         events = []
         def observe(*args, **kwargs):
             events.append(('observe', kwargs))
             return observations.pop(0)
         def osa(script):
             events.append(('native', script))
+            if script == helper.VERIFY_BLOCK + 'NATIVE_MODAL_PROOF':
+                return modal_result
             return activation if script == helper.VERIFY_BLOCK else (0, 'done', '')
         with patch.object(helper.aside_bridge, 'browser_js', side_effect=observe), \
              patch.object(helper, 'osa', side_effect=osa), \
              patch.object(helper, 'ime_state', return_value={'cjk_active': cjk}), \
+             patch.object(helper, 'native_picker_guard', return_value='NATIVE_MODAL_PROOF'), \
              patch.object(helper, 'evidence'):
             rc = helper.run_verified(argparse.Namespace(), 'test',
-                                     'keystroke "g"', 'set the clipboard to "approved-path"\n')
+                                     'keystroke "g"', 'set the clipboard to "approved-path"\n',
+                                     native_picker=native_picker)
         return rc, events
 
     def test_activation_precedes_strict_recheck_and_guarded_input_once(self):
@@ -90,6 +96,57 @@ class NativeFocusRecoveryTests(unittest.TestCase):
         rc, events = self.invoke([(0, '', ''), (0, '', '')], cjk=True)
         self.assertEqual(rc, 4)
         self.assertEqual([x[0] for x in events], ['observe', 'native', 'observe'])
+
+    def test_native_picker_modal_proof_is_repeated_before_input(self):
+        rc, events = self.invoke([(0, '', ''), (3, '', 'ASIDE_NATIVE_BOUND_TAB_NOT_ACTIVE')],
+                                 native_picker=True)
+        self.assertEqual(rc, 0)
+        self.assertEqual([x[0] for x in events], ['observe', 'native', 'observe', 'native', 'native'])
+        self.assertEqual(events[3][1], helper.VERIFY_BLOCK + 'NATIVE_MODAL_PROOF')
+        self.assertTrue(events[4][1].startswith(helper.VERIFY_BLOCK + 'NATIVE_MODAL_PROOF'))
+
+    def test_failed_modal_proof_or_unrelated_bridge_error_never_sends_input(self):
+        for error, modal in [('ASIDE_NATIVE_BOUND_TAB_NOT_ACTIVE', (1, '', 'wrong modal')),
+                             ('ASIDE_BOUND_SESSION_CHANGED', (0, '', ''))]:
+            rc, events = self.invoke([(0, '', ''), (3, '', error)],
+                                     native_picker=True, modal_result=modal)
+            self.assertEqual(rc, 2)
+            self.assertTrue(all('keystroke' not in value and 'clipboard' not in value
+                                for kind, value in events if kind == 'native'))
+
+    def test_native_guard_requires_window_id_url_main_window_and_open_panel(self):
+        binding = {**BINDING, 'account': None}
+        with patch.object(bridge, 'require_project', return_value=binding), \
+             patch.object(bridge, 'repl', return_value={'windowId': 123, 'url': URL}):
+            guard = helper.native_picker_guard()
+            for marker in ('ABORT_NATIVE_WINDOW_CHANGED', 'ABORT_NATIVE_TAB_CHANGED',
+                           'AXMain', 'ABORT_NO_PICKER_SHEET', 'open-panel'):
+                self.assertIn(marker, guard)
+            self.assertNotIn('keystroke', guard)
+            self.assertNotIn('clipboard', guard)
+        for observation in ({'windowId': '1\" & bad', 'url': URL},
+                            {'windowId': 123, 'url': URL.replace('one', 'two')}):
+            with patch.object(bridge, 'require_project', return_value=binding), \
+                 patch.object(bridge, 'repl', return_value=observation), self.assertRaises(ValueError):
+                helper.native_picker_guard()
+
+    def test_native_alias_selection_is_unique_folder_bound_and_keyboard_free(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td); source = root / 'source'; source.write_bytes(b'fixture')
+            alias = root / 'B01__IMAGE1__1234ABCD.png'; alias.symlink_to(source)
+            with patch.object(helper, 'UPLOAD_ALIAS_ROOT', root), \
+                 patch.object(helper, 'run_verified', return_value=0) as run:
+                self.assertEqual(helper.cmd_picker_select(argparse.Namespace(path=str(alias))), 0)
+                tail = run.call_args.args[2]
+                for marker in ('ABORT_NATIVE_ALIAS_FOLDER', 'ABORT_NATIVE_UNIQUE_FILE_ROW',
+                               'AXSelected', 'ABORT_NATIVE_SELECTION_NOT_APPLIED'):
+                    self.assertIn(marker, tail)
+                self.assertNotIn('keystroke', tail); self.assertNotIn('clipboard', tail)
+                self.assertEqual(run.call_args.kwargs, {'native_picker': True})
+                run.reset_mock()
+                with self.assertRaises(ValueError):
+                    helper.cmd_picker_select(argparse.Namespace(path=str(source)))
+                run.assert_not_called()
 
 
 if __name__ == '__main__':
