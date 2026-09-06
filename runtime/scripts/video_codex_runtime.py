@@ -672,7 +672,7 @@ def workflow(args) -> None:
             STANDARD_I2V_MODE: 'per-cut source frames followed by I2V',
             NO_I2V_MODE: 'minimum reusable references; no per-cut frames; prompt-heavy native video',
         },
-        'mode': 'one lane at a time; run next, then dispatch exactly one returned lane; multi-lane dispatch is rejected',
+        'mode': 'one current owner, one lane at a time; next selects a responsibility, not a new agent; dispatch is optional and separately approved',
         'serial_order': LANES,
         'aliases': ALIASES,
         'alias_policy': 'no grouped lane aliases in sequential mode',
@@ -684,7 +684,7 @@ def workflow(args) -> None:
         'model_routing': {
             'policy_version': model_routing.POLICY_VERSION,
             'routes': model_routing.matrix(),
-            'seedance_phase_handoff': 'prompting(Astra xhigh) -> explicit sequential production(Luna high)',
+            'seedance_phase_handoff': 'same-owner sequential by default; approved new-owner dispatch preferences: prompting(Astra xhigh), production(Luna high)',
             'auto_spawn_next_phase': False,
         },
         'internal_parallel_exceptions': [
@@ -848,6 +848,14 @@ def next_cmd(args) -> None:
         phase = seedance_phase(project, 'auto') if lane == 'seedance' else None
         dispatch.append(model_routing.resolve(lane, phase))
     result['next_dispatch'] = dispatch
+    result['default_execution'] = {
+        'action': 'CONTINUE_IN_CURRENT_CONVERSATION',
+        'new_owner': False,
+        'new_approval_for_role_change': False,
+        'automatic_model_switch': False,
+        'next_roles': [{'lane': row['lane'], 'phase': row['phase']} for row in dispatch],
+        'dispatch_note': 'next_dispatch is optional new-owner routing, not an instruction to spawn or ask again for routine steps.',
+    }
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 

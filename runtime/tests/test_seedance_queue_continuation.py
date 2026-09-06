@@ -6,6 +6,7 @@ import json
 import os
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 
@@ -480,6 +481,54 @@ class SeedanceQueueContinuationTests(unittest.TestCase):
         self.sync(self.jobs())
         self.prebinding_block()
         self.assertFalse(helper.evaluate_queue_exit(self.project)['ok'])
+
+    def test_doctor_contract_alone_never_means_scheduler_or_queue(self) -> None:
+        helper.resume_contract_path(self.project).write_text('{}')
+        before = set(self.project.rglob('*'))
+        report = helper.diagnose_queue(self.project)
+        self.assertEqual(report['diagnosis'], 'NO_QUEUE_OBSERVATION')
+        self.assertFalse(report['scheduler_created'])
+        self.assertFalse(report['automatic_model_reentry'])
+        self.assertFalse(report['queue_record_exists'])
+        self.assertEqual(before, set(self.project.rglob('*')))
+
+    def test_doctor_distinguishes_live_orphan_elapsed_and_unstarted_wait(self) -> None:
+        self.sync(self.jobs())
+        self.assertEqual(helper.diagnose_queue(self.project)['diagnosis'], 'REQUIRED_WAIT_NOT_STARTED')
+        path = helper.queue_runtime_path(self.project)
+        runtime = json.loads(path.read_text())
+        runtime['wake'].update(pending=True, wait_pid=12345)
+        path.write_text(json.dumps(runtime))
+        for alive, expected in [(True, 'WAIT_PROCESS_ALIVE'), (False, 'BROKEN_FOREGROUND_CONTINUATION')]:
+            with mock.patch.object(helper, '_pid_running', return_value=alive):
+                report = helper.diagnose_queue(self.project)
+                self.assertEqual(report['diagnosis'], expected)
+                self.assertFalse(report['automatic_model_reentry'])
+        runtime['wake'].update(pending=False, wait_pid=None, elapsed_unconsumed=True)
+        path.write_text(json.dumps(runtime))
+        report = helper.diagnose_queue(self.project)
+        self.assertEqual(report['diagnosis'], 'WAIT_ELAPSED_UNCONSUMED')
+        self.assertIn('--from-wake', report['next_action'])
+
+    def test_doctor_model_environment_does_not_change_decision_or_write(self) -> None:
+        self.sync(self.jobs())
+        path = helper.queue_runtime_path(self.project); before = path.read_bytes()
+        reports = []
+        for model in ['gpt-5.6-luna', 'gpt-5.6-terra', 'gpt-6-astra']:
+            with mock.patch.dict(os.environ, {'CODEX_MODEL': model}):
+                reports.append(helper.diagnose_queue(self.project))
+        self.assertEqual(reports[0], reports[1]); self.assertEqual(reports[1], reports[2])
+        self.assertEqual(before, path.read_bytes())
+
+    def test_doctor_reports_prebinding_terminal_and_corrupt_record(self) -> None:
+        self.prebinding_block()
+        self.assertEqual(helper.diagnose_queue(self.project)['diagnosis'], 'PREPRODUCTION_USER_ACTION_REQUIRED')
+        self.sync([], armed=None, next_eligible=None, shelf_state='ALL_BLOCKED')
+        self.assertEqual(helper.diagnose_queue(self.project)['diagnosis'], 'TERMINAL_QUEUE')
+        helper.queue_runtime_path(self.project).write_text('corrupt')
+        report = helper.diagnose_queue(self.project)
+        self.assertEqual(report['diagnosis'], 'INVALID_QUEUE_RECORD')
+        self.assertFalse(report['exit_gate']['ok'])
 
 
 if __name__ == '__main__':

@@ -5,12 +5,12 @@
     {
       "source": "codex-skills/seedance-prompt-en/SKILL.md",
       "target": ".codex/skills/seedance-prompt-en/SKILL.md",
-      "sha256": "de7d392511496ca3acc26efd0fe5db2c547e1cb5757498cd2dccb7288c70decc"
+      "sha256": "3c2870f3f22bd1dd786d0bc76121855b5b17d2c0eea5bf8c29c4877e94793837"
     },
     {
       "source": "codex-skills/seedance-prompt-en/aside-operator.md",
       "target": ".codex/skills/seedance-prompt-en/aside-operator.md",
-      "sha256": "c403edbd084d8572af8ede075f56f0d692246a759f410900985f283d6752e8c3"
+      "sha256": "73eda7886f746601f9adf3379aebba14b6211daa1c449d5a594bdc3381da78e4"
     },
     {
       "source": "codex-skills/seedance-prompt-en/hell-grind-production-prompting-adapter.md",
@@ -35,7 +35,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/scripts/runway_ui_helper.py",
       "target": ".codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py",
-      "sha256": "8befadcdea94262601401f148c1282305165d33935bb4cb308090922dd02ac36"
+      "sha256": "744ee8c62be87072b6a784c906f08e4a70832dcb798c320592f9bdce99684d1e"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-field-lessons.md",
@@ -45,7 +45,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/seedance-production.md",
       "target": ".codex/skills/seedance-prompt-en/seedance-production.md",
-      "sha256": "1d679aea4ece77bf9a49c98037837e66ebbdddbd289ae631d33726c7012fd09c"
+      "sha256": "60c4488b7dae4779c40e7273a311475328b9ade3e6ce13bc41fa2cd894db4bb5"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-prompting.md",
@@ -195,7 +195,7 @@
     {
       "source": "runtime/scripts/video_codex_runtime.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/video_codex_runtime.py",
-      "sha256": "fa172ee539858d0ff423616b5339db9e2567f7b31ffa3ac33d45630706cceda6"
+      "sha256": "f9736dbdd50100aadd489f1c21226a9d29abb31f66bc37c9234f869ddf8dafca"
     },
     {
       "source": "runtime/scripts/video_knowledge_router.py",
@@ -255,7 +255,7 @@
     {
       "source": "runtime/templates/shared_lane_contract.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/shared_lane_contract.md",
-      "sha256": "700ea29e600050ae96b4391776d55b3e03baf6194586fcfea1bd7b6ae4906005"
+      "sha256": "5e14b6d740ffd990d29a6b39b0571d46c299756d2f60158090450b747d25df94"
     },
     {
       "source": "runtime/templates/visual.md",
@@ -270,7 +270,7 @@
     {
       "source": "runtime/AGENTS.md",
       "target": "Documents/Codex/video-team-runtime/AGENTS.md",
-      "sha256": "076655a08e81d343d924680f9b55f95dee2dc6ab50d7a0bb04187a23cd1144b5"
+      "sha256": "b7bbc6e8b4a4399de5201e74705d8de29f1a34c1980138cc1534617c5954fea3"
     },
     {
       "source": "references/character_sheet_prompt_standard.md",

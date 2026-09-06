@@ -8,9 +8,11 @@ upload input, API generation, extra owner or background observer.
 The selected version helper consumes this contract; 2.5 does not fork it.
 
 1. Read current project state, selected version, attested pack and current board.
-2. List existing tabs with the read-only command below. Match the exact Runway
-   session to the project's checkpoint. If no authoritative match exists, do
-   not guess by title or the front tab; request the intended session from user.
+2. List existing tabs with the read-only command below. For a resumed project,
+   match the exact Runway session to its checkpoint; a missing/ambiguous match
+   requires user selection, never a title/front-tab guess. For a genuinely new
+   unsubmitted project, follow the bounded bootstrap below instead of asking
+   routine permission to create a private session.
 3. Bind the exact existing target. Binding stores only project-local metadata;
    it never opens a session or changes provider state.
 
@@ -32,6 +34,22 @@ The bridge re-lists tabs, requires exactly one matching session and target,
 attaches only that target, rechecks URL, and checks location again in the DOM
 callback. A switched/missing/duplicated session fails closed. There is no
 front-tab fallback and no Apple Events JavaScript requirement.
+
+### New-project bootstrap is routine, not a new browser owner
+
+Only before any binding, checkpoint, accepted/uncertain Generate or project queue:
+- Use the sole existing authenticated Aside Runway tab by observed exact targetId.
+  Multiple possible tabs/accounts or an unreadable UI still require selection.
+- Inspect current board and composer. Do not navigate away from active jobs or
+  unsaved/uncertain work. Preserve the previous exact session URL and a minimal
+  composer/card checkpoint locally; do not erase, close or repurpose old media.
+- If visibly idle and the prior session is safely retained, use the actual
+  visible new-session control in that same tab for the requested new project.
+  This needs no extra routine confirmation; it is not permission for a new tab,
+  account switch, credit purchase, public upload or additional agent.
+- Verify the new exact URL and empty session, register its project ownership,
+  then bind/checkpoint normally before attaching anything. A failed or uncertain
+  action is observed once before recovery, never blindly repeated.
 
 ## B. Observe → act once → verify, for each block
 
@@ -82,7 +100,7 @@ wake, deck/prompt/model change invalidates the prior visual preflight.
   stop that control operation. Never try a bypass or another account/browser.
 - Record outcome/evidence and next step in project `status.json` / `result.md`.
   Redact prompt bodies, account URLs and unrelated browser data from release logs.
-- Before any binding or Generate, a missing intended session is a preproduction
+- Before any binding or Generate, unresolved session ambiguity or unsafe bootstrap is a preproduction
   user-action block, not a queue. Record `production_started=false`, empty
   `provider_jobs`, all held `blocked_attested_blocks`, and `preproduction_block`
   with code `BLOCKED_RUNWAY_SESSION_SELECTION_REQUIRED`, evidence and the exact

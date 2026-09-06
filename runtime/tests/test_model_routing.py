@@ -104,6 +104,21 @@ class ModelRoutingTests(unittest.TestCase):
                         project=str(project), lanes=['director'], phase='auto',
                         approved_spawn=None, force=False))
 
+    def test_next_prefers_same_owner_without_automatic_model_switch(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            out = io.StringIO()
+            with mock.patch.object(video_codex_runtime.lane_gates, 'next_actions',
+                                   return_value={'next_lanes': ['seedance']}), \
+                    mock.patch.object(video_codex_runtime, 'seedance_phase', return_value='production'), \
+                    contextlib.redirect_stdout(out):
+                video_codex_runtime.next_cmd(SimpleNamespace(project=td))
+            value = json.loads(out.getvalue())
+            self.assertEqual(value['default_execution']['action'], 'CONTINUE_IN_CURRENT_CONVERSATION')
+            self.assertFalse(value['default_execution']['new_approval_for_role_change'])
+            self.assertFalse(value['default_execution']['automatic_model_switch'])
+            self.assertTrue(value['next_dispatch'][0]['dispatch_requires_explicit_action'])
+            self.assertEqual(value['next_dispatch'][0]['required_spawn_approval'], 'seedance:production')
+
 
 if __name__ == '__main__':
     unittest.main()

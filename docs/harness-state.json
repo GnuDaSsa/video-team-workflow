@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Allow truthful user-action stop before any production binding, without weakening active queue continuation.",
+  "currentGoal": "Remove routine approval friction and distinguish foreground wait from real scheduled execution across models.",
   "status": "complete",
-  "currentContract": "docs/contracts/2026-09-06-preproduction-stop.md",
+  "currentContract": "docs/contracts/2026-09-06-routine-flow-and-wait-diagnostics.md",
   "blockers": [],
-  "nextStep": "Current romance project is waiting for the intended same-tab Runway session. Resume real generation after user selection; prompts/media are ready, no Generate occurred.",
-  "lastUpdated": "2026-09-06T15:04:08.874902+09:00",
+  "nextStep": "Use current-owner next/default_execution and queue-doctor. Romance cycle READY_FOR_PRODUCTION; no routine new-session permission hold. Specific new owner/scheduler approvals remain; no scheduled route installed.",
+  "lastUpdated": "2026-09-06T17:11:46.041314+09:00",
   "verification": {
-    "lastCommand": "105 unit tests; runtime/helper py_compile; zsh -n; strict 66-file release preflight/apply/check; git diff --check",
+    "lastCommand": "110 unit tests; runtime/helper py_compile; zsh -n; 2.012s real synthetic exec/write_stdin/wake-consumption test; strict 66-file release check; git diff --check",
     "lastResult": "PASS",
-    "notes": "Four new regression methods cover prebinding human-action stop, corrupt or existing production evidence, missing explicit status, and active queue non-bypass. No fake queue observation is written."
+    "notes": "Code and documentation corrections only. Historical paused 5m Luna cron untouched; no agents, scheduler, provider/browser mutation or real model A/B run. Wiki pointers and project readiness corrected. Current project next resolves seedance:production with user_actions_required=[]; full project validate correctly remains STOPPED_INCOMPLETE because the requested media cycle has not run."
   },
   "recentCloseouts": [
     {

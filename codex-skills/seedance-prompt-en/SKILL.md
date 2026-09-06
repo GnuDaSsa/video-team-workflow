@@ -23,6 +23,7 @@ One Seedance lane performs two sequential phases; they are not separate agents:
    In a v4 video-team project with knowledge routing enabled, first run `video-codex-runtime knowledge-select --project <p> --block <BLOCK>` and read only its bounded context packet. Do not read the whole wiki.
    Within creative knowledge, apply the packet's `higgsfield-community-*` selections before general camera inspiration. User instructions, project/identity/medium locks, and this skill's operational gates still rank higher.
 3. For Aside/Runway attachment, Generate, same-task queue resume, download, registry ingest, or `ffprobe`, read `seedance-production.md`.
+   Use its read-only `queue-doctor` at resume/model changes to distinguish an attached foreground wait, an orphaned timer, unconsumed wake, and actual app scheduling. Model names and timer files do not prove monitoring capability.
    The canonical executable is `scripts/runway_ui_helper.py` inside this skill. Video-team runtimes may keep a compatibility shim, but must not own or fork Runway UI/recovery logic.
 4. When both are requested, finish and attest the prompting package first, then continue in the same lane to production. Do not rewrite prompts during UI execution; return to the authoring phase if revision is required.
 5. Apply `prompt-review.md` as a same-owner compile/review checklist. It replaces the retired Creative team surface; it does not spawn roles.

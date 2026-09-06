@@ -27,6 +27,7 @@ Commands:
   queue-cycle --project P                sync once and immediately hold when the reducer requires a wait
   queue-wait --project P                 hold one bounded 15-minute foreground tool session
   queue-exit-check --project P           refuse a final response while the queue cycle is nonterminal
+  queue-doctor --project P               read-only wait/receipt diagnosis; never starts monitoring
   resume-contract --project P            write state for that foreground wait; never schedules Codex
   recover                                focus-pollution ritual step: ESC + frontmost report
 
@@ -2117,6 +2118,87 @@ def cmd_queue_exit_check(args) -> int:
     return 0 if result['ok'] else 1
 
 
+def diagnose_queue(project: Path) -> dict:
+    """Model-independent observation of local continuation evidence, not a watcher.
+
+    A live PID proves only a process, not attachment to an owning Codex tool
+    session. No scheduler/tool/model availability is inferred from JSON text.
+    """
+    project = project.expanduser().resolve()
+    path = queue_runtime_path(project)
+    runtime = _json_file(path)
+    wake = runtime.get('wake') if isinstance(runtime.get('wake'), dict) else {}
+    exit_gate = evaluate_queue_exit(project)
+    next_action = exit_gate.get('next_action') or 'No remaining queue action.'
+    fresh_board = False
+    if not path.exists():
+        state = ('PREPRODUCTION_USER_ACTION_REQUIRED' if exit_gate.get('ok')
+                 else 'NO_QUEUE_OBSERVATION')
+        if state == 'NO_QUEUE_OBSERVATION':
+            next_action = 'Verify intended session, read its visible board, then queue-cycle; a resume contract alone starts nothing.'
+            fresh_board = True
+    elif runtime.get('contract_version') != QUEUE_RUNTIME_VERSION:
+        state = 'INVALID_QUEUE_RECORD'
+        next_action = 'Preserve the invalid record and recover from the exact visible board; do not claim any watcher is running.'
+        fresh_board = True
+    elif wake.get('pending'):
+        if _pid_running(wake.get('wait_pid')):
+            state = 'WAIT_PROCESS_ALIVE'
+            next_action = 'Keep the owning exec tool session attached with write_stdin until completion. wait_pid is NOT a tool session_id. Do not start a second wait or finish the turn.'
+        else:
+            state = 'BROKEN_FOREGROUND_CONTINUATION'
+            next_action = 'Record the lost wait/tool session, re-read the exact board in the owning task and recover. A dead wait PID cannot wake a model.'
+            fresh_board = True
+    elif _wait_elapsed_unconsumed(wake):
+        state = 'WAIT_ELAPSED_UNCONSUMED'
+        next_action = 'Read the exact visible board now, then queue-cycle --from-wake with fresh jobs/shelf/settings. Do not sleep again first.'
+        fresh_board = True
+    elif exit_gate.get('ok'):
+        state = 'TERMINAL_QUEUE'
+    elif runtime.get('wake_required'):
+        state = 'REQUIRED_WAIT_NOT_STARTED'
+        next_action = 'Read the visible board and use queue-cycle, not separate queue-sync/queue-wait. Keep its yielded exec session attached.'
+        fresh_board = True
+    else:
+        state = 'ACTION_REQUIRED_NOW'
+        next_action = str(runtime.get('next_action') or next_action)
+        fresh_board = True
+    return {
+        'ok': True, 'read_only': True, 'project': str(project),
+        'diagnosis': state, 'continuation_mode': 'FOREGROUND_TOOL_LONG_POLL_ONLY',
+        'interval_seconds': WAKE_DELAY_SECONDS,
+        'scheduler_created': False, 'automatic_model_reentry': False,
+        'model_specific_branch': False,
+        'helper_path': str(Path(__file__).resolve()),
+        'helper_sha256': media_registry.sha256(Path(__file__)),
+        'queue_record_exists': path.exists(),
+        'resume_contract_exists': resume_contract_path(project).exists(),
+        'queue_verdict': runtime.get('verdict'),
+        'active_count': runtime.get('active_count'),
+        'settled_backlog_count': runtime.get('settled_backlog_count'),
+        'wait_pid': wake.get('wait_pid'), 'due_at': wake.get('due_at'),
+        'elapsed_count': wake.get('elapsed_count', 0),
+        'consumed_count': wake.get('consumed_count', 0),
+        'fresh_board_required': fresh_board,
+        'exit_gate': exit_gate, 'next_action': next_action,
+        'limitations': [
+            'Local evidence only; no current provider/UI observation.',
+            'No proof of owning tool-session attachment from a PID alone.',
+            'Native scheduled tasks require separate app-tool registration and actual run evidence.',
+        ],
+    }
+
+
+def cmd_queue_doctor(args) -> int:
+    try:
+        result = diagnose_queue(Path(args.project))
+    except (ValueError, OSError) as exc:
+        print(json.dumps({'ok': False, 'error': str(exc)}, ensure_ascii=False))
+        return 1
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0
+
+
 def cmd_check_generate(args) -> int:
     st = read_generate_state()
     evidence(args, 'check-generate', 'read visible button color via CSS', json.dumps(st, ensure_ascii=False), st['verdict'])
@@ -2241,6 +2323,9 @@ def main() -> int:
         help='fail closed before a final response unless queue_runtime may_stop=true')
     p.add_argument('--project', required=True)
     p.set_defaults(fn=cmd_queue_exit_check)
+    p = sub.add_parser('queue-doctor', help='read-only model-independent continuation diagnosis; creates no watcher')
+    p.add_argument('--project', required=True)
+    p.set_defaults(fn=cmd_queue_doctor)
     p = sub.add_parser(
         'resume-contract',
         help='write state for one foreground wait; this does not schedule or wake Codex')

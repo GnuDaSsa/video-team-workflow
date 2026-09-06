@@ -43,7 +43,14 @@ flowchart TD
 4. 이미지 QC, Seedance, Seedance QC, 편집, 패키징은 모두 직렬이다.
 5. 프로바이더 기본값은 Seedance다. Grok I2V는 사용자가 해당 프로젝트에서 명시했을 때만 같은 직렬 레일 안에서 사용한다. 프로바이더 병렬은 금지한다.
 6. 임의 subagent, 전담 프롬프트 agent, 백그라운드 daemon, cron, heartbeat, 두 번째 브라우저 자동화 루프를 만들지 않는다.
-7. 모든 Codex lane dispatch는 현재 대화의 해당 spawn 승인을 요구하며, runtime은 `--approved-spawn <lane>:<phase>`가 정확히 일치하지 않으면 거부한다. 승인 없이 다음 phase를 자동 시작하지 않는다.
+7. 별도 Codex owner를 만드는 lane dispatch는 현재 대화의 해당 spawn 승인을 요구하며, runtime은 `--approved-spawn <lane>:<phase>`가 정확히 일치하지 않으면 거부한다. **같은 owner가 다음 lane/phase의 책임을 이어받는 것은 dispatch/spawn이 아니며 추가 승인을 묻지 않는다.** `next`의 `default_execution`이 기본이고 `next_dispatch`는 승인된 별도 owner 생성에만 쓰는 호환 정보다.
+
+### 1.0a 불필요한 확인 금지
+
+- 사용자가 요청한 프로젝트 범위의 프롬프트 작성·검수, 승인 참조의 비공개 생성 입력, 설정 확인, Generate, 다운로드, 재시도 규칙 안의 수정, QC, 로컬 CapCut 편집·export는 같은 owner가 이어간다. 다음 컷이나 단계마다 “진행할까요?”를 묻지 않는다.
+- Seedance의 같은-turn foreground wait는 매 15분마다 새 승인을 받는 작업이 아니다. 대기와 실제 예약의 구분·진단은 선택된 Seedance skill이 소유한다.
+- 별도 실행자/실제 scheduler를 처음 생성하는 승인과 결제·로그인·공개 게시·외부 제출·개인정보·비가역 삭제 gate는 그대로다. 역할 표나 포괄적 자동화 선호를 개별 spawn 승인으로 바꾸지 않는다.
+- safe same-tab 새 프로젝트 세션 준비는 Seedance `aside-operator.md`의 구체적 보존·확인 조건을 따른다. 이 파일은 UI 절차를 복제하지 않는다.
 
 ### 1.0 입력 증거 게이트
 

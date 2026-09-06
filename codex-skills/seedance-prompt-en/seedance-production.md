@@ -49,6 +49,15 @@ Do not repeatedly try a failed control or switch browser to escape the block.
 
 ## One queue controller, same-turn continuation
 
+Start/resume, a model change, or a disputed "monitor is running" claim first
+uses `queue-doctor --project <p>`. This read-only command reports the canonical
+helper hash, queue/timer/elapsed-consumption evidence and next action without
+opening a browser, waiting, writing state or starting a scheduler. A live wait
+PID is not proof that the owning exec tool session remains attached; never pass
+that PID as a `write_stdin` session ID. The same state uses the same controller
+under Luna, Terra or Astra. Record actual missing-tool/permission/version/session
+evidence instead of diagnosing a model limitation from its name.
+
 After every accepted/changed/completed card, use **`queue-cycle`**, not separate
 discretionary `queue-sync` / `queue-wait` steps. Inputs must describe the current
 visible board, not a stale status file. `queue_runtime.json` is its continuation
@@ -67,6 +76,7 @@ record. A `resume-contract` file does not schedule or wake Codex.
   download/verification/registry, so settled cards cannot block refill forever.
 - `queue-cycle` checkpoints and enters its bounded 900-second foreground wait
   when required. Only one pending wait, existing turn and existing board.
+  Repeating that authorized same-owner wait does not require another approval.
   If the shell yields `session_id`, keep that exact process attached with
   `write_stdin` until it returns `WAIT_ELAPSED_RECHECK_BOARD_NOW`.
 - Re-read the visible board, then `queue-cycle --from-wake`; only this consumes
@@ -82,6 +92,24 @@ record. A `resume-contract` file does not schedule or wake Codex.
 - Before final response run `queue-exit-check --project <p>` and obey it.
   `SHELF_EXHAUSTED` / `ALL_REMAINING_BLOCKED` requires empty active/backlog;
   otherwise only explicit external stall/interruption can end continuation.
+
+### A timer is not a scheduled task
+
+`queue-cycle`, `queue-wait`, `resume-contract`, a CLI PID and a promised next-check
+time are not app scheduler registrations. Never call them a 15–20 minute booking
+or claim they will wake a future model turn. This production controller remains
+foreground-only; changing models does not convert it into a scheduler.
+
+A real recurring follow-up is a separate app capability and an additional
+surface governed by the specific spawn-approval gate. After that specific
+approval, only the app's native automation tool may register it; default to the
+current-task heartbeat, not a standalone cron or handwritten configuration.
+Inspect an existing matching task before creating another. Report exact task
+identity, active/paused state, accepted cadence, destination and run evidence;
+unknown/missing fields stay unverified. Registration is not proof of successful
+first execution or browser access. Do not auto-reactivate an unrelated old cron,
+fork a browser loop, or layer a scheduled observer over a live foreground owner.
+No scheduled production-continuation mode is implemented by this CLI.
 
 ## Download and completion
 

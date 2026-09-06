@@ -69,3 +69,8 @@ Use this file for durable context that should survive across threads.
 
 - A newly attested project without an intended Runway session may stop for explicit human selection before binding. The queue checker now permits only a fully evidenced unstarted state with no queue/binding/recovery/preflight artifacts. Corrupt queue files and active or uncertain production still require normal recovery/continuation. The branch never invents a visible-board observation.
 - Canonical code and four negative/positive test methods enforce this boundary; see docs/contracts/2026-09-06-preproduction-stop.md.
+
+## Routine flow and truthful monitoring
+
+- User corrected repeated production approvals and model-dependent monitoring claims. Runtime next now prefers the current owner, not optional new-owner dispatch. Routine role changes, safe same-tab fresh-session preparation and repeated foreground waits need no repeated confirmation; specific new surface and high-impact approvals remain.
+- Canonical queue-doctor distinguishes absent queue, contract-only promises, live/dead wait processes and unconsumed wakes without creating any watcher. The old paused five-minute cron was not restarted; no 15-20 minute scheduled continuation is claimed. See docs/releases/2026-09-06/continuation-reliability.md.
