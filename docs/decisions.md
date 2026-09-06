@@ -116,3 +116,7 @@ Record notable technical or product decisions here so they do not live only in c
 
 - User corrected repeated production approvals and model-dependent monitoring claims. Runtime next now prefers the current owner, not optional new-owner dispatch. Routine role changes, safe same-tab fresh-session preparation and repeated foreground waits need no repeated confirmation; specific new surface and high-impact approvals remain.
 - Canonical queue-doctor distinguishes absent queue, contract-only promises, live/dead wait processes and unconsumed wakes without creating any watcher. The old paused five-minute cron was not restarted; no 15-20 minute scheduled continuation is claimed. See docs/releases/2026-09-06/continuation-reliability.md.
+
+## Scheduled intent takes priority over legacy waiting
+
+Explicit scheduled-check intent is persisted in the canonical Seedance helper before draining a queue. Scheduled queue-cycle checkpoints once and returns; direct foreground wait is rejected. This local selection is not an automation registration or spawn approval. Native app registration and first-run evidence remain separate. Exit now requires a justified terminal, evidenced interruption or scheduled checkpoint, not merely may_stop=true. Scope and verified limitations: docs/releases/2026-09-07/cycle-audit.md.

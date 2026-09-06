@@ -28,6 +28,7 @@ Commands:
   queue-wait --project P                 hold one bounded 15-minute foreground tool session
   queue-exit-check --project P           refuse a final response while the queue cycle is nonterminal
   queue-doctor --project P               read-only wait/receipt diagnosis; never starts monitoring
+  queue-mode --project P --mode scheduled --request-evidence F   persist intent, never register a scheduler
   resume-contract --project P            write state for that foreground wait; never schedules Codex
   recover                                focus-pollution ritual step: ESC + frontmost report
 
@@ -41,6 +42,7 @@ import datetime as dt
 import json
 import os
 import re
+import sqlite3
 import subprocess
 import sys
 import time
@@ -1931,6 +1933,8 @@ def run_bounded_queue_wake(
     debt until queue-cycle --from-wake records a fresh visible-board observation.
     """
     project = project.expanduser().resolve()
+    if read_queue_mode(project)['mode'] == 'scheduled':
+        raise ValueError('SCHEDULED_MODE_FORBIDS_FOREGROUND_WAIT: use one native scheduled check, not sleep')
     path = queue_runtime_path(project)
     runtime = _json_file(path)
     if runtime.get('contract_version') != QUEUE_RUNTIME_VERSION:
@@ -2045,14 +2049,22 @@ def run_queue_cycle(
     delay_seconds: int = WAKE_DELAY_SECONDS,
     **sync_kwargs,
 ) -> dict:
-    """Checkpoint one visible board and immediately hold if waiting is required.
+    """Checkpoint one visible board using the persisted continuation choice.
 
     This removes the discretionary gap between ``queue-sync`` and
-    ``queue-wait``.  It is still one foreground tool call, never a scheduler or
-    resident observer.  A returned elapsed wait still requires a fresh visible
-    board read in the owning Codex turn.
+    ``queue-wait`` in foreground mode. Scheduled checks return without sleep;
+    neither path creates a scheduler. An elapsed foreground wait still requires
+    a fresh visible board read in the owning Codex turn.
     """
+    mode = read_queue_mode(project)
     runtime = sync_queue_runtime(project, jobs, **sync_kwargs)
+    if mode['mode'] == 'scheduled':
+        return {
+            'ok': True, 'verdict': 'SCHEDULED_CHECKPOINT_NO_WAIT',
+            'wait_started': False, 'scheduler_created': False,
+            'registration_verified': False, 'queue_runtime': runtime,
+            'next_action': 'Inspect native app registration/run evidence; this call only checkpoints one observation. Never start a foreground wait.',
+        }
     if not runtime.get('wake_required'):
         return {
             'ok': True,
@@ -2070,6 +2082,129 @@ def run_queue_cycle(
         'queue_runtime': runtime,
         'wait_result': wait_result,
     }
+
+
+def queue_mode_path(project: Path) -> Path:
+    return Path(_project_seedance_sources(project)['metadata_dir']) / 'continuation_mode.json'
+
+
+def read_queue_mode(project: Path) -> dict:
+    """A user-intent checkpoint, never an automation registration receipt."""
+    path = queue_mode_path(project)
+    if not path.exists():
+        monitoring = _json_file(path.with_name('status.json')).get('monitoring') or {}
+        if str(monitoring.get('mode', '')).startswith('SCHEDULED'):
+            raise ValueError('QUEUE_SCHEDULED_REQUEST_REQUIRES_MODE_CHECKPOINT: do not fall back to foreground')
+        return {'mode': 'foreground', 'interval_minutes': 15, 'source': 'legacy_default'}
+    value = _json_file(path)
+    if (value.get('mode') not in {'foreground', 'scheduled'}
+            or value.get('project') != str(project.expanduser().resolve())
+            or value.get('interval_minutes') not in {15, 20}):
+        raise ValueError('QUEUE_MODE_INVALID: repair explicit selection; never fall back to sleep')
+    evidence = Path(value.get('request_evidence') or '').resolve()
+    if (not evidence.is_relative_to(project.expanduser().resolve())
+            or not evidence.is_file() or not evidence.stat().st_size
+            or media_registry.sha256(evidence) != value.get('request_evidence_sha256')):
+        raise ValueError('QUEUE_MODE_EVIDENCE_CHANGED_OR_MISSING')
+    return value
+
+
+def select_queue_mode(project: Path, mode: str, evidence: Path, interval_minutes: int = 20) -> dict:
+    project = project.expanduser().resolve()
+    if mode not in {'foreground', 'scheduled'} or interval_minutes not in {15, 20}:
+        raise ValueError('QUEUE_MODE_OR_INTERVAL_INVALID')
+    evidence = evidence.expanduser().resolve()
+    if not evidence.is_relative_to(project) or not evidence.is_file() or not evidence.stat().st_size:
+        raise ValueError('QUEUE_MODE_PROJECT_USER_REQUEST_EVIDENCE_REQUIRED')
+    wake = (_json_file(queue_runtime_path(project)).get('wake') or {})
+    if wake.get('pending') and _pid_running(wake.get('wait_pid')):
+        raise ValueError('QUEUE_FOREGROUND_WAIT_STILL_RUNNING: stop and consume the owning tool session first')
+    value = {
+        'project': str(project), 'mode': mode,
+        'interval_minutes': interval_minutes if mode == 'scheduled' else 15,
+        'request_evidence': str(evidence), 'request_evidence_sha256': media_registry.sha256(evidence),
+        'selected_at': dt.datetime.now().astimezone().isoformat(timespec='seconds'),
+        'scheduler_created': False, 'registration_verified': False,
+    }
+    _write_json_atomic(queue_mode_path(project), value)
+    return value
+
+
+def audit_production_state(project: Path) -> dict:
+    """Read-only consistency check, not a replacement for GUI, ffprobe or playback QC."""
+    project = project.expanduser().resolve()
+    metadata = Path(_project_seedance_sources(project)['metadata_dir'])
+    queue = _json_file(queue_runtime_path(project))
+    documents = {name: _json_file(path) for name, path in {
+        'state': project / 'state.json', 'manifest': project / 'manifest.json',
+        'lane': metadata / 'status.json', 'qc': project / 'lanes/seedance_qc/status.json',
+    }.items()}
+    issues = []
+    expected = {str(j['scene_id']): j['visible_state'] for j in queue.get('jobs', [])}
+    for name in ('state', 'manifest', 'lane', 'qc'):
+        doc = documents[name]
+        reported = {str(j.get('block_id') or j.get('scene_id')): j.get('visible_state')
+                    for j in doc.get('provider_jobs', [])}
+        if name != 'qc' and expected and reported != expected:
+            issues.append(f'QUEUE_JOB_STATE_MISMATCH:{name}')
+        blocker = doc.get('blocker') or {}
+        code = blocker.get('code', '') if isinstance(blocker, dict) else str(blocker)
+        if (expected and queue.get('shelf_state') == 'EXHAUSTED'
+                and ('NATIVE_FILE' in code or 'NATIVE_CONTROL' in code)):
+            issues.append(f'STALE_PRE_GENERATION_BLOCKER:{name}')
+    reported_statuses = [documents[n].get('lanes', {}).get('seedance', {}).get('status')
+                         for n in ('state', 'manifest')] + [documents['lane'].get('status')]
+    if len(set(filter(None, reported_statuses))) > 1:
+        issues.append('LANE_STATUS_ROLLUP_MISMATCH')
+    monitoring = documents['lane'].get('monitoring') or {}
+    def has_evidence(field):
+        value = monitoring.get(field)
+        if not isinstance(value, str) or not value:
+            return False
+        file = Path(value).expanduser().resolve()
+        return file.is_relative_to(project) and file.is_file() and file.stat().st_size > 0
+    if monitoring.get('scheduled_run_verified') and not monitoring.get('automation_id'):
+        issues.append('SCHEDULE_RUN_CLAIM_WITHOUT_AUTOMATION_ID')
+    if monitoring.get('scheduled_run_verified') and not has_evidence('first_run_evidence'):
+        issues.append('SCHEDULE_RUN_CLAIM_WITHOUT_RUN_EVIDENCE')
+    if str(monitoring.get('registration_status', '')).upper() in {'ACTIVE', 'REGISTERED'}:
+        if not monitoring.get('automation_id') or not has_evidence('registration_evidence'):
+            issues.append('SCHEDULE_REGISTRATION_CLAIM_WITHOUT_RECEIPT')
+    verified, approved = 0, 0
+    registry = media_registry.db_path(project)
+    if registry.is_file():
+        try:
+            with sqlite3.connect(registry.as_uri() + '?mode=ro', uri=True) as conn:
+                rows = conn.execute("SELECT current_path, sha256, state FROM assets WHERE kind='video' AND active=1").fetchall()
+            for filename, digest, state in rows:
+                file = Path(filename).resolve()
+                if (file.is_relative_to(project / 'media') and file.is_file()
+                        and file.stat().st_size > 0 and media_registry.sha256(file) == digest):
+                    verified += 1
+                    approved += state == 'approved'
+                else:
+                    issues.append('REGISTERED_VIDEO_MISSING_OR_CHANGED')
+        except sqlite3.Error:
+            issues.append('REGISTRY_UNREADABLE')
+    if 'DONE' in reported_statuses and not verified:
+        issues.append('PRODUCTION_DONE_WITHOUT_REGISTERED_VIDEO')
+    if documents['qc'].get('status') in {'DONE', 'PASS'} and not approved:
+        issues.append('QC_DONE_WITHOUT_APPROVED_VIDEO')
+    return {
+        'read_only': True, 'issues': sorted(set(issues)),
+        'ui_completed_cards': sum(j.get('visible_state') == 'COMPLETED' for j in queue.get('jobs', [])),
+        'verified_local_video_files': verified, 'approved_local_video_files': approved,
+        'reported_monitoring': monitoring, 'native_schedule_registration_verified_by_this_audit': False,
+        'playback_qc_verified_by_this_audit': False,
+    }
+
+
+def cmd_queue_mode(args) -> int:
+    try:
+        result = select_queue_mode(Path(args.project), args.mode, Path(args.request_evidence), args.interval_minutes)
+    except (OSError, ValueError) as exc:
+        print(json.dumps({'ok': False, 'error': str(exc)})); return 1
+    print(json.dumps({'ok': True, **result}, ensure_ascii=False, indent=2)); return 0
 
 
 def cmd_queue_cycle(args) -> int:
@@ -2176,7 +2311,27 @@ def evaluate_queue_exit(project: Path) -> dict:
             'next_action': 'Re-read the visible Runway board and run queue-cycle.',
         }
     wake = runtime.get('wake') if isinstance(runtime.get('wake'), dict) else {}
-    if runtime.get('may_stop') is True:
+    live_wait = wake.get('pending') and _pid_running(wake.get('wait_pid'))
+    mode = read_queue_mode(project)
+    if mode['mode'] == 'scheduled' and not live_wait and not _wait_elapsed_unconsumed(wake):
+        return {
+            'ok': True, 'verdict': 'QUEUE_EXIT_ALLOWED_SCHEDULED_CHECKPOINT',
+            'project': str(project), 'active_count': int(runtime.get('active_count') or 0),
+            'settled_backlog_count': int(runtime.get('settled_backlog_count') or 0),
+            'production_complete': False, 'registration_verified': False,
+            'next_action': 'Verify the native schedule separately; preserve outstanding download/QC work. This exit is not media completion.',
+        }
+    empty = not runtime.get('active_count') and not runtime.get('settled_backlog_count')
+    terminal = empty and runtime.get('verdict') in {'SHELF_EXHAUSTED', 'ALL_REMAINING_BLOCKED'}
+    stalled = (runtime.get('verdict') == 'BLOCKED_RUNWAY_QUEUE_STALLED'
+               and int(runtime.get('unchanged_in_queue_wakes') or 0) >= 3
+               and bool(runtime.get('inflight_jobs')) and not runtime.get('settled_backlog_count')
+               and all(j.get('visible_state') == 'IN_QUEUE' for j in runtime['inflight_jobs']))
+    interruption = runtime.get('interruption') or {}
+    interrupted = (runtime.get('verdict') == 'BROKEN_FOREGROUND_CONTINUATION'
+                   and interruption.get('code') == 'BROKEN_FOREGROUND_CONTINUATION'
+                   and bool(interruption.get('evidence')) and bool(interruption.get('at')))
+    if runtime.get('may_stop') is True and not live_wait and (terminal or stalled or interrupted):
         return {
             'ok': True,
             'verdict': 'QUEUE_EXIT_ALLOWED',
@@ -2211,7 +2366,10 @@ def evaluate_queue_exit(project: Path) -> dict:
 
 
 def cmd_queue_exit_check(args) -> int:
-    result = evaluate_queue_exit(Path(args.project))
+    try:
+        result = evaluate_queue_exit(Path(args.project))
+    except (OSError, ValueError) as exc:
+        print(json.dumps({'ok': False, 'error': str(exc)})); return 1
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0 if result['ok'] else 1
 
@@ -2261,10 +2419,18 @@ def diagnose_queue(project: Path) -> dict:
         state = 'ACTION_REQUIRED_NOW'
         next_action = str(runtime.get('next_action') or next_action)
         fresh_board = True
+    mode = read_queue_mode(project)
+    if mode['mode'] == 'scheduled' and not (wake.get('pending') and _pid_running(wake.get('wait_pid'))):
+        state = ('SCHEDULED_HANDOFF_RECHECK_REQUIRED' if _wait_elapsed_unconsumed(wake)
+                 else 'SCHEDULED_CHECK_SELECTED')
+        next_action = ('Read the exact board once and consume the interrupted wake with queue-cycle --from-wake; scheduled mode will not sleep.'
+                       if _wait_elapsed_unconsumed(wake) else
+                       'Inspect native app automation registration and last run. Local selection is not registration; do not restart foreground waiting.')
+        fresh_board = True
     return {
         'ok': True, 'read_only': True, 'project': str(project),
-        'diagnosis': state, 'continuation_mode': 'FOREGROUND_TOOL_LONG_POLL_ONLY',
-        'interval_seconds': WAKE_DELAY_SECONDS,
+        'diagnosis': state, 'continuation_mode': mode['mode'],
+        'interval_seconds': mode.get('interval_minutes', 15) * 60,
         'scheduler_created': False, 'automatic_model_reentry': False,
         'model_specific_branch': False,
         'helper_path': str(Path(__file__).resolve()),
@@ -2279,6 +2445,7 @@ def diagnose_queue(project: Path) -> dict:
         'consumed_count': wake.get('consumed_count', 0),
         'fresh_board_required': fresh_board,
         'exit_gate': exit_gate, 'next_action': next_action,
+        'state_audit': audit_production_state(project),
         'limitations': [
             'Local evidence only; no current provider/UI observation.',
             'No proof of owning tool-session attachment from a PID alone.',
@@ -2425,6 +2592,12 @@ def main() -> int:
     p = sub.add_parser('queue-doctor', help='read-only model-independent continuation diagnosis; creates no watcher')
     p.add_argument('--project', required=True)
     p.set_defaults(fn=cmd_queue_doctor)
+    p = sub.add_parser('queue-mode', help='persist explicit user continuation intent; does not create or approve a scheduler')
+    p.add_argument('--project', required=True)
+    p.add_argument('--mode', choices=['foreground', 'scheduled'], required=True)
+    p.add_argument('--request-evidence', required=True, help='nonempty project-local note of the actual user request')
+    p.add_argument('--interval-minutes', choices=[15, 20], type=int, default=20)
+    p.set_defaults(fn=cmd_queue_mode)
     p = sub.add_parser(
         'resume-contract',
         help='write state for one foreground wait; this does not schedule or wake Codex')

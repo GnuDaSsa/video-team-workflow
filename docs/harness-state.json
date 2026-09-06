@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Correct visible Lexical paragraph serialization without repasting or weakening exact prompt checks.",
+  "currentGoal": "Audit the real two-job cycle and make scheduled intent, truthful completion evidence and safe exit deterministic.",
   "status": "complete",
-  "currentContract": "docs/contracts/2026-09-07-lexical-visible-text.md",
+  "currentContract": "docs/contracts/2026-09-07-cycle-audit-scheduled-checks.md",
   "blockers": [],
-  "nextStep": "B01 accepted In queue after exact live readback without repaste. Continue B02 fill, then 2-slot queue/QC.",
-  "lastUpdated": "2026-09-07T06:14:36.288866+09:00",
+  "nextStep": "Workflow code/metadata audit complete. Inspect exact native automation ID/first-run receipt when available; download, ffprobe and playback QC of the two completed clips remain separate production work.",
+  "lastUpdated": "2026-09-07T07:28:18.133287+09:00",
   "verification": {
-    "lastCommand": "123 unit tests; Python compile; strict 66-file parity; live read-prompt --file B01 exact SHA equality; git diff --check",
-    "lastResult": "PASS_LIVE_NO_REPASTE",
-    "notes": "All-P DOM serializer preserves words, double spaces, deliberate blank paragraphs and inline line breaks. Read-only B01 matched immutable canonical SHA; no second paste. B01 accepted In queue. Video QC not yet run."
+    "lastCommand": "136 unit tests; Python compile; zsh -n deploy script; strict 66-file source/live parity; live scheduled checkpoint returns immediately; direct wait rejected; state audit before/after; git diff --check",
+    "lastResult": "PASS_WORKFLOW_AUDIT",
+    "notes": "13 new regressions preserve two slots and model-independent continuation. Four real stale-state issues reconciled to zero. No new agent/scheduler/provider action. Native schedule registration/run receipt, actual model UI A/B, downloads/ffprobe/playback/CapCut not verified."
   },
   "recentCloseouts": [
     {

@@ -47,7 +47,55 @@ requires current-conversation approval and a controller-authorized rung.
 Login/CAPTCHA/payment/account/OS permissions require an exact user action.
 Do not repeatedly try a failed control or switch browser to escape the block.
 
-## One queue controller, same-turn continuation
+## Continuation selection: scheduled means short scheduled checks
+
+The user's explicit scheduled-check request takes priority over the legacy
+foreground default. Record that request once in project evidence, then persist
+it before the first queue drain or on a changed preference:
+
+```bash
+python3 ~/.codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py queue-mode \
+  --project <p> --mode scheduled --interval-minutes 20 \
+  --request-evidence <project-local-user-request-note>
+```
+
+This command creates **no scheduler and grants no spawn approval**. The
+hash-bound selection survives model/turn changes. A live foreground wait must
+first be stopped and its owning tool result consumed. The next fresh board
+`queue-cycle --from-wake` clears any interrupted wake without sleeping.
+
+In scheduled mode, `queue-cycle` records one board observation and immediately
+returns `SCHEDULED_CHECKPOINT_NO_WAIT`. Direct `queue-wait` is rejected. Do not
+hand-edit queue flags to escape the foreground branch. A corrupt/changed mode
+receipt fails closed rather than falling back to a 15-minute sleep.
+
+Use the native app automation tool after the **specific surface approval**;
+inspect a matching existing automation before proposing/creating another.
+Prefer one current-task heartbeat, 15–20 minutes as requested. Do not revive an
+unrelated old cron, guess a task ID, write raw scheduler config, or run both
+foreground and scheduled owners. If only a proposal card is returned, record
+`PROPOSED`, not `ACTIVE`; do not repeatedly ask at each run after initial approval.
+
+Capture registration ID, accepted cadence, destination, active/paused state and
+native tool evidence separately from first-run evidence. Heartbeat model choice
+may inherit task settings; do not claim Luna execution from a routing table.
+A local mode file never proves registration, browser access or successful runs.
+
+Each approved scheduled run checks the same bound board **once**, checkpoints
+actual states, then exits quietly when unchanged. Report only meaningful state
+changes, completion/failure or required user action. Never call sleep, start a
+browser loop, add agents or re-submit accepted jobs. A live production owner or
+login/permission/CAPTCHA/account block means no competing UI action. At the
+schedule's declared completion condition, pause that exact automation and hand
+off the remaining download/QC work; scope expansion requires the appropriate
+approval. Provider `COMPLETED` is not downloaded or QC-passed media.
+
+`queue-doctor` also returns a read-only state audit: stale lane/queue rollups,
+unsupported scheduling claims and DONE-without-local-video evidence. It does
+not query the scheduler or certify playback. Fix active state in place from
+fresh evidence; keep historical failures in logs, not active blocker fields.
+
+## Foreground branch (only when selected)
 
 Start/resume, a model change, or a disputed "monitor is running" claim first
 uses `queue-doctor --project <p>`. This read-only command reports the canonical
@@ -58,7 +106,7 @@ that PID as a `write_stdin` session ID. The same state uses the same controller
 under Luna, Terra or Astra. Record actual missing-tool/permission/version/session
 evidence instead of diagnosing a model limitation from its name.
 
-After every accepted/changed/completed card, use **`queue-cycle`**, not separate
+In this foreground branch, after every accepted/changed/completed card, use **`queue-cycle`**, not separate
 discretionary `queue-sync` / `queue-wait` steps. Inputs must describe the current
 visible board, not a stale status file. `queue_runtime.json` is its continuation
 record. A `resume-contract` file does not schedule or wake Codex.
@@ -93,28 +141,20 @@ record. A `resume-contract` file does not schedule or wake Codex.
   `SHELF_EXHAUSTED` / `ALL_REMAINING_BLOCKED` requires empty active/backlog;
   otherwise only explicit external stall/interruption can end continuation.
 
-### A timer is not a scheduled task
+### Foreground is not scheduled
 
-`queue-cycle`, `queue-wait`, `resume-contract`, a CLI PID and a promised next-check
-time are not app scheduler registrations. Never call them a 15–20 minute booking
-or claim they will wake a future model turn. This production controller remains
-foreground-only; changing models does not convert it into a scheduler.
-
-A real recurring follow-up is a separate app capability and an additional
-surface governed by the specific spawn-approval gate. After that specific
-approval, only the app's native automation tool may register it; default to the
-current-task heartbeat, not a standalone cron or handwritten configuration.
-Inspect an existing matching task before creating another. Report exact task
-identity, active/paused state, accepted cadence, destination and run evidence;
-unknown/missing fields stay unverified. Registration is not proof of successful
-first execution or browser access. Do not auto-reactivate an unrelated old cron,
-fork a browser loop, or layer a scheduled observer over a live foreground owner.
-No scheduled production-continuation mode is implemented by this CLI.
+The foreground helper never registers a future task. Use the continuation
+selection section above for actual app scheduling; do not substitute this loop
+when the user requested scheduled checks.
 
 ## Download and completion
 
 Download the exact matching output from the same board. Verify path, bytes,
 SHA-256, duration, container/codec, dimensions, frame rate and audio presence.
+Provider filenames may share the same style-lock prefix; do not map outputs by
+filename alone. Preserve card-to-block evidence (provider asset ID when exposed,
+or verified same-session card lineage) before renaming local files. Never call a
+local prompt fingerprint a provider UUID.
 V4 media is ingested into `media/06_videos_candidates_영상후보/` and registered
 before processed acknowledgement and Seedance QC handoff. A card without a
 verified file remains `UI_ONLY_NOT_DOWNLOADED`.

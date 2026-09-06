@@ -108,7 +108,9 @@ to 2.0 during recovery. Resume the same slot in the same session.
   one-slot evidence.
 - After every accepted, changed, or completed card, use the adapter's
   `queue-cycle` with the visible board observation. It remains the shared atomic
-  checkpoint + same-turn foreground-wait controller.
+  checkpoint controller. Continuation selection is shared with the 2.0 production
+  document: persisted scheduled mode checkpoints once without sleeping; only
+  selected foreground mode waits. Use the 2.5 adapter for the same commands.
 - A foreground wait is not a scheduler. If the shell yields a session ID, keep
   that exact session attached until it exits, visibly re-read the board, and
   consume the wake in the same turn.

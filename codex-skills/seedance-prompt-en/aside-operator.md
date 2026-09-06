@@ -78,6 +78,10 @@ repeated immediately before input; an unrelated dialog or changed tab fails clos
 verified native ListView without keys or clipboard input; it therefore does not depend
 on an English IME. A changed layout, duplicate/missing row or unapplied selection fails
 closed. Re-read the native Open button and actual uploaded thumbnail before proceeding.
+A short locator timeout after Open is not an upload failure: observe the same
+slot again without replaying Open/upload. Capture enlarged content only after
+image decode **and visible overlay rendering** settle; a blank screenshot is not
+verification even when the image reports loaded.
 This does not override the current controller's UI-technology or permission gates.
 Verify the actual chooser before/after native input: no software check can make
 OS focus atomic with a user's simultaneous click. A focus change means stop the

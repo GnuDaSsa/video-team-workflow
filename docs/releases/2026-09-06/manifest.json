@@ -5,12 +5,12 @@
     {
       "source": "codex-skills/seedance-prompt-en/SKILL.md",
       "target": ".codex/skills/seedance-prompt-en/SKILL.md",
-      "sha256": "3c2870f3f22bd1dd786d0bc76121855b5b17d2c0eea5bf8c29c4877e94793837"
+      "sha256": "4ebb3629983e04bb125aa5f3274a953f21a4f06e391d7972750f2f7989350693"
     },
     {
       "source": "codex-skills/seedance-prompt-en/aside-operator.md",
       "target": ".codex/skills/seedance-prompt-en/aside-operator.md",
-      "sha256": "8149ff958fd23469adb4c61dcc91d7259e7a098ad26fb77aeb9e7f8f36b9f72c"
+      "sha256": "603b9b1f55400c2bdc7624d880988765b68a0227e4adf649dbebdfa7d4fe17b0"
     },
     {
       "source": "codex-skills/seedance-prompt-en/hell-grind-production-prompting-adapter.md",
@@ -35,7 +35,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/scripts/runway_ui_helper.py",
       "target": ".codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py",
-      "sha256": "849fef151c94842fc64b20bb0dfddb7923f7dd83f53cd0c900a350335e2cec61"
+      "sha256": "f2525bc135d51dc8c28070d8615896c136c48d67ad6518227a78dc562d298e29"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-field-lessons.md",
@@ -45,7 +45,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/seedance-production.md",
       "target": ".codex/skills/seedance-prompt-en/seedance-production.md",
-      "sha256": "60c4488b7dae4779c40e7273a311475328b9ade3e6ce13bc41fa2cd894db4bb5"
+      "sha256": "207ef5ffb2a12ba11a2d808a99415478d4f6ad94e03134aa3324118a75d20138"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-prompting.md",
@@ -80,7 +80,7 @@
     {
       "source": "codex-skills/seedance25-prompt-en/production.md",
       "target": ".codex/skills/seedance25-prompt-en/production.md",
-      "sha256": "29839a3ab8b8acbf2a60d7fef4c1c36a1a7af0aa9416900d3a9f4d6f2ecc8cda"
+      "sha256": "e778ba2a83761cadedeb201841c71d9ba83876901fa33c8ac0afd173ecfc5be0"
     },
     {
       "source": "codex-skills/seedance25-prompt-en/prompting.md",

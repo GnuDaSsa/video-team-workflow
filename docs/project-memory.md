@@ -74,3 +74,7 @@ Use this file for durable context that should survive across threads.
 
 - User corrected repeated production approvals and model-dependent monitoring claims. Runtime next now prefers the current owner, not optional new-owner dispatch. Routine role changes, safe same-tab fresh-session preparation and repeated foreground waits need no repeated confirmation; specific new surface and high-impact approvals remain.
 - Canonical queue-doctor distinguishes absent queue, contract-only promises, live/dead wait processes and unconsumed wakes without creating any watcher. The old paused five-minute cron was not restarted; no 15-20 minute scheduled continuation is claimed. See docs/releases/2026-09-06/continuation-reliability.md.
+
+## Scheduled-check continuation
+
+When the user requests periodic scheduled checks, preserve that mode across model/turn changes through canonical queue-mode; do not silently substitute attached 15-minute waits. Never infer an active schedule from a proposal card or mode file, nor repeat initial approval at every run. Inspect existing native registration before creating another surface. queue-doctor also audits active rollups and unsupported DONE/schedule claims; its local file checks never certify scheduler access or playback QC. See the canonical Seedance production branch.
