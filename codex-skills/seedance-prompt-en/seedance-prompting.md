@@ -35,9 +35,9 @@ Measured on E24 (3,207 chars): `Scene ID`, `REFERENCE ROLES`, gate wording, `EXP
 | file paths, project names, status values | operational |
 | lists of banned characters | see Negatives below |
 
-**Do include:** the visible scene, what the subject does and shows, one camera move, physical motion, sound, how the 15 seconds are spent, and the closing frame.
+**Do include:** the visible scene, what the subject does and shows, one camera move, physical motion, sound, how the workflow-locked duration is spent, and the closing frame.
 
-All the metadata lives in the **handoff package**, a separate file. Keep `*_prompt.txt` prompt-only so pasting the whole file is always safe.
+All the metadata lives in the **handoff package**, a separate file. Keep `*_prompt.txt` prompt-only so pasting the whole file is always safe. Write it as UTF-8 NFC and treat that file—not browser typing—as the production prompt source of truth.
 
 ## Structure
 
@@ -45,8 +45,8 @@ All the metadata lives in the **handoff package**, a separate file. Keep `*_prom
 STYLE        medium, texture, lighting, colour        ┐
 CONTINUITY   identity, costume, props, spatial rules  ├ shared across the sequence;
 DIRECTION    camera grammar, pacing, sound character  ┘ do not rewrite per shot
-SHOT         the one event that happens in this cut   ← the only block that changes
-TIMING       how the 15 seconds are spent
+SHOT PLAN    one sustained event, or 2–4 planned scenes with timed edit-outs
+TIMING       how the locked duration is spent
 SOUND        what should be heard
 ```
 
@@ -56,7 +56,7 @@ A change of medium, character rules or camera grammar starts a new sequence — 
 
 - **One event.** Cause → contact → response, all visible.
 - Start from the visible composition of `@Image1`.
-- **One camera move.** Do not stack tricks into 15 seconds.
+- **One camera move.** Do not stack tricks into the locked duration.
 - 2–4 physical layers, and only where the cause is actually present in frame (steam, cloth, reflection, foreground occlusion, dust, vibration, focus breathing).
 - Specify the closing frame — stable enough for the next cut to take over.
 - Do not name emotions; show them. Not "he is sad" but "his gaze drops and his shoulders lower."
@@ -127,10 +127,12 @@ the handoff package with four items: `incoming_story_state`,
 
 ## Scene-density and cut-ownership gate
 
-When the user or project declares a provider scene budget—for example, two
-planned scenes in each 15-second clip—that instruction overrides the ordinary
-one-event default for every unsubmitted block. This is a prompt-complexity
-budget, not a claim about final edit duration.
+The workflow prefers a useful 15-second source. When the final video is short or
+cut-dense, the Planner groups 2–4 consecutive, causally related cuts into one
+`PLANNED_MULTI_SHOT_SOURCE` instead of shortening generation. A written scene
+plan may drive final-production multi-shot output in `GENERAL_REFERENCE_MODE`;
+reference attachment order still does not define story order. This is a source
+yield design, not a claim about final edit duration.
 
 - Create a cut-ownership ledger before authoring supplemental blocks.
 - Each cut ID may have only one active owner among queued, accepted, completed,
@@ -147,6 +149,7 @@ budget, not a claim about final edit duration.
   Seedance text-rendering scene.
 - Before attestation, record `covered_cuts`, the previous owner if any, the
   duplicate-check verdict, and retry state in the handoff package or ledger.
+- For multi-shot, record a contiguous 0–15s `scene_plan` with 2–4 entries. Each entry has unique covered cuts, relevant reference tokens, one action, one camera setup, and one edit-ready exit. The Korean prompt declares `15초 N숏` and names every `숏 1..N` with hard-cut grammar unless another transition is explicitly motivated.
 
 ## Sound
 
@@ -164,6 +167,14 @@ Do not attach a habitual list of prohibitions.
 
 ## References
 
+- Read `manifest.json.generation_mode` before building the reference package.
+- In `standard_i2v`, the approved per-cut source frame carries the scene and the
+  approved character sheet carries recurring-character identity.
+- In `no_i2v_reference_native`, do not request or attach a per-cut
+  styleframe/start/end/keyframe. Reuse only the minimum approved reusable
+  identity/environment references; the Korean prompt must specify the shot
+  composition, blocking, action, camera, atmosphere, and timing that the omitted
+  frame would otherwise have supplied.
 - Count follows the request — commonly 3–4, sometimes a character sheet plus a background. There is no minimum, and a file is never attached twice to reach a number.
 - `@ImageN` numbering is **not a narrative order**. Each reference is an independent anchor for look, space, props and plausible action, not a sequence to replay.
 - Build the deck from **this shot's own material**. Padding with neighbouring cuts' frames makes adjacent clips look like the same shot.
@@ -175,16 +186,27 @@ Do not attach a habitual list of prohibitions.
 
 ## Authoring isolation
 
-Prompt authoring is a single sequential foreground operation. It may read approved local files, write the package, and call the runtime prompt bridge. No browser, Computer Use, `osascript`, file chooser, queue observer or background job belongs in this branch. The six Creative roles are sequential review passes, not parallel workers.
+Prompt authoring is a single sequential foreground operation owned by the Seedance lane. It may read approved registered files and write/attest the package. It never calls a prompt bridge or a dedicated prompt agent. No browser, Computer Use, `osascript`, file chooser, queue observer or background job belongs in this phase. Use the same-owner `prompt-review.md`; there is no separate Creative team.
+
+## Attribute-routed wiki context
+
+In a v4 project, read `lanes/planner/video_attributes.json`, run the local `knowledge-select` command for the current block, and read only `lanes/seedance/knowledge/<BLOCK>_context.md`. The packet always contains a compact hot core, the preferred Higgsfield community compile core, and camera-composition core; it then selects the current 2D/3D/live-action medium and only matching shot/camera/risk/method/audio sections. Default limits are six selections and 9,000 characters.
+
+Within creative knowledge, use the selected `higgsfield-community-*` grammar first: camera family before style adjectives; `start state → action → physical result → camera beat → end frame`; subject/camera/world lanes; one dominant move; 2–4 motivated physical layers; complexity sized *inside the workflow-locked duration*; physical translation instead of preset names. Complexity never selects or shortens the generation duration. This preference never overrides the latest user instruction, project/style/identity/medium locks, approved references, or safety/operational gates. Do not copy community prompt wording, celebrity/IP cameos, or motion IDs literally.
+
+Do not load the full wiki, raw source collection, or archive during ordinary prompting. Targeted lookup is allowed only when the selected packet reports a conflict or the clip exposes a genuinely new failure class. Record the selection ID, context SHA-256, and selected knowledge IDs in the prompt pack; knowledge content is reasoning context and must not be copied as operational metadata into the visual prompt.
 
 ## Before handing off
 
 - no sentence that describes something invisible
-- one event in the SHOT block
-- one camera move
+- `shot_grammar` matches the Planner: one sustained event, or 2–4 explicitly timed scenes
+- one dominant camera setup per planned scene
 - every physical layer has a cause in frame
 - the closing frame is specified
 - spoken lines are verbatim Korean
 - length is inside the target
+- `duration_sec` equals the current workflow-owned project/block duration lock, and any explicit duration wording in every prompt variant names that same value
 
 Then hand the prompt file and the package to the production branch. UI operation is its job.
+
+For video-team runtime projects, the package must declare `prompt_language=ko-KR`, `prompt_style_version=creative_seedance_ko_v4_20260731`, `authoring_contract=seedance_lane_owned_ko`, and `duration_sec`. Run `prompt_packet_utils.py attest --project <p> --pack <pack>` and require `ATTESTED` before the same lane begins UI operation. Attestation without the project duration lock is not a production handoff.

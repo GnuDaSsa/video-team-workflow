@@ -4,6 +4,8 @@ Use this document only for an attested package whose `provider_model` is exactly
 `Seedance 2.5` and whose `provider_skill` is `seedance25-prompt-en`. Production
 does not rewrite prompts.
 
+Read `../seedance-prompt-en/aside-operator.md` for the shared exact-session binding and transaction procedure.
+
 ## One visible operator
 
 - Use the one existing, logged-in Aside tab whose URL is the intended Runway
@@ -44,13 +46,14 @@ inside the shared helper. If that shared helper is missing, stop with
    thumbnail by enlarged visible content, not filename or upload progress alone.
 6. Paste the UTF-8 NFC Korean prompt file, then compare normalized visible text
    and hash with the attested prompt.
-7. Set duration from the unchanged project lock. Seedance 2.5 supports longer
-   clips, but that capability never changes the workflow's 15-second default or
-   an explicit project override.
-8. Set the package resolution. For quality-critical final sources, prefer
-   1080p when the current Runway surface/account exposes it and the package
-   requests it; never silently substitute 480p/720p or claim later upscaling is
-   equivalent.
+7. Reference/Keyframe/Extend: verify the exposed duration against the runtime
+   lock. Edit: duration and ratio inherit the verified input video; there is no
+   duration control. Record source hash + ffprobe duration as inherited evidence,
+   not a fabricated visible label. If it conflicts with the runtime lock, return
+   to planning for an explicit project override; do not silently change modes.
+8. Reference/Keyframe expose resolution/ratio settings; Edit/Extend inherit ratio
+   and do not expose the same resolution selector. Verify only controls that
+   actually exist, plus source properties for inherited values.
 9. Verify Audio, ratio, and other visible controls against the package.
 10. Run the 2.5 settings guard immediately before Generate:
 
@@ -62,6 +65,13 @@ python3 ~/.codex/skills/seedance25-prompt-en/scripts/runway_ui_helper.py \
   --visible-model '<fresh closed-control label>' \
   --duration-sec <visible-seconds>
 ```
+
+For Edit, the package also names the approved registered `input_video_asset_id`.
+Use `--duration-source input-video --source-video <registered path>` and pass
+its ffprobe duration via `--duration-sec`. The shared guard checks input hash,
+video stream and inherited length against the lock (one input-frame metadata
+rounding tolerance); it records `visible_duration_sec: null`. An unregistered
+legacy source must be registered/approved before using this guard, not bypassed.
 
 Any `Seedance 2.0`, missing/ambiguous model label, duration drift, stale pack,
 or changed lock fails closed.
@@ -140,3 +150,11 @@ endpoint problem to **Keyframe**, and a source/identity conflict back to
 **Reference** prompting. Change one diagnosed variable per revision and keep a
 revision receipt. Do not hide a failed source with random transitions or call a
 technically polished identity change a pass.
+
+## Capability evidence
+
+Mode-specific inherited controls and approximate timing were checked against
+[Runway's Seedance 2.5 guide](https://help.runwayml.com/hc/en-us/articles/53542207042323-Creating-with-Seedance-2-5)
+on 2026-09-06. Edit takes source length/ratio; Extend outputs new footage only.
+Prompt timestamps are not frame-accurate cut points. Gray can indicate invalid
+references; inspect the reason before treating it as queue saturation.

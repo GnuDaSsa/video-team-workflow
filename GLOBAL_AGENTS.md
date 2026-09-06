@@ -7,10 +7,10 @@ When the current working directory is under `/Users/gnudas/Documents/Codex/video
 This is a Codex-native workflow. Codex is the single entrypoint and execution owner; no external orchestrator, sidecar, or relay layer is part of the route.
 
 Lane rules:
-- Write only inside the assigned `lanes/<lane>/` directory unless the prompt explicitly names an output package path.
+- For v4 projects, write lane metadata under `lanes/<lane>/` and write/register all actual media under the project's canonical numbered `media/` tree. Legacy projects keep their existing layout until explicitly migrated.
 - Update `status.json` and `result.md` for the lane.
 - Real media completion requires verified files, paths, sizes, duration/codec where relevant, or verified GUI state. Prompts/plans/placeholders are not completion.
-- Parallel lanes require explicit per-spawn user approval first (see "Subagent / lane spawn approval gate — 2026-07-21"). Once a lane set is approved, do not wait on unrelated lanes unless the lane prompt states a dependency.
+- Parallel lanes require explicit per-spawn user approval first. The v4 image stage may use up to three bounded non-agent generation processes over immutable prompts; this is not permission to spawn image agents or parallel lanes.
 - Public upload, publish, contest/government submission, email send, personal-info form submit, payment, password/2FA, and irreversible deletion require explicit user approval.
 - If GUI/login/CAPTCHA/payment/permission/account-limit blocks occur, stop and write BLOCKED with exact required user action.
 
@@ -20,7 +20,7 @@ After the video team (or any team workflow) is invoked, work must not fan out in
 
 - Spawning any additional agent surface — Codex delegated lane, subagent/worker/explorer, external orchestrator sidecar, background monitor/scheduler/cron/heartbeat, or a second concurrent browser-automation loop — requires **explicit user approval for that specific spawn in the current conversation**. The approval request must name the lane/role, purpose, and expected output.
 - Default execution model is single-agent, sequential, in the main conversation. Parallel lanes are an exception the user grants per project/turn, not the default. Role templates define responsibilities, not standing permission to instantiate agents.
-- Single pre-approved exception: the 15-minute Generate-queue observer defined in the Seedance execution contract, only while a queue is active.
+- Single pre-approved exception: one 15-minute **foreground wait tool session** in the same Codex turn and existing Runway browser while an armed queue is active. It is not a scheduler and cannot create a future model turn; the owning turn must remain attached, consume the result, and re-read the board. It is not a resident observer/agent/process, and only one wait may be pending.
 - Rule files operate latest-only: corrections edit/delete old text in place instead of appending dated layers. History and rollback live in the `GnuDaSsa/video-team-workflow` git repo and `~/.codex/archive/`. Deployed policy: `~/.codex/video-team-policies/subagent_approval_gate_20260721.md`.
 
 ## Codex Harness Auto Workflow
@@ -152,7 +152,7 @@ Mode boundary: this section is primarily for song-first MV production logistics 
 - If any local plan, prompt package, or older skill says `Grok image prompt`, `grok_image`, or “ChatGPT Image 2 browser generation”, reinterpret/update it as `Codex imagegen styleframe prompt` unless the user explicitly requests browser generation.
 - For a **new project**, create/save character sheets and production styleframes through Codex imagegen first; ChatGPT web/new-tab generation is fallback/manual only when imagegen is unavailable or explicitly requested.
 - Codex imagegen production must remain **one cut = one prompt = one standalone image**. Do not request 2x2 grids, contact sheets, collages, or multi-panel sheets for production styleframes.
-- Fast production may batch up to four separate Codex imagegen calls conceptually, one cut prompt per call, then QC the resulting independent images together. This is allowed only if each request remains a standalone one-cut image; never combine four cuts into one prompt or ask for a 2x2/grid/contact sheet.
+- Fast production may run up to three separate bounded Codex imagegen calls concurrently, one immutable one-cut prompt per worker, then fan in and QC the independent images. Additional cuts wait for the next batch; never combine cuts into one prompt or request a production grid/contact sheet.
 
 ### Operating mode
 - Default to **no-question, one-block execution** for MV production: analyze → cut design → image generation → image-to-video → edit → QC → package, without asking between routine steps.

@@ -66,3 +66,5 @@ and provider-visible capabilities outrank those adapters.
 
 - [ByteDance Seed: Introducing Seedance 2.5](https://seed.bytedance.com/en/blog/one-take-creation-flexible-referencing-introducing-seedance-2-5)
 - [Runway: Creating with Seedance 2.5](https://help.runwayml.com/hc/en-us/articles/53542207042323-Creating-with-Seedance-2-5)
+
+Shared compiler review and exact-session operations: `../seedance-prompt-en/prompt-review.md` and `../seedance-prompt-en/aside-operator.md`. These are version-neutral, not a second version branch.

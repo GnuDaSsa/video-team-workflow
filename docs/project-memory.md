@@ -27,7 +27,7 @@ Use this file for durable context that should survive across threads.
 ## Runway Browser Owner
 
 - Seedance production uses one visible, logged-in Aside `app.runwayml.com` tab only. Never fall back to Chrome, Safari, the Codex in-app browser, connector/API, or a second browser session.
-- Primary controller is `aside repl` with `listBrowserTabs()` and `attachBrowserTab(exactTargetId)` on the existing tab. AppleScript is optional, not a prerequisite.
+- Primary controller is the exact-session CLI helper documented in `codex-skills/seedance-prompt-en/aside-operator.md`; do not retain a separate AppleScript DOM route.
 - If Aside control is unavailable, stop that UI route with `BLOCKED_ASIDE_CONTROL_UNAVAILABLE` and the exact required user action; do not reinterpret `어사이드` as `알아서`.
 
 ## Generated-vocal naturalness preference
@@ -42,3 +42,14 @@ Use this file for durable context that should survive across threads.
 - Only prompting and production diverge. Runtime rails, media registry, safety and approval gates, duration lock, one existing Aside tab, and same-turn foreground queue handling remain shared.
 - Every 2.5 package records `provider_model: Seedance 2.5` and `provider_skill: seedance25-prompt-en`. Production uses the 2.5 adapter to prove the freshly visible model and duration; the adapter imports the shared helper and may not grow separate browser/upload/queue/recovery code.
 - For low-AI animation, prompts specify opening balance/contact, anticipation, one primary action, weight transfer, causal secondary motion, settle, one motivated camera path, and an editor-usable held end state. 2D prompts additionally specify key-pose timing, spacing, line/style stability, and restrained parallax/effects.
+
+## Lean workflow release
+
+- Stage responsibility is not permission to instantiate another agent or change
+  the current conversation's model. Explicitly approved legacy dispatch remains
+  available; default execution stays inside the current owner.
+- Prompt compile/review owner: `codex-skills/seedance-prompt-en/prompt-review.md`.
+  Exact Aside transport owner: `codex-skills/seedance-prompt-en/aside-operator.md`.
+- Deployment safety preflight and strict installed hash parity are distinct.
+  Canonical release mechanism and evidence: `tools/video_release.py` and
+  `docs/releases/2026-09-06/`. Never infer video quality from those checks.

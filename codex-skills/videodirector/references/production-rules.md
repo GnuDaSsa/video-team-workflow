@@ -12,9 +12,10 @@
 
 ## Multi-panel sourceframe crop rule
 
+- A multi-panel storyboard is allowed only as a planning/reference artifact under `/Users/gnudas/wiki/concepts/storyboard-production-blueprint-standard.md`. It is not a production sourceframe and its character thumbnails do not replace approved provider-safe identity sheets.
 - Do not use 2x2, contact-sheet, grid, collage, or multi-panel generated images as direct sourceframes for MV production.
 - Prefer one complete 16:9 sourceframe per cut, generated as a single image, so no crop border, panel gutter, or white margin can enter I2V or final edits.
-- If a multi-panel sheet is unavoidable for exploration, every cropped panel must pass a border/gutter QC step before I2V: crop past all white gutters, inspect all four edges at full resolution, and reject if any white frame, panel seam, or leftover background margin remains.
+- Cropped storyboard/contact-sheet panels remain lookdev only. Generate an independent, identity-bound per-cut frame and pass image QC before standard I2V; cropping does not confer production approval.
 - A crop that contains a white border from the original 2x2 sheet is a failed source asset even if the character/scene looks good.
 - Never send a bordered crop to Grok/I2V; regenerate or recrop first.
 
@@ -61,3 +62,10 @@ For recurring people/characters the sheet stage is a hard gate, not a polish ste
 - Styleframes generated **before** the sheet lock are `HOLD_LOOKDEV_ONLY`: composition/lookdev reference only, excluded from I2V handoff, and regenerated with the sheets attached before they can be used.
 - If the generator cannot verify the attachment, record `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED` or `BLOCKED_IMAGEGEN_EDIT_FAILED` — never proceed from memory.
 - QC compares regenerated frames to the sheets for face, hair mass, age impression, outfit/materials, hands/props, and role separation.
+
+## Storyboard blueprint gate
+
+- For serious narrative work, lock the storyboard blueprint after the real audio/cut map and recurring-character sheet approval, before production styleframes. Simple one-shot or typography-only work may mark the gate `not applicable` with a reason.
+- The board must bind set geometry, actor paths, camera positions, numbered shot purpose, distance/angle/lens, action, sound, and exit composition; a row of attractive thumbnails alone is not a PASS.
+- Default final production uses `STORYBOARD_SHOT_MODE`. One-pass multi-shot board generation is `STORYBOARD_SEQUENCE_PREVIS_MODE` and remains `PREVIS_HOLD` until per-shot order, identity, timing, and board-artifact contamination pass QC.
+- Detailed board schema and boundaries live only in `/Users/gnudas/wiki/concepts/storyboard-production-blueprint-standard.md`.

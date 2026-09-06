@@ -1,81 +1,68 @@
-# Video Team Workflow
+# Codex 영상팀 워크플로
 
-Reusable **Codex-native** video-team package: Seedance/Runway operating rules, image/I2V QC, typography, submission safety, and curated knowledge.
+Canonical source for the user's video workflow. Project/media data stays outside
+this repository. Active rules are latest-only; history belongs to Git/archive.
 
-**Version line (2026-07-29 v3):** one video skill + wiki pointers · Korean prompt output · prompt/package split · repair-vs-blocked · rail enforced in code · IME-safe prompt input.
+## 실행 모델
 
-v3 arbitrated a rule set that had grown five authority layers (~3,000 lines) each declaring itself final. Symptoms were non-deterministic runs: Seedance silently disabling audio, uploads that worked one day failing the next, one project running 14 days across 68 session folders with its canonical asset folders empty.
+기본은 **현재 대화의 한 작업자**가 아래 역할을 순차 수행한다. 역할 변경은
+새 에이전트 생성이나 자동 모델 변경을 뜻하지 않는다.
 
-What changed:
+`Director → Music Lock → Planner → Image → Image QC → Seedance prompting →
+Seedance production → Seedance QC → Editor/CapCut → Package`
 
-- **Audio** — the toggle stays ON; the prompt names the soundscape. The old "no BGM" preference sat in the settings field, so operators reached for the switch; the 15-minute observer was even told to verify "Audio Off".
-- **Character sheets** — always attached when a recurring character appears. The producer now emits `CHAR_<ID>_PROVIDER_REF_R<n>`, a text-free single-figure sheet, so downstream selects by filename instead of judging which sheet is safe.
-- **Upload** — one fixed ladder: asset selector → one retry → drag only with explicit approval → blocked. Drag was demoted from canonical to last resort.
-- **Persistence** — a blocker stops an item, never the session; "exactly once" is per scene. Work continues until the shelf is exhausted, then schedules.
-- **Repair vs blocked** — five "blockers" were repair tasks. Fix what you own, defer after two attempts, escalate only what needs a human, and never poll a human-action blocker.
-- **Prompts** — written in Korean, and prompt-only: `<BLOCK>_prompt.txt` versus `<BLOCK>_package.md`. Operational text was 34% of a measured live prompt.
-- **Skills** — `videodirector` and `music-video-production-team` merged; MV/promo/shortform are modes, depth moved to `references/` and the wiki.
-- **The rail is enforced** — gates checked self-reported JSON and never looked at a file. `validate` now audits artifacts, and `sequence_manager.py` renumbers the ordered library while rewriting references.
-- **Tooling** — the Generate watcher polled Safari after the move to Chrome; Korean input failed because macOS routes synthetic keystrokes through the active IME. Both fixed, with an IME-safe `paste-prompt`.
+- `prepare-image-batch`는 내장 imagegen용 hash-bound 목록만 만들며 숨은 Codex 작업/API 전환은 없다.
+- 별도 dispatch는 해당 spawn을 사용자가 명시 승인했을 때만 사용하는 호환 경로.
+- 이미지 실행만 불변 1-cut prompt당 최대 3개의 bounded non-agent process 허용.
+- No-I2V는 새 팀이 아니라 승인된 재사용 reference를 최소로 쓰는 생성 모드.
+- 프로젝트별 media/registry와 승인/제출 안전은 runtime AGENTS.md가 소유한다.
+- v4 조회 명령은 자동 정리를 실행하지 않는다. 승인 게이트를 통과한 lane dispatch 경로의 기존
+  24시간 정리와 명시적 정리 명령만 해당 정책을 따른다. 미디어 이관은 별도 요청.
 
-## Included
+## 권위
 
-| Path | Purpose |
+| 범위 | 단일 소유자 |
 |---|---|
-| `codex-skills/` | Deployable Codex skills |
-| `references/` | Character sheet standards |
-| `wiki-extract/` | QC / seed knowledge extracts |
-| `seedance-operations/` | Ops helpers (Finder placement, continuity) |
-| `team-policies/` | Subagent gate, Chrome hybrid operator |
-| `docs/` | Session / version records |
-| `tools/deploy_skills_to_codex.sh` | Deploy everything → `~/.codex/skills`, `~/.codex/video-team-policies`, `~/.codex/AGENTS.md`, `video-team-runtime/AGENTS.md`, and the two character-sheet standards (archives old first). `--check` reports what a deploy would destroy. |
-| `GLOBAL_AGENTS.md` | Deployed to `~/.codex/AGENTS.md` |
-| `runtime/AGENTS.md` | Deployed to `video-team-runtime/AGENTS.md` — rails, gates, ladders, provider routing |
+| 레일·승인·미디어·입력 게이트 | `runtime/AGENTS.md` + runtime code |
+| Seedance 2.0 / 기본 | `codex-skills/seedance-prompt-en/` |
+| 사용자가 명시한 Seedance 2.5 | `codex-skills/seedance25-prompt-en/` |
+| 공통 프롬프트 검토 | `seedance-prompt-en/prompt-review.md` |
+| Aside exact-session 실행 | `seedance-prompt-en/aside-operator.md` + shared helper |
+| 스폰 승인 | `team-policies/subagent_approval_gate_20260721.md` |
+| 이야기·연출·편집 품질 | `codex-skills/videodirector/` |
 
-## Excluded
-
-Project folders, generated media, CapCut drafts, browser/session state, credentials, tokens, `.env`, private personal-information forms.
-
-## Authority map
-
-| Topic | Live file |
-|---|---|
-| Seedance prompt + UI | `codex-skills/seedance-prompt-en/SKILL.md` **only** |
-| Chrome hybrid + dual in-flight | `team-policies/chrome_hybrid_operator_20260721.md` |
-| No subagent fan-out | `team-policies/subagent_approval_gate_20260721.md` |
-| Cleanup history | `docs/2026-07-21-video-team-cleanup-session.md` |
-| This version-up | `docs/2026-07-21-video-team-version-up.md` |
-
-`videodirector` / `music-video-production-team` define story and image requirements only — **not** Seedance UI steps.
-
-## Seedance operating model (v2)
-
-```
-Chrome tab = app.runwayml.com Generate board (only browser for Runway)
-ATTACH  → Computer Use: Finder → Chrome Multi-ref, one drag at a time
-VERIFY  → Chrome Codex plugin: thumbnail count/order = PASS
-WEB     → Chrome Codex plugin: prompt, settings, Generate once, cards
-QUEUE   → keep ~2 jobs in flight (~30 min each); fill next slot ASAP
-WAIT    → poll / 15-min observer only; no second agent
-```
-
-- Default I2V: **Seedance**. Grok only if the user explicitly names Grok.
-- No Runway API/connector, no picker/path/AppleScript method ladder, no Credits/Max without explicit approval.
-- No Hermes / `~/.hermes` / external orchestrator.
-
-## Operating principles
-
-1. **Subagent spawn approval gate** — no delegated lanes, subagents, sidecars, or extra loops without per-spawn user approval (exception: Seedance 15-min queue observer while active).
-2. **Latest-only** — active files hold only current rules; no stacked dated contradictions. History = git + `archive/`.
-3. **Canonical source** — this GitHub repo; `~/.codex/skills` is a deploy target.
-
-## Deploy
+## 배포와 검증
 
 ```bash
-# from package root on the Mac video machine
+python3 -m unittest discover -s runtime/tests -v
+python3 tools/video_release.py freeze       # 검토 완료된 source hash 고정
+./tools/deploy_skills_to_codex.sh --preflight # 안전한 적용 가능 여부; parity 아님
+# 검토한 변경만 commit/push 후, 활성 제작 owner가 없을 때:
 ./tools/deploy_skills_to_codex.sh
+./tools/deploy_skills_to_codex.sh --check     # source + live hash / 퇴역 경로 엄격 검사
 ```
 
-## Codex-native boundary
+이 릴리스는 명시된 세 skill(Seedance 2.0/2.5, videodirector), runtime scripts/
+templates, 표준 reference, global/policy만 관리한다. 다른 음악/코딩 skill 및
+무관한 사용자 파일은 동기화하지 않는다. 알 수 없는 live skill 파일은 삭제하지
+않고 조정 필요로 중단한다. 기존 파일/퇴역 경로는 `~/.codex/archive/`에 먼저
+보관한다. 덮어쓴 파일 hash가 다르면 성공으로 보고하지 않는다.
 
-Codex is the single entrypoint and execution owner. Former Hermes supervisor/relay and `codex-video-runtime/` scaffold were removed (2026-07-21). Recover from git history only if ever needed.
+기존 pack 읽기 전용 감사:
+
+```bash
+python3 tools/shadow_prompt_audit.py --root '<prepared shelf>' > /tmp/shadow-audit.json
+```
+
+`ATTESTED` 과거 표시만으로 신규 제출하지 않는다. 현재 validator에서 FAIL이면
+아직 제출하지 않은 pack을 저작 단계로 되돌린다. 제출된 job/media/history는
+고치거나 자동 재승인하지 않는다.
+
+## 검증의 한계
+
+코드·해시·프롬프트 검사는 영상 품질 PASS가 아니다. 실제 생성 후 전 구간 재생,
+identity/physics/temporal QC와 실제 CapCut preview/export 검사가 따로 필요하다.
+릴리스 범위와 증거: `docs/releases/2026-09-06/`.
+
+포함하지 않는 것: 프로젝트 폴더, 영상/음원, CapCut draft, 세션 URL/계정 상태,
+비밀정보, 개인 제출 양식. 별도 에이전트/스케줄러/브라우저 루프는 만들지 않는다.

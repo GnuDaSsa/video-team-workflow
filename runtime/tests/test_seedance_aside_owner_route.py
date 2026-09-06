@@ -21,6 +21,7 @@ class SeedanceAsideOwnerRouteTests(unittest.TestCase):
         self.assertIn("Generate board in Aside", text)
         self.assertIn("attachBrowserTab(targetId)", text)
         self.assertIn("Apple Events JavaScript is not required", text)
+        text = " ".join(text.split())
         self.assertIn(
             "One logged-in Aside `app.runwayml.com` Generate board per project",
             text,

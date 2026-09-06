@@ -1,8 +1,5 @@
-# Runway Generate Button Color Rule — 2026-07-18
+# Seedance operations — compatibility pointer
 
-User correction: judge Generate button active/inactive by visible button color.
-
-- Blue Generate button = clickable/active state.
-- Gray Generate button = inactive/wait state; do not click.
-- Do not over-prioritize AX disabled/active ambiguity over the visible color.
-- After a blue-button click, still record whether a visible queued/generating card appears; media is not complete until downloaded + ffprobe + QC.
+The selected version Seedance production branch owns this procedure. Shared
+exact-session operations: `~/.codex/skills/seedance-prompt-en/aside-operator.md`.
+This compatibility file carries no separate queue/button/advance rules.

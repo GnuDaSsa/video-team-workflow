@@ -1,0 +1,346 @@
+{
+  "schema": "video_release_v1",
+  "release": "2026-09-06-lean-aside",
+  "files": [
+    {
+      "source": "codex-skills/seedance-prompt-en/SKILL.md",
+      "target": ".codex/skills/seedance-prompt-en/SKILL.md",
+      "sha256": "de7d392511496ca3acc26efd0fe5db2c547e1cb5757498cd2dccb7288c70decc"
+    },
+    {
+      "source": "codex-skills/seedance-prompt-en/aside-operator.md",
+      "target": ".codex/skills/seedance-prompt-en/aside-operator.md",
+      "sha256": "2703d3bda6df93b8e684a2a0c306ba4aaaf9190aa8b6925ca89413db7e99e7d5"
+    },
+    {
+      "source": "codex-skills/seedance-prompt-en/hell-grind-production-prompting-adapter.md",
+      "target": ".codex/skills/seedance-prompt-en/hell-grind-production-prompting-adapter.md",
+      "sha256": "115c4c51de09cfb5b489a1d4e5e46842e9c17a0d68abdec8a8ebccdc099e171d"
+    },
+    {
+      "source": "codex-skills/seedance-prompt-en/image-qc-source-frame-standard.md",
+      "target": ".codex/skills/seedance-prompt-en/image-qc-source-frame-standard.md",
+      "sha256": "1ec1c669fe14bd72e4738fe69e4c9fe202e5f934a75467424edc69a7ddf3bc5b"
+    },
+    {
+      "source": "codex-skills/seedance-prompt-en/prompt-review.md",
+      "target": ".codex/skills/seedance-prompt-en/prompt-review.md",
+      "sha256": "12486d0498d6dae117bfccfd55c20286d9ea453b4cd036f9364f97994f127a9a"
+    },
+    {
+      "source": "codex-skills/seedance-prompt-en/scripts/aside_bridge.py",
+      "target": ".codex/skills/seedance-prompt-en/scripts/aside_bridge.py",
+      "sha256": "38d1a1ca2d046ca64c8825b99eff304b44dd0d802cef434146b1a99ee43e39d4"
+    },
+    {
+      "source": "codex-skills/seedance-prompt-en/scripts/runway_ui_helper.py",
+      "target": ".codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py",
+      "sha256": "413c945bd3797dfd6fcafb2d8c00b7ca09fa8c7ef78fc99bf766a024922fbcf8"
+    },
+    {
+      "source": "codex-skills/seedance-prompt-en/seedance-field-lessons.md",
+      "target": ".codex/skills/seedance-prompt-en/seedance-field-lessons.md",
+      "sha256": "b73502c5ff7604203f94b75e2aee55a7db1f28b06b4ec74b8c52cb8fe727aaec"
+    },
+    {
+      "source": "codex-skills/seedance-prompt-en/seedance-production.md",
+      "target": ".codex/skills/seedance-prompt-en/seedance-production.md",
+      "sha256": "1d679aea4ece77bf9a49c98037837e66ebbdddbd289ae631d33726c7012fd09c"
+    },
+    {
+      "source": "codex-skills/seedance-prompt-en/seedance-prompting.md",
+      "target": ".codex/skills/seedance-prompt-en/seedance-prompting.md",
+      "sha256": "9cc2dd481e89efe756606ea83b8857a8933b5e59358b7b858b2bbc380a288f11"
+    },
+    {
+      "source": "codex-skills/seedance-prompt-en/seedance-shared-contract.md",
+      "target": ".codex/skills/seedance-prompt-en/seedance-shared-contract.md",
+      "sha256": "eb1f4325027eeaea4ec476329ce6f0d60088ea082bfd82d9510ba966fbedb57e"
+    },
+    {
+      "source": "codex-skills/seedance-prompt-en/seedance2-prompt-patterns.md",
+      "target": ".codex/skills/seedance-prompt-en/seedance2-prompt-patterns.md",
+      "sha256": "32c9d6c53b782b1c49bea1a7dac4fdda4c70e5178e75a9b8eab4858f3a276580"
+    },
+    {
+      "source": "codex-skills/seedance-prompt-en/xazinga-prompting-adapter.md",
+      "target": ".codex/skills/seedance-prompt-en/xazinga-prompting-adapter.md",
+      "sha256": "aca08c0b47ea20338ea19e9402bc760f720152333a9e81fe8dbc917145763b44"
+    },
+    {
+      "source": "codex-skills/seedance25-prompt-en/SKILL.md",
+      "target": ".codex/skills/seedance25-prompt-en/SKILL.md",
+      "sha256": "d136efc2dccce66b03f9f6eeea43c986ffd4ff42d3d4b2e6cf16a46cbd9c2b9a"
+    },
+    {
+      "source": "codex-skills/seedance25-prompt-en/agents/openai.yaml",
+      "target": ".codex/skills/seedance25-prompt-en/agents/openai.yaml",
+      "sha256": "c92041bac831b5327d525ebde2c28a33bc98fbd9eb018706c78644ba5c8f1f7b"
+    },
+    {
+      "source": "codex-skills/seedance25-prompt-en/production.md",
+      "target": ".codex/skills/seedance25-prompt-en/production.md",
+      "sha256": "29839a3ab8b8acbf2a60d7fef4c1c36a1a7af0aa9416900d3a9f4d6f2ecc8cda"
+    },
+    {
+      "source": "codex-skills/seedance25-prompt-en/prompting.md",
+      "target": ".codex/skills/seedance25-prompt-en/prompting.md",
+      "sha256": "75f4fe4d4ee3c3d0c158fad681ad701a89544c23f317194f3941378b096cfd13"
+    },
+    {
+      "source": "codex-skills/seedance25-prompt-en/scripts/runway_ui_helper.py",
+      "target": ".codex/skills/seedance25-prompt-en/scripts/runway_ui_helper.py",
+      "sha256": "995995fe50f99ad02146360701572dd6e56bcd4d4202ec44f89bc0064819a485"
+    },
+    {
+      "source": "codex-skills/videodirector/SKILL.md",
+      "target": ".codex/skills/videodirector/SKILL.md",
+      "sha256": "b53fb2a04388df7610e4b7156d9518e055150ab2c567cc860087278bced892a1"
+    },
+    {
+      "source": "codex-skills/videodirector/agents/openai.yaml",
+      "target": ".codex/skills/videodirector/agents/openai.yaml",
+      "sha256": "1af387e2c30557ea7c7929c7000fb76dcd7e79c4df1fd9377a56d9839250e926"
+    },
+    {
+      "source": "codex-skills/videodirector/references/modes.md",
+      "target": ".codex/skills/videodirector/references/modes.md",
+      "sha256": "c04e606c5e6935351b9251cad5473ac4fa56507497e640fd4a033b01eab66da3"
+    },
+    {
+      "source": "codex-skills/videodirector/references/mv-team-standing-memory-low-signal-and-hito-neko.md",
+      "target": ".codex/skills/videodirector/references/mv-team-standing-memory-low-signal-and-hito-neko.md",
+      "sha256": "b2ee7d4edae1a1314fd8674c0579486914a8d4d3b81b8cd6ebff0f2f74a70af3"
+    },
+    {
+      "source": "codex-skills/videodirector/references/output-formats.md",
+      "target": ".codex/skills/videodirector/references/output-formats.md",
+      "sha256": "a34246f26d95fcdb2b27740faad9f152a430e18188fc81e06c547207666f16af"
+    },
+    {
+      "source": "codex-skills/videodirector/references/production-rules.md",
+      "target": ".codex/skills/videodirector/references/production-rules.md",
+      "sha256": "fd0b79ec08444c026831d9afa881fd67f261e0acff6c9611a84ac2b1b5f01535"
+    },
+    {
+      "source": "codex-skills/videodirector/references/role-split.md",
+      "target": ".codex/skills/videodirector/references/role-split.md",
+      "sha256": "5d04d4f92429c7047afca9520bfe530da9069a0ed8de6d8f3cf30fa029d32ca5"
+    },
+    {
+      "source": "codex-skills/videodirector/references/user-calibrations.md",
+      "target": ".codex/skills/videodirector/references/user-calibrations.md",
+      "sha256": "32b0a44453a4bf56557258d6a400e45b6b632b2e0b8ece6bba2cb790373eb7db"
+    },
+    {
+      "source": "runtime/scripts/generation_settings.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/generation_settings.py",
+      "sha256": "cf308fd7e44cbcf90522333540e037420df81ac81cb08b6fa069073ebfa5d0e7"
+    },
+    {
+      "source": "runtime/scripts/image_creator_lane_runner.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/image_creator_lane_runner.py",
+      "sha256": "0f2ba7d7636999b0413c010513c14ba59c091fd0e778225c35d7b2a7ee949c21"
+    },
+    {
+      "source": "runtime/scripts/lane_gates.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/lane_gates.py",
+      "sha256": "fdf3b9eb1a3f8ad90309f1a0a10c793b40ae156a0ba8facbe888b62f178cdd05"
+    },
+    {
+      "source": "runtime/scripts/lane_inputs.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/lane_inputs.py",
+      "sha256": "dc058050245b62e72673d3292a2713a73e7f3aa03dce631beb4b486ef9ab7512"
+    },
+    {
+      "source": "runtime/scripts/media_registry.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/media_registry.py",
+      "sha256": "cb4b925b128e365a3c8dacf47ceecfd7d4ce66601d9fd1d9ee8878ce0ca9a449"
+    },
+    {
+      "source": "runtime/scripts/model_routing.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/model_routing.py",
+      "sha256": "53c45f0ca7faeb613d54d0b2344f3f03fd1d98a6e057e8a821807d18f7e53e6e"
+    },
+    {
+      "source": "runtime/scripts/project_sweep.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/project_sweep.py",
+      "sha256": "373f1c3d46ef5cf6b9e45b83f18d8bd68aacee08c60070c6a1361d67901fa8ca"
+    },
+    {
+      "source": "runtime/scripts/prompt_packet_utils.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/prompt_packet_utils.py",
+      "sha256": "e5c41ce4fc1a22eed15d66146f71f1f384c6eec39427f41581715ccfbc3c71ec"
+    },
+    {
+      "source": "runtime/scripts/runway_ui_helper.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/runway_ui_helper.py",
+      "sha256": "abe061e59ec48b9422d6624cfd0f43443f09733b8f47fd25105e6fd20de2c3b3"
+    },
+    {
+      "source": "runtime/scripts/seedance_prompt_case_harness.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/seedance_prompt_case_harness.py",
+      "sha256": "6fa1ea17815c28cb4b388a20d352c197c9b22b710944969eb2f651c387e4b68d"
+    },
+    {
+      "source": "runtime/scripts/sequence_manager.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/sequence_manager.py",
+      "sha256": "78774796dfa30181baf744a37dd28552ce5acb8aaa1e4c4699ae5aa304fe876e"
+    },
+    {
+      "source": "runtime/scripts/shot_semantics.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/shot_semantics.py",
+      "sha256": "d0874fd29ec662300554d547ae2deb44b76e3889e65d1eb0e19baf9c3b38b436"
+    },
+    {
+      "source": "runtime/scripts/video_codex_runtime.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/video_codex_runtime.py",
+      "sha256": "160b315139987c2f5d5d0b36817dda4b0eaaa91b2b043f2364b75ab7c1916497"
+    },
+    {
+      "source": "runtime/scripts/video_knowledge_router.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/video_knowledge_router.py",
+      "sha256": "bf27aac91218408ef8e5402a31c0699605e7313f1c679ab96c5110916e68983c"
+    },
+    {
+      "source": "runtime/templates/director.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/templates/director.md",
+      "sha256": "cf4275cfe0189047d866669bf22afed7900f8e6fbbba1d533902dcd37dd35958"
+    },
+    {
+      "source": "runtime/templates/editor.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/templates/editor.md",
+      "sha256": "3c971324e0b3df3986b2dad006f4a11b6ddd503236f5af435d00364e7f399592"
+    },
+    {
+      "source": "runtime/templates/image_creator.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/templates/image_creator.md",
+      "sha256": "df9084831802fdcb7eba5aa403f8935ae129f25293659fa3deb436432721c7bd"
+    },
+    {
+      "source": "runtime/templates/image_qc.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/templates/image_qc.md",
+      "sha256": "51c433e7da48108505d3dc7fe8c313137b22e4a0d090789777f80173c8f03277"
+    },
+    {
+      "source": "runtime/templates/music.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/templates/music.md",
+      "sha256": "4ec208bc2bed5fedc30f8cfefd90b16547de4a2f69d0bde19c10d6eae9005018"
+    },
+    {
+      "source": "runtime/templates/package.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/templates/package.md",
+      "sha256": "52dfd9838b0d794e4892e6f23f4b74b4caf5586ee9084fb06f02a01cefe65dde"
+    },
+    {
+      "source": "runtime/templates/planner.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/templates/planner.md",
+      "sha256": "e4964a7f73dfbf803f38e3bb5e6bd1c02960d0ffd9f11de5df10b195f6e32660"
+    },
+    {
+      "source": "runtime/templates/qc.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/templates/qc.md",
+      "sha256": "31773571e15d3e661efd8adf6fa6289fdc6d6f2a17a3091500ad981344b4050e"
+    },
+    {
+      "source": "runtime/templates/seedance.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/templates/seedance.md",
+      "sha256": "186111cf6fa20e9ac68d600213f7f2a1c59df375aac640c8507c3e74a3ca6839"
+    },
+    {
+      "source": "runtime/templates/seedance_qc.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/templates/seedance_qc.md",
+      "sha256": "9751043c9a5210a2a9d1a59e4f6f4ffe7c7f1cd868a83ab1eb99bf47bf85a3b3"
+    },
+    {
+      "source": "runtime/templates/shared_lane_contract.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/templates/shared_lane_contract.md",
+      "sha256": "700ea29e600050ae96b4391776d55b3e03baf6194586fcfea1bd7b6ae4906005"
+    },
+    {
+      "source": "runtime/templates/visual.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/templates/visual.md",
+      "sha256": "41e99c344ca4487752a39cf794123ecdbf6904d4465d7990e671c4a1ad8701d6"
+    },
+    {
+      "source": "GLOBAL_AGENTS.md",
+      "target": ".codex/AGENTS.md",
+      "sha256": "538ccec93c8b5664e83aa14413229188205f1077e2952bfa9bab0bfabbce676f"
+    },
+    {
+      "source": "runtime/AGENTS.md",
+      "target": "Documents/Codex/video-team-runtime/AGENTS.md",
+      "sha256": "2c921ff4c8ae205e3823250ddecc0c5f7a9f460e86e3d76aaac7ea0113d750b2"
+    },
+    {
+      "source": "references/character_sheet_prompt_standard.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/references/character_sheet_prompt_standard.md",
+      "sha256": "366793090c3c9e92ab15d75fd56f89e2ea947ffd36bed946a69004a5f583eb67"
+    },
+    {
+      "source": "references/seedance_prompting_rulebook.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/references/seedance_prompting_rulebook.md",
+      "sha256": "5b8009c86aa005c4ff23eb43a269d78a6994f8778e0d45e72d2ac40e568a28cc"
+    },
+    {
+      "source": "team-policies/chrome_hybrid_operator_20260721.md",
+      "target": ".codex/video-team-policies/chrome_hybrid_operator_20260721.md",
+      "sha256": "e0792079d474c8f34a409ee5ca307d119d1bbc801479a1156c5550c0c4dc7a05"
+    },
+    {
+      "source": "team-policies/subagent_approval_gate_20260721.md",
+      "target": ".codex/video-team-policies/subagent_approval_gate_20260721.md",
+      "sha256": "97022fcb9078da6f9d25fea5cd7f8a028d302d43c1c3dde25547200d72afeaa6"
+    },
+    {
+      "source": "seedance-operations/finder_window_placement_rule_20260720.md",
+      "target": ".codex/video-team-policies/seedance-operations/finder_window_placement_rule_20260720.md",
+      "sha256": "05a2451d754e60e61f741e869e1e43b243ade84980a2244b51ade5b8a03e776a"
+    },
+    {
+      "source": "seedance-operations/provider_continuity_rules_20260707.md",
+      "target": ".codex/video-team-policies/seedance-operations/provider_continuity_rules_20260707.md",
+      "sha256": "c2f452449c680744630484e79329e66af4e51aa5941fd0a63f70681678871f82"
+    },
+    {
+      "source": "seedance-operations/runway_generate_button_color_rule_20260718.md",
+      "target": ".codex/video-team-policies/seedance-operations/runway_generate_button_color_rule_20260718.md",
+      "sha256": "97dea4187dd1891e347fc4ba5fcce51aa59991f5297eb7ab89f1ed97134a5a81"
+    },
+    {
+      "source": "seedance-operations/scene_advancement_policy_20260719.md",
+      "target": ".codex/video-team-policies/seedance-operations/scene_advancement_policy_20260719.md",
+      "sha256": "97dea4187dd1891e347fc4ba5fcce51aa59991f5297eb7ab89f1ed97134a5a81"
+    },
+    {
+      "source": "seedance-operations/seedance_video_prompting_high_lane_20260719.md",
+      "target": ".codex/video-team-policies/seedance-operations/seedance_video_prompting_high_lane_20260719.md",
+      "sha256": "4257902a44230dbf2e85a12a5fe8a52fd77e2da2c8e5f6d20c4851e8efc998c6"
+    },
+    {
+      "source": "seedance-operations/simple_generate_loop_policy_20260720.md",
+      "target": ".codex/video-team-policies/seedance-operations/simple_generate_loop_policy_20260720.md",
+      "sha256": "97dea4187dd1891e347fc4ba5fcce51aa59991f5297eb7ab89f1ed97134a5a81"
+    },
+    {
+      "source": "seedance-operations/taegeukgi_flag_qc_rule.md",
+      "target": ".codex/video-team-policies/seedance-operations/taegeukgi_flag_qc_rule.md",
+      "sha256": "544b5eebcef48c30181ee3f50ffd6d70cc70fb6a9bb2d5b4a4338e0c763cbd39"
+    },
+    {
+      "source": "seedance-operations/tools/position_seedance_finder_window_20260720.sh",
+      "target": ".codex/video-team-policies/seedance-operations/tools/position_seedance_finder_window_20260720.sh",
+      "sha256": "0bc6cfc78f0656fb4eb2f16473335aebb962f7971ee02ccb9d4afb21138242d4"
+    }
+  ],
+  "retired": [
+    ".codex/skills/seedance-creative-prompt-team",
+    ".codex/skills/seedance-prompt-en/archive",
+    ".local/bin/video-image-cli",
+    "Documents/Codex/video-team-runtime/runtime/scripts/codex_app_image_cli.py",
+    "Documents/Codex/video-team-runtime/runtime/scripts/sol_prompt_bridge.py",
+    "Documents/Codex/video-team-runtime/runtime/scripts/seedance_inflight_monitor.py",
+    "Documents/Codex/video-team-runtime/runtime/scripts/image_qc_lane_runner.py",
+    "Documents/Codex/video-team-runtime/runtime/scripts/image_qc_queue.py"
+  ]
+}

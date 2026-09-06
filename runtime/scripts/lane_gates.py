@@ -15,10 +15,16 @@ import json
 import os
 from pathlib import Path
 
+import media_registry
+import lane_inputs
+import generation_settings
+from prompt_packet_utils import prompt_sha256
+
 STATUS_ENUM = {
     'PENDING', 'LAUNCHING', 'RUNNING', 'DONE', 'PARTIAL_DONE', 'PARTIAL_BLOCKED',
     'BLOCKED', 'FAILED', 'KILLED', 'NOT_LOCKED', 'LOCKED', 'PASS', 'FAIL',
     'REWORK_ONLY', 'READY_FOR_USER_REVIEW',
+    'READY_FOR_PRODUCTION',
 }
 DONE_LIKE = {'DONE', 'PASS', 'READY_FOR_USER_REVIEW', 'LOCKED', 'PARTIAL_DONE'}
 
@@ -29,8 +35,10 @@ LANES = [
 ]
 
 # Canonical block-ready events for the sequential Codex runtime.
-BLOCK_READY_EVENT = 'BLOCK_READY_FOR_I2V'
-LEGACY_BLOCK_READY = ('SEEDANCE_BLOCK_READY', 'IMAGE_REFERENCE_BUNDLE_READY')
+BLOCK_READY_EVENT = 'BLOCK_READY_FOR_SEEDANCE'
+LEGACY_BLOCK_READY = (
+    'BLOCK_READY_FOR_I2V', 'SEEDANCE_BLOCK_READY', 'IMAGE_REFERENCE_BUNDLE_READY',
+)
 QUEUES = [
     'intake_queue', 'music_queue', 'planning_queue',
     'image_reference_queue', 'image_retry_queue', 'image_review_queue',
@@ -76,13 +84,61 @@ def _project_video_count(project: Path) -> int:
     'is it filed correctly' — location discipline is validate's job, so a
     mid-project rail cleanup never blocks a lane that genuinely has clips."""
     project = Path(project)
+    if media_registry.is_v4_project(project):
+        return media_registry.registry_count(
+            project, kind='video', states={'approved', 'selected'}
+        )
     n = _count_media(project / 'assets', VIDEO_EXT)
     if n:
         return n
     return _count_media(project / 'lanes', VIDEO_EXT)
 
 
-TERMINAL_STATES = {'QUEUE_FULL_WAITING', 'SHELF_EXHAUSTED', 'ALL_REMAINING_BLOCKED'}
+TERMINAL_STATES = {
+    'SHELF_EXHAUSTED',
+    'ALL_REMAINING_BLOCKED',
+    'BLOCKED_RUNWAY_QUEUE_STALLED',
+}
+QUEUE_WAIT_STATE = 'QUEUE_FULL_WAITING'
+RESUME_CONTRACT_VERSION = 'seedance_foreground_wait_v4_20260819'
+QUEUE_RUNTIME_VERSION = 'seedance_queue_runtime_v2_20260819'
+SEEDANCE_RECOVERY_VERSION = 'seedance_same_session_recovery_v1_20260810'
+
+
+def _seedance_recovery(project: Path) -> dict:
+    """Read and integrity-check the active same-session recovery controller."""
+    raw = _json(Path(project) / 'lanes' / 'seedance' / 'recovery_state.json', {}) or {}
+    if not raw:
+        return {'present': False, 'valid': False, 'status': None}
+    checkpoint = raw.get('checkpoint') or {}
+    stored_hash = checkpoint.get('checkpoint_sha256')
+    unsigned = {key: value for key, value in checkpoint.items() if key != 'checkpoint_sha256'}
+    valid = (
+        raw.get('contract_version') == SEEDANCE_RECOVERY_VERSION
+        and bool(raw.get('block_id'))
+        and raw.get('block_id') == checkpoint.get('block_id')
+        and str(checkpoint.get('session_url') or '').startswith('https://app.runwayml.com/')
+        and bool(stored_hash)
+        and stored_hash == prompt_sha256(json.dumps(
+            unsigned, ensure_ascii=False, sort_keys=True, separators=(',', ':')))
+    )
+    return {
+        'present': True,
+        'valid': valid,
+        'status': str(raw.get('status') or '').upper() or None,
+        'block_id': raw.get('block_id'),
+        'next_action': raw.get('next_action'),
+        'required_user_action': raw.get('required_user_action'),
+    }
+
+
+def _seedance_recovery_needed(project: Path) -> bool:
+    recovery = _seedance_recovery(project)
+    return bool(
+        recovery['present'] and recovery['valid']
+        and recovery['status'] == 'RECOVERING'
+        and recovery.get('next_action')
+    )
 
 
 def cycle_status(project: Path) -> dict:
@@ -94,13 +150,21 @@ def cycle_status(project: Path) -> dict:
     "then continue" is exactly the one that gets forgotten.
 
     So the contract is positive: a run ends only by declaring one of
-    TERMINAL_STATES in the seedance lane status. Anything else, with work still
-    available, is an incomplete stop and is reported as a problem. (2026-07-29)
+    TERMINAL_STATES in the seedance lane status. A full queue is intermediate:
+    it is valid only while queue_runtime records one actually running bounded
+    foreground wait process. A timer file or boolean claim cannot re-enter
+    Codex reasoning and is not an automatic scheduler.
     """
     project = Path(project)
     st = _json(project / 'lanes' / 'seedance' / 'status.json', {}) or {}
     declared = str(st.get('terminal_state') or '').upper()
     running = str(st.get('status', '')).upper() == 'RUNNING'
+    owner_pid_path = project / 'lanes' / 'seedance' / 'pid'
+    try:
+        owner_pid = int(_read(owner_pid_path).strip()) if owner_pid_path.is_file() else None
+    except (TypeError, ValueError):
+        owner_pid = None
+    owner_alive = _pid_running(owner_pid)
 
     shelf = 0
     prompts = project / 'lanes' / 'seedance' / 'prompts'
@@ -108,19 +172,152 @@ def cycle_status(project: Path) -> dict:
         shelf = len([p for p in prompts.glob('*_prompt.txt')])
     queued = _queue_has_event(project, 'seedance_block_queue',
                               (BLOCK_READY_EVENT,) + LEGACY_BLOCK_READY)
+    recovery = _seedance_recovery(project)
 
+    queue_runtime_path = project / 'lanes' / 'seedance' / 'queue_runtime.json'
+    queue_runtime = _json(queue_runtime_path, {}) or {}
     out = {'declared_terminal_state': declared or None, 'lane_running': running,
-           'staged_prompts': shelf, 'block_ready_events': queued}
+           'owner_pid': owner_pid, 'owner_alive': owner_alive,
+           'staged_prompts': shelf, 'block_ready_events': queued,
+           'recovery': recovery,
+           'queue_runtime_verdict': queue_runtime.get('verdict'),
+           'queue_runtime_active_count': queue_runtime.get('active_count')}
 
     if running:
-        out['verdict'] = 'RUNNING'
+        if owner_alive:
+            out['verdict'] = 'RECOVERY_ACTIVE' if _seedance_recovery_needed(project) else 'RUNNING'
+            return out
+        out['verdict'] = 'STOPPED_INCOMPLETE'
+        if (queue_runtime.get('contract_version') == QUEUE_RUNTIME_VERSION
+                and queue_runtime.get('may_stop') is False):
+            out['problem'] = (
+                'SEEDANCE_RUNNING_WITHOUT_LIVE_OWNER: status.json says RUNNING but no '
+                'lane owner PID is alive while queue_runtime.json says may_stop=false. '
+                'A completed foreground wake must continue in the same turn; "next owning '
+                'turn" is not a valid pause state.')
+        else:
+            out['problem'] = (
+                'SEEDANCE_RUNNING_WITHOUT_LIVE_OWNER: status.json says RUNNING but no '
+                'lane owner PID is alive. Resume with one approved owner or record a '
+                'machine-valid terminal state; prose cannot keep a turn alive.')
         return out
+
+    if declared == QUEUE_WAIT_STATE:
+        if _seedance_recovery_needed(project):
+            out['verdict'] = 'STOPPED_INCOMPLETE'
+            out['problem'] = (
+                'SEEDANCE_RECOVERY_ABANDONED: finish the machine-actionable same-session '
+                'recovery before entering a queue wait.')
+            return out
+        contract = _json(project / 'lanes' / 'seedance' / 'resume_contract.json', {}) or {}
+        wait_instruction = str(contract.get('wait_return_instruction_ko') or '')
+        stored_hash = contract.get('contract_sha256')
+        unsigned = {key: value for key, value in contract.items() if key != 'contract_sha256'}
+        computed_hash = prompt_sha256(json.dumps(
+            unsigned, ensure_ascii=False, sort_keys=True, separators=(',', ':')))
+        queue_hash = (
+            prompt_sha256(queue_runtime_path.read_text(encoding='utf-8'))
+            if queue_runtime_path.is_file() else None
+        )
+        valid_contract = (
+            contract.get('contract_version') == RESUME_CONTRACT_VERSION
+            and contract.get('delay_seconds') == 900
+            and contract.get('same_codex_task_only') is True
+            and contract.get('same_runway_browser_only') is True
+            and contract.get('continuation_mode') == 'FOREGROUND_TOOL_LONG_POLL_ONLY'
+            and contract.get('automatic_model_reentry') is False
+            and contract.get('external_scheduler') is False
+            and contract.get('additional_agents') == 0
+            and contract.get('resident_processes') == 0
+            and 1 <= len(wait_instruction) <= 100
+            and bool(_re_mod.search(r'[가-힣]', wait_instruction))
+            and not any(token in wait_instruction for token in (
+                '/Users/', 'state.json', 'manifest.json', '@Image', 'TEST', 'BLOCK_'))
+            and stored_hash == computed_hash
+            and (contract.get('snapshot') or {}).get('queue_runtime_sha256') == queue_hash
+        )
+        wake = queue_runtime.get('wake') if isinstance(queue_runtime.get('wake'), dict) else {}
+        pending_wake = (
+            queue_runtime.get('contract_version') == QUEUE_RUNTIME_VERSION
+            and queue_runtime.get('verdict') in {
+                'QUEUE_FULL_WAKE_REQUIRED', 'DRAIN_QUEUE_WAKE_REQUIRED'}
+            and int(queue_runtime.get('active_count') or 0) > 0
+            and wake.get('pending') is True
+            and bool(wake.get('due_at'))
+            and wake.get('last_result') == 'WAITING_IN_FOREGROUND_TOOL_SESSION'
+            and wake.get('elapsed_unconsumed') is False
+            and _pid_running(wake.get('wait_pid'))
+        )
+        out['resume_contract_valid'] = valid_contract
+        out['pending_wake_valid'] = pending_wake
+        if valid_contract and pending_wake:
+            out['verdict'] = 'WAITING_FOREGROUND_TOOL_SESSION'
+        else:
+            out['verdict'] = 'STOPPED_INCOMPLETE'
+            out['problem'] = (
+                'QUEUE_FULL_WAITING is intermediate and requires queue_runtime.json with a '
+                'live foreground wait_pid plus a matching v4 wait contract. A timer that '
+                'already elapsed, next_check_scheduled text, or a contract file cannot wake Codex.')
+        return out
+
     if declared in TERMINAL_STATES:
         out['verdict'] = 'STOPPED_DECLARED'
-        if declared == 'QUEUE_FULL_WAITING' and not st.get('next_check_scheduled'):
+        if _seedance_recovery_needed(project):
             out['verdict'] = 'STOPPED_INCOMPLETE'
-            out['problem'] = ('QUEUE_FULL_WAITING declared without next_check_scheduled — '
-                              'a full queue with no pending check is a silent end, not a pause')
+            out['problem'] = (
+                'SEEDANCE_RECOVERY_ABANDONED: recovery_state.json still has a machine-actionable '
+                f'next step for {recovery.get("block_id")}: {recovery.get("next_action")}. '
+                'Resume that same-session recovery before declaring a terminal state.')
+            return out
+        if (declared == 'ALL_REMAINING_BLOCKED'
+                and recovery.get('status') == 'USER_ACTION_REQUIRED'
+                and not recovery.get('required_user_action')):
+            out['verdict'] = 'STOPPED_INCOMPLETE'
+            out['problem'] = (
+                'ALL_REMAINING_BLOCKED requires one exact required_user_action for the active '
+                'Seedance recovery checkpoint.')
+            return out
+        if declared in {'SHELF_EXHAUSTED', 'ALL_REMAINING_BLOCKED'}:
+            valid_terminal = (
+                queue_runtime.get('contract_version') == QUEUE_RUNTIME_VERSION
+                and queue_runtime.get('verdict') == declared
+                and int(queue_runtime.get('active_count') or 0) == 0
+                and not queue_runtime.get('settled_jobs')
+                and queue_runtime.get('may_stop') is True
+            )
+            if not valid_terminal:
+                out['verdict'] = 'STOPPED_INCOMPLETE'
+                out['problem'] = (
+                    f'{declared} is terminal only when queue_runtime confirms no active or '
+                    'settled/download-backlog cards remain.')
+        elif declared == 'BLOCKED_RUNWAY_QUEUE_STALLED':
+            valid_stall = (
+                queue_runtime.get('contract_version') == QUEUE_RUNTIME_VERSION
+                and queue_runtime.get('verdict') == declared
+                and int(queue_runtime.get('unchanged_in_queue_wakes') or 0) >= 3
+            )
+            if not valid_stall:
+                out['verdict'] = 'STOPPED_INCOMPLETE'
+                out['problem'] = (
+                    'BLOCKED_RUNWAY_QUEUE_STALLED requires three consecutive unchanged '
+                    'In queue wake observations in queue_runtime.json.')
+        return out
+    if (queue_runtime.get('contract_version') == QUEUE_RUNTIME_VERSION
+            and queue_runtime.get('may_stop') is False):
+        out['verdict'] = 'STOPPED_INCOMPLETE'
+        out['problem'] = (
+            'SEEDANCE_NONTERMINAL_QUEUE_WITHOUT_LIVE_OWNER: queue_runtime.json '
+            f'reports verdict={queue_runtime.get("verdict")}, '
+            f'active_count={int(queue_runtime.get("active_count") or 0)}, and '
+            'may_stop=false, but no foreground lane owner/wait is alive. Resume '
+            'the same queue controller; a future-turn note is not continuation.')
+        return out
+    if _seedance_recovery_needed(project):
+        out['verdict'] = 'STOPPED_INCOMPLETE'
+        out['problem'] = (
+            'SEEDANCE_RECOVERY_ABANDONED: a recoverable session/upload incident still has '
+            f'next_action={recovery.get("next_action")} for {recovery.get("block_id")}. '
+            'Resume the same Seedance lane; do not convert it to BLOCKED.')
         return out
     if shelf or queued:
         out['verdict'] = 'STOPPED_INCOMPLETE'
@@ -135,6 +332,13 @@ def cycle_status(project: Path) -> dict:
 def audit_artifacts(project: Path) -> dict:
     """Compare what the lanes claim against what is actually on disk."""
     project = Path(project)
+    if media_registry.is_v4_project(project):
+        result = media_registry.audit_project(project)
+        return {
+            'problems': result['problems'],
+            'warnings': result['warnings'],
+            'stats': result['stats'],
+        }
     problems, warnings, stats = [], [], {}
 
     approved_img = _count_media(project / 'assets' / 'images_approved', IMAGE_EXT)
@@ -281,29 +485,12 @@ def lane_process_running(project: Path, lane: str) -> bool:
     return _pid_running(_lane_pid(project, lane))
 
 
-def seedance_monitor_running(project: Path) -> bool:
-    lane_dir = project / 'lanes' / 'seedance'
-    for pid_name in ('watch_generate.pid', 'monitor.pid'):
-        txt = _read(lane_dir / pid_name).strip()
-        if not txt:
-            continue
-        try:
-            if _pid_running(int(txt)):
-                return True
-        except ValueError:
-            continue
-    return False
-
-
-def _seedance_monitor_needed(project: Path) -> bool:
+def _seedance_resume_needed(project: Path) -> bool:
     info = lane_status(project, 'seedance')
     if info['status'] != 'RUNNING':
         return False
     if lane_process_running(project, 'seedance'):
         return False
-    if seedance_monitor_running(project):
-        return False
-
     meta = info.get('meta') or {}
     submit_record = str(meta.get('submit_success_record') or '')
     haystack = ' '.join(
@@ -343,6 +530,11 @@ def gate_level(lane: str) -> str:
     return 'hard' if lane in HARD_GATES else 'soft'
 
 
+def non_bypassable_reason(project: Path, reason: str) -> bool:
+    """V4 media gates cannot be converted to warnings or bypassed by --force."""
+    return media_registry.is_v4_project(Path(project)) and reason.startswith('MEDIA_HARD_GATE:')
+
+
 def gate_check(project: Path, lane: str) -> tuple[bool, str]:
     """Return (ok, reason). Reason explains what is missing when not ok.
 
@@ -351,6 +543,11 @@ def gate_check(project: Path, lane: str) -> tuple[bool, str]:
     project = Path(project)
     st = lambda l: lane_status(project, l)['status']  # noqa: E731
 
+    if media_registry.is_v4_project(project):
+        audit = media_registry.audit_project(project)
+        if audit['problems']:
+            return False, 'MEDIA_HARD_GATE: ' + audit['problems'][0]
+
     if lane == 'director':
         return True, 'OK: director is the entry lane.'
     if lane == 'music':
@@ -358,27 +555,64 @@ def gate_check(project: Path, lane: str) -> tuple[bool, str]:
             return True, 'OK'
         return False, 'WAIT_DIRECTOR: music starts after director locks direction/safety gates (music_first rail).'
     if lane == 'planner':
+        if media_registry.is_v4_project(project):
+            problem = lane_inputs.music_error(project, _json(project / 'manifest.json', {}) or {})
+            return (False, 'MEDIA_HARD_GATE: ' + problem) if problem else (True, 'OK')
         music = (_json(project / 'manifest.json', {}) or {}).get('music', {})
         if st('music') in DONE_LIKE or music.get('status') == 'LOCKED':
             return True, 'OK'
         return False, 'WAIT_MUSIC_LOCK: planner needs Music Lock (manifest.music.status=LOCKED or music lane DONE).'
     if lane in ('image_creator_01', 'image_creator_02'):
+        if media_registry.is_v4_project(project):
+            problem = lane_inputs.planner_error(project)
+            return (False, 'MEDIA_HARD_GATE: ' + problem) if problem else (True, 'OK')
         if st('planner') in DONE_LIKE or (project / 'lanes' / 'planner' / 'multi_reference_block_map.json').exists():
             return True, 'OK'
         return False, 'WAIT_PLANNER: image creators need the cut/block map from planner.'
     if lane == 'image_qc':
-        return True, 'OK: image_qc watches image_review_queue and may idle.'
+        manifest = _json(project / 'manifest.json', {}) or {}
+        no_i2v = manifest.get('generation_mode') == 'no_i2v_reference_native'
+        if media_registry.is_v4_project(project):
+            candidate_count = media_registry.registry_count(
+                project, kind='image', states={'candidate'})
+            approved_count = media_registry.registry_count(
+                project, kind='image', states={'approved', 'selected'})
+            if candidate_count <= 0 and not (no_i2v and approved_count > 0):
+                return False, (
+                    'MEDIA_HARD_GATE: image_qc requires a registered image candidate, '
+                    'or in No-I2V mode an already approved reusable reference.'
+                )
+        return True, 'OK: image_qc watches image_review_queue.'
     if lane == 'seedance':
-        if lane_status(project, 'seedance')['status'] == 'RUNNING' and seedance_monitor_running(project):
-            return True, 'MONITOR_ACTIVE: seedance in-flight monitor is polling Runway UI signal evidence only.'
-        if _seedance_monitor_needed(project):
-            return True, ('MONITOR_SEEDANCE_INFLIGHT: submitted Runway/Seedance job is queued or generating, '
-                          'but the seedance lane has no live process; relaunch seedance to poll/download/QC.')
+        recovery = _seedance_recovery(project)
+        if recovery.get('valid') and recovery.get('status') == 'USER_ACTION_REQUIRED':
+            return False, (
+                'WAIT_SEEDANCE_USER_ACTION: '
+                f'{recovery.get("required_user_action") or "exact user action is missing"}')
+        if _seedance_recovery_needed(project):
+            return True, (
+                'RESUME_SEEDANCE_RECOVERY: restore the exact same Aside/Runway transaction '
+                f'for {recovery.get("block_id")} and execute {recovery.get("next_action")}. '
+                'Do not create a new session or consume an attachment attempt for transport failure.')
+        if _seedance_resume_needed(project):
+            return True, ('RESUME_SEEDANCE_INFLIGHT: a submitted Runway job is queued/generating; '
+                          'relaunch the same Seedance lane. Do not start a detached monitor.')
+        duration_errors, _duration_lock = generation_settings.validate_duration_lock(project)
+        if duration_errors:
+            return False, (
+                'DURATION_LOCK_REQUIRED: Planner/project workflow must lock generation duration '
+                'before any new Seedance prompt attestation or submission: ' + duration_errors[0])
+        if media_registry.is_v4_project(project) and media_registry.registry_count(
+                project, kind='image', states={'approved', 'selected'}) <= 0:
+            return False, 'MEDIA_HARD_GATE: Seedance requires registered approved images.'
         if _queue_has_event(project, 'seedance_block_queue', (BLOCK_READY_EVENT,) + LEGACY_BLOCK_READY):
             return True, 'OK'
         return False, ('WAIT_BLOCK_READY: no %s event in seedance_block_queue (Image QC has not approved a full '
                        'reference bundle for any block).' % BLOCK_READY_EVENT)
     if lane == 'seedance_qc':
+        if media_registry.is_v4_project(project) and media_registry.registry_count(
+                project, kind='video', states={'candidate'}) <= 0:
+            return False, 'MEDIA_HARD_GATE: seedance_qc requires a registered downloaded video candidate.'
         if _read(project / 'queues' / 'seedance_review_queue.jsonl').strip():
             return True, 'OK'
         return False, 'WAIT_SEEDANCE_OUTPUT: no Seedance review/output event.'
@@ -399,6 +633,9 @@ def gate_check(project: Path, lane: str) -> tuple[bool, str]:
         if _project_video_count(project) == 0:
             return False, ('CLAIM_WITHOUT_MEDIA: editor reports done but the project contains no video file. '
                            'A package cannot be assembled from status fields alone.')
+        if media_registry.is_v4_project(project) and media_registry.registry_count(
+                project, kind='final', states={'final', 'approved', 'selected'}) <= 0:
+            return False, 'MEDIA_HARD_GATE: package requires a registered final export in media/09_final_최종본.'
         return True, 'OK'
     return False, f'unknown lane {lane}'
 
@@ -412,10 +649,22 @@ def next_actions(project: Path) -> dict:
         info = lane_status(project, lane)
         ok, reason = gate_check(project, lane)
         lanes[lane] = {'status': info['status'], 'raw': info['raw'], 'gate_ok': ok, 'gate_reason': reason}
-        if info['status'] == 'BLOCKED':
+        recovery_restart = lane == 'seedance' and _seedance_recovery_needed(project)
+        recovery = _seedance_recovery(project) if lane == 'seedance' else {}
+        recovery_user_action = bool(
+            recovery.get('valid') and recovery.get('status') == 'USER_ACTION_REQUIRED')
+        if recovery_user_action:
+            user_actions.append({
+                'lane': lane,
+                'detail': recovery.get('required_user_action') or 'exact user action is missing',
+            })
+        elif info['status'] == 'BLOCKED' and not recovery_restart:
             user_actions.append({'lane': lane, 'detail': info.get('detail') or info['raw']})
-        monitor_restart = lane == 'seedance' and info['status'] == 'RUNNING' and _seedance_monitor_needed(project)
-        if ok and (monitor_restart or info['status'] in {'PENDING', 'UNKNOWN', 'NOT_LOCKED', 'PARTIAL_BLOCKED', 'FAILED', 'REWORK_ONLY'}):
+        resume_restart = lane == 'seedance' and (
+            recovery_restart or (info['status'] == 'RUNNING' and _seedance_resume_needed(project)))
+        if ok and (resume_restart or info['status'] in {
+                'PENDING', 'UNKNOWN', 'NOT_LOCKED', 'PARTIAL_BLOCKED', 'FAILED',
+                'REWORK_ONLY', 'READY_FOR_PRODUCTION'}):
             next_lanes.append(lane)
     phase = (_json(project / 'manifest.json', {}) or {}).get('project_phase')
     return {'project': str(project), 'phase': phase, 'lanes': lanes,
@@ -459,8 +708,34 @@ def validate_project(project: Path) -> dict:
     art = audit_artifacts(project)
     problems.extend(art['problems'])
     warnings.extend(art['warnings'])
+    recovery = _seedance_recovery(project)
+    if recovery['present'] and not recovery['valid']:
+        problems.append(
+            'SEEDANCE_RECOVERY_CHECKPOINT_INVALID: recovery_state.json version, session URL, '
+            'block identity, or checkpoint hash does not validate.')
+    duration_required = (
+        lane_status(project, 'planner')['status'] in DONE_LIKE
+        or (project / 'lanes' / 'seedance' / 'prompts').exists()
+        or _queue_has_event(
+            project, 'seedance_block_queue', (BLOCK_READY_EVENT,) + LEGACY_BLOCK_READY)
+    )
+    if duration_required:
+        duration_errors, _duration_lock = generation_settings.validate_duration_lock(project)
+        problems.extend(duration_errors)
     cyc = cycle_status(project)
     if cyc.get('problem'):
         problems.append(cyc['problem'])
+    if media_registry.is_v4_project(project):
+        for pid_name in ('monitor.pid', 'watch_generate.pid'):
+            pid_text = _read(project / 'lanes' / 'seedance' / pid_name).strip()
+            try:
+                pid = int(pid_text) if pid_text else None
+            except ValueError:
+                pid = None
+            if _pid_running(pid):
+                problems.append(
+                    f'DETACHED_SEEDANCE_MONITOR_FORBIDDEN: {pid_name} pid={pid}; '
+                    'v4 uses one bounded foreground wait, not a resident process or scheduler.'
+                )
     return {'project': str(project), 'ok': not problems, 'problems': problems,
             'warnings': warnings, 'artifacts': art['stats'], 'cycle': cyc}

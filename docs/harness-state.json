@@ -1,28 +1,59 @@
 {
-  "currentGoal": "Make Aside the sole visible Runway owner for Seedance production and reject Chrome/Safari/in-app-browser fallback.",
-  "status": "complete",
-  "currentContract": "codex-skills/seedance-prompt-en/seedance-production.md",
+  "currentGoal": "Apply lean video workflow, scoped Seedance prompting and exact-session Aside CLI control with verified source/live release.",
+  "status": "in_progress",
+  "currentContract": "docs/contracts/2026-09-06-lean-workflow-aside-release.md",
   "blockers": [],
-  "nextStep": "Resume the current Kim Wooyoung Scene 4 package only in the existing Aside Runway tab.",
-  "lastUpdated": "2026-08-24T13:50:00.000Z",
+  "nextStep": "Isolated staged-tree test, commit and sync; deploy 66 managed files then verify exact parity.",
+  "lastUpdated": "2026-09-06T13:53:31.158276+09:00",
   "verification": {
-    "lastCommand": "python3 -m unittest runtime.tests.test_seedance_aside_owner_route -v; git diff --check; zsh -n tools/deploy_skills_to_codex.sh",
-    "lastResult": "pass",
-    "notes": "Canonical Seedance docs name Aside as the sole owner and prohibit Chrome/Safari/in-app-browser/API fallback. Live helper smoke separately rejects RUNWAY_BROWSER=Google Chrome with ASIDE_ONLY_RUNWAY_OWNER."
+    "lastResult": "PASS",
+    "lastCommand": "py_compile; unittest 101 tests; actual Aside read-only binding smoke; 28-pack shadow audit",
+    "notes": "Hidden App Server image-agent/API fallback found and retired; image batch now hands off to current-owner built-in imagegen. Isolated recheck/commit/sync/deploy pending."
   },
   "recentCloseouts": [
+    {
+      "id": "2026-09-05-seedance-25-explicit-skill",
+      "status": "complete",
+      "contract": "docs/contracts/2026-09-05-seedance-25-explicit-skill.md",
+      "commit": "420bec8",
+      "deployment": "/Users/gnudas/.codex/skills/seedance25-prompt-en; /Users/gnudas/.codex/skills/seedance-prompt-en routing boundary; /Users/gnudas/.codex/AGENTS.md; /Users/gnudas/Documents/Codex/video-team-runtime/AGENTS.md; /Users/gnudas/Documents/Codex/video-team-runtime/runtime/templates/seedance.md",
+      "verification": {
+        "lastCommand": "quick_validate seedance25-prompt-en; py_compile runtime and 2.5 adapter; python3 -m unittest discover -s runtime/tests -v (70 tests); source/live diff+cmp; git diff --check; remote-main SHA equality",
+        "lastResult": "PASS",
+        "notes": "Added natural-language explicit Seedance 2.5 routing with only prompting and production branches. The 2.5 adapter reuses the canonical 2.0 Runway helper implementation while reversing only the fail-closed model guard. Local/live 2.0 rejects 2.5 and local/live 2.5 rejects 2.0. Deployed skills and runtime routing pointers match source; commit 420bec8 is on origin/main. No Runway Generate, upload, browser production, provider job, or media mutation occurred."
+      },
+      "nextStep": "When the user explicitly names Seedance 2.5, use seedance25-prompt-en; otherwise keep Seedance 2.0/default. Evaluate the first real 2.5 clips against the physical-motion and AI-artifact QC gates before promoting more rules."
+    },
+    {
+      "id": "2026-09-02-toonkit-2d-snappy-animation-grammar",
+      "status": "complete",
+      "contract": "docs/contracts/2026-09-02-toonkit-2d-snappy-animation-grammar.md",
+      "commit": "a86de74",
+      "deployment": "/Users/gnudas/.codex/skills/seedance-prompt-en and /Users/gnudas/.codex/skills/videodirector/SKILL.md",
+      "verification": {
+        "lastCommand": "canonical/live profile-marker assertions; zsh -n tools/deploy_one_skill_to_codex.sh; targeted Seedance deploy preflight; wiki raw provenance hash; python3 -m py_compile runtime/scripts/*.py; python3 -m unittest discover -s runtime/tests -v (65 tests); git diff --check",
+        "lastResult": "PASS",
+        "notes": "Added opt-in toonkit_2d_snappy_v1 routing in videodirector and visible Korean prompt semantics in seedance-prompt-en. Seedance was deployed using the one-skill deployer and archived at ~/.codex/archive/20260902_073641_single_skill_deploy/seedance-prompt-en. Videodirector received only the new option markers to preserve unrelated live-file drift. No provider, browser, queue, agent, or media action occurred."
+      },
+      "nextStep": "Use only after an explicit Toonkit/12-laws request for a 2D/stylized block."
+    },
     {
       "id": "2026-08-28-ai-vocal-naturalness-gate",
       "status": "complete",
       "contract": "codex-skills/music-director/SKILL.md",
-      "commit": "00dcfa7",
+      "commit": "4cd61fe",
       "deployment": "/Users/gnudas/.codex/skills/music-director",
       "verification": {
         "lastCommand": "zsh -n tools/deploy_one_skill_to_codex.sh; targeted deploy smoke; marker assertions; git diff --check; source/live diff and SHA-256",
         "lastResult": "PASS",
-        "notes": "Rejected Link Up and Rewind vocal families as negative references; automated audio analysis cannot certify naturalness; full-track playback gate deployed."
+        "notes": "User-rejected Link Up and Rewind vocal families are negative references; preventive single-identity Korean vocal prompting and full-track playback gate are deployed. Project audit: 40 MP3s = 8 REJECT, 32 HOLD, 0 PASS."
       },
-      "nextStep": "Apply the full-track vocal listening gate before recommending any new Suno vocal candidate."
+      "nextStep": "Apply the full-track vocal listening gate before recommending any new Suno vocal candidate.",
+      "commits": [
+        "00dcfa7",
+        "408e95f",
+        "4cd61fe"
+      ]
     }
   ]
 }

@@ -56,7 +56,7 @@ _original_verify = _shared.verify_attested_generation_settings
 
 def _verify_seedance_25_settings(*args, **kwargs) -> dict:
     result = _original_verify(*args, **kwargs)
-    result['contract_version'] = 'seedance25_generation_settings_preflight_v1_20260905'
+    result['contract_version'] = 'seedance25_generation_settings_preflight_v2_20260906'
     result['expected_model'] = EXPECTED_MODEL
     result['visible_model'] = EXPECTED_MODEL
     result['verdict'] = 'PASS_SETTINGS_MATCH_SEEDANCE_2_5_AND_ATTESTED_DURATION'

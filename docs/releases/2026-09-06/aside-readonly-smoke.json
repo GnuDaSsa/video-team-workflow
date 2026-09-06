@@ -1,0 +1,9 @@
+{
+  "read_only_smoke": true,
+  "result": {
+    "ok": true,
+    "title": "Runway",
+    "host": "app.runwayml.com"
+  },
+  "error": ""
+}

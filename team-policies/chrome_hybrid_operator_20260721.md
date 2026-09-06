@@ -1,68 +1,8 @@
-# Chrome hybrid operator — 2026-07-21 (v2)
+# Retired Chrome operator — compatibility pointer only
 
-Live operating model for Runway/Seedance after the cleanup session. Supersedes “Safari-only Computer Use for every click” as the default.
-
-## Goal
-
-- Keep **~2 Seedance jobs in flight** (generation is ~30 min each; idle slots are a production loss).
-- Stop multi-file rule thrash and multi-agent fan-out (see cleanup session + subagent gate).
-- Prefer **Chrome** for all Runway work so session/tab/DOM stay one surface.
-
-## Browser
-
-- **Runway lives in Chrome only** for this workflow: one logged-in `app.runwayml.com` Generate board tab.
-- Do not open a parallel Safari Runway session for the same project.
-- Finder is staging only (upper-right, not covering Multi-ref / prompt / Generate).
-
-## Tool split (phase lock)
-
-| Phase | Owner tool | Actions |
-|---|---|---|
-| `ATTACH` | **Chrome Codex plugin / Computer Use** | Visible `Reference` asset selector → native chooser, one file at a time (see attachment ladder) |
-| `VERIFY_REFS` | **Chrome Codex plugin** | Count/order of visible Multi-ref thumbnails |
-| `WEB` | **Chrome Codex plugin** | Prompt paste, settings, Generate once, queue/card read, download clicks |
-| `WAIT` | Poll / observer (no VLM spam) | 15-min observer may re-check **current** gray→blue prearm only |
-| `DOWNLOAD/QC` | Chrome plugin or local tools | Path, size, duration/codec evidence |
-
-### Phase lock rules
-
-1. Only one owner tool is active at a time.
-2. During `ATTACH`, only the tool performing the attach acts on Runway.
-3. During `WEB`, Computer Use must not move the mouse except explicit user recovery.
-4. Attach **PASS** = Chrome-visible thumbnail count/order, not “the tool returned OK”.
-5. Generate is **Chrome plugin only** (never dual-click with Computer Use).
-
-## Dual in-flight (mandatory capacity)
-
-```
-A: ATTACH → VERIFY → WEB Generate once → card visible → inflight++
-if inflight < 2 and next scene eligible:
-  B: same pipeline immediately
-while inflight == 2:
-  WAIT / offline prep next prompts / download completed cards
-when a slot frees:
-  submit next eligible scene
-```
-
-- Do **not** wait for A’s full ~30 min render before starting B.
-- Hands are sequential; **queue slots are not**.
-- No second agent to “watch the queue”. Same main agent or the single pre-approved 15-min observer only.
-
-## Fallback
-
-If Chrome Codex plugin is unavailable:
-
-1. Prefer fixing the plugin/native host (preferred path).
-2. Temporary fallback: full **Computer Use** on the **same Chrome** Runway tab (not Safari), still one file at a time + eight-check Generate.
-3. Follow the fixed attachment ladder in `seedance-production.md` — asset selector → one retry → drag only with explicit user approval → `BLOCKED_REFERENCE_ATTACH_FAILED`. Do not invent a rung that is not on it (AppleScript coordinates, clipboard paste, hidden DOM input).
-
-If the asset selector is unavailable:
-
-1. `BLOCKED_CODEX_COMPUTER_USE_UNAVAILABLE` once with exact missing capability.
-2. Do not Generate and do not spawn a helper. Drag is rung 3 and needs explicit user approval — it is not an automatic substitute.
-
-## Relation to other files
-
-- Prompt + eight-check + evidence: `codex-skills/seedance-prompt-en/SKILL.md` (implements this model).
-- Subagent ban: `team-policies/subagent_approval_gate_20260721.md`.
-- Cleanup history: `docs/2026-07-21-video-team-cleanup-session.md`.
+This filename is retained for old links, not as an active browser policy.
+The one visible Aside route, exact-session CLI binding, native chooser,
+Generate preflight, queue and recovery are owned only by the selected Seedance
+skill and shared `seedance-prompt-en/aside-operator.md`.
+Spawn approval remains in `subagent_approval_gate_20260721.md`.
+Do not revive the old Chrome/observer procedure from Git or the local archive.

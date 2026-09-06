@@ -72,3 +72,26 @@ Record notable technical or product decisions here so they do not live only in c
 - Decision: Add `seedance25-prompt-en` as a narrow natural-language version route. Explicit 2.5 requests use its `prompting.md` and `production.md`; explicit 2.0 and unversioned Seedance requests remain on `seedance-prompt-en`. Runtime rails, media, safety, approvals, one Aside tab, and foreground queue waits stay shared. The 2.5 executable is a thin model-policy adapter over the existing Runway helper, not a second UI/queue implementation.
 - Consequences: Every 2.5 package names `provider_model` and `provider_skill`, production freshly proves the visible 2.5 selector before Generate, and the prompt compiler chooses Reference/Keyframe/Edit/Extend from the actual continuity or repair problem. The 2.0 guard remains fail-closed against 2.5.
 - Follow-up: Judge 2.5 against real generated animation QC. Promote only repeated, verified failures into the 2.5 prompting branch; do not widen generic Seedance routing from a single project.
+
+## 2026-09-06 — Lean same-owner workflow and verified Aside release
+
+- User explicitly requested applying the audit, removing unnecessary subordinate
+  agents/old traces, improving Seedance prompting and concrete Aside operation.
+- Retire the Creative prompt-team surface and installed skill archive; preserve
+  useful directing review in the same owner's `prompt-review.md`. Historical
+  browser/queue filenames become pointers, not competing procedures.
+- Actual Aside execution now uses exact target/session/project CLI binding,
+  explicit result/error transport, in-page URL recheck and unique empty Lexical
+  guards. REPL lacks global URL; tested sandbox parsing is distinct from browser
+  URL validation. No browser agent, hidden upload input or front-tab fallback.
+- Current pack/duration checks run again at settings preflight. Scoped regressions
+  reject undecided cameras and entity-motion contamination without banning
+  intentional compound direction. 2.5 Edit records verified input duration instead
+  of inventing a visible duration control.
+- Strict source/live manifest parity replaces a misleading deploy-safe check.
+  Only the reviewed v4 dependency closure is included; unknown live skill files
+  block deployment and retired files move to archive. User media/submitted jobs
+  remain untouched. Source files alone do not prove production quality.
+- Evidence and remaining empirical QC: `docs/releases/2026-09-06/`.
+
+- Staged-tree review also found a hidden App Server image-task launcher and automatic reference-image API fallback. Both are retired; image batching now creates an immutable current-owner handoff without starting an agent or provider CLI.

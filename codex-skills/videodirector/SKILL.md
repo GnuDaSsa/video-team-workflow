@@ -43,9 +43,10 @@ Direction first, the audio spine second, and **QC after every production stage**
 2. **음악·오디오 / Audio spine** — generate and verify the real file: Suno track for music-led work, narration/VO for narration-led. Listen to it. A placeholder or an unheard file is not a spine.
 3. **컷맵 / Cut map** — built **against that spine**: beats, accents, phrase changes, lyric hooks and cadence for music; sentence and breath boundaries for narration. Concept was decided in step 1; timing is decided here, against real audio.
 4. **캐릭터 / 스타일** → **QC** against the approved design. The three-panel master `CHAR_<ID>_TRIPTYCH_R<n>` or its minimum deterministic crop must exist before anything depends on it.
-5. **이미지 / Styleframes** → **QC**: identity, composition, and whether the frame is usable as an I2V source at all.
-6. **I2V / Clips** → **QC**: motion, identity drift, texture, crop preservation, duplicate impressions.
-7. **편집 / Edit** → **패키지 / Package** — QC-passed clips and locked audio only.
+5. **스토리보드 / Production blueprint** → **QC**: bind the locked cut map and approved identity to set geometry, blocking, numbered shots, distance/angle/lens, camera positions, movement, sound and exit compositions. This is Planner metadata/design reference, not a new lane.
+6. **이미지 / Styleframes** → **QC**: identity, composition, and whether the frame is usable as an I2V source at all.
+7. **I2V / Clips** → **QC**: motion, identity drift, texture, crop preservation, duplicate impressions.
+8. **편집 / Edit** → **패키지 / Package** — QC-passed clips and locked audio only.
 
 A stage that has not passed its QC does not feed the next one. Failures go back to the stage that produced them, not forward. User approval gates sit on top of this where the project needs them — QC is the team checking its own work; approval is the user deciding.
 
@@ -56,7 +57,7 @@ If the user has not said, confirm three things before producing: **style**, **le
 ## Tool routing
 
 - **Stills, styleframes, start frames, character sheets** — Codex `imagegen` / built-in `image_gen`, file-backed and non-GUI. Never a browser for image *generation*.
-- **One cut = one prompt = one standalone image.** No 2x2 grids, contact sheets, collages or multi-panel output for production frames. Up to four separate sequential calls is fine; one prompt asking for four images is not.
+- **One cut = one prompt = one standalone image.** No 2x2 grids, contact sheets, collages or multi-panel output for production frames. The runtime may execute up to three separate immutable prompts concurrently; additional cuts wait for the next bounded batch.
 - **I2V** — Seedance by default. Grok only when the user names it for that job. Never Grok for stills. Kling only on explicit request.
 - **Edit** — CapCut is the editable surface. `ffmpeg` is for QC/proxy/probe only, never the deliverable.
 - Compile image prompts through the Gongnyang `image-prompt` skill before calling `image_gen`.
@@ -69,7 +70,7 @@ This skill owns story, shot purpose, visual intent, and delivery taste. It does 
 |---|---|
 | Seedance prompt spec, Runway UI, attach/Generate/queue | `seedance-prompt-en` |
 | Rails, lanes, gates, ordered library, provider assignment | `video-team-runtime/AGENTS.md` |
-| Spawn approval, Chrome operator model | `~/.codex/video-team-policies/` |
+| Spawn approval; browser operation points to Seedance skill | `~/.codex/video-team-policies/` |
 
 Do not spawn delegated lanes, subagents, sidecars, schedulers or parallel loops without explicit per-spawn approval in the current conversation. Default is single-agent sequential.
 
@@ -80,6 +81,7 @@ Do not write these from memory; the wiki holds the worked-out version.
 | Before you… | Read |
 |---|---|
 | write a Shinkai/anime-look prompt, or the user says AI티·자글자글 | `wiki/concepts/shinkai-style-anti-noise-image-prompting.md` |
+| design a storyboard, conti, shot board, blocking map, or board-to-video handoff | `wiki/concepts/storyboard-production-blueprint-standard.md` |
 | choose shot distance and camera angle | `wiki/concepts/ai-image-composition-distance-angle.md` |
 | put a phone, message or screen in frame | `wiki/concepts/phone-screen-geometry-qc.md` |
 | design a character sheet or bible page | `wiki/concepts/character-bible-page-prompt-standard.md` |
@@ -97,7 +99,7 @@ Do not write these from memory; the wiki holds the worked-out version.
 
 ## Operating mode
 
-Default to no-question, one-block execution: analyze → cut design → images → I2V → edit → QC → package. Stop only for login, payment, CAPTCHA, account choice, sensitive upload, deletion, public publish, or an explicit review gate. Do not present a failed draft as final — mark it failed, say why, and continue.
+Default to no-question, one-block execution: analyze → audio/cut design → character lock → storyboard blueprint → images → I2V → edit → QC → package. Stop only for login, payment, CAPTCHA, account choice, sensitive upload, deletion, public publish, or an explicit review gate. Do not present a failed draft as final — mark it failed, say why, and continue.
 
 ## Quality bar
 
@@ -105,4 +107,4 @@ Lead with usable deliverables, not theory. Keep outputs copy-paste ready and spe
 
 ## Language
 
-Planning, explanation, narration and delivery notes in Korean. Image/video/BGM prompts in English. JSON keys in English.
+Planning, explanation, narration and delivery notes are Korean-first. Seedance video prompts are Korean (`ko-KR`) and are authored by the Seedance production lane. Image and BGM prompt language follows their owning skill/lane. JSON keys remain English.

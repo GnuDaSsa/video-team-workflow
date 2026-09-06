@@ -6,31 +6,30 @@ This document contains rules that both the prompting and production branches mus
 
 - `SKILL.md` dispatches the workflow; this file defines the shared invariants.
 - `seedance-prompting.md` owns visual prompt and reference-package authoring.
-- `seedance-production.md` owns visible Runway operation, queue monitoring, downloads, and media verification.
+- `seedance-production.md` owns visible Runway operation, same-task queue resume, downloads, registry ingest, and media verification.
 - `videodirector` may define story and shot purpose, but do not replace these Seedance rules.
 - Still images are produced with Codex imagegen/Gongnyang. This contract covers Seedance videoization only.
 - Default provider is Seedance. Grok is used only when the user explicitly names it for the specific job.
 
 ## Prompting/production isolation — 2026-07-26
 
-- Prompt authoring is single-agent and sequential. The Creative six-role structure is a checklist, not a default parallel spawn.
+- Prompt authoring is single-agent and sequential. Use `prompt-review.md`; no separate Creative team surface is loaded.
 - While authoring, do not start delegated prompt workers, background schedulers, queue observers, browser loops, or external sidecars.
-- The prompting branch is non-GUI and browser-free: no Aside/Chrome/Safari/Runway activation, Computer Use, `osascript`, AppleScript, `open -a`, native file chooser, or browser automation. It writes the local handoff package and then stops.
-- Visible browser operation, Generate, queue monitoring, and downloads belong only to the production branch after an explicit handoff and use one logged-in Aside Runway tab only. A production observer must not be launched by the prompting branch.
-- The 15-minute Generate-queue check belongs to the production branch. Once a package is staged and the queue is full or the staged Generate button is waiting for eligibility, **scheduling that check is a required part of the cycle** — the operator does it unprompted, and stopping at a full queue without one leaves the next slot unused.
-- It is the same single operator resuming its own loop, not a new agent surface, so the spawn gate's approval requirement does not apply to it. It must remain one sequential check — never a parallel browser loop, sidecar, cron, or second agent.
+- The prompting phase is non-GUI and browser-free. It writes and attests the local handoff package; the same Seedance lane then enters the production phase.
+- The production phase owns visible browser operation, Generate, download, registry ingest, and verification. No resident observer process is launched.
+- Queue continuation belongs only to the selected production branch and `queue-cycle`; a contract file never schedules a future model turn.
 
 ## Standing generation defaults — 2026-07-25
 
 User standing preference for ordinary Seedance work:
 
-- **Shape:** **15 seconds** by default; shorter only with an explicit override for that shot. Reference count comes from the request, not a rule — see the reference/character-sheet gate below.
+- **Shape:** use the workflow-owned, attested project/block duration exactly. The runtime starts at 15 seconds; 5–14 seconds requires an explicit user/brief override. This skill has no independent competing default and may not shorten the lock from prompt complexity, final edit trim, or the board's existing value. Reference count comes from the request, not a rule — see the reference/character-sheet gate below.
 - **Creative room:** open after identity lock. References are anchors (identity/environment/texture/prop), not start/middle/end cages.
 - **Audio:** the Runway **Audio setting stays ON**, always. The prompt names the soundscape for that shot — ambience, contact SFX, room tone, or music. Spoken dialogue only with a verified performed `@Audio1` guide. See "Audio: toggle always ON" below.
 - **Naturalism:** believable body mechanics and ordinary contact physics over glossy AI spectacle.
 - **Texture:** medium-aware. Live-action/photoreal requires stable materials and rejects plastic/waxy/crawling texture; 2D/stylized preserves medium-true material and does not force photoreal pores.
 
-These defaults apply to both the single-agent prompting branch and `$seedance-creative-prompt-team`.
+These defaults apply to the single-owner prompting branch and `prompt-review.md`.
 
 ## Audio: toggle always ON, soundscape directed by the prompt — 2026-07-28
 
@@ -62,7 +61,11 @@ Defaults exist for what the user did *not* specify. They are never a reason to i
 - **Reference count** is how many files go in that mode. It follows the request: typically 3–4, sometimes a character sheet plus a background, sometimes a larger deck.
 - *The agent* must not invent a fixed count or pad a deck to reach a number. That restriction is on the agent, **not on the user** — a count the user asks for is an instruction, not a number to second-guess.
 - Do not ask whether to use multi-reference; it is already the default. Asking is different from ignoring a stated one.
-- Whatever the count, the prompt package must contain an ordered `@ImageN` role map naming each reference's visible function.
+- Whatever the count or modality, the prompt package must contain an ordered
+  `@ImageN` / `@VideoN` / `@AudioN` role map naming each attached source's
+  visible or audible function. The Korean model-facing prompt must also bind
+  every attached token to that narrow function; a package-only role is invisible
+  to the provider.
 - **Build each deck from that shot's own material.** Do not pad a deck with the previous or next scene's frames to reach a count. A sliding window like `E19: E18·E19·E20` then `E20: E19·E20·E21` makes consecutive blocks share most of their references, and the model returns two clips that read as the same shot — the exact "why are you making the same video twice" failure.
 - If a block genuinely has only one usable frame of its own, submit it with that one frame plus the character sheet. **A smaller honest deck beats a padded one.**
 - A neighbouring frame may be attached only when it carries a specific visible role for *this* shot (a prop that must match, a wall the camera crosses), and the role map must say what that role is. Continuity between shots comes from the exit-composition handoff in the prompt, not from recycling the neighbour's reference images.
@@ -81,39 +84,53 @@ Promoted from the operating rules that were actually producing clips in the inde
 - **Attachment order:** scene references first, approved character sheet(s) after. Record the order.
 - The sheet fixes **face silhouette, hair mass, costume, age impression, body proportion, and signature props** — nothing else.
 - The sheet is **not** a scene-order instruction, not a transition cue, and not a pose instruction. A sheet must never push the character into a frontal poster stance; the shot's action, camera, and mid-motion state are specified separately.
-- `@ImageN` numbering is **not** a narrative sequence. Ordered references are independent anchors for look, palette, space, props, and plausible action — never a storyboard to interpolate, match-cut, or replay in order (`GENERAL_REFERENCE_MODE`).
+- In `GENERAL_REFERENCE_MODE`, `@ImageN` numbering is **not** a narrative sequence. Ordered references are independent anchors for look, palette, space, props, and plausible action — never a storyboard to interpolate, match-cut, or replay in order.
 - This gate **supersedes any rule that forbids uploading character sheets to Runway.** Sheets are required multi-reference inputs when a recurring character appears.
+
+### Reference interpretation modes
+
+The Runway tab remains Multi-reference; these names describe how the prompt package interprets an approved deck.
+
+- `GENERAL_REFERENCE_MODE` — default. Each `@ImageN` has an independent role. Deck order is attachment order only.
+- `STORYBOARD_SHOT_MODE` — final-production storyboard use. One generation executes one internal board `shot_id`. In `standard_i2v`, the approved per-cut styleframe carries the scene, the minimum `TRIPTYCH`/identity crop carries identity, and the unified board carries shot purpose, blocking, lens/camera intent, sound cue, and exit composition. Other board cells are context, not scenes to replay.
+- `STORYBOARD_SEQUENCE_PREVIS_MODE` — opt-in prototype/previsualization only. One approved unified board carries internally numbered beats, and the Korean prompt restates a duration-feasible order. The output must be actual cinematic scenes, never the board sheet, panels, labels, diagrams, UI, or printed layout. The package status is `PREVIS_HOLD` until order, identity, timing, and board-artifact contamination pass QC.
+
+Shot grammar is separate from reference interpretation. `GENERAL_REFERENCE_MODE` may produce either `SINGLE_CONTINUOUS_SHOT` or final-production `PLANNED_MULTI_SHOT_SOURCE`. In the latter, the Planner's written 0–15s scene plan—not `@ImageN` order—defines 2–4 scene order. Each scene binds only its relevant approved references and ends on an edit-ready frame. `STORYBOARD_SEQUENCE_PREVIS_MODE` remains reserved for a unified multi-panel board prototype.
+
+Rules shared by both storyboard modes:
+
+- A unified storyboard is one named reference role. `@Image1 → @ImageN` deck numbering never becomes the narrative sequence; only the board's internal `shot_id` order can be sequential.
+- The board never replaces the approved `CHAR_<ID>_TRIPTYCH_R<n>` or minimum deterministic identity crop for a recurring character.
+- The board never becomes a `standard_i2v` per-cut sourceframe. A multi-panel board or cropped panel is not an approved source image.
+- If the package lacks an approved storyboard asset, internal shot IDs, or the matching storyboard mode declaration, fall back to `GENERAL_REFERENCE_MODE`; never infer storyboard semantics from a random collage or multi-panel sheet.
+- Canonical directing schema and board QC: `/Users/gnudas/wiki/concepts/storyboard-production-blueprint-standard.md`.
 
 ### Which character identity asset to attach
 
 The canonical master is **`CHAR_<ID>_TRIPTYCH_R<n>`**: a text-free neutral 16:9 strip whose left panel is a headless front full body, middle panel is a back full body with head, and right panel is one large 3/4 portrait. Select it by registered name/hash, not by eye. Its approved deterministic derivatives are `_FACE`, `_FRONT_BODY`, and `_BACK_BODY`; they inherit the master identity and record crop coordinates.
 
-Attach the minimum asset that proves the current shot. Use the full triptych for general identity/body binding, `_FACE` for fragile close-ups, and a body crop only when wardrobe orientation or full-body proportion is visible. Every full-triptych attachment requires Korean role binding that assigns face identity to the right portrait, front body/wardrobe to the left panel, and rear silhouette/wardrobe to the middle panel, while excluding the gray background, seams, and missing front head from scene content.
+Attach the minimum asset that proves the current shot. Use the full triptych for general identity/body binding, `_FACE` for fragile close-ups, and a body crop only when wardrobe orientation or full-body proportion is visible. Never pad the deck with all derivatives. Every full-triptych attachment requires Korean model-facing role binding that assigns face identity to the right portrait, front body/wardrobe to the left panel, and rear silhouette/wardrobe to the middle panel, while explicitly excluding the gray background, panel seams, and missing front head from the generated scene.
 
-If no QC-passed triptych or appropriate derivative exists, stop with `BLOCKED_NO_PROVIDER_SAFE_SHEET`. Do not improvise from beauty key art, a text-heavy bible, or an unverified crop.
+If no QC-passed triptych or appropriate derivative exists, stop with `BLOCKED_NO_PROVIDER_SAFE_SHEET`. Do not improvise from a beauty key art, text-heavy bible, or unverified crop.
 
 Spec and generation rules: `runtime/references/character_sheet_prompt_standard.md`. Compatible compile additions live in `hell-grind-production-prompting-adapter.md`.
 
-The identity asset **does not replace** the per-cut styleframe. Attach `styleframe(s) + minimum required TRIPTYCH/crop` — the styleframe carries the scene and the character asset carries identity/body construction.
+Generation mode decides whether a per-cut styleframe exists; the identity gate itself does not change.
 
-## Generate-ready queue observer protocol
+- `standard_i2v`: the identity asset **does not replace** the per-cut styleframe. Attach `styleframe(s) + minimum required TRIPTYCH/crop` — the styleframe carries the scene and the character asset carries identity/body construction.
+- `no_i2v_reference_native`: a per-cut styleframe is intentionally absent. Attach only the minimum approved reusable identity/environment references needed by this shot family. The Korean prompt carries the omitted frame's composition, blocking, action, camera, atmosphere, and timing.
 
-- After the prompt and all required references are visibly loaded, inspect the visible Generate control. If it is gray/disabled, do not click it and start one 15-minute observer schedule for that staged package.
-- On each 15-minute wake, re-query the same visible Runway Generate board and verify that the staged prompt, ordered references, Multi-reference mode, 15s duration, and ratio are still present. Audio is a standing ON default and is checked once in the Generate preflight, not re-verified on every wake. Do not rely on a previous screenshot or stale element index.
-- If Generate is still gray, leave the package untouched and schedule the next 15-minute wake. Do not spin-poll, re-upload, rewrite the prompt, open another browser route, or create a second observer.
-- If Generate is blue, click it **exactly once for that scene** (not once per session; after the card is confirmed, continue to the next eligible package while a slot is free). Immediately verify the resulting scene card itself—`In queue`, `Generating`, `Processing`, or `Completed`—and match its scene ID/prompt before recording the queue submission. A blue button alone is not completion evidence.
-- If one click does not produce a matching accepted card, do **not** conclude anything yet — run the `ACTIVE_CLICK_NO_CARD` protocol in `seedance-production.md` (poll 60s, refresh and check the feed for a hidden success, re-preflight, then one conditional second click). Declaring a blocker after a few seconds is a false negative: the card often takes longer than the button does to settle.
-- After a matching card is visible, and only if the Generate control remains blue/eligible, advance to the next prepared prompt and reference package. Attach and visibly verify that next package first, then click Generate once. Repeat this staged-package → blue-button → one-click → matching-card cycle.
-- **An empty queue is a cue to submit, not a cue to quit.** Before retiring anything, check whether a prepared block remains. If one does: pre-arm it (attach the ordered references, paste the prompt, set duration/ratio/**Audio ON**), run the eight-check preflight, click Generate once, and confirm the accepted card. Only then resume observing.
-- Retire the observer only when the queue is empty **and** no prepared block remains. Report that the shelf is exhausted; do not silently disappear while work is still queued upstream.
-- **Never observe an empty composer.** Generate stays gray when nothing is loaded, so a watcher on an empty board waits forever no matter how many slots free up. If the composer shows 0 references, pre-arm first — that is a staging failure, not a wait state.
-- The observer never downloads, deletes, publishes, or submits external forms.
+## Generate-ready queue resume protocol
+
+The selected production branch and shared `aside-operator.md` own queue/recovery
+procedures. Use atomic `queue-cycle`, not a discretionary sync-then-wait split.
+This shared contract does not reproduce those procedures.
 
 ## Creative mode and continuity
 
 - Creative Seedance Mode permits camera invention, motivated aperture/reveal, speed change, focus discovery, and atmospheric transformation after reference identity is verified.
 - Creative mode does not permit generic visual glue. Fire/torch/lamp/light matches are reserved for explicit character-transition beats or a cause that exists in the shot; repeated light matches between unrelated scenes are a QC failure.
-- References are anchors, not mandatory start/middle/end storyboard frames. The model may invent the in-between motion and exit composition when the prompt asks for creative freedom.
+- In `GENERAL_REFERENCE_MODE`, references are anchors, not mandatory start/middle/end storyboard frames. In storyboard modes, only the declared internal `shot_id` or ordered PREVIS beats constrain sequence; creative freedom remains inside those bounds.
 - Every clip still needs a physical cause → contact → response, a clear subject action, and a usable exit composition.
 - Default package duration is 15s multi-ref with Audio ON; the prompt states the intended soundscape (ambience, SFX, room tone, or music) for that shot.
 
@@ -130,7 +147,7 @@ Two artifacts, and the split is the point:
 | File | Contents | Destination |
 |---|---|---|
 | `<BLOCK>_prompt.txt` | **the prompt only** — what will be visible | pasted whole into Runway's prompt box |
-| `<BLOCK>_package.md` | scene id, mode, reference roles and paths, gates, settings, handoff notes | read by the operator; **never enters Runway** |
+| `<BLOCK>_package.md` | scene id, mode, routed-knowledge receipt IDs/hashes, reference roles and paths, gates, settings, handoff notes | read by the operator; **never enters Runway** |
 
 Keeping metadata out of the prompt file makes the paste accident structurally impossible. Put both in one file and it eventually gets pasted whole — which is exactly how 1,100 of 3,207 characters (34%) ended up in a live prompt.
 
@@ -142,10 +159,21 @@ Keeping metadata out of the prompt file makes the paste accident structurally im
 Scene ID:
 Mode: Creative | Standard
 Look medium: live-action | 2D/stylized | mixed
+Reference interpretation mode: GENERAL_REFERENCE_MODE | STORYBOARD_SHOT_MODE | STORYBOARD_SEQUENCE_PREVIS_MODE
+Shot grammar: SINGLE_CONTINUOUS_SHOT | PLANNED_MULTI_SHOT_SOURCE
+Planned scene count: 1 | 2 | 3 | 4
+Scene plan: <for multi-shot: scene_id, start_sec, end_sec, covered_cuts, reference_tokens, action, camera, edit_out>
+Knowledge selection ID:
+Knowledge context SHA-256:
+Knowledge selected IDs:
 Prompt file: <BLOCK>_prompt.txt
 Ordered references:
-  Image1 = <path> — <what it contributes to this shot>
-  ImageN = <path> — approved CHAR_<ID>_TRIPTYCH_R<n> or minimum deterministic identity crop when that character appears
+  Image1 = <asset_id/path> — <what it contributes to this shot>
+  Video1 = <asset_id/path> — <camera/action/rhythm/edit role, if attached>
+  Audio1 = <asset_id/path> — <performed speech/music/SFX role, if attached>
+  ImageN = <asset_id/path> — approved CHAR_<ID>_TRIPTYCH_R<n> or minimum deterministic identity crop when that character appears
+Storyboard asset / internal shot range: <none | STORYBOARD_<PROJECT>_R<n> / S01 | S01-S04>
+Production status: FINAL_CANDIDATE | PREVIS_HOLD
 Character-sheet gate: required | not applicable
 Naturalism / texture notes:
 Expected settings: 15s; Audio: ON; 9:16 | 16:9
@@ -153,7 +181,17 @@ Exit composition / next-scene handoff:
 Source root and exact file paths:
 ```
 
-The production branch may reject an incomplete package, but it must not silently rewrite the visual prompt. Send it back to prompting for revision.
+For a v4 project with knowledge routing enabled, these three knowledge fields
+must match `lanes/seedance/knowledge/<BLOCK>_selection.json`; attestation fails
+when the Planner attribute file, catalog, selected source, or context packet has
+changed. The production branch may reject an incomplete package, but it must
+not silently rewrite the visual prompt. Send it back to prompting for revision.
+
+New reference-based packs also declare
+`prompt_rules_used += model_facing_multimodal_binding_v1`. Runtime attestation
+then requires every ordered source token and role to be valid and non-empty, and
+requires each non-empty prompt variant to contain every attached token. This is
+the executable guard against a role existing only in package metadata.
 
 ### Never in the prompt file
 

@@ -152,6 +152,14 @@ def main() -> int:
     a = ap.parse_args()
 
     project = Path(a.project).expanduser().resolve()
+    try:
+        manifest = json.loads((project / 'manifest.json').read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError):
+        manifest = {}
+    if manifest.get('media_schema_version') == '2026-07-31-v4':
+        raise SystemExit(
+            'V4_REGISTRY_OWNS_ORDER: sequence_manager is legacy-only. '
+            'Use asset_registry.sqlite work_item_id/revision and media_registry.py promote for v4.')
     lib = project / a.lib
     stamp = dt.datetime.now().strftime('%Y%m%d_%H%M%S')
     result: dict = {'command': a.command, 'project': str(project), 'library': str(lib),

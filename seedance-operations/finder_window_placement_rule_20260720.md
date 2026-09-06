@@ -1,11 +1,8 @@
-# Finder window placement rule — 2026-07-20
+# Finder staging — compatibility pointer
 
-User correction: every Runway/Seedance staging Finder window must be moved to the middle, slightly upper-right of the screen, compact icon view, and must not cover the Runway left reference strip, prompt field, or Generate button.
-
-Default helper:
-`lanes/seedance/tools/position_seedance_finder_window_20260720.sh <upload_staging_folder>`
-
-Implementation bounds: `{780, 105, 1230, 505}`.
-
-After each upload batch or when Finder blocks Runway, close Finder windows immediately.
-
+Use the shared `seedance-prompt-en/aside-operator.md` native chooser procedure.
+If a Finder staging window is actually needed, keep it compact and slightly
+upper-right without covering the current reference strip, prompt or Generate.
+Fit current viewport geometry; there is no project-specific positioning script
+or fixed screen coordinate prerequisite. Close only workflow-opened staging
+windows after use; do not rearrange unrelated user windows.

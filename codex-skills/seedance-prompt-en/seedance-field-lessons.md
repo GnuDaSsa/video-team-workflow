@@ -52,7 +52,7 @@ Record in the manifest: `batch_id`, `image_batch_index`, `character_sheet_refres
 When the user explicitly prefers their own short, natural-language Runway cards over an expanded template, that preference overrides the normal prompt-length target for the affected package.
 
 - Write one cohesive Korean paragraph, not a label list or compressed schema.
-- For one coherent 15-second beat, **about 180–450 Korean characters is valid** when it still names the visible setup, one action, one camera direction, only the motivated physical reactions, sound, and the final composition.
+- For one coherent **15-second locked-duration beat**, about **180–450 Korean characters can be valid** when it still names the visible setup, one action, one camera direction, only the motivated physical reactions, sound, and the final composition. This character-count observation applies only after a 15-second lock; it never selects the duration.
 - Do not fake concision by dropping identity, contact physics, sound, or the ending frame. A genuinely complex or explicitly storyboarded sequence may stay longer.
 - Keep model choice, settings, attestation, QC, file paths, and operator gates in the handoff package. The **visible-function `@ImageN` role sentence** is the narrow exception: it belongs in the visual prompt when it disambiguates background versus identity versus action/prop anchors.
 - Treat this as a user-preference route, not a new provider, model, agent, or automation branch. Verify the result in media QC before promoting it as a broadly proven quality rule.
