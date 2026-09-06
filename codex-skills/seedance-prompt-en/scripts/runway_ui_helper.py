@@ -2034,11 +2034,47 @@ def evaluate_queue_exit(project: Path) -> dict:
     project = project.expanduser().resolve()
     runtime = _json_file(queue_runtime_path(project))
     if runtime.get('contract_version') != QUEUE_RUNTIME_VERSION:
+        metadata = Path(_project_seedance_sources(project)['metadata_dir'])
+        status = _json_file(metadata / 'status.json')
+        blocked = status.get('preproduction_block') or {}
+        attested = status.get('attested_blocks')
+        held = status.get('blocked_attested_blocks')
+        # This is not a queue observation. Permit only the narrow case before
+        # any binding/transaction, never a lost or corrupt queue's replacement.
+        production_evidence = (
+            (metadata / 'aside_binding.json').exists()
+            or (metadata / 'recovery_state.json').exists()
+            or (metadata / 'recovery_events.jsonl').exists()
+            or any((metadata / 'recovery').glob('*.json'))
+            or any((metadata / 'evidence').glob('*settings_preflight.json'))
+        )
+        if (
+            not queue_runtime_path(project).exists()
+            and not production_evidence
+            and status.get('status') == 'BLOCKED'
+            and status.get('production_started') is False
+            and status.get('provider_jobs') == []
+            and isinstance(attested, list) and attested
+            and isinstance(held, list) and sorted(attested) == sorted(held)
+            and isinstance(blocked, dict)
+            and blocked.get('code') == 'BLOCKED_RUNWAY_SESSION_SELECTION_REQUIRED'
+            and str(blocked.get('evidence') or '').strip()
+            and str(blocked.get('required_user_action') or '').strip()
+        ):
+            return {
+                'ok': True,
+                'verdict': 'QUEUE_EXIT_ALLOWED_PREPRODUCTION_BLOCK',
+                'project': str(project),
+                'may_stop': True,
+                'active_count': 0,
+                'queue_observation': False,
+                'next_action': blocked['required_user_action'],
+            }
         return {
             'ok': False,
             'verdict': 'QUEUE_EXIT_REFUSED_SYNC_REQUIRED',
             'project': str(project),
-            'next_action': 'Re-read the visible Runway board and run queue-sync.',
+            'next_action': 'Re-read the visible Runway board and run queue-cycle.',
         }
     wake = runtime.get('wake') if isinstance(runtime.get('wake'), dict) else {}
     if runtime.get('may_stop') is True:

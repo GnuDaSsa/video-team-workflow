@@ -82,3 +82,10 @@ wake, deck/prompt/model change invalidates the prior visual preflight.
   stop that control operation. Never try a bypass or another account/browser.
 - Record outcome/evidence and next step in project `status.json` / `result.md`.
   Redact prompt bodies, account URLs and unrelated browser data from release logs.
+- Before any binding or Generate, a missing intended session is a preproduction
+  user-action block, not a queue. Record `production_started=false`, empty
+  `provider_jobs`, all held `blocked_attested_blocks`, and `preproduction_block`
+  with code `BLOCKED_RUNWAY_SESSION_SELECTION_REQUIRED`, evidence and the exact
+  `required_user_action`. `queue-exit-check` accepts this only without any queue,
+  binding, recovery or settings-preflight evidence. Never fabricate a board sync
+  or use this state to abandon a started/uncertain transaction.

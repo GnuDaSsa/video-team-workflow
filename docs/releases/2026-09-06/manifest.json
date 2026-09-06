@@ -10,7 +10,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/aside-operator.md",
       "target": ".codex/skills/seedance-prompt-en/aside-operator.md",
-      "sha256": "2703d3bda6df93b8e684a2a0c306ba4aaaf9190aa8b6925ca89413db7e99e7d5"
+      "sha256": "c403edbd084d8572af8ede075f56f0d692246a759f410900985f283d6752e8c3"
     },
     {
       "source": "codex-skills/seedance-prompt-en/hell-grind-production-prompting-adapter.md",
@@ -35,7 +35,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/scripts/runway_ui_helper.py",
       "target": ".codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py",
-      "sha256": "413c945bd3797dfd6fcafb2d8c00b7ca09fa8c7ef78fc99bf766a024922fbcf8"
+      "sha256": "8befadcdea94262601401f148c1282305165d33935bb4cb308090922dd02ac36"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-field-lessons.md",

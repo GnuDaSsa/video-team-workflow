@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Correct mandatory identity vs scene-reference overlap contradiction found in live cycle.",
+  "currentGoal": "Allow truthful user-action stop before any production binding, without weakening active queue continuation.",
   "status": "complete",
-  "currentContract": "docs/contracts/2026-09-06-reference-role-overlap.md",
+  "currentContract": "docs/contracts/2026-09-06-preproduction-stop.md",
   "blockers": [],
-  "nextStep": "Resume current-owner romance-anime production: attest Korean B01/B02 then bind the intended Aside session; no video generated yet.",
-  "lastUpdated": "2026-09-06T14:58:39.693064+09:00",
+  "nextStep": "Current romance project is waiting for the intended same-tab Runway session. Resume real generation after user selection; prompts/media are ready, no Generate occurred.",
+  "lastUpdated": "2026-09-06T15:04:08.874902+09:00",
   "verification": {
-    "lastCommand": "101 unit tests; py_compile; zsh -n; 4 same-owner overlap fixtures; strict 66-file release preflight/apply/check; git diff --check",
+    "lastCommand": "105 unit tests; runtime/helper py_compile; zsh -n; strict 66-file release preflight/apply/check; git diff --check",
     "lastResult": "PASS",
-    "notes": "Only two canonical skill documents changed on deployment. Mandatory identity anchors excluded from scene/action overlap count; anti-padding and per-generation attachment remain. No video quality claim."
+    "notes": "Four new regression methods cover prebinding human-action stop, corrupt or existing production evidence, missing explicit status, and active queue non-bypass. No fake queue observation is written."
   },
   "recentCloseouts": [
     {

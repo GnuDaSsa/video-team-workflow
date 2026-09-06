@@ -106,3 +106,8 @@ Record notable technical or product decisions here so they do not live only in c
 
 - Live two-character cycle exposed a contradiction between mandatory per-generation identity sheets and the previous raw-image overlap limit. The canonical Seedance shared contract now counts scene/action duplication separately from required approved identity anchors; four same-owner good/bad review fixtures preserve attachment and anti-padding gates.
 - No automatic agent, reduced identity test, provider action, or video-quality claim is introduced.
+
+## Preproduction stop is not queue completion
+
+- A newly attested project without an intended Runway session may stop for explicit human selection before binding. The queue checker now permits only a fully evidenced unstarted state with no queue/binding/recovery/preflight artifacts. Corrupt queue files and active or uncertain production still require normal recovery/continuation. The branch never invents a visible-board observation.
+- Canonical code and four negative/positive test methods enforce this boundary; see docs/contracts/2026-09-06-preproduction-stop.md.

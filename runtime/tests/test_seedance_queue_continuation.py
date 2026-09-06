@@ -434,6 +434,53 @@ class SeedanceQueueContinuationTests(unittest.TestCase):
         self.assertTrue(result['ok'])
         self.assertEqual(result['verdict'], 'QUEUE_EXIT_ALLOWED')
 
+    def prebinding_block(self) -> Path:
+        metadata = self.project / 'i2v' / 'seedance'
+        (metadata / 'status.json').write_text(json.dumps({
+            'status': 'BLOCKED', 'production_started': False, 'provider_jobs': [],
+            'attested_blocks': ['C01'], 'blocked_attested_blocks': ['C01'],
+            'preproduction_block': {
+                'code': 'BLOCKED_RUNWAY_SESSION_SELECTION_REQUIRED',
+                'evidence': 'New project; existing tab belongs to a different project; no binding or Generate.',
+                'required_user_action': 'Identify the intended same-tab session.',
+            },
+        }))
+        return metadata
+
+    def test_prebinding_human_action_stop_is_not_fake_queue_observation(self) -> None:
+        self.prebinding_block()
+        result = helper.evaluate_queue_exit(self.project)
+        self.assertTrue(result['ok'])
+        self.assertFalse(result['queue_observation'])
+        self.assertFalse(helper.queue_runtime_path(self.project).exists())
+
+    def test_prebinding_stop_refuses_corrupt_queue_or_production_evidence(self) -> None:
+        metadata = self.prebinding_block()
+        paths = ['queue_runtime.json', 'aside_binding.json', 'recovery_state.json',
+                 'recovery_events.jsonl', 'recovery/C01.json',
+                 'evidence/C01_settings_preflight.json']
+        for name in paths:
+            with self.subTest(name=name):
+                path = metadata / name; path.parent.mkdir(exist_ok=True)
+                path.write_text('corrupt')
+                self.assertFalse(helper.evaluate_queue_exit(self.project)['ok'])
+                path.unlink()
+
+    def test_prebinding_stop_requires_all_explicit_evidence(self) -> None:
+        for field, value in [('production_started', True), ('provider_jobs', ['C01']),
+                             ('blocked_attested_blocks', []), ('status', 'READY_FOR_PRODUCTION'),
+                             ('preproduction_block', {})]:
+            with self.subTest(field=field):
+                metadata = self.prebinding_block(); path = metadata / 'status.json'
+                status = json.loads(path.read_text()); status[field] = value
+                path.write_text(json.dumps(status))
+                self.assertFalse(helper.evaluate_queue_exit(self.project)['ok'])
+
+    def test_prebinding_label_cannot_override_active_queue(self) -> None:
+        self.sync(self.jobs())
+        self.prebinding_block()
+        self.assertFalse(helper.evaluate_queue_exit(self.project)['ok'])
+
 
 if __name__ == '__main__':
     unittest.main()
