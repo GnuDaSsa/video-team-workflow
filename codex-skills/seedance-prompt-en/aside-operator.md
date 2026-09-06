@@ -67,8 +67,10 @@ Only before any binding, checkpoint, accepted/uncertain Generate or project queu
 Use the selected helper's `recovery-checkpoint` before ATTACH, then its
 `prepare-upload-alias` for the exact registered asset/modality. Use the visible
 Reference selector to open the native chooser. Computer Use may operate only
-that same Aside chooser; the helper's optional native `picker-go` requires the
-bound tab active in the focused Aside window plus macOS frontmost and IME checks.
+that same Aside chooser; the helper's optional native `picker-go` first requires
+the exact bound tab to be active, activates Aside without input, then rechecks
+the exact active tab in the focused window before macOS frontmost and IME checks.
+This does not override the current controller's UI-technology or permission gates.
 Verify the actual chooser before/after native input: no software check can make
 OS focus atomic with a user's simultaneous click. A focus change means stop the
 input and re-observe, not send more keystrokes. Never upload through hidden DOM

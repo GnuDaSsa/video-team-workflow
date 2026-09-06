@@ -1,14 +1,16 @@
 {
-  "currentGoal": "Remove routine approval friction and distinguish foreground wait from real scheduled execution across models.",
-  "status": "complete",
-  "currentContract": "docs/contracts/2026-09-06-routine-flow-and-wait-diagnostics.md",
-  "blockers": [],
-  "nextStep": "Use current-owner next/default_execution and queue-doctor. Romance cycle READY_FOR_PRODUCTION; no routine new-session permission hold. Specific new owner/scheduler approvals remain; no scheduled route installed.",
-  "lastUpdated": "2026-09-06T17:11:46.041314+09:00",
+  "currentGoal": "Fix native helper focus-validation ordering without weakening exact-session safety.",
+  "status": "blocked",
+  "currentContract": "docs/contracts/2026-09-07-native-focus-recovery.md",
+  "blockers": [
+    "Native AppleScript live test requires explicit user technology exception; image upload and video generation/QC remain unverified."
+  ],
+  "nextStep": "Obtain one specific native-helper approval, then exact-session activation/chooser live test; no new agent/browser or hidden-input fallback.",
+  "lastUpdated": "2026-09-07T05:47:21.765398+09:00",
   "verification": {
-    "lastCommand": "110 unit tests; runtime/helper py_compile; zsh -n; 2.012s real synthetic exec/write_stdin/wake-consumption test; strict 66-file release check; git diff --check",
-    "lastResult": "PASS",
-    "notes": "Code and documentation corrections only. Historical paused 5m Luna cron untouched; no agents, scheduler, provider/browser mutation or real model A/B run. Wiki pointers and project readiness corrected. Current project next resolves seedance:production with user_actions_required=[]; full project validate correctly remains STOPPED_INCOMPLETE because the requested media cycle has not run."
+    "lastCommand": "116 unittest tests; Python compile; zsh -n; video_release freeze/preflight/apply/check (66 files, 3 changed); git diff --check",
+    "lastResult": "PASS_CODE_AND_DEPLOYMENT_GUI_NOT_RUN",
+    "notes": "Optional native helper guard order fixed and tested; no live AppleScript/permissions changes. Sky row/key failure remains unresolved. Harness/contract and private project status updated; unrelated dirty decision/memory files preserved."
   },
   "recentCloseouts": [
     {

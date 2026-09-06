@@ -48,7 +48,8 @@ def repl(code: str, account: str | None = None):
     return value
 
 
-def binding_script(binding: dict, expression: str, *, require_active: bool = False) -> str:
+def binding_script(binding: dict, expression: str, *, require_active: bool = False,
+                   require_focused: bool = True) -> str:
     target = str(binding.get('target_id') or '')
     if not re.fullmatch(r'[A-Za-z0-9_-]+', target):
         raise ValueError('ASIDE_TARGET_ID_INVALID')
@@ -75,7 +76,8 @@ const tabs = await listBrowserTabs();
 const matches = tabs.filter(t => same(t.url));
 if (matches.length !== 1 || matches[0].targetId !== target)
   throw new Error('ASIDE_BOUND_SESSION_MISSING_OR_AMBIGUOUS');
-if ({str(require_active).lower()} && (matches[0].active !== true || matches[0].focusedWindow !== true))
+if ({str(require_active).lower()} && (matches[0].active !== true ||
+    ({str(require_focused).lower()} && matches[0].focusedWindow !== true)))
   throw new Error('ASIDE_NATIVE_BOUND_TAB_NOT_ACTIVE');
 const page = await attachBrowserTab(target);
 if (!same(await page.url())) throw new Error('ASIDE_BOUND_SESSION_CHANGED');
@@ -118,7 +120,8 @@ def require_project(project: Path | None = None, prompt_file: Path | None = None
     return binding
 
 
-def browser_js(js: str, binding_path: Path | None = None, *, require_active: bool = False) -> tuple[int, str, str]:
+def browser_js(js: str, binding_path: Path | None = None, *, require_active: bool = False,
+               require_focused: bool = True) -> tuple[int, str, str]:
     try:
         path = binding_path or Path(os.environ.get('RUNWAY_ASIDE_BINDING', ''))
         if not path.is_file():
@@ -135,7 +138,8 @@ def browser_js(js: str, binding_path: Path | None = None, *, require_active: boo
                       'u.searchParams.get("sessionId")!==session) '
                       'throw new Error("ASIDE_SESSION_CHANGED_BEFORE_DOM"); '
                       'return (0,eval)(code);}, ' + json.dumps(payload, ensure_ascii=False) + ')')
-        result = repl(binding_script(binding, expression, require_active=require_active), binding.get('account'))
+        result = repl(binding_script(binding, expression, require_active=require_active,
+                                     require_focused=require_focused), binding.get('account'))
         return 0, result if isinstance(result, str) else json.dumps(result, ensure_ascii=False), ''
     except (ValueError, OSError, KeyError, TypeError) as exc:
         return 3, '', str(exc)

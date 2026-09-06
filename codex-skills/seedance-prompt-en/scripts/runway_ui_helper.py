@@ -833,15 +833,26 @@ if fm is not "{TARGET_APP}" then error "ABORT_FOCUS_NOT_{TARGET_APP.upper()}: " 
 
 
 def run_verified(args, action: str, tail: str, pre: str = '') -> int:
-    """pre (e.g. clipboard load) + activate + frontmost verify + tail action, ONE osascript.
+    """Validate/activate/revalidate, then guarded pre + tail in one osascript.
 
     Refuses to fire keys while a CJK IME is active — see the input-method guard.
     """
-    # Native events have no targetId. Refuse unless that bound tab is active in
-    # the focused Aside window, then verify macOS frontmost immediately again.
-    rc, _out, err = aside_bridge.browser_js('true', require_active=True)
+    # First require the exact active tab, but permit Aside to be in the
+    # background: requiring window focus here prevents our own activation.
+    # This preliminary observation never authorizes keys or clipboard writes.
+    rc, _out, err = aside_bridge.browser_js('true', require_active=True, require_focused=False)
     if rc:
         evidence(args, action, 'exact bound tab active before native action', err, 'FOCUS_ABORT')
+        return 2
+    rc, out, err = osa(VERIFY_BLOCK)
+    if rc:
+        evidence(args, action, 'activate existing Aside without input', err or out, 'FOCUS_ABORT')
+        return 2
+    # Activation can select another window, and the user may have switched
+    # tabs. Re-read both exact identity and focused-window state before input.
+    rc, _out, err = aside_bridge.browser_js('true', require_active=True)
+    if rc:
+        evidence(args, action, 'exact bound tab focused after activation', err, 'FOCUS_ABORT')
         return 2
     if 'keystroke' in tail or 'key code' in tail:
         st = ime_state()
@@ -850,7 +861,7 @@ def run_verified(args, action: str, tail: str, pre: str = '') -> int:
                      json.dumps({**st, 'required_action': IME_REMEDY}, ensure_ascii=False),
                      'BLOCKED_IME_ACTIVE')
             return 4
-    rc, out, err = osa(pre + VERIFY_BLOCK + tail)
+    rc, out, err = osa(VERIFY_BLOCK + pre + tail)
     if rc != 0:
         verdict = 'FOCUS_ABORT' if 'ABORT_FOCUS' in err else 'ASIDE_CONTROL_ERROR'
         evidence(args, action, f'frontmost={TARGET_APP} then action', err or out, verdict)
