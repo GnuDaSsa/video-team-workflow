@@ -143,6 +143,79 @@ class ScheduledQueueChecks(unittest.TestCase):
                      'SCHEDULE_RUN_CLAIM_WITHOUT_AUTOMATION_ID', 'SCHEDULE_REGISTRATION_CLAIM_WITHOUT_RECEIPT']:
             self.assertIn(code, issues)
 
+    def test_native_heartbeat_shape_cannot_fall_back_to_sleep(self):
+        (self.meta / 'status.json').write_text(json.dumps({'monitoring': {
+            'kind': 'heartbeat', 'status': 'ACTIVE', 'automation_id': 'test-only'}}))
+        before = (self.meta / 'status.json').read_bytes()
+        with self.assertRaisesRegex(ValueError, 'SCHEDULED_REQUEST_REQUIRES'):
+            h.run_queue_cycle(self.project, self.jobs, **self.kw,
+                              sleeper=lambda _: self.fail('slept'))
+        self.assertFalse(h.queue_runtime_path(self.project).exists())
+        result = h.diagnose_queue(self.project)
+        self.assertFalse(result['ok'])
+        self.assertEqual(result['diagnosis'], 'CONTINUATION_SELECTION_REQUIRED')
+        self.assertIn('SCHEDULE_INTENT_WITHOUT_MODE_CHECKPOINT', result['state_audit']['issues'])
+        self.assertEqual(before, (self.meta / 'status.json').read_bytes())
+        self.select()
+        self.assertFalse(h.run_queue_cycle(self.project, self.jobs, **self.kw)['wait_started'])
+
+    def test_native_claim_requires_receipt_even_with_status_alias(self):
+        monitoring = {'kind': 'heartbeat', 'status': 'ACTIVE', 'automation_id': 'test-only'}
+        (self.meta / 'status.json').write_text(json.dumps({'monitoring': monitoring}))
+        self.assertIn('SCHEDULE_REGISTRATION_CLAIM_WITHOUT_RECEIPT',
+                      h.audit_production_state(self.project)['issues'])
+        monitoring['registration_evidence'] = str(self.evidence)
+        (self.meta / 'status.json').write_text(json.dumps({'monitoring': monitoring}))
+        audit = h.audit_production_state(self.project)
+        self.assertNotIn('SCHEDULE_REGISTRATION_CLAIM_WITHOUT_RECEIPT', audit['issues'])
+        self.assertFalse(audit['native_schedule_registration_verified_by_this_audit'])
+
+    def test_inactive_or_non_scheduler_status_does_not_invent_active_schedule(self):
+        for monitoring in [{'kind': 'heartbeat', 'status': 'PAUSED'},
+                           {'kind': 'foreground', 'status': 'ACTIVE'}]:
+            (self.meta / 'status.json').write_text(json.dumps({'monitoring': monitoring}))
+            self.assertEqual(h.read_queue_mode(self.project)['source'], 'legacy_default')
+            self.assertNotIn('SCHEDULE_REGISTRATION_CLAIM_WITHOUT_RECEIPT',
+                             h.audit_production_state(self.project)['issues'])
+
+    def test_explicit_mode_still_wins_over_old_native_status(self):
+        (self.meta / 'status.json').write_text(json.dumps({'monitoring': {
+            'kind': 'heartbeat', 'status': 'ACTIVE'}}))
+        h.select_queue_mode(self.project, 'foreground', self.evidence)
+        self.assertEqual(h.read_queue_mode(self.project)['mode'], 'foreground')
+
+    def test_processed_cards_still_detect_nested_current_rollup_mapping(self):
+        completed = [{**j, 'visible_state': 'COMPLETED'} for j in self.jobs]
+        h.sync_queue_runtime(self.project, completed, **self.kw, processed_jobs=completed)
+        h.sync_queue_runtime(self.project, [], **self.kw)
+        stale = [{'scene_id': 'B01', 'output_index': 'second', 'visible_state': 'IN_QUEUE'},
+                 {'scene_id': 'B02', 'output_index': 'first', 'visible_state': 'IN_QUEUE'}]
+        root = {'lanes': {'seedance': {'current_test_queue_rollup': {'jobs': stale}}}}
+        (self.project / 'state.json').write_text(json.dumps(root))
+        code = 'CURRENT_QUEUE_ROLLUP_MISMATCH:state.lanes.seedance.current_test_queue_rollup'
+        self.assertIn(code, h.audit_production_state(self.project)['issues'])
+        root['lanes']['seedance']['current_test_queue_rollup']['jobs'] = completed
+        (self.project / 'state.json').write_text(json.dumps(root))
+        self.assertNotIn(code, h.audit_production_state(self.project)['issues'])
+
+    def test_archive_and_unknown_scene_are_not_current_rollup_errors(self):
+        h.sync_queue_runtime(self.project, self.jobs, **self.kw)
+        (self.project / 'state.json').write_text(json.dumps({
+            'history_queue_rollup': {'jobs': [{'scene_id': 'B01', 'output_index': 'wrong'}]},
+            'current_test_queue_rollup': {'jobs': [{'scene_id': 'NEW', 'output_index': 'unseen'}]}}))
+        self.assertFalse(any(x.startswith('CURRENT_QUEUE_ROLLUP_MISMATCH')
+                             for x in h.audit_production_state(self.project)['issues']))
+
+    def test_missing_mode_doctor_does_not_mutate_any_project_file(self):
+        h.sync_queue_runtime(self.project, self.jobs, **self.kw)
+        (self.meta / 'status.json').write_text(json.dumps({'monitoring': {
+            'kind': 'heartbeat', 'status': 'ACTIVE', 'automation_id': 'test-only'}}))
+        before = {str(p): p.read_bytes() for p in self.project.rglob('*') if p.is_file()}
+        with mock.patch.object(h, 'run_bounded_queue_wake', side_effect=AssertionError('must not wait')):
+            result = h.diagnose_queue(self.project)
+        self.assertFalse(result['scheduler_created'])
+        self.assertEqual(before, {str(p): p.read_bytes() for p in self.project.rglob('*') if p.is_file()})
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Audit the real two-job cycle and make scheduled intent, truthful completion evidence and safe exit deterministic.",
-  "status": "complete",
-  "currentContract": "docs/contracts/2026-09-07-cycle-audit-scheduled-checks.md",
+  "currentGoal": "Monitor active Blue Orbit task with bounded native checks and close reproduced scheduling-intent / current-rollup audit gaps.",
+  "status": "in_progress",
+  "currentContract": "docs/contracts/2026-09-08-session-monitor-consistency.md",
   "blockers": [],
-  "nextStep": "Workflow code/metadata audit complete. Inspect exact native automation ID/first-run receipt when available; download, ffprobe and playback QC of the two completed clips remain separate production work.",
-  "lastUpdated": "2026-09-07T07:28:18.133287+09:00",
+  "nextStep": "Native 20-minute monitor ACTIVE; first run pending. Source fix tested; sync isolated commit. Deploy only at safe production-owner boundary, then check issue resolution.",
+  "lastUpdated": "2026-09-08T07:30:54+09:00",
   "verification": {
-    "lastCommand": "136 unit tests; Python compile; zsh -n deploy script; strict 66-file source/live parity; live scheduled checkpoint returns immediately; direct wait rejected; state audit before/after; git diff --check",
-    "lastResult": "PASS_WORKFLOW_AUDIT",
-    "notes": "13 new regressions preserve two slots and model-independent continuation. Four real stale-state issues reconciled to zero. No new agent/scheduler/provider action. Native schedule registration/run receipt, actual model UI A/B, downloads/ffprobe/playback/CapCut not verified."
+    "lastCommand": "143 unit tests (7 new); runtime/helper py_compile; zsh -n deploy script; git diff --check; read-only live source queue-doctor and registry SHA comparison",
+    "lastResult": "PASS_SOURCE_FIX_PENDING_SAFE_DEPLOY",
+    "notes": "Native automation-2 registration and saved 20-minute/current-owner fields verified; no first scheduled run yet. Found nested state/manifest rollup drift and two S07 candidate registry SHA mismatches. Target files/browser untouched; owner advisory sent once. No hot-deploy, provider operation, full-video playback QC, or model switch."
   },
   "recentCloseouts": [
     {

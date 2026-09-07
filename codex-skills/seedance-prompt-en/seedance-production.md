@@ -68,6 +68,9 @@ In scheduled mode, `queue-cycle` records one board observation and immediately
 returns `SCHEDULED_CHECKPOINT_NO_WAIT`. Direct `queue-wait` is rejected. Do not
 hand-edit queue flags to escape the foreground branch. A corrupt/changed mode
 receipt fails closed rather than falling back to a 15-minute sleep.
+Existing native `kind: heartbeat/cron, status: ACTIVE` records also express
+scheduled intent: repair a missing mode checkpoint from the original request,
+not by restarting foreground waits or asking for the same approval again.
 
 Use the native app automation tool after the **specific surface approval**;
 inspect a matching existing automation before proposing/creating another.
@@ -81,6 +84,13 @@ native tool evidence separately from first-run evidence. Heartbeat model choice
 may inherit task settings; do not claim Luna execution from a routing table.
 A local mode file never proves registration, browser access or successful runs.
 
+Persist the exact monitored scene IDs and completion condition with the native
+registration receipt. First compare that scope with the owner's latest
+harvest/queue evidence: if already finished, pause that exact schedule without
+reopening the board or expanding to the next scene. Codex usage-limit failures
+are failed observation runs, not proof that Runway is stalled; distinguish
+configured model preference from the model named in an actual run/error.
+
 Each approved scheduled run checks the same bound board **once**, checkpoints
 actual states, then exits quietly when unchanged. Report only meaningful state
 changes, completion/failure or required user action. Never call sleep, start a
@@ -90,7 +100,8 @@ schedule's declared completion condition, pause that exact automation and hand
 off the remaining download/QC work; scope expansion requires the appropriate
 approval. Provider `COMPLETED` is not downloaded or QC-passed media.
 
-`queue-doctor` also returns a read-only state audit: stale lane/queue rollups,
+`queue-doctor` also returns a read-only state audit: stale lane/queue rollups
+(including nested current rollups after cards have been processed),
 unsupported scheduling claims and DONE-without-local-video evidence. It does
 not query the scheduler or certify playback. Fix active state in place from
 fresh evidence; keep historical failures in logs, not active blocker fields.

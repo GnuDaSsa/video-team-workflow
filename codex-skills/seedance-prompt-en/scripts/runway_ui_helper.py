@@ -2088,12 +2088,21 @@ def queue_mode_path(project: Path) -> Path:
     return Path(_project_seedance_sources(project)['metadata_dir']) / 'continuation_mode.json'
 
 
+def _native_schedule_claimed(monitoring: dict) -> bool:
+    """Recognize persisted intent/claims, never verify a native scheduler."""
+    registration = str(monitoring.get('registration_status', '')).upper()
+    native_active = (str(monitoring.get('kind', '')).lower() in {'heartbeat', 'cron'}
+                     and str(monitoring.get('status', '')).upper() == 'ACTIVE')
+    return registration in {'ACTIVE', 'REGISTERED'} or native_active
+
+
 def read_queue_mode(project: Path) -> dict:
     """A user-intent checkpoint, never an automation registration receipt."""
     path = queue_mode_path(project)
     if not path.exists():
         monitoring = _json_file(path.with_name('status.json')).get('monitoring') or {}
-        if str(monitoring.get('mode', '')).startswith('SCHEDULED'):
+        if (str(monitoring.get('mode', '')).upper().startswith('SCHEDULED')
+                or _native_schedule_claimed(monitoring)):
             raise ValueError('QUEUE_SCHEDULED_REQUEST_REQUIRES_MODE_CHECKPOINT: do not fall back to foreground')
         return {'mode': 'foreground', 'interval_minutes': 15, 'source': 'legacy_default'}
     value = _json_file(path)
@@ -2156,6 +2165,33 @@ def audit_production_state(project: Path) -> dict:
                          for n in ('state', 'manifest')] + [documents['lane'].get('status')]
     if len(set(filter(None, reported_statuses))) > 1:
         issues.append('LANE_STATUS_ROLLUP_MISMATCH')
+    # Once processed cards leave jobs[], their observed history still exposes
+    # stale *current* rollups. Do not compare archived revisions or infer unseen
+    # jobs from absence. The visible queue remains production-owner evidence.
+    known = {
+        str(j.get('scene_id')): (j.get('last_output_index'), j.get('last_visible_state'))
+        for j in queue.get('observed_job_history', []) if j.get('scene_id')
+    }
+    known.update({str(j['scene_id']): (j.get('output_index'), j.get('visible_state'))
+                  for j in queue.get('jobs', [])})
+    for name in ('state', 'manifest', 'lane'):
+        doc = documents[name]
+        locations = [(name, doc),
+                     (name + '.lanes.seedance', doc.get('lanes', {}).get('seedance', {}))]
+        for location, section in locations:
+            for key, rollup in section.items():
+                if not (key.startswith('current_') and key.endswith('_queue_rollup')
+                        and isinstance(rollup, dict)):
+                    continue
+                for row in rollup.get('jobs', []):
+                    actual = known.get(str(row.get('scene_id') or row.get('block_id')))
+                    if actual is None:
+                        continue
+                    reported = (row.get('output_index'), row.get('visible_state'))
+                    if any(a is not None and r is not None and str(a) != str(r)
+                           for a, r in zip(actual, reported)):
+                        issues.append(f'CURRENT_QUEUE_ROLLUP_MISMATCH:{location}.{key}')
+                        break
     monitoring = documents['lane'].get('monitoring') or {}
     def has_evidence(field):
         value = monitoring.get(field)
@@ -2167,9 +2203,11 @@ def audit_production_state(project: Path) -> dict:
         issues.append('SCHEDULE_RUN_CLAIM_WITHOUT_AUTOMATION_ID')
     if monitoring.get('scheduled_run_verified') and not has_evidence('first_run_evidence'):
         issues.append('SCHEDULE_RUN_CLAIM_WITHOUT_RUN_EVIDENCE')
-    if str(monitoring.get('registration_status', '')).upper() in {'ACTIVE', 'REGISTERED'}:
+    if _native_schedule_claimed(monitoring):
         if not monitoring.get('automation_id') or not has_evidence('registration_evidence'):
             issues.append('SCHEDULE_REGISTRATION_CLAIM_WITHOUT_RECEIPT')
+        if not queue_mode_path(project).exists():
+            issues.append('SCHEDULE_INTENT_WITHOUT_MODE_CHECKPOINT')
     verified, approved = 0, 0
     registry = media_registry.db_path(project)
     if registry.is_file():
@@ -2384,6 +2422,17 @@ def diagnose_queue(project: Path) -> dict:
     path = queue_runtime_path(project)
     runtime = _json_file(path)
     wake = runtime.get('wake') if isinstance(runtime.get('wake'), dict) else {}
+    try:
+        read_queue_mode(project)
+    except ValueError as exc:
+        return {
+            'ok': False, 'read_only': True, 'project': str(project),
+            'diagnosis': 'CONTINUATION_SELECTION_REQUIRED', 'error': str(exc),
+            'scheduler_created': False, 'automatic_model_reentry': False,
+            'model_specific_branch': False,
+            'next_action': 'Repair the hash-bound continuation choice from existing user-request evidence in the owning task; do not create a schedule or fall back to sleep.',
+            'state_audit': audit_production_state(project),
+        }
     exit_gate = evaluate_queue_exit(project)
     next_action = exit_gate.get('next_action') or 'No remaining queue action.'
     fresh_board = False
