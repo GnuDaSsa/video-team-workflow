@@ -95,7 +95,7 @@
     {
       "source": "codex-skills/videodirector/SKILL.md",
       "target": ".codex/skills/videodirector/SKILL.md",
-      "sha256": "b53fb2a04388df7610e4b7156d9518e055150ab2c567cc860087278bced892a1"
+      "sha256": "fe24cd9c8fb8091bad149cc1c6031f5065d57914d9016e2ee51abfd275e8b04d"
     },
     {
       "source": "codex-skills/videodirector/agents/openai.yaml",

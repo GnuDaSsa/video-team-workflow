@@ -120,3 +120,13 @@ Record notable technical or product decisions here so they do not live only in c
 ## Scheduled intent takes priority over legacy waiting
 
 Explicit scheduled-check intent is persisted in the canonical Seedance helper before draining a queue. Scheduled queue-cycle checkpoints once and returns; direct foreground wait is rejected. This local selection is not an automation registration or spawn approval. Native app registration and first-run evidence remain separate. Exit now requires a justified terminal, evidenced interruption or scheduled checkpoint, not merely may_stop=true. Scope and verified limitations: docs/releases/2026-09-07/cycle-audit.md.
+
+## Scoped Hell Grind live-action knowledge
+
+The user requested automatic use for photoreal work. Keep the creative content
+in the existing live-action wiki profile, route stills from image-prompt and
+video planning from videodirector, and reuse v4 bounded knowledge selection.
+Do not install the conflicting external skills, switch providers, hide age to
+evade filters, or impose cinematic effects/timings on unrelated work. Single
+stills do not inherit recurring-video identity or dialogue workflow overhead.
+Evidence, scoped deployment and verification: `docs/releases/2026-09-08-hell-grind/release.md`.

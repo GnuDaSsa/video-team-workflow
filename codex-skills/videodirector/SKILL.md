@@ -35,6 +35,16 @@ prompt construction to `seedance-prompt-en`, which owns the model-facing
 prompt rules. Do not apply this profile by default, to live action, or to a
 quiet/continuous acting beat unless the user explicitly asks for it.
 
+## Automatic live-action knowledge
+
+For 실사, 실사풍, 포토리얼, photoreal or live-action work, use
+`/Users/gnudas/wiki/concepts/video-prompting-live-action.md` before planning,
+image authoring or QC; the user need not name Hell Grind. Apply only the matching
+medium and task sections. In v4, declare `medium: live_action` (plus the actual
+component media for mixed work); Seedance receives it through the existing
+bounded `medium-live-action` knowledge selection, not a second full-wiki read.
+This is creative knowledge, not a new production rail or external skill install.
+
 ## Workflow
 
 Direction first, the audio spine second, and **QC after every production stage** — never one review at the end.

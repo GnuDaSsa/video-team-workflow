@@ -1,0 +1,253 @@
+{
+  "catalog": {
+    "ok": true,
+    "catalog": "/Users/gnudas/wiki/_meta/video-knowledge-catalog.json",
+    "wiki_root": "/Users/gnudas/wiki",
+    "entry_count": 25,
+    "problems": []
+  },
+  "routing_cases": [
+    {
+      "case": "ko_portrait",
+      "attributes": {
+        "medium": "실사",
+        "shot_roles": [
+          "close_up"
+        ],
+        "cameras": [
+          "static"
+        ],
+        "risks": [
+          "identity_drift"
+        ]
+      },
+      "expected_live_action": true,
+      "selected": [
+        "hot-core",
+        "higgsfield-community-core",
+        "composition-order",
+        "higgsfield-community-camera-physics",
+        "medium-live-action",
+        "risk-identity-clone"
+      ],
+      "profile_full_text_preserved": true,
+      "context_chars": 7564,
+      "pass": true
+    },
+    {
+      "case": "dialogue",
+      "attributes": {
+        "medium": "live_action",
+        "shot_roles": [
+          "dialogue"
+        ],
+        "cameras": [
+          "handheld"
+        ],
+        "risks": [
+          "identity_drift",
+          "audio_naturalness"
+        ],
+        "audio": [
+          "dialogue"
+        ]
+      },
+      "expected_live_action": true,
+      "selected": [
+        "hot-core",
+        "higgsfield-community-core",
+        "composition-order",
+        "higgsfield-community-camera-physics",
+        "medium-live-action",
+        "risk-identity-clone"
+      ],
+      "profile_full_text_preserved": true,
+      "context_chars": 7599,
+      "pass": true
+    },
+    {
+      "case": "product",
+      "attributes": {
+        "medium": "live_action",
+        "project_type": "product",
+        "shot_roles": [
+          "product",
+          "object_macro"
+        ],
+        "cameras": [
+          "macro"
+        ],
+        "risks": [
+          "hand_object",
+          "text_logo"
+        ]
+      },
+      "expected_live_action": true,
+      "selected": [
+        "hot-core",
+        "higgsfield-community-core",
+        "composition-order",
+        "higgsfield-community-camera-physics",
+        "higgsfield-community-product-ugc",
+        "medium-live-action"
+      ],
+      "profile_full_text_preserved": true,
+      "context_chars": 6934,
+      "pass": true
+    },
+    {
+      "case": "action",
+      "attributes": {
+        "medium": "live_action",
+        "shot_roles": [
+          "action"
+        ],
+        "cameras": [
+          "tracking"
+        ],
+        "risks": [
+          "crop_drift",
+          "hand_object"
+        ]
+      },
+      "expected_live_action": true,
+      "selected": [
+        "hot-core",
+        "higgsfield-community-core",
+        "composition-order",
+        "higgsfield-community-camera-physics",
+        "higgsfield-community-product-ugc",
+        "medium-live-action"
+      ],
+      "profile_full_text_preserved": true,
+      "context_chars": 6858,
+      "pass": true
+    },
+    {
+      "case": "mixed",
+      "attributes": {
+        "mediums": [
+          "mixed",
+          "2d_animation",
+          "live_action"
+        ],
+        "shot_roles": [
+          "montage"
+        ],
+        "cameras": [
+          "static"
+        ]
+      },
+      "expected_live_action": true,
+      "selected": [
+        "hot-core",
+        "higgsfield-community-core",
+        "composition-order",
+        "higgsfield-community-camera-physics",
+        "medium-2d",
+        "medium-live-action"
+      ],
+      "profile_full_text_preserved": true,
+      "context_chars": 8501,
+      "pass": true
+    },
+    {
+      "case": "pure_2d",
+      "attributes": {
+        "medium": "2d_animation",
+        "shot_roles": [
+          "dialogue"
+        ],
+        "cameras": [
+          "static"
+        ],
+        "audio": [
+          "dialogue"
+        ]
+      },
+      "expected_live_action": false,
+      "selected": [
+        "hot-core",
+        "higgsfield-community-core",
+        "composition-order",
+        "higgsfield-community-camera-physics",
+        "medium-2d",
+        "audio-route"
+      ],
+      "profile_full_text_preserved": false,
+      "context_chars": 7922,
+      "pass": true
+    },
+    {
+      "case": "pure_3d",
+      "attributes": {
+        "medium": "3d_animation",
+        "shot_roles": [
+          "action"
+        ],
+        "cameras": [
+          "tracking"
+        ]
+      },
+      "expected_live_action": false,
+      "selected": [
+        "hot-core",
+        "higgsfield-community-core",
+        "composition-order",
+        "higgsfield-community-camera-physics",
+        "medium-3d",
+        "camera-action-tracking"
+      ],
+      "profile_full_text_preserved": false,
+      "context_chars": 6279,
+      "pass": true
+    }
+  ],
+  "compiler_examples": [
+    {
+      "file": "cafe-still.txt",
+      "pass": true,
+      "validator": {
+        "ok": true,
+        "format": "A",
+        "tier": 0,
+        "errors": [],
+        "warnings": []
+      }
+    },
+    {
+      "file": "product-still.txt",
+      "pass": true,
+      "validator": {
+        "ok": true,
+        "format": "A",
+        "tier": 0,
+        "errors": [],
+        "warnings": []
+      }
+    },
+    {
+      "file": "jacket-edit.txt",
+      "pass": true,
+      "validator": {
+        "ok": true,
+        "format": "A",
+        "tier": 0,
+        "errors": [],
+        "warnings": []
+      }
+    }
+  ],
+  "profile_chars": 2143,
+  "wiki_snapshot_parity": true,
+  "videodirector_parity": true,
+  "image_compiler_frontmatter_unchanged": true,
+  "image_compiler_global_quick_validate": "PREEXISTING version frontmatter key unsupported by generic quick_validate; preserved. Actual compiler examples pass.",
+  "source_notes_hash_verified": true,
+  "limitations": [
+    "No media generation or playback-quality claim",
+    "No independent model/agent behavioral evaluation",
+    "No provider/UI/queue changes",
+    "Global deployment is not claimed: unrelated preexisting SOURCE_MANIFEST_DRIFT"
+  ]
+}

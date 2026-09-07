@@ -78,3 +78,11 @@ Use this file for durable context that should survive across threads.
 ## Scheduled-check continuation
 
 When the user requests periodic scheduled checks, preserve that mode across model/turn changes through canonical queue-mode; do not silently substitute attached 15-minute waits. Never infer an active schedule from a proposal card or mode file, nor repeat initial approval at every run. Inspect existing native registration before creating another surface. queue-doctor also audits active rollups and unsupported DONE/schedule claims; its local file checks never certify scheduler access or playback QC. See the canonical Seedance production branch.
+
+## Automatic photoreal knowledge
+
+For 실사/포토리얼 stills and live-action video, the user need not repeat “Hell
+Grind.” The existing live-action wiki profile is selected automatically via
+image-prompt/videodirector/v4 knowledge routing. Apply only matching task/media
+sections. Source contradictions and provider-specific recipes are not global
+rules. Canonical content and verification: `docs/releases/2026-09-08-hell-grind/release.md`.

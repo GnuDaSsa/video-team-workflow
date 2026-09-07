@@ -12,6 +12,18 @@
   },
   "recentCloseouts": [
     {
+      "id": "2026-09-08-hell-grind-live-action",
+      "status": "complete",
+      "contract": "docs/contracts/2026-09-08-hell-grind-live-action.md",
+      "completedAt": "2026-09-08T07:40:38+09:00",
+      "verification": {
+        "lastResult": "PASS_SCOPED_ROUTES_AND_DEPLOYMENT",
+        "lastCommand": "7 router cases; 3 compiler examples; 14 compiler fixtures; videodirector quick_validate; 143 unit tests; Python/shell/diff checks; wiki lint and source/deployed hashes",
+        "notes": "No actual media generation or full-film playback. Existing image-prompt generic-validator version-key warning and unrelated full-release source drift remain scoped out. See release.md."
+      },
+      "nextStep": "Apply matching profile on the next real photoreal request; assess generated image/video quality separately."
+    },
+    {
       "id": "2026-09-05-seedance-25-explicit-skill",
       "status": "complete",
       "contract": "docs/contracts/2026-09-05-seedance-25-explicit-skill.md",
