@@ -102,21 +102,45 @@ continuation without inventing a provider failure. A timestamp-only update is
 not progress. Never add a second scheduler or take over the browser to repair it.
 Verify actual native PAUSED state before claiming that monitoring stopped.
 
-Persist the exact monitored scene IDs and completion condition with the native
-registration receipt. First compare that scope with the owner's latest
-harvest/queue evidence: if already finished, pause that exact schedule without
-reopening the board or expanding to the next scene. Codex usage-limit failures
-are failed observation runs, not proof that Runway is stalled; distinguish
-configured model preference from the model named in an actual run/error.
+### Post-Generate continuation gate
 
-Each approved scheduled run checks the same bound board **once**, checkpoints
-actual states, then exits quietly when unchanged. Report only meaningful state
-changes, completion/failure or required user action. Never call sleep, start a
-browser loop, add agents or re-submit accepted jobs. A live production owner or
-login/permission/CAPTCHA/account block means no competing UI action. At the
-schedule's declared completion condition, pause that exact automation and hand
-off the remaining download/QC work; scope expansion requires the appropriate
-approval. Provider `COMPLETED` is not downloaded or QC-passed media.
+A successful Generate is not a safe terminal checkpoint. Before ending a
+scheduled production turn, persist `scheduled_followup` with the exact job/scene,
+acceptance evidence and observation time, `due_at`, existing automation ID,
+consumer task ID, next action, and terminal condition. Verify native registration
+covers that consumer and purpose. If the existing approved schedule is absent or
+paused, repair that same registration through the native tool; never merely
+promise to wait. A missing executable follow-up is `CONTINUATION_NOT_ARMED`, not
+production running or complete. Do not click Generate again to repair scheduling.
+
+For project-wide continuation already authorized by the user, the next action is
+check accepted job -> download -> verify file/registry -> QC -> next approved
+package. Advance the exact scene scope inside that same authorized project;
+finishing one clip does not end the project schedule. For an explicitly
+single-scene/observe-only schedule, stop at its declared terminal scope instead.
+Do not pause at provider COMPLETED when download/QC is still in that scope.
+No new scheduler or renewed routine approval is needed for an existing approved
+project continuation schedule.
+
+At each due check, consume one actual board observation, not a continuous watch.
+Set the next due time from the real acceptance/pending observation plus the
+approved 15-20 minute interval. Execution occurs on the first heartbeat at or
+after due, not at a guaranteed exact second. An idle owner is woken once; an active
+owner is never given competing UI commands. Require fresh execution evidence
+within one check interval after delivery even if app metadata stays active;
+otherwise pause the exact registration and report `EXECUTION_UNVERIFIED` once.
+
+App active, a new turn ID, file mtime and a saved plan are not evidence of current
+production. Compare embedded observation time with original tool/capture evidence
+or an independently verified new artifact. Late-written old observations remain
+historical; inconsistent times are `STALE_OR_INCONSISTENT_EVIDENCE`. Report app
+state, last verified production observation, and media/QC status separately.
+Never certify full playback QC from file hashes or owner text alone.
+
+A live production owner or verified login/permission/CAPTCHA/account blocker means
+no competing UI action. Codex usage-limit errors are observation execution
+failures, not proof of Runway failure. No sleep, extra agent, second browser loop,
+or resubmission of accepted jobs. Verify native PAUSED before reporting a stop.
 
 `queue-doctor` also returns a read-only state audit: stale lane/queue rollups
 (including nested current rollups after cards have been processed),

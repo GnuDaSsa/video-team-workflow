@@ -45,7 +45,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/seedance-production.md",
       "target": ".codex/skills/seedance-prompt-en/seedance-production.md",
-      "sha256": "a7a7eafdce700b787485315273458fbca497844e80edfcbe9b37c1d33dc0bb52"
+      "sha256": "ba2ea00d7f02ddb7699c280a0f723cabe340058e208beda49612b16a266f3d17"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-prompting.md",

@@ -47,5 +47,10 @@ no-progress consumed checks. No second scheduler or UI owner is introduced.
 143 existing tests and syntax/diff checks pass; these do not establish live
 continuation delivery/consumption. Canonical deployment at the observed idle boundary passed 66-file parity (2
 changed files). One existing-owner resume was delivered and a new active turn
-was verified. Fresh provider/artifact consumption remains pending; no further
-resume may be sent while that handoff is outstanding.
+was verified. S08 canonical video size/SHA were subsequently independently verified, consuming
+that handoff. S09 acceptance is owner-recorded; current provider completion is
+not independently verified. The user requested actual post-Generate supervision.
+The shared production checklist now requires an executable follow-up before
+ending, distinguishes project-wide continuation from single-scene scope, and
+rejects active/mtime-only progress claims. Existing project schedule remains the
+only scheduler; test-suite PASS does not prove unattended production completion.
