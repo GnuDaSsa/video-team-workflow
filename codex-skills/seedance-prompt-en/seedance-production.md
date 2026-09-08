@@ -84,6 +84,24 @@ native tool evidence separately from first-run evidence. Heartbeat model choice
 may inherit task settings; do not claim Luna execution from a routing table.
 A local mode file never proves registration, browser access or successful runs.
 
+Declare the reservation's purpose: **observe-only** or **production continuation**.
+An observe-only heartbeat on a review task cannot wake an idle production owner
+and must never be presented as automatic production. Before ending with active
+jobs, verify which exact existing task will consume the next scheduled check.
+"Waiting" in a final answer is not a continuation mechanism.
+
+When the user authorizes continuation through an existing review heartbeat, keep
+the production task as the sole UI owner. The review heartbeat may send one
+bounded resume message to that existing idle/notLoaded task, never to an active
+task or one held by the user or a verified safety blocker. Persist a pending
+handoff before sending; receipt is delivery, not execution. Require a new owner
+turn plus a fresh provider/artifact checkpoint before another handoff. Missing
+consumption means pause and report once, not another identical message. After
+three consumed checks without material progress, pause and report stalled
+continuation without inventing a provider failure. A timestamp-only update is
+not progress. Never add a second scheduler or take over the browser to repair it.
+Verify actual native PAUSED state before claiming that monitoring stopped.
+
 Persist the exact monitored scene IDs and completion condition with the native
 registration receipt. First compare that scope with the owner's latest
 harvest/queue evidence: if already finished, pause that exact schedule without

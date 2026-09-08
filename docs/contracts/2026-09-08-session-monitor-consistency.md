@@ -38,6 +38,14 @@ claims that technical/assignment QC establishes full-motion quality.
 source audit reproduces two nested current-rollup mismatches, missing schedule
 mode/receipt linkage, and two candidate-video registry hash mismatches. Evidence
 was sent once to the production owner; no project or browser mutation. Native
-20-minute monitor registration is verified, first scheduled run is pending.
-Source correction is ready for isolated sync; deployment remains pending a safe
-production-owner boundary.
+20-minute registration and actual native runs are verified. The later audit found
+38 checks of a non-running owner: observe-only was mistaken for continuation.
+The user requested repairing that gap. The existing heartbeat now permits bounded
+resume of the same idle production owner, with pending-delivery deduplication,
+actual checkpoint acknowledgement, and pause after missing consumption or three
+no-progress consumed checks. No second scheduler or UI owner is introduced.
+143 existing tests and syntax/diff checks pass; these do not establish live
+continuation delivery/consumption. Canonical deployment at the observed idle boundary passed 66-file parity (2
+changed files). One existing-owner resume was delivered and a new active turn
+was verified. Fresh provider/artifact consumption remains pending; no further
+resume may be sent while that handoff is outstanding.
