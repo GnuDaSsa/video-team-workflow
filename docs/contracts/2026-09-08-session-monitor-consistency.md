@@ -54,3 +54,16 @@ The shared production checklist now requires an executable follow-up before
 ending, distinguishes project-wide continuation from single-scene scope, and
 rejects active/mtime-only progress claims. Existing project schedule remains the
 only scheduler; test-suite PASS does not prove unattended production completion.
+
+## Rejected-output and authoring correction
+User evidence: R24 S08/S09 were authored in Luna tool turns, while routing alone
+claimed Astra preference. S08 sampled ending loses its required person despite
+owner QC PASS. Scope: runtime actual-model stop/visible label, immutable handoff,
+manual author-evidence + semantic review checklist, and 2.5 ending/subject QC.
+No automatic authorship verification is claimed: existing attest remains format/
+hash/duration validation. No new agent or production generation. Existing native
+automation is PAUSED for user review. Acceptance: deployed document parity and 143 existing regression tests PASS;
+no new automatic model/creative verifier or video quality PASS is claimed.
+User correction: do not proliferate project reconciliation files. Use existing
+package/attestation plus task history; canonical policy only, evidence is not
+implementation.

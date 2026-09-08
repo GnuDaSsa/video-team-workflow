@@ -132,6 +132,18 @@ For every completed card:
 
 ## Clip QC for reducing AI appearance
 
+Before creative PASS, compare every planned shot and the final one-second hold
+against the actual video. Explicitly check subject permanence, face/body continuity,
+contact/prop continuity, unintended transparency/disappearance, and required final
+pose/crop. A sample showing an absent subject where one must remain is REJECT,
+not PASS merely because a forbidden drone is absent. Do not claim inspected
+sample times without viewing those frames. Technical file/hash/codec PASS and
+creative/identity PASS are separate. Contact-sheet review cannot certify motion,
+transition or audio quality; full playback remains required for those verdicts.
+A user-rejected clip is HOLD for editing/reuse until the rejection is resolved;
+retain the historical receipt but do not keep citing it as current approval.
+
+
 Inspect full-speed playback, slow inspection around contact/transition frames,
 and representative full-resolution frames. Reject or repair:
 

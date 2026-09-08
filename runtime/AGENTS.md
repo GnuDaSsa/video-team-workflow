@@ -83,7 +83,7 @@ flowchart TD
 
 ### 1.3 모델 라우팅과 Seedance phase handoff
 
-기본은 현재 대화의 모델/owner를 유지하고 역할만 전환한다. 아래 `runtime/scripts/model_routing.py` 정책은 사용자가 특정 별도 dispatch를 승인했을 때만 적용하는 호환 경로다. 모델 표가 새 작업/owner 생성 지시가 되지 않는다.
+기본은 현재 owner를 유지한다. 단, 이미지·영상 프롬프트 저작은 아래 아스트라 저작 게이트를 통과해야 하며 역할 이름만 바꿔 다른 모델이 대행하지 않는다. `runtime/scripts/model_routing.py`의 별도 dispatch는 해당 spawn 승인 때만 쓰는 호환 경로이며 모델 표는 새 작업/owner 생성 권한이 아니다.
 
 | 작업 phase | 모델 | reasoning |
 |---|---|---|
@@ -91,6 +91,14 @@ flowchart TD
 | Seedance 영상 프롬프트 저작·검증·attest (`seedance:prompting`) | `gpt-6-astra` | `xhigh` |
 | Director, Music, Planner, Image QC, Seedance QC, Editor, Package | `gpt-5.6-luna` | `high` |
 | Aside CLI/Runway/Computer Use 실행 (`seedance:production`) | `gpt-5.6-luna` | `high` |
+
+### 아스트라 프롬프트 저작 게이트
+
+- 이미지·영상의 최종 프롬프트 작성·의미 변경·창작 검토를 실제 아스트라가 시작할 때 사용자에게 정확히 **`[아스트라 프롬프팅]`**을 표시한다. 이 라벨은 transcript용이며 이미지/영상 생성기에 보내는 본문에는 넣지 않는다.
+- 실제 현재 모델이 `gpt-6-astra`인지 실행 컨텍스트로 확인한다. 라우팅 표, 역할 이름, 과거 모델, 수동 `author_model` 값은 실행 근거가 아니다. 루나/다른 모델이면 최종 저작을 대신하지 않고 `HOLD_ASTRA_AUTHOR_REQUIRED`를 기록한다. 임의 agent를 만들거나 자동 모델 전환이 됐다고 가장하지 않는다. 같은 기존 작업의 모델 전환이 필요하면 그 한 가지 조치를 명확히 알린다.
+- 루나 production은 아스트라가 확정한 불변 프롬프트를 실행할 수 있다. 문장 삭제·추가·요약·정책 경고 수정·일괄 템플릿 치환은 모두 저작 변경이므로 아스트라 단계로 돌아간다. 안전 경고를 숨기거나 우회하지 않는다.
+- 아스트라 등장 표시는 모델 증명이 아니다. 최종 prompt hash, 작성 task/turn, 실제 모델 관측 출처를 묶어 handoff에 남긴다. 기존 프롬프트는 역사적 승인으로 소급 폐기하지 않지만, 아직 제출하지 않았거나 사용자가 거부한 패키지는 이 근거 없이 재사용·재제출하지 않는다. 과거 루나 문장을 읽고 metadata만 아스트라로 바꾸는 것은 저작/검토가 아니다.
+- 저작 근거와 의미 검토의 구체적 체크리스트는 Seedance `prompt-review.md`가 소유한다. 자동 `ATTESTED` 검증이 저작 모델이나 창작 품질까지 증명한다고 말하지 않는다.
 
 - Seedance는 같은 `lanes/seedance/`에서 **동일 owner의 두 순차 단계**로 실행한다. 별도 owner handoff는 해당 spawn 승인 때만 예외다.
 - Prompting phase는 로컬 prompt pack을 저작·attest하고 `READY_FOR_PRODUCTION`을 기록하고 같은 대화에서 production 단계로 이어간다. Aside/Runway/Computer Use를 열지 않는다.
@@ -107,7 +115,7 @@ flowchart TD
 
 - `Sol prompt bridge`, `Terra prompt lane` 및 모델별 프롬프트 전담 역할은 폐기한다.
 - Planner는 컷·블록 구조, 참조 역할, 음악 큐, 동작 의도까지만 정의한다.
-- 프롬프트를 실제로 쓰는 production lane이 최종 저작자다.
+- lane 이름이 저작 권한을 주지 않는다. 최종 프롬프트는 §1.3 아스트라 저작 게이트를 통과한 prompting 단계가 소유하고 production 단계는 불변 입력을 소비한다.
 
 ### 2.2 이미지
 

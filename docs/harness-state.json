@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Repair observe-only vs production continuation gap using the existing heartbeat and existing production owner.",
+  "currentGoal": "Enforce Astra authoring discipline and reject false-positive creative QC without project-specific rule proliferation",
   "status": "in_progress",
   "currentContract": "docs/contracts/2026-09-08-session-monitor-consistency.md",
   "blockers": [],
-  "nextStep": "Existing heartbeat verifies S09 resume consumption and synchronizes owner scheduled_followup through download/QC/next approved scene. Do not equate delivery/active with production.",
-  "lastUpdated": "2026-09-08T21:35:32.839070+09:00",
+  "nextStep": "Production remains user-review HOLD. Astra reauthors rejected blocks under canonical policy; existing package/attestation and real task history, no reconciliation files. Automatic model provenance enforcement is not implemented.",
+  "lastUpdated": "2026-09-08T23:04:13.544668+09:00",
   "verification": {
-    "lastCommand": "143 unittest tests; py_compile; shell syntax; git diff --check; video_release freeze/preflight/apply/check",
-    "lastResult": "PASS_POST_GENERATE_GUIDANCE_DEPLOYED",
-    "notes": "66-file parity. Existing automation ACTIVE update confirmed, one user-requested S09 resume delivered. Current provider state and unattended continuation not verified."
+    "lastCommand": "143 existing unit tests; py_compile; shell syntax; diff check; release freeze/preflight/apply/check",
+    "lastResult": "PASS_CANONICAL_GUIDANCE_ONLY",
+    "notes": "Policy/checklist change, not new automatic model/creative verifier. No video regeneration or full playback QC. Exact Astra label deployed; producer idle at deployment."
   },
   "recentCloseouts": [
     {
