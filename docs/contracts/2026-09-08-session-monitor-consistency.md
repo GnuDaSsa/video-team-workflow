@@ -75,3 +75,9 @@ as standing preference, with existing native registration reuse, post-generation
 continuation and no per-project rule clones. Runtime points to that single owner;
 promotion protocol interprets guideline-improvement requests as shared by default.
 No new schedule is created and the rejected project's PAUSED/HOLD is preserved.
+
+## Generation-first correction
+User rejects serial per-clip QC bottlenecks. Shared policy now prioritizes filling
+allowed generation capacity, candidate harvest, opportunistic wait-time QC, then
+remaining QC in cut order after generation. QC still gates promotion/delivery and
+dependent sources, not independent submissions. No new worker or live generation.

@@ -132,6 +132,11 @@ For every completed card:
 
 ## Clip QC for reducing AI appearance
 
+QC timing follows the shared production document’s Generation-first scheduling
+priority: wait-time or post-batch review, not a per-clip prerequisite to the next
+independent approved generation. The checks below gate creative approval/reuse
+and delivery, not queue refilling.
+
 Before creative PASS, compare every planned shot and the final one-second hold
 against the actual video. Explicitly check subject permanence, face/body continuity,
 contact/prop continuity, unintended transparency/disappearance, and required final

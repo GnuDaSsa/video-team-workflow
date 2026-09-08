@@ -40,7 +40,7 @@ flowchart TD
    - worker는 프롬프트를 수정·재작성·보완하지 않는다.
    - worker는 에이전트가 아니라 수명이 제한된 파일 생성 프로세스이며, fan-in 뒤 종료한다.
    - 4개 이상 요청은 `IMAGE_WORKER_CAP_EXCEEDED`로 거부한다.
-4. 이미지 QC, Seedance, Seedance QC, 편집, 패키징은 모두 직렬이다.
+4. 같은 owner가 직렬 실행하되 영상 생성은 QC보다 우선한다. 제출 가능한 승인 패키지를 먼저 생성하고, provider 대기 시간에 완료 후보를 QC한다. QC backlog는 독립된 다음 패키지 생성을 막지 않는다. 생성 배치 후 남은 QC를 컷 순서대로 끝내며 승인 승격·최종 편집/납품에는 QC를 유지한다.
 5. 프로바이더 기본값은 Seedance다. Grok I2V는 사용자가 해당 프로젝트에서 명시했을 때만 같은 직렬 레일 안에서 사용한다. 프로바이더 병렬은 금지한다.
 6. 임의 subagent, 전담 프롬프트 agent, 백그라운드 daemon, cron, heartbeat, 두 번째 브라우저 자동화 루프를 만들지 않는다.
 7. 별도 Codex owner를 만드는 lane dispatch는 현재 대화의 해당 spawn 승인을 요구하며, runtime은 `--approved-spawn <lane>:<phase>`가 정확히 일치하지 않으면 거부한다. **같은 owner가 다음 lane/phase의 책임을 이어받는 것은 dispatch/spawn이 아니며 추가 승인을 묻지 않는다.** `next`의 `default_execution`이 기본이고 `next_dispatch`는 승인된 별도 owner 생성에만 쓰는 호환 정보다.
@@ -55,7 +55,7 @@ flowchart TD
 ### 공통 워크플로우 개선과 예약 적용 범위
 
 - 사용자가 작업 중 “지침 반영”, “워크플로우 수정/개선”을 요청하면 명시적 프로젝트 한정 예외가 아닌 한 `video-team-workflow`의 해당 공통 원본을 수정·검증·배포한다. 프로젝트 메모/증거/래퍼 수정만으로 완료를 보고하지 않는다. 절차: 원본 저장소 `docs/video-feedback-promotion-protocol.md`.
-- Seedance 생성 후 예약 확인·다운로드·QC·다음 승인 패키지 연속 진행은 모든 프로젝트에 적용되는 공통 절차다. 기본 주기·등록·종료·소비 검증의 단일 원본은 선택된 Seedance skill이 참조하는 shared `seedance-production.md`의 Continuation selection/Post-Generate continuation gate다. 이 파일에 UI/예약 절차를 복제하지 않는다.
+- Seedance 생성 우선·예약 확인·다음 승인 패키지 접수·다운로드·대기 중/배치 후 QC은 모든 프로젝트에 적용되는 공통 절차다. 기본 주기·등록·종료·소비 검증의 단일 원본은 선택된 Seedance skill이 참조하는 shared `seedance-production.md`의 Continuation selection/Post-Generate continuation gate다. 이 파일에 UI/예약 절차를 복제하지 않는다.
 - 공통 정책 적용과 예약 인스턴스 생성은 다르다. 각 프로젝트는 자신의 작업/큐에 연결된 승인된 예약을 사용한다. 다른 프로젝트 예약을 재사용하거나 현재 HOLD/PAUSED 작업을 공통 개선 명목으로 재개하지 않는다. 새 surface 승인과 안전 게이트는 유지한다.
 
 ### 1.0 입력 증거 게이트

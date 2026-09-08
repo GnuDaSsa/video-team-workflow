@@ -45,7 +45,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/seedance-production.md",
       "target": ".codex/skills/seedance-prompt-en/seedance-production.md",
-      "sha256": "23ac9d2ce3134f207b78b805ee0c244ac919a00253f545d1b833e73c509c8f8e"
+      "sha256": "b2cd1910c47f5d65718f18e1a9b966287bb23a0e979d66d276bd4353749d2a89"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-prompting.md",
@@ -80,7 +80,7 @@
     {
       "source": "codex-skills/seedance25-prompt-en/production.md",
       "target": ".codex/skills/seedance25-prompt-en/production.md",
-      "sha256": "028b373de77a2d04bea4769299b8847484dfc8278446f9cbf05f8824f0e054de"
+      "sha256": "3ddbb233d354e82dfa18c02290a9ac21b2f4833a78467917a1482c91478b7774"
     },
     {
       "source": "codex-skills/seedance25-prompt-en/prompting.md",
@@ -270,7 +270,7 @@
     {
       "source": "runtime/AGENTS.md",
       "target": "Documents/Codex/video-team-runtime/AGENTS.md",
-      "sha256": "d7e5514f7d9e6702d81825a4c55eb1e48c0b7b1b651ff5fc854d06df46335d50"
+      "sha256": "4bd7023a183ae1ffb18c7f674ec8e03f0812c1161bc81c32960e44af5ed86ae0"
     },
     {
       "source": "references/character_sheet_prompt_standard.md",

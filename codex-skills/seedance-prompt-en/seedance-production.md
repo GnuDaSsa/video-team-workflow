@@ -62,8 +62,8 @@ approved schedule, silently fall back to foreground, or claim registration when
 only a local preference exists. If creation approval is missing, report that exact
 missing step once rather than pretending continuation is armed.
 
-The shared behavior is check accepted jobs -> download -> technical verification
--> visual/playback QC -> next approved package, with the post-Generate gate below.
+The shared behavior follows the generation-first priority below, with the
+post-Generate gate preserving follow-up rather than blocking on clip QC.
 Keep only run data (project/task/job IDs, native receipt, last observation,
 next due/action and completion scope) in existing project state. Never copy this
 procedure into a project-specific reconciliation JSON or wrapper. Existing user
@@ -119,6 +119,32 @@ continuation without inventing a provider failure. A timestamp-only update is
 not progress. Never add a second scheduler or take over the browser to repair it.
 Verify actual native PAUSED state before claiming that monitoring stopped.
 
+### Generation-first scheduling priority
+
+Unless the user explicitly requests a per-clip review gate, generate the planned
+approved batch first. At each short scheduled check, read the board and refill
+available capacity with the next eligible, attested package BEFORE lengthy QC.
+Use the selected version's actual capacity rules; this is not agent concurrency.
+Save completed media promptly to candidate storage and verify file identity so
+it is not lost or misassigned. Candidate registration is not creative approval.
+
+During provider waiting time, the same owner may QC downloaded candidates in
+cut order. If QC cannot finish before generation work is due, checkpoint the
+backlog and prioritize the next generation action. After initial generation is
+finished, review all remaining candidates from the first unreviewed cut onward.
+Do not pause a project because an unrelated previous clip is not yet QC-passed.
+A failed clip goes on the repair list without blocking independent approved
+shots. Do not trigger an endless repair loop before completing the initial batch.
+
+Keep QC before approved-media promotion and final edit/delivery, not between
+independent Generate submissions. Prompt/identity/reference/settings checks,
+actual source dependencies (a later clip using an earlier video), safety failures,
+and explicit user HOLD still gate the affected submission. This priority does
+not bypass source-image QC or permit reuse of a rejected source. Never infer
+project-wide HOLD from a single creative defect unless it affects shared inputs.
+Project generation complete and QC complete are distinct states; the existing
+schedule remains responsible for the QC backlog within its authorized scope.
+
 ### Post-Generate continuation gate
 
 A successful Generate is not a safe terminal checkpoint. Before ending a
@@ -131,8 +157,9 @@ promise to wait. A missing executable follow-up is `CONTINUATION_NOT_ARMED`, not
 production running or complete. Do not click Generate again to repair scheduling.
 
 For project-wide continuation already authorized by the user, the next action is
-check accepted job -> download -> verify file/registry -> QC -> next approved
-package. Advance the exact scene scope inside that same authorized project;
+check accepted jobs -> submit the next eligible approved package when capacity
+opens -> harvest completed candidates -> use waiting time for QC. Advance the
+exact scene scope inside that same authorized project;
 finishing one clip does not end the project schedule. For an explicitly
 single-scene/observe-only schedule, stop at its declared terminal scope instead.
 Do not pause at provider COMPLETED when download/QC is still in that scope.

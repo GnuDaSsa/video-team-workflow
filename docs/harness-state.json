@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Apply scheduled continuation and workflow-feedback promotion as shared defaults, not project patches",
+  "currentGoal": "Generation-first shared workflow; QC during wait or after batch without blocking independent submissions",
   "status": "in_progress",
   "currentContract": "docs/contracts/2026-09-08-session-monitor-consistency.md",
   "blockers": [],
-  "nextStep": "Use deployed shared scheduling procedure on future approved project runs; current rejected project remains PAUSED/HOLD. New schedule surfaces still require specific approval.",
-  "lastUpdated": "2026-09-08T23:10:03.019455+09:00",
+  "nextStep": "Apply deployed generation-first priority on next eligible production; current authoring/review HOLD unchanged. Verify actual queue throughput separately.",
+  "lastUpdated": "2026-09-08T23:24:51.651666+09:00",
   "verification": {
-    "lastCommand": "143 existing tests; git diff --check; release freeze/preflight/apply/check",
-    "lastResult": "PASS_SHARED_POLICY_DEPLOYED",
-    "notes": "66 managed files parity; 2 deployed changes. No new scheduler or production execution; scheduling preference is policy, not an automatically created registration."
+    "lastCommand": "143 existing tests; diff check; release freeze/preflight/apply/check",
+    "lastResult": "PASS_GENERATION_FIRST_POLICY_DEPLOYED",
+    "notes": "66-file parity,3 deployed changes. Existing paused automation prompt aligned. No actual generation/throughput test or new scheduler."
   },
   "recentCloseouts": [
     {
