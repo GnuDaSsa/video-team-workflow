@@ -270,7 +270,7 @@
     {
       "source": "runtime/AGENTS.md",
       "target": "Documents/Codex/video-team-runtime/AGENTS.md",
-      "sha256": "4bd7023a183ae1ffb18c7f674ec8e03f0812c1161bc81c32960e44af5ed86ae0"
+      "sha256": "f70ee669575906bd1c4089c559489b44f7027670db464e0fc83089c26817c741"
     },
     {
       "source": "references/character_sheet_prompt_standard.md",

@@ -81,3 +81,10 @@ User rejects serial per-clip QC bottlenecks. Shared policy now prioritizes filli
 allowed generation capacity, candidate harvest, opportunistic wait-time QC, then
 remaining QC in cut order after generation. QC still gates promotion/delivery and
 dependent sources, not independent submissions. No new worker or live generation.
+
+## Same-task model transition correction
+User requested direct coordination with the existing production task. Native
+follow-up sent with actual model=gpt-6-astra, thinking=xhigh (no new task).
+Canonical policy now distinguishes authorized same-task model transition from
+new-owner spawning; require actual authored artifacts before Luna execution.
+Source update must wait for idle boundary before deployment.
