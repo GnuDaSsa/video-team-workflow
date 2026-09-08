@@ -49,9 +49,26 @@ Do not repeatedly try a failed control or switch browser to escape the block.
 
 ## Continuation selection: scheduled means short scheduled checks
 
-The user's explicit scheduled-check request takes priority over the legacy
-foreground default. Record that request once in project evidence, then persist
-it before the first queue drain or on a changed preference:
+The user's standing video-team preference is **scheduled production continuation**,
+not continuous foreground supervision. This common procedure applies to every
+Seedance project (2.0/default and the 2.5 adapter), not just the project that
+exposed the failure. Use 20-minute checks unless the user specifies 15 minutes
+or another interval. An explicit foreground request overrides this preference.
+
+Select scheduled mode before the first queue drain. Reuse an existing matching,
+authorized native registration; a new scheduler surface still needs its specific
+approval under the spawn policy. Do not ask again for routine checks on that
+approved schedule, silently fall back to foreground, or claim registration when
+only a local preference exists. If creation approval is missing, report that exact
+missing step once rather than pretending continuation is armed.
+
+The shared behavior is check accepted jobs -> download -> technical verification
+-> visual/playback QC -> next approved package, with the post-Generate gate below.
+Keep only run data (project/task/job IDs, native receipt, last observation,
+next due/action and completion scope) in existing project state. Never copy this
+procedure into a project-specific reconciliation JSON or wrapper. Existing user
+request/task evidence is sufficient; do not manufacture another evidence note
+just to restate this standing preference. Persist mode using the existing helper:
 
 ```bash
 python3 ~/.codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py queue-mode \

@@ -9,14 +9,17 @@ never authorizes an extra agent, scheduler, monitor, or automatic Git writer.
 
 ## Intake
 
-When a user correction or a material process failure occurs, the owning lane
-records a concise evidence note under `lanes/<lane>/logs/` and links it from
-that lane's `result.md`/`status.json` when relevant. The note contains:
+An explicit request to "reflect this in the guidelines" or "improve the workflow"
+means change the canonical shared owner by default, unless the user explicitly
+limits it to this project. First locate the existing task evidence; reference it
+from the existing lane result/status where needed. Do not require a new nested
+reconciliation JSON or wrapper for every correction. Project evidence records
+what happened; it is not the procedure and is not proof of a deployed fix.
 
-1. observed behavior and artifact/GUI evidence;
-2. impact on quality, safety, or delivery;
-3. root-cause hypothesis and correction; and
-4. whether the scope is project-only or candidate for promotion.
+For a process improvement, delivery must distinguish canonical source change,
+installed deployment, validation, and actual live behavior still unverified.
+Project-local changes alone do not satisfy a common-workflow request. Preserve
+user holds and existing specific-surface approval requirements.
 
 Do not store passwords, tokens, personal form data, private message bodies, or
 unnecessary provider/account details in the note or the repository.

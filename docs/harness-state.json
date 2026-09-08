@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Enforce Astra authoring discipline and reject false-positive creative QC without project-specific rule proliferation",
+  "currentGoal": "Apply scheduled continuation and workflow-feedback promotion as shared defaults, not project patches",
   "status": "in_progress",
   "currentContract": "docs/contracts/2026-09-08-session-monitor-consistency.md",
   "blockers": [],
-  "nextStep": "Production remains user-review HOLD. Astra reauthors rejected blocks under canonical policy; existing package/attestation and real task history, no reconciliation files. Automatic model provenance enforcement is not implemented.",
-  "lastUpdated": "2026-09-08T23:04:13.544668+09:00",
+  "nextStep": "Use deployed shared scheduling procedure on future approved project runs; current rejected project remains PAUSED/HOLD. New schedule surfaces still require specific approval.",
+  "lastUpdated": "2026-09-08T23:10:03.019455+09:00",
   "verification": {
-    "lastCommand": "143 existing unit tests; py_compile; shell syntax; diff check; release freeze/preflight/apply/check",
-    "lastResult": "PASS_CANONICAL_GUIDANCE_ONLY",
-    "notes": "Policy/checklist change, not new automatic model/creative verifier. No video regeneration or full playback QC. Exact Astra label deployed; producer idle at deployment."
+    "lastCommand": "143 existing tests; git diff --check; release freeze/preflight/apply/check",
+    "lastResult": "PASS_SHARED_POLICY_DEPLOYED",
+    "notes": "66 managed files parity; 2 deployed changes. No new scheduler or production execution; scheduling preference is policy, not an automatically created registration."
   },
   "recentCloseouts": [
     {

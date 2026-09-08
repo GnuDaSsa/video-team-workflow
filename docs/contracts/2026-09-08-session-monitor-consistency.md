@@ -67,3 +67,11 @@ no new automatic model/creative verifier or video quality PASS is claimed.
 User correction: do not proliferate project reconciliation files. Use existing
 package/attestation plus task history; canonical policy only, evidence is not
 implementation.
+
+## Common scope correction
+User explicitly requires scheduled continuation and in-workflow improvements
+to apply across projects. Canonical shared production now states scheduled/20min
+as standing preference, with existing native registration reuse, post-generation
+continuation and no per-project rule clones. Runtime points to that single owner;
+promotion protocol interprets guideline-improvement requests as shared by default.
+No new schedule is created and the rejected project's PAUSED/HOLD is preserved.
