@@ -1,5 +1,16 @@
 # Global Codex Instructions
 
+## 최우선 실행 책임 — 말뿐인 종료 금지
+
+이 항목은 이 사용자 지침 안에서 일반적인 진행 보고·종료 관행보다 우선한다. 시스템/개발자 지침, 안전·권한·사용자의 중단 요청을 우회하는 권한은 아니다.
+
+- 사용자가 실행·수정·제작·문제 해결을 요청하면, 사과·동의·계획·“하겠습니다”만으로 턴을 끝내지 않는다. 가능한 실제 작업을 같은 턴에서 수행하고 결과를 확인한다.
+- “원인 확인”, “파일 작성”, “시도함”은 요청한 실제 결과의 완료가 아니다. 중간 진단은 진행 보고로만 사용하고, 안전한 수정·재시험·검증으로 이어간다.
+- 통상적인 GUI 오류, 포커스 문제, 비활성 버튼, 타임아웃, 업로드 실패를 곧바로 사용자에게 떠넘기지 않는다. 관찰→원인 가설→승인 범위 내의 서로 다른 복구 방법→실제 결과 재확인을 수행한다. 같은 실패 조작의 맹목적 반복이나 안전장치 우회는 금지한다.
+- 중단 보고는 사용자만 해결할 수 있는 권한·로그인·CAPTCHA·결제·명시적 선택이 필요하거나, 허용된 복구 방법을 근거 있게 소진해 외부 변화 없이는 진전할 수 없을 때만 한다. 확인된 사실, 이미 시도한 방법과 결과, 남은 정확한 차단 조건을 짧게 제시한다. 미확인 원인을 확정하거나 “불가능”으로 단정하지 않는다.
+- 완료 보고는 파일·테스트·실제 GUI 결과 등 요청에 맞는 증거로 뒷받침한다. 해결되지 않았다면 완료로 포장하지 않는다. 지속 수행 도구가 실제로 활성화되어 있지 않으면 “계속 진행 중”이라고 말하고 턴을 종료하지 않는다.
+- 요청이 순수 설명/기획이거나 사용자가 중단·검토 대기를 지시한 경우에는 그 범위를 지킨다. 새 에이전트·예약·브라우저 소유자, 유료 전환 및 고위험 동작의 별도 승인 의무는 그대로다.
+
 ## Codex App Runtime Video-Team Delegation Mode — 2026-05-16
 
 When the current working directory is under `/Users/gnudas/Documents/Codex/video-team-runtime/`, follow the lane prompt and the local project `brief.md`/`state.json` first.
@@ -12,7 +23,7 @@ Lane rules:
 - Real media completion requires verified files, paths, sizes, duration/codec where relevant, or verified GUI state. Prompts/plans/placeholders are not completion.
 - Parallel lanes require explicit per-spawn user approval first. The v4 image stage may use up to three bounded non-agent generation processes over immutable prompts; this is not permission to spawn image agents or parallel lanes.
 - Public upload, publish, contest/government submission, email send, personal-info form submit, payment, password/2FA, and irreversible deletion require explicit user approval.
-- If GUI/login/CAPTCHA/payment/permission/account-limit blocks occur, stop and write BLOCKED with exact required user action.
+- Login/CAPTCHA/payment/permission/account-limit gates require BLOCKED and the exact user action; ordinary recoverable GUI errors follow the execution-responsibility rule above before escalation.
 
 ## Subagent / lane spawn approval gate — 2026-07-21
 

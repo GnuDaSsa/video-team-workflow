@@ -79,6 +79,12 @@
         "lastCommand": "154 tests; Python compile; shell syntax; diff check; canonical release freeze/preflight/apply/check",
         "notes": "66-file parity; two live files updated at no-wait/no-queue boundary. Capacity enums are operator-supplied, not automatic UI detection. Independent production is held for foreign unsent composer selection; AX18 harvested, no full playback QC."
       }
+    },
+    {
+      "id": "2026-09-09-execution-responsibility",
+      "status": "complete",
+      "scope": "GLOBAL_AGENTS top-priority user execution responsibility; preserve safety/approval and stop boundaries",
+      "verification": "154 tests PASS; release freeze/preflight/apply/check PASS; 66-file parity; one deployed global instruction file. Behavioral adherence is not established by tests."
     }
   ]
 }
