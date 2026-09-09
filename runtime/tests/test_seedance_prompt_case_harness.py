@@ -14,6 +14,20 @@ import prompt_packet_utils  # noqa: E402
 
 
 class SeedancePromptCaseHarnessTests(unittest.TestCase):
+    def test_explicit_seedance25_six_shot_request(self):
+        pack = {'duration_sec': 15, 'shot_grammar': 'PLANNED_MULTI_SHOT_SOURCE',
+                'provider_model': 'Seedance 2.5', 'planned_scene_count': 6,
+                'user_requested_scene_count': 6, 'covered_cuts': list('abcdef'),
+                'scene_plan': [{'start_sec': i*2.5, 'end_sec': (i+1)*2.5,
+                                'covered_cuts': [c], 'scene_id': c, 'reference_tokens': ['@Image1'],
+                                'action': 'fly', 'camera': 'track', 'edit_out': 'cut'} for i,c in enumerate('abcdef')]}
+        self.assertEqual(prompt_packet_utils.validate_shot_grammar(pack, [('@Image1', 'drone')]), [])
+        for key,value in [('provider_model', 'Seedance 2.0'), ('user_requested_scene_count', None)]:
+            invalid = {**pack, key: value}
+            self.assertTrue(prompt_packet_utils.validate_shot_grammar(invalid, [('@Image1', 'drone')]))
+        pack['scene_plan'][2]['start_sec'] = 5.5
+        self.assertTrue(prompt_packet_utils.validate_shot_grammar(pack, [('@Image1', 'drone')]))
+
     def base_pack(self) -> dict:
         return {
             'duration_sec': 12,

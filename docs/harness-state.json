@@ -85,6 +85,11 @@
       "status": "complete",
       "scope": "GLOBAL_AGENTS top-priority user execution responsibility; preserve safety/approval and stop boundaries",
       "verification": "154 tests PASS; release freeze/preflight/apply/check PASS; 66-file parity; one deployed global instruction file. Behavioral adherence is not established by tests."
+    },
+    {
+      "id": "2026-09-09-native-main-and-six-shots",
+      "status": "verified",
+      "verification": "155 tests PASS, release parity66 PASS. Exact CLI window/URL gates retained; native guard selects sole AXMain instead of index1. Explicit user six-shot request supported only Seedance2.5; existing duration/timeline checks retained. Live: native guard progressed to IME gate, CUA no-key file-open uploaded six refs; OP02 accepted. Picker-select still has independent layout assumptions; not claimed repaired."
     }
   ]
 }

@@ -35,7 +35,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/scripts/runway_ui_helper.py",
       "target": ".codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py",
-      "sha256": "cc170e8bcebd6560845ba1d7e524096ac156a765014325689950420968076b07"
+      "sha256": "fed524e8fb988b3fc49c069f75d89064252f6a6fa5adcf978ec46fc70e9379c1"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-field-lessons.md",
@@ -170,7 +170,7 @@
     {
       "source": "runtime/scripts/prompt_packet_utils.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/prompt_packet_utils.py",
-      "sha256": "e5c41ce4fc1a22eed15d66146f71f1f384c6eec39427f41581715ccfbc3c71ec"
+      "sha256": "0413358579c82191d4a168b8469d6842cb5b14d5de67f240cab133c72ed7178e"
     },
     {
       "source": "runtime/scripts/runway_ui_helper.py",

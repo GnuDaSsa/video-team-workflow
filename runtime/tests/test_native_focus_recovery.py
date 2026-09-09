@@ -124,6 +124,9 @@ class NativeFocusRecoveryTests(unittest.TestCase):
                 self.assertIn(marker, guard)
             self.assertNotIn('keystroke', guard)
             self.assertNotIn('clipboard', guard)
+            self.assertIn('count mainCandidates', guard)
+            self.assertIn('sheet 1 of nativeMainWindow', guard)
+            self.assertNotIn('of window 1', guard)
         for observation in ({'windowId': '1\" & bad', 'url': URL},
                             {'windowId': 123, 'url': URL.replace('one', 'two')}):
             with patch.object(bridge, 'require_project', return_value=binding), \

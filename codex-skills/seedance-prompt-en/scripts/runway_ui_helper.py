@@ -853,9 +853,14 @@ tell application "{TARGET_APP}"
 end tell
 tell application "System Events"
     tell process "{TARGET_APP}"
-        if (value of attribute "AXMain" of window 1) is not true then error "ABORT_NATIVE_MAIN_WINDOW"
-        if not (exists sheet 1 of window 1) then error "ABORT_NO_PICKER_SHEET"
-        if (value of attribute "AXIdentifier" of sheet 1 of window 1) is not "open-panel" then error "ABORT_NOT_OPEN_PANEL"
+        set mainCandidates to {{}}
+        repeat with candidateWindow in windows
+            if (value of attribute "AXMain" of candidateWindow) is true then set end of mainCandidates to contents of candidateWindow
+        end repeat
+        if (count mainCandidates) is not 1 then error "ABORT_NATIVE_MAIN_WINDOW"
+        set nativeMainWindow to item 1 of mainCandidates
+        if not (exists sheet 1 of nativeMainWindow) then error "ABORT_NO_PICKER_SHEET"
+        if (value of attribute "AXIdentifier" of sheet 1 of nativeMainWindow) is not "open-panel" then error "ABORT_NOT_OPEN_PANEL"
     end tell
 end tell
 '''
