@@ -1,14 +1,16 @@
 {
   "currentGoal": "Resume existing production owner without fabricating idle; verify direct executor action",
-  "status": "in_progress",
+  "status": "blocked",
   "currentContract": "docs/contracts/2026-09-08-session-monitor-consistency.md",
-  "blockers": [],
-  "nextStep": "Explicit resume delivered to existing Luna owner; audit actual exact-session operation and existing heartbeat consumption. No media completion verified yet.",
-  "lastUpdated": "2026-09-09T16:36:38.908063+09:00",
+  "blockers": [
+    "Live continuation: Aside currently contains another project session; exact intended session restoration required."
+  ],
+  "nextStep": "Restore exact original Aside session, then resume existing owner and automation-2. S09/S10 completion/QC unverified.",
+  "lastUpdated": "2026-09-09T16:39:05.070337+09:00",
   "verification": {
     "lastCommand": "152 tests; Python compile; shell syntax; diff check; release freeze/preflight/apply/check",
     "lastResult": "PASS_EXPLICIT_RESUME_DEPLOYED",
-    "notes": "66-file parity, 2 changed live files. Native existing-owner delivery and automation-2 ACTIVE registration verified; corrected live action pending. No new task or automation."
+    "notes": "152 tests and 66-file parity PASS. Native Luna/high context and actual CUA session read verified, no echo-only result. Found other-project session collision; no media mutations. automation-2 reactivated then PAUSED. Owner still sent substantive result message despite final-only instruction."
   },
   "recentCloseouts": [
     {
