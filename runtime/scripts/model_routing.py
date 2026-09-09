@@ -67,7 +67,10 @@ def matrix() -> list[dict]:
 
 
 def existing_owner_handoff(*, manager_id: str, owner_id: str,
-                           owner_status: str, phase: str, action: str) -> dict:
+                           owner_status: str, phase: str, action: str,
+                           explicit_resume: bool = False,
+                           latest_turn_status: str = "",
+                           latest_turn_id: str = "") -> dict:
     """Build a native follow-up payload; never dispatch or certify execution."""
     import uuid
     for value in (manager_id, owner_id):
@@ -75,7 +78,10 @@ def existing_owner_handoff(*, manager_id: str, owner_id: str,
     if manager_id == owner_id:
         raise ValueError('manager_and_executor_must_differ')
     if owner_status != 'idle':
-        raise ValueError('existing_owner_must_be_observed_idle')
+        if not (owner_status == 'notLoaded' and explicit_resume is True
+                and latest_turn_status == 'completed' and latest_turn_id):
+            raise ValueError('existing_owner_must_be_observed_idle_or_explicit_completed_resume')
+        uuid.UUID(latest_turn_id)
     if not action.strip():
         raise ValueError('bounded_action_required')
     route = resolve('seedance', phase)
@@ -120,6 +126,9 @@ if __name__ == '__main__':
     parser.add_argument('--owner-status', required=True)
     parser.add_argument('--phase', choices=['prompting', 'production'], required=True)
     parser.add_argument('--action', required=True)
+    parser.add_argument('--explicit-resume', action='store_true')
+    parser.add_argument('--latest-turn-status', default='')
+    parser.add_argument('--latest-turn-id', default='')
     args = parser.parse_args()
     try:
         print(json.dumps(existing_owner_handoff(**vars(args)), ensure_ascii=False))

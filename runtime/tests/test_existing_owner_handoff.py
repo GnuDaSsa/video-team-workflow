@@ -42,3 +42,26 @@ class ExistingOwnerHandoffTests(unittest.TestCase):
         self.assertTrue(m.is_instruction_echo('실제 확인 요청', '전달 완료: 실제 확인 요청'))
         self.assertFalse(m.is_instruction_echo('', ''))
         self.assertFalse(m.is_instruction_echo('실제 확인 요청', '새 결과 없음'))
+
+    def test_explicit_completed_unloaded_resume(self):
+        a = self.args()
+        a.update(owner_status='notLoaded', explicit_resume=True,
+                 latest_turn_status='completed', latest_turn_id=a['owner_id'])
+        self.assertEqual(m.existing_owner_handoff(**a)['threadId'], a['owner_id'])
+
+    def test_resume_does_not_bypass_live_or_unknown(self):
+        for state in ['active', 'unknown', '']:
+            a = self.args()
+            a.update(owner_status=state, explicit_resume=True,
+                     latest_turn_status='completed', latest_turn_id=a['owner_id'])
+            with self.assertRaises(ValueError): m.existing_owner_handoff(**a)
+
+    def test_unloaded_resume_requires_all_evidence(self):
+        for patch in [dict(explicit_resume=False), dict(explicit_resume='true'),
+                      dict(latest_turn_status='active'), dict(latest_turn_status=''),
+                      dict(latest_turn_id=''), dict(latest_turn_id='invalid')]:
+            a = self.args()
+            a.update(owner_status='notLoaded', explicit_resume=True,
+                     latest_turn_status='completed', latest_turn_id=a['owner_id'])
+            a.update(patch)
+            with self.assertRaises(ValueError): m.existing_owner_handoff(**a)

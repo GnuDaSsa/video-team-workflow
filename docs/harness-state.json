@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Fix shared manager/executor handoff inversion with deterministic message builder and echo guard",
+  "currentGoal": "Resume existing production owner without fabricating idle; verify direct executor action",
   "status": "in_progress",
   "currentContract": "docs/contracts/2026-09-08-session-monitor-consistency.md",
   "blockers": [],
-  "nextStep": "Existing automation remains PAUSED; next authorized run must use installed handoff builder and verify real actions, not echoed instruction. Live corrected production round trip remains untested.",
-  "lastUpdated": "2026-09-09T16:10:29.248617+09:00",
+  "nextStep": "Explicit resume delivered to existing Luna owner; audit actual exact-session operation and existing heartbeat consumption. No media completion verified yet.",
+  "lastUpdated": "2026-09-09T16:36:38.908063+09:00",
   "verification": {
-    "lastCommand": "149 tests (6 new); py_compile; zsh syntax; CLI payload smoke; diff check; release freeze/preflight/apply/check",
-    "lastResult": "PASS_HANDOFF_GUARDS_DEPLOYED",
-    "notes": "66-file parity,2 deployed changes; existing paused automation prompt updated. Deterministic routing/echo checks only; semantic execution still requires tool/artifact audit. No generation or new scheduler."
+    "lastCommand": "152 tests; Python compile; shell syntax; diff check; release freeze/preflight/apply/check",
+    "lastResult": "PASS_EXPLICIT_RESUME_DEPLOYED",
+    "notes": "66-file parity, 2 changed live files. Native existing-owner delivery and automation-2 ACTIVE registration verified; corrected live action pending. No new task or automation."
   },
   "recentCloseouts": [
     {

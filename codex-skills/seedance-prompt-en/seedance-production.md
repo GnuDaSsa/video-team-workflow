@@ -127,7 +127,14 @@ For an authorized existing-owner check, use the shared runtime
 `--phase production|prompting`, and a bounded `--action`. It returns the native
 send-message payload, never sends it. The manager calls the native tool once
 with that payload after normal approval/HOLD checks; the builder itself grants
-no authorization. Unknown/notLoaded is not proof of idle.
+no authorization. Unknown/notLoaded is not proof of idle. For a fresh, explicit
+user request to resume an existing unloaded task only, keep `--owner-status
+notLoaded` and provide `--explicit-resume --latest-turn-status completed
+--latest-turn-id <UUID>` from a fresh native read of the latest turn. Record the
+user request and observation in existing pending state. This exception never
+applies to automatic due checks, active/unknown states, old cached completion,
+or unresolved HOLD/safety blocks. Completion proves a turn boundary, not media
+progress; verify actual tools after delivery as usual.
 
 The recipient is the executor; the sender remains manager. Execute the requested
 board/file/prompt work in the receiving task. Do not send the instruction back,

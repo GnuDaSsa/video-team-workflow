@@ -97,3 +97,10 @@ recipient, and detects exact instruction echoes (not a semantic execution
 verifier). Shared production documents consume the builder. Six regression
 tests cover routing and echo guards; existing automation uses the same contract.
 No project-specific rule file, new agent, scheduler or browser owner.
+
+## Explicit resume of unloaded existing owner
+A fresh read_thread returned notLoaded with latest turn completed while the user
+explicitly requested resume. Preserve that observed status; permit native
+existing-task follow-up only with explicit resume approval and a latest completed
+turn UUID. Automated checks still reject notLoaded; active/unknown always reject.
+No new task, implicit model switch, or fabricated idle observation.
