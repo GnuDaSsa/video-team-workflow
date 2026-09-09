@@ -34,6 +34,7 @@ they apply:
 - `../seedance-prompt-en/seedance-field-lessons.md`
 - `../seedance-prompt-en/hell-grind-production-prompting-adapter.md`
 - `../seedance-prompt-en/xazinga-prompting-adapter.md`
+- `../seedance-prompt-en/blender-previs-prompting.md` — required for Blender/3D previs, animatics or source restyling; version-neutral, no 2.0 UI/model rules
 - the project's bounded `knowledge-select` packet, when present
 
 Current user instructions, project locks, approved identity/style references,

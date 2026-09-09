@@ -30,6 +30,12 @@
 - 사용자 거부나 provider 정책 경고 후 자동 재생성하지 않는다. 정책 경고의
   원인은 관측 근거와 추정을 분리하고 정상적인 원본 내용 검토로 처리한다.
 
+## Blender / 3D previs 조건부 검토
+
+Blender/프리비즈 입력은 `blender-previs-prompting.md`의 source-role,
+프록시 외형, 수정 패스 분리와 출력 판정 항목을 함께 검토한다.
+이는 같은 owner의 시각 검토이며 자동 attestation PASS로 대체하지 않는다.
+
 ## 1. 장면 계약부터 확정
 
 Package: 목적, 시작 상태 → 원인/접촉 → 반응 → 끝 상태, 음악 cue,

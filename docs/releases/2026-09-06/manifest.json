@@ -5,12 +5,17 @@
     {
       "source": "codex-skills/seedance-prompt-en/SKILL.md",
       "target": ".codex/skills/seedance-prompt-en/SKILL.md",
-      "sha256": "4ebb3629983e04bb125aa5f3274a953f21a4f06e391d7972750f2f7989350693"
+      "sha256": "bc2939c92affc7330ddbb82fd6008ae253470574577a5ad9d38b51f503a7db03"
     },
     {
       "source": "codex-skills/seedance-prompt-en/aside-operator.md",
       "target": ".codex/skills/seedance-prompt-en/aside-operator.md",
       "sha256": "abfb35a069193e0ec8192d7920481356e1d0880d1e5e2f87bc0499826605f5a6"
+    },
+    {
+      "source": "codex-skills/seedance-prompt-en/blender-previs-prompting.md",
+      "target": ".codex/skills/seedance-prompt-en/blender-previs-prompting.md",
+      "sha256": "13bdeb009e30120c21c15ba537f8aeaedb560337c320eb4bfe08af003d1facd6"
     },
     {
       "source": "codex-skills/seedance-prompt-en/hell-grind-production-prompting-adapter.md",
@@ -25,7 +30,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/prompt-review.md",
       "target": ".codex/skills/seedance-prompt-en/prompt-review.md",
-      "sha256": "6244a8f2c56d8c30db67b4fdbb37ae8fae4459d8fe24013ba6038151730ddb38"
+      "sha256": "7f4efa4e73ee03d66b33870ec0f79e5803191f487ce8690bfac900caacb389cb"
     },
     {
       "source": "codex-skills/seedance-prompt-en/scripts/aside_bridge.py",
@@ -70,7 +75,7 @@
     {
       "source": "codex-skills/seedance25-prompt-en/SKILL.md",
       "target": ".codex/skills/seedance25-prompt-en/SKILL.md",
-      "sha256": "d136efc2dccce66b03f9f6eeea43c986ffd4ff42d3d4b2e6cf16a46cbd9c2b9a"
+      "sha256": "836b569a1ae577887c53dffdfc48413171e80d5847fcc6b0054ebe5f7c987af0"
     },
     {
       "source": "codex-skills/seedance25-prompt-en/agents/openai.yaml",
