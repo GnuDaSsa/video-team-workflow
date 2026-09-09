@@ -88,3 +88,12 @@ follow-up sent with actual model=gpt-6-astra, thinking=xhigh (no new task).
 Canonical policy now distinguishes authorized same-task model transition from
 new-owner spawning; require actual authored artifacts before Luna execution.
 Source update must wait for idle boundary before deployment.
+
+## Direct executor handoff correction
+BO-WF-08: production forwarded the incoming check verbatim to the manager and
+waited on the manager; no board/file operation. Scope: existing model-routing
+module builds explicit native executor payload, rejects same ID/active/unknown
+recipient, and detects exact instruction echoes (not a semantic execution
+verifier). Shared production documents consume the builder. Six regression
+tests cover routing and echo guards; existing automation uses the same contract.
+No project-specific rule file, new agent, scheduler or browser owner.

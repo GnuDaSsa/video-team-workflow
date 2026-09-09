@@ -64,3 +64,64 @@ def matrix() -> list[dict]:
         lane, sep, phase = key.partition(':')
         rows.append(resolve(lane, phase if sep else None))
     return rows
+
+
+def existing_owner_handoff(*, manager_id: str, owner_id: str,
+                           owner_status: str, phase: str, action: str) -> dict:
+    """Build a native follow-up payload; never dispatch or certify execution."""
+    import uuid
+    for value in (manager_id, owner_id):
+        uuid.UUID(value)
+    if manager_id == owner_id:
+        raise ValueError('manager_and_executor_must_differ')
+    if owner_status != 'idle':
+        raise ValueError('existing_owner_must_be_observed_idle')
+    if not action.strip():
+        raise ValueError('bounded_action_required')
+    route = resolve('seedance', phase)
+    prompt = (
+        '[기존 작업 직접 실행 요청]\n'
+        f'실행 담당 작업: {owner_id}\n'
+        f'관리·결과 수신 작업: {manager_id}\n'
+        f'현재 단계: {phase}\n'
+        '이 메시지를 받은 작업이 실행 담당입니다. 관리 작업에 이 지시를 '
+        '재전송하거나 실행을 맡기지 마세요. 관리 작업을 wait_threads로 '
+        '기다리는 것도 실행이 아닙니다.\n\n'
+        f'직접 수행할 범위:\n{action.strip()}\n\n'
+        '반환할 것은 새 결과입니다: 실제 수행 동작, 관측 시각, 기존 산출물 '
+        '경로/검증 근거, 미완료 또는 차단 사유, 다음 확인 대상·시각. '
+        '기존 lane status/result에 기록하고 이 작업의 final로 보고하세요. '
+        '관리자는 그 결과를 읽습니다. 원문 지시나 접수 확인만 반환하면 '
+        '미실행으로 처리됩니다. 새 작업/agent/예약은 만들지 마세요. '
+        '최신 사용자 HOLD와 안전 게이트를 유지하세요.'
+    )
+    return {'threadId': owner_id, 'model': route['model'],
+            'thinking': route['reasoning_effort'], 'prompt': prompt}
+
+
+def is_instruction_echo(request: str, reply: str) -> bool:
+    """Reject exact/whitespace echoes, including an unchanged quoted request.
+
+    False means only 'not an exact echo', NEVER verified execution.
+    """
+    import unicodedata
+    def compact(value):
+        return ''.join(unicodedata.normalize('NFC', value).split())
+    original, returned = compact(request), compact(reply)
+    return bool(original) and original in returned
+
+
+if __name__ == '__main__':
+    import argparse
+    import json
+    parser = argparse.ArgumentParser(description='Build an existing-owner handoff; no dispatch')
+    parser.add_argument('--manager-id', required=True)
+    parser.add_argument('--owner-id', required=True)
+    parser.add_argument('--owner-status', required=True)
+    parser.add_argument('--phase', choices=['prompting', 'production'], required=True)
+    parser.add_argument('--action', required=True)
+    args = parser.parse_args()
+    try:
+        print(json.dumps(existing_owner_handoff(**vars(args)), ensure_ascii=False))
+    except ValueError as exc:
+        parser.error(str(exc))

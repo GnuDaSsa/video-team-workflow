@@ -45,7 +45,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/seedance-production.md",
       "target": ".codex/skills/seedance-prompt-en/seedance-production.md",
-      "sha256": "b2cd1910c47f5d65718f18e1a9b966287bb23a0e979d66d276bd4353749d2a89"
+      "sha256": "60bb700140cbd301c7c55633e547b02df954bd72f193bea637bdec87e0a935bb"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-prompting.md",
@@ -160,7 +160,7 @@
     {
       "source": "runtime/scripts/model_routing.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/model_routing.py",
-      "sha256": "6ef39af8436ad9ed870fe6538a9a185c55a68e955196a723d5c58484051dd220"
+      "sha256": "694e280ac10c5d15dbe7851e7f0730fe0e4fc1f3b56462486c68afa5c52ec18a"
     },
     {
       "source": "runtime/scripts/project_sweep.py",

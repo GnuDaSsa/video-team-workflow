@@ -109,7 +109,7 @@ jobs, verify which exact existing task will consume the next scheduled check.
 
 When the user authorizes continuation through an existing review heartbeat, keep
 the production task as the sole UI owner. The review heartbeat may send one
-bounded resume message to that existing idle/notLoaded task, never to an active
+bounded resume message to that existing verified-idle task, never to an active
 task or one held by the user or a verified safety blocker. Persist a pending
 handoff before sending; receipt is delivery, not execution. Require a new owner
 turn plus a fresh provider/artifact checkpoint before another handoff. Missing
@@ -118,6 +118,31 @@ three consumed checks without material progress, pause and report stalled
 continuation without inventing a provider failure. A timestamp-only update is
 not progress. Never add a second scheduler or take over the browser to repair it.
 Verify actual native PAUSED state before claiming that monitoring stopped.
+
+### Direct executor handoff, not instruction relay
+
+For an authorized existing-owner check, use the shared runtime
+`runtime/scripts/model_routing.py` existing-owner handoff builder. Provide
+`--manager-id`, `--owner-id`, freshly observed `--owner-status idle`,
+`--phase production|prompting`, and a bounded `--action`. It returns the native
+send-message payload, never sends it. The manager calls the native tool once
+with that payload after normal approval/HOLD checks; the builder itself grants
+no authorization. Unknown/notLoaded is not proof of idle.
+
+The recipient is the executor; the sender remains manager. Execute the requested
+board/file/prompt work in the receiving task. Do not send the instruction back,
+ask the manager to operate the browser, or wait on the manager instead of doing
+the work. Return actual results through existing lane state and the receiving
+task's final answer. Routine result delivery does not need another cross-task
+message or another monitor. This distinction survives model changes.
+
+The manager retains the exact outgoing prompt in existing pending-handoff state.
+An exact or whitespace-only echo (including the full request quoted in a reply)
+is rejected using `model_routing.is_instruction_echo`; no reciprocal send and no
+consumed acknowledgement. A non-echo is still NOT execution evidence: verify
+fresh actual tools/artifacts. If execution is absent at the next scheduled check,
+pause the same automation and report recipient-role inversion once. A completed
+turn, self-written result, or claimed forwarding does not substitute for action.
 
 ### Generation-first scheduling priority
 
