@@ -226,7 +226,7 @@ class SeedanceQueueContinuationTests(unittest.TestCase):
 
     def test_one_slot_fallback_requires_exact_toast_and_retries_two_when_empty(self) -> None:
         one = [helper.parse_queue_job('C15|31|GENERATING')]
-        with self.assertRaisesRegex(ValueError, 'REQUIRES_TOAST_EVIDENCE'):
+        with self.assertRaisesRegex(ValueError, 'REQUIRES_VISIBLE_EVIDENCE'):
             self.sync(one, capacity_limit=1)
 
         runtime = self.sync(
@@ -243,6 +243,24 @@ class SeedanceQueueContinuationTests(unittest.TestCase):
         self.assertEqual(runtime['queue_target'], 2)
         self.assertEqual(runtime['capacity_evidence'], 'AUTO_RETRY_TWO_AFTER_QUEUE_EMPTY')
         self.assertEqual(runtime['verdict'], 'FILL_FREE_SLOT_NOW')
+
+    def test_tooltip_capacity_is_preserved_without_claiming_a_toast(self) -> None:
+        runtime = self.sync(
+            [helper.parse_queue_job('C15|31|GENERATING')],
+            capacity_limit=1, capacity_evidence='RUNWAY_QUEUE_CAPACITY_TOOLTIP')
+        self.assertEqual(runtime['queue_target'], 1)
+        self.assertEqual(runtime['capacity_evidence'], 'RUNWAY_QUEUE_CAPACITY_TOOLTIP')
+        self.assertEqual(runtime['verdict'], 'QUEUE_FULL_WAKE_REQUIRED')
+        runtime = self.sync([], armed='C17', next_eligible='C17')
+        self.assertEqual(runtime['queue_target'], 2)
+        self.assertEqual(runtime['verdict'], 'FILL_FREE_SLOT_NOW')
+
+    def test_gray_or_generic_tooltip_is_not_capacity_evidence(self) -> None:
+        for evidence in ('GRAY_BUTTON', 'TOOLTIP', '', 'OPERATOR_CONFIRMED_TWO_SLOT_RETRY'):
+            with self.subTest(evidence=evidence):
+                with self.assertRaisesRegex(ValueError, 'REQUIRES_VISIBLE_EVIDENCE'):
+                    self.sync([helper.parse_queue_job('C15|31|GENERATING')],
+                              capacity_limit=1, capacity_evidence=evidence)
 
     def test_two_active_jobs_require_arming_before_wait(self) -> None:
         runtime = self.sync(self.jobs(), armed=None, next_eligible='C17')

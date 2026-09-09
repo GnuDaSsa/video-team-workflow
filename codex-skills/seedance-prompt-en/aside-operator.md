@@ -99,6 +99,19 @@ operator-supplied labels must come from a fresh visible inspection. Its PASS
 alone does not prove deck, prompt or all other settings. Any refresh, recovery,
 wake, deck/prompt/model change invalidates the prior visual preflight.
 
+### Resume must reconcile the composer, not only the URL
+
+On resume, compare the visible composer prompt hash, reference count/order and
+settings against the intended attested block before clearing, attaching or
+Generate. The same session URL can contain another project's unsent composer.
+A saved armed block is not fresh proof. Preserve the unmatched composer locally
+and identify its existing package/owner without editing that other project.
+Do not submit it under the current project's block ID or erase it to restore a
+stale checkpoint. An unresolved ownership conflict needs exact user selection;
+verified completed cards from the bound project can still be harvested without
+changing the composer. This is a manual visible preflight, not an automatic
+ownership detector or permission to start another operator.
+
 ## C. Uncertainty is not permission to repeat
 
 - Missing marker, CLI timeout or tab mismatch: no alternate route and no blind
@@ -110,6 +123,14 @@ wake, deck/prompt/model change invalidates the prior visual preflight.
 - Gray means not eligible *now*, not necessarily queue full. Inspect exposed
   error/tooltip and current active cards. Input/reference errors return to the
   affected attachment/settings step; active-card capacity uses `queue-cycle`.
+  Record an actually observed queue-capacity toast as
+  `RUNWAY_QUEUE_CAPACITY_TOAST`, or the Generate control's explicit capacity
+  tooltip as `RUNWAY_QUEUE_CAPACITY_TOOLTIP`; never relabel one as the other.
+  Keep the exact message and current active-card count in local evidence.
+  Gray alone, an absent tooltip, or an input-error tooltip is not capacity proof.
+  These operator-supplied labels are not automatic UI detection and never
+  authorize Credits Mode. Empty queues retry the normal target instead of
+  turning one temporary restriction into a permanent account limit.
 - Login/CAPTCHA/payment/account/permission: record the exact human action and
   stop that control operation. Never try a bypass or another account/browser.
 - Record outcome/evidence and next step in project `status.json` / `result.md`.

@@ -1643,10 +1643,13 @@ def build_queue_runtime(
     previous_target = int(previous.get('queue_target') or QUEUE_TARGET_DEFAULT)
     if capacity_limit not in {None, 1, 2}:
         raise ValueError('QUEUE_CAPACITY_LIMIT_INVALID: expected 1 or 2')
-    if capacity_limit == 1 and capacity_evidence != 'RUNWAY_QUEUE_CAPACITY_TOAST':
+    if capacity_limit == 1 and capacity_evidence not in {
+        'RUNWAY_QUEUE_CAPACITY_TOAST', 'RUNWAY_QUEUE_CAPACITY_TOOLTIP',
+    }:
         raise ValueError(
-            'QUEUE_CAPACITY_ONE_REQUIRES_TOAST_EVIDENCE: pass '
-            '--capacity-evidence RUNWAY_QUEUE_CAPACITY_TOAST only after the exact visible toast')
+            'QUEUE_CAPACITY_ONE_REQUIRES_VISIBLE_EVIDENCE: pass '
+            '--capacity-evidence RUNWAY_QUEUE_CAPACITY_TOAST or '
+            'RUNWAY_QUEUE_CAPACITY_TOOLTIP only after observing the exact capacity message')
     if len(inflight) >= 2:
         effective_target = 2
         effective_capacity_evidence = 'TWO_DISTINCT_CARDS_VISIBLE'
@@ -2601,10 +2604,11 @@ def main() -> int:
             help='consume one elapsed foreground queue-wait with this visible-board observation')
         parser.add_argument(
             '--capacity-limit', type=int, choices=[1, 2],
-            help='temporary effective provider capacity; 1 requires exact toast evidence')
+            help='temporary effective provider capacity; 1 requires exact toast or tooltip capacity evidence')
         parser.add_argument(
             '--capacity-evidence',
-            choices=['RUNWAY_QUEUE_CAPACITY_TOAST', 'OPERATOR_CONFIRMED_TWO_SLOT_RETRY'],
+            choices=['RUNWAY_QUEUE_CAPACITY_TOAST', 'RUNWAY_QUEUE_CAPACITY_TOOLTIP',
+                     'OPERATOR_CONFIRMED_TWO_SLOT_RETRY'],
             help='visible evidence supporting a temporary capacity decision')
 
     p = sub.add_parser('queue-sync', help='persist one visible-board observation and compute the mandatory next action')
