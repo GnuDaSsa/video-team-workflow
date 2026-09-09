@@ -125,7 +125,7 @@ def validate_shot_grammar(pack: dict, binding_entries: list[tuple[str, str]]) ->
     if duration != 15:
         errors.append(f'multi_shot_source_requires_15s:{duration}')
     count = pack.get('planned_scene_count')
-    explicit_six = (pack.get('provider_model') == 'Seedance 2.5'
+    explicit_six = (pack.get('provider_model') in ('Seedance 2.0', 'Seedance 2.5')
                     and pack.get('user_requested_scene_count') == 6
                     and count == 6)
     if not isinstance(count, int) or not (2 <= count <= 4 or explicit_six):

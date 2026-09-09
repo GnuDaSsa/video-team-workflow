@@ -22,7 +22,9 @@ class SeedancePromptCaseHarnessTests(unittest.TestCase):
                                 'covered_cuts': [c], 'scene_id': c, 'reference_tokens': ['@Image1'],
                                 'action': 'fly', 'camera': 'track', 'edit_out': 'cut'} for i,c in enumerate('abcdef')]}
         self.assertEqual(prompt_packet_utils.validate_shot_grammar(pack, [('@Image1', 'drone')]), [])
-        for key,value in [('provider_model', 'Seedance 2.0'), ('user_requested_scene_count', None)]:
+        for model in ('Seedance 2.0', 'Seedance 2.5'):
+            self.assertEqual(prompt_packet_utils.validate_shot_grammar({**pack, 'provider_model': model}, [('@Image1', 'drone')]), [])
+        for key,value in [('provider_model', 'Unknown'), ('user_requested_scene_count', None)]:
             invalid = {**pack, key: value}
             self.assertTrue(prompt_packet_utils.validate_shot_grammar(invalid, [('@Image1', 'drone')]))
         pack['scene_plan'][2]['start_sec'] = 5.5
