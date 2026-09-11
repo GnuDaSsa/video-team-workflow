@@ -5,7 +5,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/SKILL.md",
       "target": ".codex/skills/seedance-prompt-en/SKILL.md",
-      "sha256": "bc2939c92affc7330ddbb82fd6008ae253470574577a5ad9d38b51f503a7db03"
+      "sha256": "ea4f42fbb7c562a3291390dde77ddc6c4eac690ddbdb22a8cd27d100475283b5"
     },
     {
       "source": "codex-skills/seedance-prompt-en/aside-operator.md",
@@ -15,7 +15,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/blender-previs-prompting.md",
       "target": ".codex/skills/seedance-prompt-en/blender-previs-prompting.md",
-      "sha256": "13bdeb009e30120c21c15ba537f8aeaedb560337c320eb4bfe08af003d1facd6"
+      "sha256": "22736a0efa882a6a4aed9427a14c35bf98f271fba3174df31f06fdbb36588113"
     },
     {
       "source": "codex-skills/seedance-prompt-en/hell-grind-production-prompting-adapter.md",
