@@ -65,7 +65,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import aside_bridge
 import media_registry
 import generation_settings
-from prompt_packet_utils import language_stats, normalize_prompt, prompt_sha256, validate_seedance
+from prompt_packet_utils import (language_stats, normalize_prompt, prompt_sha256,
+                                 validate_seedance, validate_paste_pack, prompt_language_matches)
 
 
 UPLOAD_ALIAS_ROOT = Path(os.environ.get('RUNWAY_UPLOAD_ALIAS_ROOT', '/tmp/codex-runway-upload'))
@@ -1105,16 +1106,24 @@ def cmd_paste_prompt(args) -> int:
         return 1
     expected_normalized = normalize_prompt(text)
     expected_stats = language_stats(expected_normalized)
-    if len(expected_normalized) > 3500 or not expected_stats['korean_dominant']:
+    prompt_language = 'ko-KR'
+    if getattr(args, 'pack', None):
+        try:
+            project = aside_bridge.require_project(prompt_file=prompt_path)
+            prompt_language = validate_paste_pack(Path(args.pack), expected_normalized, Path(project['project']))
+        except (OSError, ValueError) as exc:
+            print(json.dumps({'ok': False, 'verdict': 'PROMPT_PACK_PREFLIGHT_FAILED', 'error': str(exc)}))
+            return 1
+    if len(expected_normalized) > 3500 or not prompt_language_matches(expected_normalized, prompt_language):
         st = {
             'ok': False,
-            'verdict': 'KOREAN_PROMPT_PREFLIGHT_FAILED',
+            'verdict': 'PROMPT_LANGUAGE_PREFLIGHT_FAILED',
             'language': expected_stats,
             'over_limit': len(expected_normalized) > 3500,
             'prompt_sha256': prompt_sha256(expected_normalized),
         }
         evidence(args, 'paste-prompt-preflight',
-                 'Korean-dominant prompt <=3500 characters',
+                 f'{prompt_language} prompt <=3500 characters',
                  json.dumps(st, ensure_ascii=False), st['verdict'])
         print(json.dumps(st, ensure_ascii=False))
         return 1
@@ -1211,7 +1220,7 @@ def cmd_paste_prompt(args) -> int:
     })
     verdict = ('OVER_3500_LIMIT' if st['over_limit']
                else 'CONTENT_MISMATCH_DO_NOT_GENERATE' if not content_match
-               else 'KOREAN_VALIDATION_FAILED' if not actual_stats['korean_dominant']
+               else 'PROMPT_LANGUAGE_VALIDATION_FAILED' if not prompt_language_matches(actual_normalized, prompt_language)
                else 'OK')
     st['expected_prompt_sha256'] = prompt_sha256(expected_normalized)
     st['actual_prompt_sha256'] = prompt_sha256(actual_normalized)
@@ -2585,6 +2594,7 @@ def main() -> int:
     p = sub.add_parser('paste-prompt', help='insert prompt text into the Lexical editor via a dispatched paste event (no keystrokes, IME-safe)')
     p.add_argument('--file', required=True)
     p.add_argument('--replace', action='store_true', help='replace all existing text instead of appending')
+    p.add_argument('--pack', help='Attested project pack; required for explicit English override')
     p.set_defaults(fn=cmd_paste_prompt)
     p = sub.add_parser('read-prompt'); p.add_argument('--file'); p.set_defaults(fn=cmd_read_prompt)
     sub.add_parser('ime-check', help='is the active input source safe for synthetic keystrokes?').set_defaults(fn=cmd_ime_check)

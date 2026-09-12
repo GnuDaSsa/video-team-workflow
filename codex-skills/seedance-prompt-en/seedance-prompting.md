@@ -4,18 +4,11 @@ This branch writes **only what will be visible on screen**. It does not click Ru
 
 Defaults: 15s, audio toggle always ON (the soundscape is directed in the prompt), naturalism first, medium-aware texture. Reference count follows the request.
 
-## The prompt is written in Korean — 2026-07-29
+## Prompt language
 
-**Seedance prompts are written in Korean**, creative prompts included.
-
-The reason is review. A prompt the user cannot read is a prompt they cannot approve or correct, and the prompt is a directing decision, not a machine-only string.
-
-- Spoken lines stay verbatim Korean.
-- Proper nouns, on-screen text and brand names keep their original spelling.
-- Format tokens (`16:9`, `9:16`, `15s`) stay as written.
-- If a specific shot comes back badly, revise **that shot's prompt**. Do not roll the language back.
-
-This governs Seedance video prompts only. Image (imagegen) prompt language is decided elsewhere.
+Follow the single language owner in `seedance-shared-contract.md` → Handoff
+contract, including its explicit, block-scoped English request exception.
+This governs Seedance video prompts only; image prompt language is separate.
 
 ## What goes in the prompt, and what never does
 

@@ -151,7 +151,24 @@ Two artifacts, and the split is the point:
 
 Keeping metadata out of the prompt file makes the paste accident structurally impossible. Put both in one file and it eventually gets pasted whole — which is exactly how 1,100 of 3,207 characters (34%) ended up in a live prompt.
 
-**Prompts are written in Korean** (2026-07-29), creative prompts included, so the user can read, approve and correct them. Spoken lines stay verbatim Korean; proper nouns, on-screen text and format tokens (`15s`, `9:16`) keep their original form.
+**Prompts default to Korean**, creative prompts included, so the user can read, approve and correct them. An explicit user English request may use the block-scoped English contract below; changing language is not a remedy for, or permission to bypass, provider moderation. Spoken lines stay verbatim Korean; proper nouns, on-screen text and format tokens (`15s`, `9:16`) keep their original form.
+
+### Explicit English request exception
+
+For explicitly requested blocks only, use `prompt_language: en-US`,
+`prompt_style_version: creative_seedance_en_v4_20260912`, and
+`authoring_contract: seedance_lane_owned_en`. Record `prompt_language_override`
+with the absolute `project`, `evidence_path` under that project's `docs/`, and
+`evidence_sha256`. The referenced JSON records `source: explicit_user_request`,
+`language: en-US`, the verbatim `user_quote`, `turn_id`, and exact `block_ids`.
+Note the exception in the project's `docs/project_overrides.md`.
+
+English multi-shot prompts declare `15 seconds, N shots` and `Shot 1..N`.
+Attest normally with `--project`; use `paste-prompt --file <txt> --pack <json>`
+so the English route checks scope, unchanged attestation and exact prompt hash.
+Korean remains the default without this evidence. Reference, safety, settings,
+duration, semantic and character-limit checks are unchanged. Never infer that
+an English prompt will resolve a policy rejection.
 
 ### Package (`<BLOCK>_package.md`)
 

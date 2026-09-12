@@ -25,6 +25,8 @@ SEEDANCE_PROMPT_CHAR_LIMIT = 3500
 SEEDANCE_PROMPT_STYLE_VERSION = 'creative_seedance_ko_v4_20260731'
 SEEDANCE_AUTHORING_CONTRACT = 'seedance_lane_owned_ko'
 PROMPT_LANGUAGE = 'ko-KR'
+ENGLISH_PROMPT_STYLE_VERSION = 'creative_seedance_en_v4_20260912'
+ENGLISH_AUTHORING_CONTRACT = 'seedance_lane_owned_en'
 MULTIMODAL_BINDING_RULE = 'model_facing_multimodal_binding_v1'
 SINGLE_SHOT_GRAMMAR = 'SINGLE_CONTINUOUS_SHOT'
 MULTI_SHOT_GRAMMAR = 'PLANNED_MULTI_SHOT_SOURCE'
@@ -49,6 +51,7 @@ LEAK_PATTERN = re.compile(
 )
 
 DURATION_DECLARATION_PATTERNS = (
+    re.compile(r'(?<![\d.])(\d{1,2})\s*seconds?[,;:]?\s*\d+\s*shots', re.I),
     re.compile(r'(?<![\d.])(\d{1,2})\s*초\s*(?:동안\s*)?(?:단일|연속)'),
     re.compile(r'(?<![\d.])(\d{1,2})\s*초\s*동안'),
     re.compile(r'(?<![\d.])(\d{1,2})\s*초\s*\d+\s*숏'),
@@ -78,7 +81,71 @@ def language_stats(text: str) -> dict:
         'latin_chars': latin,
         'hangul_letter_ratio': round(ratio, 4),
         'korean_dominant': hangul >= 30 and ratio >= 0.55,
+        'english_dominant': latin >= 30 and (1 - ratio) >= 0.8,
     }
+
+
+def validate_language_override(pack: dict, project: Path | None = None) -> list[str]:
+    """English is opt-in per user-requested project/block; never a moderation bypass."""
+    if pack.get('prompt_language') == PROMPT_LANGUAGE:
+        return []
+    if pack.get('prompt_language') != 'en-US':
+        return [f'wrong_prompt_language:{pack.get("prompt_language")}']
+    override = pack.get('prompt_language_override')
+    if not isinstance(override, dict):
+        return ['english_user_request_required']
+    try:
+        root = Path(override['project']).expanduser().resolve(strict=True)
+        evidence = Path(override['evidence_path']).expanduser().resolve(strict=True)
+        if not evidence.is_relative_to(root / 'docs'):
+            return ['language_evidence_outside_project_docs']
+        if project is not None and root != project.expanduser().resolve():
+            return ['language_override_project_mismatch']
+        raw = evidence.read_bytes()
+        if hashlib.sha256(raw).hexdigest() != override.get('evidence_sha256'):
+            return ['language_request_evidence_changed']
+        request = json.loads(raw)
+    except (KeyError, TypeError, OSError, ValueError):
+        return ['language_request_evidence_invalid']
+    if not isinstance(request, dict) or not isinstance(request.get('block_ids'), list):
+        return ['language_request_scope_mismatch']
+    if (request.get('language') != 'en-US' or request.get('source') != 'explicit_user_request'
+            or not request.get('user_quote') or not request.get('turn_id')
+            or pack.get('block_id') not in request.get('block_ids', [])):
+        return ['language_request_scope_mismatch']
+    return []
+
+
+def prompt_language_matches(text: str, language: str) -> bool:
+    stats = language_stats(text)
+    return stats['english_dominant'] if language == 'en-US' else stats['korean_dominant']
+
+
+def validate_paste_pack(pack_path: Path, text: str, project: Path) -> str:
+    """Require an unchanged attested pack for the optional English paste route."""
+    pack_path = pack_path.expanduser().resolve()
+    project = project.expanduser().resolve()
+    if not pack_path.is_relative_to(project):
+        raise ValueError('PASTE_PACK_OUTSIDE_PROJECT')
+    pack = load_pack(pack_path)
+    errors = validate_seedance(pack) + validate_language_override(pack, project)
+    if errors:
+        raise ValueError('PASTE_PACK_INVALID: ' + ','.join(errors))
+    if normalize_prompt(text) != normalize_prompt(pack.get('prompt', '')):
+        raise ValueError('PASTE_PROMPT_PACK_MISMATCH')
+    receipt_path = generation_settings.seedance_prompt_dir(project) / f"{pack['block_id']}_attestation.json"
+    try:
+        receipt = json.loads(receipt_path.read_text())
+    except (OSError, ValueError) as exc:
+        raise ValueError('PASTE_ATTESTATION_MISSING') from exc
+    if not isinstance(receipt, dict):
+        raise ValueError('PASTE_ATTESTATION_STALE_OR_INVALID')
+    if (receipt.get('verdict') != 'ATTESTED' or receipt.get('block_id') != pack['block_id']
+            or receipt.get('pack') != str(pack_path)
+            or receipt.get('pack_sha256') != hashlib.sha256(pack_path.read_bytes()).hexdigest()
+            or receipt.get('prompt_sha256') != prompt_sha256(text)):
+        raise ValueError('PASTE_ATTESTATION_STALE_OR_INVALID')
+    return pack['prompt_language']
 
 
 def _reference_role_entries(value: object) -> list[tuple[str, str]]:
@@ -196,11 +263,13 @@ def validate_seedance(pack: dict) -> list[str]:
     for key in required:
         if not pack.get(key):
             errors.append(f'missing:{key}')
-    if pack.get('prompt_language') != PROMPT_LANGUAGE:
-        errors.append(f'wrong_prompt_language:{pack.get("prompt_language")}')
-    if pack.get('prompt_style_version') != SEEDANCE_PROMPT_STYLE_VERSION:
+    errors.extend(validate_language_override(pack))
+    english = pack.get('prompt_language') == 'en-US'
+    style = ENGLISH_PROMPT_STYLE_VERSION if english else SEEDANCE_PROMPT_STYLE_VERSION
+    contract = ENGLISH_AUTHORING_CONTRACT if english else SEEDANCE_AUTHORING_CONTRACT
+    if pack.get('prompt_style_version') != style:
         errors.append(f'wrong_prompt_style_version:{pack.get("prompt_style_version")}')
-    if pack.get('authoring_contract') != SEEDANCE_AUTHORING_CONTRACT:
+    if pack.get('authoring_contract') != contract:
         errors.append(f'wrong_authoring_contract:{pack.get("authoring_contract")}')
 
     rules = ' '.join(str(value) for value in (pack.get('prompt_rules_used') or []))
@@ -234,12 +303,14 @@ def validate_seedance(pack: dict) -> list[str]:
             count = pack.get('planned_scene_count')
             duration = pack.get('duration_sec')
             if isinstance(count, int):
-                if not re.search(rf'(?<![\d.]){duration}\s*초\s*{count}\s*숏', prompt):
+                declaration = (rf'(?<![\d.]){duration}\s*seconds?[,;:]?\s*{count}\s*shots' if english
+                               else rf'(?<![\d.]){duration}\s*초\s*{count}\s*숏')
+                if not re.search(declaration, prompt, re.I):
                     errors.append(
                         f'{field}_missing_multi_shot_duration_count_declaration:'
                         f'{duration}s/{count}shots')
                 for index in range(1, count + 1):
-                    if not re.search(rf'숏\s*{index}(?!\d)', prompt):
+                    if not re.search(rf'Shot\s*{index}(?!\d)' if english else rf'숏\s*{index}(?!\d)', prompt, re.I):
                         errors.append(f'{field}_missing_shot_marker:{index}')
         declared_durations = {
             int(match.group(1))
@@ -254,9 +325,9 @@ def validate_seedance(pack: dict) -> list[str]:
         if len(prompt) > SEEDANCE_PROMPT_CHAR_LIMIT:
             errors.append(f'{field}_over_{SEEDANCE_PROMPT_CHAR_LIMIT}')
         stats = language_stats(prompt)
-        if not stats['korean_dominant']:
+        if not prompt_language_matches(prompt, pack.get('prompt_language', PROMPT_LANGUAGE)):
             errors.append(
-                f'{field}_not_korean_dominant:'
+                f'{field}_not_{"english" if english else "korean"}_dominant:'
                 f'hangul={stats["hangul_chars"]},latin={stats["latin_chars"]},ratio={stats["hangul_letter_ratio"]}'
             )
         match = LEAK_PATTERN.search(prompt)
@@ -408,6 +479,7 @@ def attest(pack_path: Path, project: Path | None = None) -> dict:
         errors.append('project_required_for_duration_lock')
     else:
         project = project.expanduser().resolve()
+        errors.extend(validate_language_override(pack, project))
         duration_errors, duration_lock = generation_settings.validate_pack_duration(
             pack, project)
         errors.extend(duration_errors)
