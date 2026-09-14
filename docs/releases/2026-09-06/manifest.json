@@ -270,7 +270,7 @@
     {
       "source": "GLOBAL_AGENTS.md",
       "target": ".codex/AGENTS.md",
-      "sha256": "0c59952c7ec1c557c133d3e4193ac5cf3567f4b4bdd69bcdde79557744eff7bd"
+      "sha256": "43c61e264e2fc8a090ec112618fe4213db870515484b26bd0790c9cf32756134"
     },
     {
       "source": "runtime/AGENTS.md",
