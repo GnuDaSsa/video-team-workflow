@@ -20,3 +20,7 @@ Required result sections:
 7. Next owner
 
 Do not invent artifact quality from summaries. If files are missing, mark BLOCKED/WAITING once in the result file.
+
+For generated-video temporal review, use the coverage/disposition procedure in
+`seedance_qc.md` and the read-only `video_qc_coverage.py` checker. Do not promote a
+whole source from a usable trim or substitute sampled frames for playback/audio.

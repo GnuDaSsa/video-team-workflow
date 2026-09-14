@@ -86,3 +86,8 @@ Grind.” The existing live-action wiki profile is selected automatically via
 image-prompt/videodirector/v4 knowledge routing. Apply only matching task/media
 sections. Source contradictions and provider-specific recipes are not global
 rules. Canonical content and verification: `docs/releases/2026-09-08-hell-grind/release.md`.
+
+
+## Scheduled/QC closeout reliability
+
+Use the canonical Seedance production branch for native schedule state and runtime seedance_qc template for coverage. The 2026-09-14 release fixes local/native cadence drift and current-scope history false positives, reuses source-bound reviewed intervals, and keeps frame samples separate from playback/audio. It does not automate perception or prove the next due run. See docs/releases/2026-09-14/scheduled-production-qc.md; do not clone the rules into project folders.

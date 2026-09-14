@@ -1,3 +1,4 @@
+import datetime as dt
 import json
 import os
 from pathlib import Path
@@ -11,6 +12,95 @@ h = fixtures.helper
 
 
 class ScheduledQueueChecks(unittest.TestCase):
+    def test_explicit_cadences_survive_resume_without_sleep(self):
+        for minutes in (1, 15, 20, 30, 60, 120, 1440):
+            h.select_queue_mode(self.project, 'scheduled', self.evidence, minutes)
+            result = h.run_queue_cycle(self.project, self.jobs, **self.kw,
+                                      sleeper=lambda _: self.fail('must not sleep'))
+            self.assertFalse(result['wait_started'])
+            self.assertEqual(h.diagnose_queue(self.project)['interval_seconds'], minutes * 60)
+        h.select_queue_mode(self.project, 'foreground', self.evidence, 30)
+        self.assertEqual(h.read_queue_mode(self.project)['interval_minutes'], 15)
+
+    def test_invalid_cadence_never_creates_mode(self):
+        for value in (0, -1, 1441, True, 30.5, '30'):
+            with self.assertRaisesRegex(ValueError, 'QUEUE_MODE_OR_INTERVAL_INVALID'):
+                h.select_queue_mode(self.project, 'scheduled', self.evidence, value)
+        self.assertFalse(h.queue_mode_path(self.project).exists())
+
+    def test_fresh_native_snapshot_matches_but_does_not_prove_run(self):
+        h.select_queue_mode(self.project, 'scheduled', self.evidence, 30)
+        now = dt.datetime(2026, 9, 14, tzinfo=dt.timezone.utc)
+        snapshot = dict(id='test', target_thread_id='owner', status='ACTIVE',
+                        kind='heartbeat', rrule='FREQ=MINUTELY;INTERVAL=30', observed_at=now.isoformat())
+        before = {str(p): p.read_bytes() for p in self.project.rglob('*') if p.is_file()}
+        result = h.audit_schedule_snapshot(self.project, snapshot,
+                    automation_id='test', consumer_task_id='owner', now=now)
+        self.assertTrue(result['ok'])
+        self.assertFalse(result['scheduler_created'])
+        self.assertFalse(result['native_registration_verified_by_this_check'])
+        self.assertFalse(result['actual_run_verified_by_this_check'])
+        self.assertEqual(before, {str(p): p.read_bytes() for p in self.project.rglob('*') if p.is_file()})
+
+    def test_native_snapshot_rejects_mismatch_proposal_stale_and_calendar_rules(self):
+        self.select()
+        now = dt.datetime(2026, 9, 14, tzinfo=dt.timezone.utc)
+        base = dict(id='test', target_thread_id='owner', status='ACTIVE',
+                    kind='heartbeat', rrule='FREQ=MINUTELY;INTERVAL=20', observed_at=now.isoformat())
+        cases = [
+            ({'rrule': 'FREQ=MINUTELY;INTERVAL=30'}, 'SCHEDULE_CADENCE_MISMATCH'),
+            ({'target_thread_id': 'foreign'}, 'SCHEDULE_CONSUMER_MISMATCH'),
+            ({'id': 'foreign'}, 'SCHEDULE_ID_MISMATCH'),
+            ({'status': 'PROPOSED'}, 'SCHEDULE_NOT_ACTIVE'),
+            ({'status': 'PAUSED'}, 'SCHEDULE_NOT_ACTIVE'),
+            ({'kind': 'cron'}, 'SCHEDULE_KIND_NOT_THREAD_HEARTBEAT'),
+            ({'observed_at': '2026-09-13T00:00:00+00:00'}, 'SCHEDULE_SNAPSHOT_STALE_OR_UNTIMED'),
+            ({'observed_at': '2026-09-15T00:00:00+00:00'}, 'SCHEDULE_SNAPSHOT_STALE_OR_UNTIMED'),
+            ({'observed_at': '2026-09-14T00:00:00'}, 'SCHEDULE_SNAPSHOT_STALE_OR_UNTIMED'),
+            ({'rrule': 'FREQ=MINUTELY;INTERVAL=20;BYHOUR=9'}, 'SCHEDULE_CADENCE_UNSUPPORTED_OR_INVALID'),
+            ({'rrule': 'FREQ=MINUTELY;INTERVAL=20;INTERVAL=20'}, 'SCHEDULE_CADENCE_UNSUPPORTED_OR_INVALID'),
+        ]
+        for change, code in cases:
+            result = h.audit_schedule_snapshot(self.project, {**base, **change},
+                        automation_id='test', consumer_task_id='owner', now=now)
+            self.assertFalse(result['ok'])
+            self.assertIn(code, result['issues'])
+        h.select_queue_mode(self.project, 'scheduled', self.evidence, 60)
+        result = h.audit_schedule_snapshot(self.project, {**base, 'rrule': 'RRULE:FREQ=HOURLY;INTERVAL=1'},
+                        automation_id='test', consumer_task_id='owner', now=now)
+        self.assertTrue(result['ok'])
+
+    def test_doctor_detects_reported_native_cadence_drift(self):
+        self.select()
+        (self.meta / 'status.json').write_text(json.dumps({'monitoring': {
+            'kind': 'heartbeat', 'status': 'ACTIVE', 'interval_minutes': 30,
+            'automation_id': 'test', 'registration_evidence': str(self.evidence)}}))
+        self.assertIn('SCHEDULE_CADENCE_MISMATCH', h.audit_production_state(self.project)['issues'])
+        h.select_queue_mode(self.project, 'scheduled', self.evidence, 30)
+        self.assertNotIn('SCHEDULE_CADENCE_MISMATCH', h.audit_production_state(self.project)['issues'])
+
+    def test_provider_history_and_status_alias_are_not_current_scope_drift(self):
+        h.sync_queue_runtime(self.project, self.jobs, **self.kw)
+        rows = [{'block_id': j['scene_id'], 'status': j['visible_state']} for j in self.jobs]
+        rows.append({'block_id': 'OLD', 'status': 'COMPLETED'})
+        path = self.project / 'state.json'
+        path.write_text(json.dumps({'provider_jobs': rows}))
+        self.assertNotIn('QUEUE_JOB_STATE_MISMATCH:state', h.audit_production_state(self.project)['issues'])
+        rows[0]['status'] = 'COMPLETED'
+        path.write_text(json.dumps({'provider_jobs': rows}))
+        self.assertIn('QUEUE_JOB_STATE_MISMATCH:state', h.audit_production_state(self.project)['issues'])
+
+    def test_conflicting_aliases_duplicates_and_unseen_active_jobs_stay_flagged(self):
+        h.sync_queue_runtime(self.project, self.jobs, **self.kw)
+        rows = [dict(j) for j in self.jobs]
+        rows[0]['status'] = 'COMPLETED'
+        rows.extend([dict(rows[1]), {'block_id': 'UNSEEN', 'status': 'IN_QUEUE'}])
+        (self.project / 'state.json').write_text(json.dumps({'provider_jobs': rows}))
+        issues = h.audit_production_state(self.project)['issues']
+        self.assertIn('QUEUE_JOB_ALIAS_CONFLICT:state', issues)
+        self.assertIn('QUEUE_DUPLICATE_REPORTED_JOB:state', issues)
+        self.assertIn('QUEUE_UNOBSERVED_ACTIVE_JOB:state', issues)
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.project = Path(self.tmp.name)

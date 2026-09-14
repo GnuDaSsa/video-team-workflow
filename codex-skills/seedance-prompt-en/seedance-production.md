@@ -91,7 +91,7 @@ not by restarting foreground waits or asking for the same approval again.
 
 Use the native app automation tool after the **specific surface approval**;
 inspect a matching existing automation before proposing/creating another.
-Prefer one current-task heartbeat, 15–20 minutes as requested. Do not revive an
+Prefer one current-task heartbeat at the approved interval. Do not revive an
 unrelated old cron, guess a task ID, write raw scheduler config, or run both
 foreground and scheduled owners. If only a proposal card is returned, record
 `PROPOSED`, not `ACTIVE`; do not repeatedly ask at each run after initial approval.
@@ -100,6 +100,58 @@ Capture registration ID, accepted cadence, destination, active/paused state and
 native tool evidence separately from first-run evidence. Heartbeat model choice
 may inherit task settings; do not claim Luna execution from a routing table.
 A local mode file never proves registration, browser access or successful runs.
+
+### Cadence and stable resume payload
+
+`queue-mode` supports explicit regular scheduled intervals of 1–1440 minutes;
+30/60-minute requests must not silently become 20 minutes. Foreground stays a
+bounded 15-minute wait. For unsupported calendar cadence, report that limitation
+and retain the actual native schedule; do not approximate it or start a timer.
+Use the same accepted cadence for mode, native registration, `monitoring`, and
+`scheduled_followup.due_at`. `queue-doctor` flags locally reported cadence drift.
+
+After native create/update/view, capture the actual fields in existing project
+registration evidence: `id`, `kind`, `status`, `target_thread_id`, `rrule`, and
+timezone-aware `observed_at` (time of the real read, not the file's mtime).
+Then compare the fresh snapshot, exact expected registration and consumer:
+
+```bash
+python3 ~/.codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py queue-schedule-check \
+  --project <p> --native-snapshot <existing-registration-evidence.json> \
+  --automation-id <existing-id> --consumer-task-id <verified-task-id>
+```
+
+This read-only check rejects stale (>10 minutes), wrong-task, wrong-ID,
+non-ACTIVE and cadence-mismatched snapshots. It does **not** query/authenticate
+the native scheduler or prove a run. A proposal is not registration. Preserve
+the existing automation ID, destination, cadence and notification policy on
+updates; correct only the authorized mismatch through the native tool.
+
+Keep the automation prompt **stable**: project/state paths, approved scope,
+owner/skill pointer, action priority, safety boundary and terminal condition.
+Do not freeze counts, pending statuses, current composer contents or a long list
+of completed QC intervals into recurring instructions. Those are mutable run
+data in existing state/queue/per-asset QC reports, read afresh at every run.
+Accepted/uncertain transactions are deduplicated from their receipts, not from
+an old sentence saying which block is in the composer.
+
+Stable payload shape (fill scope and paths, not live counts):
+
+> Continue the already authorized production/download/QC scope for <project> in
+> this task using the selected canonical Seedance skill. Read current project
+> and lane state, queue receipts and per-asset QC coverage first. Resume the next
+> eligible action under the shared production priority. Preserve user HOLD and
+> accepted/uncertain transactions. Do not create another owner or schedule.
+> Checkpoint the actual result and next unresolved action. When no authorized
+> work remains, or only an external-action gate remains, close with the exact
+> disposition instead of inventing more checks; manage the existing automation
+> through the native tool according to its approved completion policy.
+
+One scheduled run may complete several bounded useful QC checks; cadence is a
+wakeup interval, not a quota of one tiny interval per run. Reuse the coverage
+record under `runtime/templates/seedance_qc.md`. Empty provider queues plus only
+audio/user-review blockers do not justify repeatedly sampling the same frames.
+Keep routine unchanged checks quiet; report material completion/failure/action.
 
 Declare the reservation's purpose: **observe-only** or **production continuation**.
 An observe-only heartbeat on a review task cannot wake an idle production owner
@@ -200,7 +252,7 @@ project continuation schedule.
 
 At each due check, consume one actual board observation, not a continuous watch.
 Set the next due time from the real acceptance/pending observation plus the
-approved 15-20 minute interval. Execution occurs on the first heartbeat at or
+accepted scheduled interval. Execution occurs on the first heartbeat at or
 after due, not at a guaranteed exact second. An idle owner is woken once; an active
 owner is never given competing UI commands. Require fresh execution evidence
 within one check interval after delivery even if app metadata stays active;
@@ -291,4 +343,6 @@ verified file remains `UI_ONLY_NOT_DOWNLOADED`.
 Playback QC is separate: identity/crop, anatomy, contact/weight/inertia,
 texture/line stability, temporal seams, freeze/jitter, sound and usable handles.
 Timestamps express intended pacing; approve actual cut intervals only after
-playback. Technical file verification alone is not a creative PASS.
+playback. Technical file verification alone is not a creative PASS. Follow the
+runtime `seedance_qc.md` template and `video_qc_coverage.py` for source-bound
+coverage, next-check reuse and disposition; do not duplicate that QC procedure.

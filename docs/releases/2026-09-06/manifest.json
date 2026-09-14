@@ -30,7 +30,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/prompt-review.md",
       "target": ".codex/skills/seedance-prompt-en/prompt-review.md",
-      "sha256": "7f4efa4e73ee03d66b33870ec0f79e5803191f487ce8690bfac900caacb389cb"
+      "sha256": "98417dd85ab9888677b75f29b3fa92ec057830dfa40830d4c46785ad992b432f"
     },
     {
       "source": "codex-skills/seedance-prompt-en/scripts/aside_bridge.py",
@@ -40,7 +40,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/scripts/runway_ui_helper.py",
       "target": ".codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py",
-      "sha256": "5d8b12ceca2d5d2c616e0607ef2e39bc2b215acb90160c5da90ead50fee6e9de"
+      "sha256": "1ed40f6ba231fa1ea5fb6816a8304e9ff5635e901ce226648c5e0294fad9a56f"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-field-lessons.md",
@@ -50,7 +50,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/seedance-production.md",
       "target": ".codex/skills/seedance-prompt-en/seedance-production.md",
-      "sha256": "9d8816bf1f5908bffa66e2f357f4bc640946b9342ae8681e58a03815411ff47c"
+      "sha256": "2eef27f667bedd42e42f551d73068ba797440d56ff800861c6a6fb3f00d17981"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-prompting.md",
@@ -208,6 +208,11 @@
       "sha256": "bf27aac91218408ef8e5402a31c0699605e7313f1c679ab96c5110916e68983c"
     },
     {
+      "source": "runtime/scripts/video_qc_coverage.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/video_qc_coverage.py",
+      "sha256": "5c2a13968e77f5b9a1a3d9e1f1bb860ccfbe50b925e9ff0a83b8d8e9fc590740"
+    },
+    {
       "source": "runtime/templates/director.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/director.md",
       "sha256": "cf4275cfe0189047d866669bf22afed7900f8e6fbbba1d533902dcd37dd35958"
@@ -245,7 +250,7 @@
     {
       "source": "runtime/templates/qc.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/qc.md",
-      "sha256": "31773571e15d3e661efd8adf6fa6289fdc6d6f2a17a3091500ad981344b4050e"
+      "sha256": "d3bf2e69d9edf6b3b638283768fbdae7972a81458b1a9ac37c3217cee8d421f9"
     },
     {
       "source": "runtime/templates/seedance.md",
@@ -255,7 +260,7 @@
     {
       "source": "runtime/templates/seedance_qc.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/seedance_qc.md",
-      "sha256": "9751043c9a5210a2a9d1a59e4f6f4ffe7c7f1cd868a83ab1eb99bf47bf85a3b3"
+      "sha256": "bf753acc3c55767d4e2fd0848735ef5c0e7f0abda07ca8bf8210d3863b6c3bdf"
     },
     {
       "source": "runtime/templates/shared_lane_contract.md",

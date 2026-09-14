@@ -29,6 +29,7 @@ Commands:
   queue-exit-check --project P           refuse a final response while the queue cycle is nonterminal
   queue-doctor --project P               read-only wait/receipt diagnosis; never starts monitoring
   queue-mode --project P --mode scheduled --request-evidence F   persist intent, never register a scheduler
+  queue-schedule-check --project P --native-snapshot F          read-only snapshot/intent comparison
   resume-contract --project P            write state for that foreground wait; never schedules Codex
   recover                                focus-pollution ritual step: ESC + frontmost report
 
@@ -2113,6 +2114,13 @@ def _native_schedule_claimed(monitoring: dict) -> bool:
     return registration in {'ACTIVE', 'REGISTERED'} or native_active
 
 
+def _valid_queue_interval(mode: str, minutes: int) -> bool:
+    # Foreground remains the one approved bounded 15-minute tool session.
+    # Scheduled cadence is user-selected, not a 15/20-minute enum or a timer.
+    return (type(minutes) is int and
+            (minutes == 15 if mode == 'foreground' else 1 <= minutes <= 1440))
+
+
 def read_queue_mode(project: Path) -> dict:
     """A user-intent checkpoint, never an automation registration receipt."""
     path = queue_mode_path(project)
@@ -2125,7 +2133,7 @@ def read_queue_mode(project: Path) -> dict:
     value = _json_file(path)
     if (value.get('mode') not in {'foreground', 'scheduled'}
             or value.get('project') != str(project.expanduser().resolve())
-            or value.get('interval_minutes') not in {15, 20}):
+            or not _valid_queue_interval(value.get('mode'), value.get('interval_minutes'))):
         raise ValueError('QUEUE_MODE_INVALID: repair explicit selection; never fall back to sleep')
     evidence = Path(value.get('request_evidence') or '').resolve()
     if (not evidence.is_relative_to(project.expanduser().resolve())
@@ -2137,7 +2145,8 @@ def read_queue_mode(project: Path) -> dict:
 
 def select_queue_mode(project: Path, mode: str, evidence: Path, interval_minutes: int = 20) -> dict:
     project = project.expanduser().resolve()
-    if mode not in {'foreground', 'scheduled'} or interval_minutes not in {15, 20}:
+    if (mode not in {'foreground', 'scheduled'}
+            or not _valid_queue_interval('scheduled', interval_minutes)):
         raise ValueError('QUEUE_MODE_OR_INTERVAL_INVALID')
     evidence = evidence.expanduser().resolve()
     if not evidence.is_relative_to(project) or not evidence.is_file() or not evidence.stat().st_size:
@@ -2156,6 +2165,82 @@ def select_queue_mode(project: Path, mode: str, evidence: Path, interval_minutes
     return value
 
 
+def audit_schedule_snapshot(project: Path, snapshot: dict, *, automation_id: str,
+                            consumer_task_id: str, now: dt.datetime = None) -> dict:
+    """Compare fresh operator-captured native fields; no scheduler query or write.
+
+    A matching JSON snapshot is NOT authenticated native registration or proof
+    of a successful run. The owner must first read the real native tool/record.
+    Deliberately support only unrestricted regular minute/hour cadence, not an
+    approximate interpretation of calendar/BY* rules.
+    """
+    mode = read_queue_mode(project)
+    issues = []
+    if mode['mode'] != 'scheduled':
+        issues.append('SCHEDULE_MODE_NOT_SELECTED')
+    for key, expected, code in (
+        ('id', automation_id, 'SCHEDULE_ID_MISMATCH'),
+        ('target_thread_id', consumer_task_id, 'SCHEDULE_CONSUMER_MISMATCH'),
+        ('kind', 'heartbeat', 'SCHEDULE_KIND_NOT_THREAD_HEARTBEAT'),
+        ('status', 'ACTIVE', 'SCHEDULE_NOT_ACTIVE'),
+    ):
+        if not expected or snapshot.get(key) != expected:
+            issues.append(code)
+    cadence = None
+    rule = snapshot.get('rrule', '')
+    fields = {}
+    try:
+        for token in rule.removeprefix('RRULE:').split(';'):
+            key, value = token.split('=', 1)
+            if key in fields:
+                raise ValueError('duplicate')
+            fields[key] = value
+        if set(fields) != {'FREQ', 'INTERVAL'} or fields['FREQ'] not in {'MINUTELY', 'HOURLY'}:
+            raise ValueError('calendar cadence')
+        interval = int(fields['INTERVAL'])
+        cadence = interval * (60 if fields['FREQ'] == 'HOURLY' else 1)
+        if not _valid_queue_interval('scheduled', cadence):
+            raise ValueError('interval')
+    except (ValueError, AttributeError, TypeError):
+        cadence = None
+        issues.append('SCHEDULE_CADENCE_UNSUPPORTED_OR_INVALID')
+    if cadence is not None and cadence != mode['interval_minutes']:
+        issues.append('SCHEDULE_CADENCE_MISMATCH')
+    try:
+        observed = dt.datetime.fromisoformat(snapshot['observed_at'].replace('Z', '+00:00'))
+        if observed.tzinfo is None:
+            raise ValueError('timezone required')
+        age = ((now or dt.datetime.now(dt.timezone.utc)) - observed).total_seconds()
+        if not -60 <= age <= 600:
+            raise ValueError('stale or future')
+    except (KeyError, ValueError, AttributeError, TypeError):
+        issues.append('SCHEDULE_SNAPSHOT_STALE_OR_UNTIMED')
+    return {
+        'ok': not issues, 'read_only': True, 'issues': issues,
+        'selected_interval_minutes': mode['interval_minutes'],
+        'snapshot_interval_minutes': cadence,
+        'scheduler_created': False, 'native_registration_verified_by_this_check': False,
+        'actual_run_verified_by_this_check': False,
+    }
+
+
+def cmd_queue_schedule_check(args) -> int:
+    try:
+        project = Path(args.project).expanduser().resolve()
+        path = Path(args.native_snapshot).expanduser().resolve()
+        if not path.is_relative_to(project):
+            raise ValueError('SCHEDULE_SNAPSHOT_MUST_BE_PROJECT_EVIDENCE')
+        snapshot = json.loads(path.read_text(encoding='utf-8'))
+        if not isinstance(snapshot, dict):
+            raise ValueError('SCHEDULE_SNAPSHOT_MUST_BE_OBJECT')
+        result = audit_schedule_snapshot(project, snapshot, automation_id=args.automation_id,
+                                         consumer_task_id=args.consumer_task_id)
+    except (OSError, ValueError) as exc:
+        result = {'ok': False, 'error': str(exc), 'read_only': True, 'scheduler_created': False}
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0 if result['ok'] else 1
+
+
 def audit_production_state(project: Path) -> dict:
     """Read-only consistency check, not a replacement for GUI, ffprobe or playback QC."""
     project = project.expanduser().resolve()
@@ -2169,10 +2254,24 @@ def audit_production_state(project: Path) -> dict:
     expected = {str(j['scene_id']): j['visible_state'] for j in queue.get('jobs', [])}
     for name in ('state', 'manifest', 'lane', 'qc'):
         doc = documents[name]
-        reported = {str(j.get('block_id') or j.get('scene_id')): j.get('visible_state')
-                    for j in doc.get('provider_jobs', [])}
-        if name != 'qc' and expected and reported != expected:
-            issues.append(f'QUEUE_JOB_STATE_MISMATCH:{name}')
+        reported = {}
+        for job in doc.get('provider_jobs', []):
+            key = str(job.get('block_id') or job.get('scene_id'))
+            values = [_normalize_queue_state(job[field]) for field in ('visible_state', 'status')
+                      if isinstance(job.get(field), str)]
+            values = [v for v in values if v in QUEUE_JOB_STATES]
+            if len(set(values)) > 1:
+                issues.append(f'QUEUE_JOB_ALIAS_CONFLICT:{name}')
+            if key in reported:
+                issues.append(f'QUEUE_DUPLICATE_REPORTED_JOB:{name}')
+            reported[key] = values[0] if values else None
+        if name != 'qc' and expected:
+            # provider_jobs may contain the project history; jobs[] is the
+            # currently observed board scope. Settled history is not drift.
+            if any(reported.get(key) != state for key, state in expected.items()):
+                issues.append(f'QUEUE_JOB_STATE_MISMATCH:{name}')
+            if any(key not in expected and state in INFLIGHT_STATES for key, state in reported.items()):
+                issues.append(f'QUEUE_UNOBSERVED_ACTIVE_JOB:{name}')
         blocker = doc.get('blocker') or {}
         code = blocker.get('code', '') if isinstance(blocker, dict) else str(blocker)
         if (expected and queue.get('shelf_state') == 'EXHAUSTED'
@@ -2225,6 +2324,13 @@ def audit_production_state(project: Path) -> dict:
             issues.append('SCHEDULE_REGISTRATION_CLAIM_WITHOUT_RECEIPT')
         if not queue_mode_path(project).exists():
             issues.append('SCHEDULE_INTENT_WITHOUT_MODE_CHECKPOINT')
+        elif type(monitoring.get('interval_minutes')) is int:
+            try:
+                mode = read_queue_mode(project)
+                if mode['mode'] == 'scheduled' and mode['interval_minutes'] != monitoring['interval_minutes']:
+                    issues.append('SCHEDULE_CADENCE_MISMATCH')
+            except ValueError:
+                issues.append('SCHEDULE_MODE_CHECKPOINT_INVALID')
     verified, approved = 0, 0
     registry = media_registry.db_path(project)
     if registry.is_file():
@@ -2664,8 +2770,15 @@ def main() -> int:
     p.add_argument('--project', required=True)
     p.add_argument('--mode', choices=['foreground', 'scheduled'], required=True)
     p.add_argument('--request-evidence', required=True, help='nonempty project-local note of the actual user request')
-    p.add_argument('--interval-minutes', choices=[15, 20], type=int, default=20)
+    p.add_argument('--interval-minutes', type=int, default=20,
+                   help='explicit regular scheduled cadence, 1..1440 minutes; foreground stays 15')
     p.set_defaults(fn=cmd_queue_mode)
+    p = sub.add_parser('queue-schedule-check', help='read-only fresh native snapshot/intent check; no scheduler query')
+    p.add_argument('--project', required=True)
+    p.add_argument('--native-snapshot', required=True)
+    p.add_argument('--automation-id', required=True)
+    p.add_argument('--consumer-task-id', required=True)
+    p.set_defaults(fn=cmd_queue_schedule_check)
     p = sub.add_parser(
         'resume-contract',
         help='write state for one foreground wait; this does not schedule or wake Codex')

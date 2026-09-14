@@ -95,6 +95,19 @@
       "scope": "explicit_seedance20_six_shots",
       "verification": "155 tests PASS; release parity 66 files PASS",
       "contract": "docs/contracts/2026-09-09-seedance20-explicit-six.md"
+    },
+    {
+      "id": "2026-09-14-scheduled-production-and-qc",
+      "status": "complete",
+      "contract": "docs/contracts/2026-09-14-scheduled-production-and-qc.md",
+      "completedAt": "2026-09-14T17:42:14+09:00",
+      "blockers": [],
+      "verification": {
+        "lastResult": "PASS_SHARED_DEPLOYMENT_AND_LOCAL_LIVE_SMOKE",
+        "lastCommand": "185 tests; Python compile; shell syntax; skill validation; release freeze/preflight/apply/check; native snapshot and registered-video QC smoke",
+        "notes": "68-file parity. Existing native reservation same ID/task/30min/policy verified after stable prompt update; local 20min drift corrected. Actual QC evidence reuse verified, no media promotion. No post-update scheduled run or new generated-quality verification."
+      },
+      "nextStep": "Existing authorized task continues unresolved QC under deployed workflow; observe the next scheduled run separately. Preserve unrelated blocked main goal."
     }
   ]
 }
