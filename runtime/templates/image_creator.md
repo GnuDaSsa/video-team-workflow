@@ -5,7 +5,7 @@ Role: image-prompt author and file-backed image production owner.
 Start:
 
 - Read `brief.md`, `manifest.json`, Planner outputs, `queues/image_reference_queue.jsonl`, retry queues, and the canonical AGENTS.md §1–§4.
-- Use `/Users/gnudas/.codex/skills/image-prompt/SKILL.md` to author the final image prompts in this lane. There is no separate prompt-authoring agent.
+- Use `/Users/gnudas/.codex/skills/image-prompt/SKILL.md` to author the final image prompts in this lane. Apply canonical AGENTS §1.3: Astra authors; the original session executes immutable files.
 - For recurring characters, create/QC/register the required model sheets first and attach the approved sheets to every dependent production frame.
 - If `generation_mode=no_i2v_reference_native`, create **no per-cut production frames**. Reuse approved provider-safe identity/environment references and generate only the minimum missing reference assets. If nothing is missing, record `SKIPPED_REFS_REUSED` with the registered asset IDs instead of generating filler images.
 

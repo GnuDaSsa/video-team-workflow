@@ -362,25 +362,24 @@ def _seedance_phase_contract(project: Path, phase: str, route: dict) -> str:
         return f"""
 # MODEL/PHASE CONTRACT — Seedance prompting only
 
-- This foreground owner is `{route['model']}` with `{route['reasoning_effort']}` reasoning.
+- This foreground owner is `{route['model'] or 'inherit_session'}` with `{route['reasoning_effort'] or 'session-selected'}` reasoning.
 - Author, validate, and attest the complete eligible Seedance prompt shelf. Do not open or
   control Aside/Runway, do not invoke Computer Use, and do not click Generate.
 - When at least one package has a current `ATTESTED` receipt, finish with
   `status=READY_FOR_PRODUCTION`, `phase=prompting_complete`, and list the attestation paths in
   `{project / 'lanes' / 'seedance' / 'prompting_handoff.json'}`.
-- Stop after the local handoff. A separate explicit sequential dispatch will start the Luna
-  production owner; never auto-spawn it and never keep a second owner alive.
+- Return the local handoff to the original session executor. Do not spawn a production owner.
 """
     return f"""
 # MODEL/PHASE CONTRACT — Seedance production only
 
-- This foreground owner is `{route['model']}` with `{route['reasoning_effort']}` reasoning.
+- This foreground owner is `{route['model'] or 'inherit_session'}` with `{route['reasoning_effort'] or 'session-selected'}` reasoning.
 - Use only current `ATTESTED` prompt packages. Do not rewrite, improve, or silently replace a
   prompt; return to the Astra prompting phase when a creative revision is required.
 - Aside is the sole visible Runway owner. Bind the exact existing Runway tab with deterministic
   `aside repl` (`listBrowserTabs()` -> exact targetId -> `attachBrowserTab(targetId)`). Never
   open a new Runway tab or use Chrome, Safari, in-app browser, connector, or API.
-- Use the same Luna owner for permitted native Computer Use/file chooser steps. Keep one owner
+- Use the same session-selected owner for permitted native Computer Use/file chooser steps. Keep one owner
   tool at a time on the same Aside tab; no second browser loop or nested browser agent.
 - Follow the canonical Seedance production skill for recovery, exactly-once Generate, queue
   continuation, download, ffprobe, registry ingest, and evidence.
@@ -400,7 +399,7 @@ def make_prompt(project: Path, lane: str, phase: str | None = None) -> str:
         f"""
 # MODEL ROUTING CONTRACT
 
-- Required owner: `{route['model']}` with `{route['reasoning_effort']}` reasoning.
+- Required owner: `{route['model'] or 'inherit_session'}` with `{route['reasoning_effort'] or 'session-selected'}` reasoning.
 - Route purpose: `{route['purpose']}`.
 - This is one explicit sequential owner, not permission to spawn another lane or agent.
 """
@@ -470,12 +469,14 @@ def active_lane_owners(project: Path) -> list[dict]:
 
 
 def codex_exec_inner(project: Path, prompt_path: Path, result_path: Path, route: dict) -> str:
+    if not route['model']:
+        raise ValueError('INHERIT_SESSION: continue in the current native session; CLI dispatch cannot inherit its model')
     effort_config = 'model_reasoning_effort=' + json.dumps(route['reasoning_effort'])
     return (
         f"HOME=/Users/gnudas {shlex.quote(str(CODEX))} exec "
         f"--skip-git-repo-check --full-auto "
         f"--output-last-message {shlex.quote(str(result_path))} "
-        f"-C {shlex.quote(str(project))} -m {shlex.quote(route['model'])} "
+        f"-C {shlex.quote(str(project))} -m {shlex.quote(route['model'] or '')} "
         f"-c {shlex.quote(effort_config)} < {shlex.quote(str(prompt_path))}"
     )
 
@@ -506,6 +507,8 @@ def dispatch(args) -> None:
                 'SPAWN_APPROVAL_REQUIRED: this dispatch creates one Codex lane owner. '
                 f'After explicit current-conversation approval, retry with '
                 f'--approved-spawn {approval_token}')
+        if not route['model']:
+            raise SystemExit('INHERIT_SESSION: execution stays in the current conversation; no CLI owner')
         owners = active_lane_owners(project)
         if owners:
             raise SystemExit(
@@ -684,7 +687,7 @@ def workflow(args) -> None:
         'model_routing': {
             'policy_version': model_routing.POLICY_VERSION,
             'routes': model_routing.matrix(),
-            'seedance_phase_handoff': 'same-owner sequential by default; approved new-owner dispatch preferences: prompting(Astra xhigh), production(Luna high)',
+            'seedance_phase_handoff': 'same-owner sequential by default; approved new-owner dispatch preferences: prompting(Astra xhigh), production(session-selected)',
             'auto_spawn_next_phase': False,
         },
         'internal_parallel_exceptions': [
@@ -853,7 +856,9 @@ def next_cmd(args) -> None:
         'new_owner': False,
         'new_approval_for_role_change': False,
         'automatic_model_switch': False,
-        'next_roles': [{'lane': row['lane'], 'phase': row['phase']} for row in dispatch],
+        'next_roles': [{'lane': row['lane'], 'phase': row['phase'],
+                        'author_required': row['model_selection'] == 'astra_author',
+                        'author_protocol': 'AGENTS.md §1.3'} for row in dispatch],
         'dispatch_note': 'next_dispatch is optional new-owner routing, not an instruction to spawn or ask again for routine steps.',
     }
     print(json.dumps(result, ensure_ascii=False, indent=2))
@@ -867,6 +872,8 @@ def model_route_cmd(args) -> None:
             if project is None:
                 raise SystemExit('--project is required for seedance --phase auto')
             phase = seedance_phase(project, 'auto')
+        elif args.lane.startswith('image_creator_'):
+            phase = 'production' if phase == 'auto' else phase
         elif args.lane != 'seedance':
             phase = None
         print(json.dumps(model_routing.resolve(args.lane, phase), ensure_ascii=False, indent=2))

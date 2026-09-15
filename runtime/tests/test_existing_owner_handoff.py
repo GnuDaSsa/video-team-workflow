@@ -16,7 +16,8 @@ class ExistingOwnerHandoffTests(unittest.TestCase):
         self.assertEqual(r['threadId'], a['owner_id'])
         self.assertIn('재전송하거나', r['prompt'])
         self.assertIn('이 작업의 final', r['prompt'])
-        self.assertEqual(r['model'], m.LUNA_MODEL)
+        self.assertNotIn('model', r)
+        self.assertNotIn('thinking', r)
 
     def test_authoring_uses_actual_native_model_argument(self):
         a = self.args(); a['phase'] = 'prompting'

@@ -31,14 +31,14 @@ class ModelRoutingTests(unittest.TestCase):
                 f'{lane}:{phase if lane == "seedance" else "lane"}')
 
     def test_flow_qc_and_computer_use_route_to_luna_high(self) -> None:
-        for lane in ('director', 'music', 'planner', 'image_qc',
+        for lane in ('director', 'music', 'image_qc',
                      'seedance_qc', 'editor', 'package'):
             route = model_routing.resolve(lane)
-            self.assertEqual(route['model'], 'gpt-5.6-luna')
-            self.assertEqual(route['reasoning_effort'], 'high')
+            self.assertIsNone(route['model'])
+            self.assertIsNone(route['reasoning_effort'])
         production = model_routing.resolve('seedance', 'production')
-        self.assertEqual(production['model'], 'gpt-5.6-luna')
-        self.assertEqual(production['reasoning_effort'], 'high')
+        self.assertIsNone(production['model'])
+        self.assertIsNone(production['reasoning_effort'])
         self.assertEqual(production['purpose'], 'aside_cli_and_computer_use')
 
     def test_seedance_auto_phase_moves_only_after_ready_status(self) -> None:
@@ -68,7 +68,7 @@ class ModelRoutingTests(unittest.TestCase):
                 prompt = video_codex_runtime.make_prompt(project, 'seedance', 'production')
             finally:
                 video_codex_runtime.TEMPLATES = old_templates
-            self.assertIn('gpt-5.6-luna', prompt)
+            self.assertIn('inherit_session', prompt)
             self.assertIn('aside repl', prompt)
             self.assertIn('attachBrowserTab(targetId)', prompt)
             self.assertIn('no second browser loop', prompt)
@@ -87,11 +87,9 @@ class ModelRoutingTests(unittest.TestCase):
 
     def test_codex_command_carries_model_and_effort(self) -> None:
         route = model_routing.resolve('seedance', 'production')
-        command = video_codex_runtime.codex_exec_inner(
-            Path('/tmp/project'), Path('/tmp/prompt.md'), Path('/tmp/result.md'), route)
-        self.assertIn('-m gpt-5.6-luna', command)
-        self.assertIn('model_reasoning_effort=', command)
-        self.assertIn('high', command)
+        with self.assertRaisesRegex(ValueError, 'INHERIT_SESSION'):
+            video_codex_runtime.codex_exec_inner(
+                Path('/tmp/project'), Path('/tmp/prompt.md'), Path('/tmp/result.md'), route)
 
     def test_dispatch_refuses_without_exact_spawn_approval(self) -> None:
         with tempfile.TemporaryDirectory() as td:
@@ -99,7 +97,7 @@ class ModelRoutingTests(unittest.TestCase):
             (project / 'state.json').write_text('{}', encoding='utf-8')
             (project / 'lanes' / 'director').mkdir(parents=True)
             with mock.patch('video_codex_runtime.lane_gates.gate_check', return_value=(True, 'OK')):
-                with self.assertRaisesRegex(SystemExit, 'SPAWN_APPROVAL_REQUIRED'):
+                with self.assertRaisesRegex(SystemExit, 'INHERIT_SESSION|SPAWN_APPROVAL_REQUIRED'):
                     video_codex_runtime.dispatch(SimpleNamespace(
                         project=str(project), lanes=['director'], phase='auto',
                         approved_spawn=None, force=False))

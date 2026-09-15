@@ -8,7 +8,7 @@ an explicit runtime action and only one Codex owner may run at a time.
 from __future__ import annotations
 
 
-POLICY_VERSION = 'video_team_model_routing_v2_20260906'
+POLICY_VERSION = 'video_team_model_routing_v3_20260915'
 
 ASTRA_MODEL = 'gpt-6-astra'
 ASTRA_EFFORT = 'xhigh'
@@ -16,17 +16,19 @@ LUNA_MODEL = 'gpt-5.6-luna'
 LUNA_EFFORT = 'high'
 
 ROUTES = {
-    'director': (LUNA_MODEL, LUNA_EFFORT, 'workflow_direction'),
-    'music': (LUNA_MODEL, LUNA_EFFORT, 'music_flow_and_lock'),
-    'planner': (LUNA_MODEL, LUNA_EFFORT, 'planning_and_cut_map'),
-    'image_creator_01': (ASTRA_MODEL, ASTRA_EFFORT, 'image_prompting_and_generation_owner'),
-    'image_creator_02': (ASTRA_MODEL, ASTRA_EFFORT, 'image_prompting_and_generation_owner'),
-    'image_qc': (LUNA_MODEL, LUNA_EFFORT, 'image_qc'),
+    'director': (None, None, 'workflow_direction'),
+    'music': (None, None, 'music_flow_and_lock'),
+    'planner': (ASTRA_MODEL, ASTRA_EFFORT, 'planning_and_cut_map'),
+    'image_creator_01': (ASTRA_MODEL, ASTRA_EFFORT, 'image_prompt_authoring'),
+    'image_creator_02': (ASTRA_MODEL, ASTRA_EFFORT, 'image_prompt_authoring'),
+    'image_creator_01:production': (None, None, 'image_generation_execution'),
+    'image_creator_02:production': (None, None, 'image_generation_execution'),
+    'image_qc': (None, None, 'image_qc'),
     'seedance:prompting': (ASTRA_MODEL, ASTRA_EFFORT, 'video_prompt_authoring'),
-    'seedance:production': (LUNA_MODEL, LUNA_EFFORT, 'aside_cli_and_computer_use'),
-    'seedance_qc': (LUNA_MODEL, LUNA_EFFORT, 'video_qc'),
-    'editor': (LUNA_MODEL, LUNA_EFFORT, 'capcut_and_edit_flow'),
-    'package': (LUNA_MODEL, LUNA_EFFORT, 'package_and_delivery_flow'),
+    'seedance:production': (None, None, 'aside_cli_and_computer_use'),
+    'seedance_qc': (None, None, 'video_qc'),
+    'editor': (None, None, 'capcut_and_edit_flow'),
+    'package': (None, None, 'package_and_delivery_flow'),
 }
 
 
@@ -35,6 +37,10 @@ def route_key(lane: str, phase: str | None = None) -> str:
         if phase not in {'prompting', 'production'}:
             raise ValueError('seedance model routing requires phase=prompting|production')
         return f'seedance:{phase}'
+    if lane.startswith('image_creator_') and phase == 'production':
+        return f'{lane}:production'
+    if phase not in (None, 'prompting'):
+        raise ValueError('invalid_lane_phase')
     return lane
 
 
@@ -48,7 +54,8 @@ def resolve(lane: str, phase: str | None = None) -> dict:
         'policy_version': POLICY_VERSION,
         'route_key': key,
         'lane': lane,
-        'phase': phase if lane == 'seedance' else 'lane',
+        'phase': phase or 'lane',
+        'model_selection': 'astra_author' if model else 'inherit_session',
         'model': model,
         'reasoning_effort': reasoning_effort,
         'purpose': purpose,
@@ -101,8 +108,10 @@ def existing_owner_handoff(*, manager_id: str, owner_id: str,
         '미실행으로 처리됩니다. 새 작업/agent/예약은 만들지 마세요. '
         '최신 사용자 HOLD와 안전 게이트를 유지하세요.'
     )
-    return {'threadId': owner_id, 'model': route['model'],
-            'thinking': route['reasoning_effort'], 'prompt': prompt}
+    payload = {'threadId': owner_id, 'prompt': prompt}
+    if route['model']:
+        payload.update(model=route['model'], thinking=route['reasoning_effort'])
+    return payload
 
 
 def is_instruction_echo(request: str, reply: str) -> bool:

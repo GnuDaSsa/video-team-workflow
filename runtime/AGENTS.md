@@ -87,39 +87,24 @@ flowchart TD
 - 잠금이 바뀌면 기존 attestation은 무효다. 아직 제출하지 않은 불일치 pack은 `HOLD_DURATION_LOCK_MISMATCH`로 두고 프롬프트의 시간 진행까지 다시 저작·attest한다.
 - Runway UI 조작 직전의 visible model+duration 비교 절차는 canonical Seedance skill의 `settings-verify`가 소유한다. 이 파일은 그 UI 절차를 복제하지 않는다.
 
-### 1.3 모델 라우팅과 Seedance phase handoff
+### 1.3 세션 실행자와 Astra 저작
 
-기본은 현재 owner를 유지한다. 단, 이미지·영상 프롬프트 저작은 아래 아스트라 저작 게이트를 통과해야 하며 역할 이름만 바꿔 다른 모델이 대행하지 않는다. `runtime/scripts/model_routing.py`의 별도 dispatch는 해당 spawn 승인 때만 쓰는 호환 경로이며 모델 표는 새 작업/owner 생성 권한이 아니다.
-
-| 작업 phase | 모델 | reasoning |
-|---|---|---|
-| 이미지 프롬프트 저작 + 이미지 생성 owner (`image_creator_01/02`) | `gpt-6-astra` | `xhigh` |
-| Seedance 영상 프롬프트 저작·검증·attest (`seedance:prompting`) | `gpt-6-astra` | `xhigh` |
-| Director, Music, Planner, Image QC, Seedance QC, Editor, Package | `gpt-5.6-luna` | `high` |
-| Aside CLI/Runway/Computer Use 실행 (`seedance:production`) | `gpt-5.6-luna` | `high` |
-
-### 아스트라 프롬프트 저작 게이트
-
-- 이미지·영상의 최종 프롬프트 작성·의미 변경·창작 검토를 실제 아스트라가 시작할 때 사용자에게 정확히 **`[아스트라 프롬프팅]`**을 표시한다. 이 라벨은 transcript용이며 이미지/영상 생성기에 보내는 본문에는 넣지 않는다.
-- 실제 현재 모델이 `gpt-6-astra`인지 실행 컨텍스트로 확인한다. 라우팅 표, 역할 이름, 과거 모델, 수동 `author_model` 값은 실행 근거가 아니다. 루나/다른 모델이면 최종 저작을 대신하지 않고 `HOLD_ASTRA_AUTHOR_REQUIRED`를 기록한다. 임의 agent를 만들거나 자동 모델 전환이 됐다고 가장하지 않는다. 사용자가 모델별 역할과 기존 작업 간 조율을 승인한 경우 관리 작업은 기존 제작 작업의 idle 경계에서 native `send_message_to_thread`의 실제 `model`/`thinking` 인자로 같은 작업을 전환한다. 저작은 Astra/xhigh → 산출물/작성 턴 확인 → 실행은 Luna/high 순서이며 새 owner spawn이 아니다. 전환 요청 성공만으로 실제 저작 완료를 주장하지 않는다. 전환 도구가 없거나 승인이 없는 경우에만 필요한 조치를 한 번 알린다. 역할 불일치를 발견하고 반복 설명만 하거나 관리 가능한 동일 작업 전환을 사용자에게 계속 떠넘기지 않는다.
-- 루나 production은 아스트라가 확정한 불변 프롬프트를 실행할 수 있다. 문장 삭제·추가·요약·정책 경고 수정·일괄 템플릿 치환은 모두 저작 변경이므로 아스트라 단계로 돌아간다. 안전 경고를 숨기거나 우회하지 않는다.
-- 아스트라 등장 표시는 모델 증명이 아니다. 최종 prompt hash, 작성 task/turn, 실제 모델 관측 출처를 묶어 handoff에 남긴다. 기존 프롬프트는 역사적 승인으로 소급 폐기하지 않지만, 아직 제출하지 않았거나 사용자가 거부한 패키지는 이 근거 없이 재사용·재제출하지 않는다. 과거 루나 문장을 읽고 metadata만 아스트라로 바꾸는 것은 저작/검토가 아니다.
-- 저작 근거와 의미 검토의 구체적 체크리스트는 Seedance `prompt-review.md`가 소유한다. 자동 `ATTESTED` 검증이 저작 모델이나 창작 품질까지 증명한다고 말하지 않는다.
-
-- Seedance는 같은 `lanes/seedance/`에서 **동일 owner의 두 순차 단계**로 실행한다. 별도 owner handoff는 해당 spawn 승인 때만 예외다.
-- Prompting phase는 로컬 prompt pack을 저작·attest하고 `READY_FOR_PRODUCTION`을 기록하고 같은 대화에서 production 단계로 이어간다. Aside/Runway/Computer Use를 열지 않는다.
-- Production phase는 기존 `ATTESTED` pack만 소비한다. 창작 수정이 필요하면 Generate하지 않고 Prompting phase로 되돌린다.
-- Production의 Runway source of truth는 하나의 기존 Aside tab이다. `aside repl`로 정확한 `targetId`에 attach하며 새 Runway tab, Chrome, Safari, in-app browser, connector/API를 쓰지 않는다.
-- native file chooser 같은 Computer Use는 같은 production owner가 수행한다. deterministic Aside repl은 별도 agent가 아니며, nested browser agent나 두 번째 loop를 열지 않는다.
-- 하나의 Codex owner PID가 살아 있으면 다른 lane/phase dispatch를 거부한다. 이미지 생성 1–3개 bounded non-agent process와 동일 turn의 foreground queue wait만 기존 예외다.
-- `video-codex-runtime next --project <p>`의 `next_dispatch`와 `video-codex-runtime model-route`가 선택된 모델·reasoning·phase·필요 승인 토큰을 보여준다.
-- main Codex 앱 transcript에는 실제 dispatch 직전 `[model-route] <model> <reasoning> | <lane>:<phase>` 라벨을 표시한다. CLI owner의 실제 선택 증거는 `lanes/<lane>/model_route.json`, `status.json`, `run*.log`에 남긴다.
+- 실행 모델을 Luna로 고정하지 않는다. 사용자가 고른 현재 세션이 컴퓨터유즈, 이미지 생성 호출, 영상 생성, 다운로드, QC, 편집, 폴더링을 맡는다. 실행 native follow-up에는 model/thinking override를 넣지 않는다. 기존 override로 바뀐 세션은 원래 사용자 선택을 확인해야 하며 null을 복귀 증거로 삼지 않는다.
+- 기획의 창작 결정·컷 설계, 이미지/영상 프롬프트의 작성·의미 수정·창작 검토는 실제 `gpt-6-astra` / `xhigh`가 맡는다. 이미 검증된 패키지를 읽고 실행하는 일은 저작이 아니다. 음악 등 다른 lane도 이미지/영상 저작을 만나면 이 경계를 적용한다.
+- 현재 세션이 Astra라면 같은 owner가 직접 저작한다. 다른 모델이면 원래 세션을 바꾸지 않고 **한 번의 bounded native author child**에 저작만 맡긴다. 별도 상주 관리자, CLI sidecar, 브라우저 owner, 자동 자기 자신 메시지 전환은 만들지 않는다.
+- 새 child에는 현재 대화에서 역할·목적·산출물이 특정된 spawn 승인이 필요하다. 워크플로우 설치나 일반 “영상팀 실행”을 향후 모든 spawn의 허가로 간주하지 않는다. 승인이 없으면 해당 저작 호출만 한 번 요청하고, 승인된 동일 범위 내 일상 동작을 재승인받지 않는다.
+- 호출 준비: `python3 runtime/scripts/author_handoff.py request --project <p> --block <id> --kind planning|image|video --input <project-relative-source> ... --output <owned-output-dir> --approval astra-author:<kind>:<id>`. 이 명령은 native `spawn_agent`용 JSON만 출력하며 모델을 실행하지 않는다. 출력의 실제 model/reasoning_effort/fork_turns 인자를 사용한다. full-history fork 대신 brief·현재 계획·정확한 참조/패키지·거절 피드백의 bounded 파일을 전달한다.
+- child 시작 때 `[아스트라 프롬프팅]`, 복귀 때 `[executor] 세션 모델 유지`를 표시한다. parent는 브라우저를 조작하지 않고 입력 무결성·기존 패키지 상태 등 독립적인 로컬 검증을 수행한 뒤 반환을 기다린다. child는 저작 파일만 수정하고 생성·컴퓨터유즈·추가 spawn을 하지 않는다. 도구가 없거나 실제 모델이 확인되지 않으면 `HOLD_ASTRA_AUTHOR_REQUIRED`; 다른 모델의 대행 또는 metadata 이름만 바꾸기는 금지한다.
+- 반환 시 parent는 실제 native 호출/반환의 agent 또는 task/turn 식별자·모델 근거와 파일 hash를 기록한다. 자기 선언이나 요청 성공은 저작 완료 증거가 아니다. 관련 skill의 critic/attestation을 통과한 원본 pack을 사용한다.
+- 실행 인수증에는 `block_id`, `status=READY_FOR_EXECUTION`, `prompt`, `settings`, `pack`과 순서 있는 `references`를 기록한다. 각 항목은 project-relative `path`와 `sha256`이다. 기존 handoff/attestation에 이 정보를 통합하고 인수 당시 receipt hash를 유지한다. `author_handoff.py verify --project <p> --block <id> --receipt <file> --receipt-sha256 <accepted-hash>`는 파일 무결성만 검증하며 실제 저작 모델·참조 첨부·창작 품질을 증명하지 않는다.
+- 실행자는 매 재개 시 다음 block ID와 원본 pack/참조/설정을 다시 읽는다. “두 개씩”은 shelf의 다음 두 eligible block이지 임의 변형 두 개가 아니다. 누락·해시 불일치·다른 block·거절 패키지는 제출하지 않는다. 요약/문장 변경/참조 축소는 저작으로 되돌린다. UI 제출 전 검증·queue-doctor·복구·exactly-once 제출은 선택된 Seedance skill만 소유한다.
+- `model_routing.py`는 저작을 Astra로, 실행을 `inherit_session`으로 반환한다. CLI는 실행 세션 모델을 상속할 수 없으므로 실행 dispatch를 거부하고 현재 대화로 돌려보낸다. 이미지 lane은 prompting과 production을 분리한다. 기존 owner 전환 호환 경로는 별도 승인된 경우에만 사용하며 자동으로 Luna를 강제하지 않는다.
 
 ## 2. 프롬프트 소유권
 
-### 2.1 전담 프롬프트 에이전트 없음
+### 2.1 저작 책임
 
-- `Sol prompt bridge`, `Terra prompt lane` 및 모델별 프롬프트 전담 역할은 폐기한다.
+- 상주 prompt bridge는 사용하지 않는다. 필요한 bounded Astra 저작 호출은 §1.3을 따른다.
 - Planner는 컷·블록 구조, 참조 역할, 음악 큐, 동작 의도까지만 정의한다.
 - lane 이름이 저작 권한을 주지 않는다. 최종 프롬프트는 §1.3 아스트라 저작 게이트를 통과한 prompting 단계가 소유하고 production 단계는 불변 입력을 소비한다.
 

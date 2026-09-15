@@ -13,7 +13,7 @@ description: Seedance 2.0/default workflow dispatcher for one owning lane. Use f
 - Never load both version-specific prompting or production branches for one
   block.
 
-One Seedance lane performs two sequential phases; they are not separate agents:
+One Seedance lane performs two sequential phases. Runtime AGENTS §1.3 owns the bounded Astra-author / session-executor handoff and its specific spawn permission; this skill does not create a permanent author agent:
 
 1. Read `seedance-shared-contract.md` first.
 2. For prompt design, reference mapping, or CLI handoff, read `seedance-prompting.md`.
