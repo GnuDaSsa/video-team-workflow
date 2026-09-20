@@ -243,7 +243,7 @@ test('exported references.json passes actual submission prepare/verify unchanged
   const evidence = path.join(f.root, 'messages.jsonl');
   await fs.writeFile(evidence, JSON.stringify({ role: 'assistant', model: 'gpt-6-astra', provider: 'synthetic', api: 'synthetic',
     responseId: 'SYNTHETIC-response', session_id: 'SYNTHETIC-author', usage: { input: 1, output: 1 },
-    timestamp: requested.created_at + 1, stopReason: 'stop', content: [{ type: 'text', text: `Prompt-SHA256: ${sha256(Buffer.from(prompt))}` }] }) + '\n');
+    timestamp: requested.created_at + 1, stopReason: 'stop', content: [{ type: 'text', text: `Prompt-SHA256: ${sha256(Buffer.from(prompt))}\nKnowledge-SHA256: ${requested.knowledge.sha256}` }] }) + '\n');
   const receipt = await seal({ request: requested.file, evidence, out: 'receipt.json' });
   const submitted = await submissionPrepare({ stage: 'seedance_prompt', receipt: receipt.file, sha256: receipt.receipt_sha256,
     out: path.join(f.root, 'payload.json'), references: result.files.references.path });

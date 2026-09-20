@@ -16,7 +16,7 @@ async function fixture(t) {
   const req = await request({ stage: 'image_prompt', context, root, prompt: 'prompt.txt', out: 'request.json' });
   await fs.writeFile(path.join(root, 'prompt.txt'), finalPrompt);
   const message = {
-    role: 'assistant', content: [{ type: 'text', text: finalPrompt }],
+    role: 'assistant', content: [{ type: 'text', text: finalPrompt + `\nKnowledge-SHA256: ${req.knowledge.sha256}` }],
     api: 'openai-codex-responses', provider: 'openai-codex', model: 'gpt-6-astra',
     usage: { input: 50, output: 30 }, stopReason: 'stop', rawStopReason: 'completed',
     timestamp: req.created_at + 1, responseId: 'resp_test_generated',
@@ -24,7 +24,7 @@ async function fixture(t) {
   const transcriptRoot = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), 'aside-harness-transcript-')));
   t.after(() => fs.rm(transcriptRoot, { recursive: true, force: true }));
   const evidence = path.join(transcriptRoot, 'messages.jsonl');
-  const write = async (m = message) => fs.writeFile(evidence, `${JSON.stringify(m)}\n`);
+  const write = async (m = message) => { const copy = structuredClone(m); if (Array.isArray(copy.content)) for (const c of copy.content) if (c.type === 'text' && !c.text.includes('Knowledge-SHA256:')) c.text += `\nKnowledge-SHA256: ${req.knowledge.sha256}`; return fs.writeFile(evidence, `${JSON.stringify(copy)}\n`); };
   await write();
   const sealIt = (out = 'receipt.json') => seal({ request: req.file, evidence, out });
   return { root, req, evidence, message, write, sealIt };
@@ -177,8 +177,8 @@ test('evidence strictly after request timestamp, not before or equal', async t =
 });
 test('schema1 historical receipt remains verifiable but cannot be freshly sealed', async t => {
   const f = await fixture(t), current = await f.sealIt();
-  const reqHash = await replaceJson(f.req.file, x => { x.schema_version = 1; delete x.language_contract; });
-  const receiptHash = await replaceJson(current.file, x => { x.schema_version = 1; delete x.language_contract; x.request_sha256 = reqHash; });
+  const reqHash = await replaceJson(f.req.file, x => { x.schema_version = 1; delete x.language_contract; delete x.knowledge; });
+  const receiptHash = await replaceJson(current.file, x => { x.schema_version = 1; delete x.language_contract; delete x.knowledge_sha256; delete x.author_record.knowledge_sha256; x.request_sha256 = reqHash; });
   const checked = await verify(current.file, receiptHash);
   assert.equal(checked.language_status, 'LEGACY_UNSPECIFIED_READ_ONLY');
   await assert.rejects(seal({ request: f.req.file, evidence: f.evidence, out: 'new-receipt.json' }), /LEGACY_UNSCOPED_REQUEST_READ_ONLY/);
@@ -312,3 +312,35 @@ test('snapshot source binds the exact original line, even when not the first rec
   await fs.writeFile(f.evidence, JSON.stringify(f.message) + '\n');
   await assert.rejects(verify(r.file, r.receipt_sha256), /Original evidence record changed or missing/);
 });
+
+// Knowledge acknowledgement is fixture metadata, not an assertion of semantic quality.
+test('new image request embeds bounded current knowledge, sealed to actual generated acknowledgement', async t => {
+  const f = await fixture(t); assert.ok(f.req.knowledge.text.length <= 9000);
+  assert.ok(f.req.knowledge.selected_ids.length <= 6); assert.match(f.req.author_task, /Knowledge-SHA256:/);
+  const r=await f.sealIt(); const v=await verify(r.file,r.sha256);
+  assert.equal(v.knowledge_status,'CURRENT_KNOWLEDGE_VALIDATED');assert.equal(v.knowledge_sha256,f.req.knowledge.sha256);
+});
+test('missing or wrong generated knowledge acknowledgement cannot seal', async t => {
+  const f=await fixture(t);
+  for(const text of [finalPrompt, finalPrompt+'\nKnowledge-SHA256: '+'0'.repeat(64)]) {
+    await fs.writeFile(f.evidence,JSON.stringify({...f.message,content:[{type:'text',text}]})+'\n');
+    await assert.rejects(f.sealIt(),/No post-request Astra/);
+  }
+});
+test('tampered request knowledge fails even before newly accepted receipt hashing', async t => {
+  const f=await fixture(t);await replaceJson(f.req.file,x=>{x.knowledge.text+=' unwanted rule';});
+  await assert.rejects(f.sealIt(),/knowledge|Knowledge|hash|Hash|packet|Packet/);
+});
+test('knowledge receipt digest cannot differ from the request', async t => {
+  const f=await fixture(t),r=await f.sealIt();const h=await replaceJson(r.file,x=>{x.knowledge_sha256='0'.repeat(64);});
+  await assert.rejects(verify(r.file,h),/Knowledge receipt.*request/);
+});
+test('schema2 language-only historical receipt is read-only for new authorship', async t => {
+  const f=await fixture(t),r=await f.sealIt();
+  const h=await replaceJson(f.req.file,x=>{delete x.knowledge;});
+  const receiptHash=await replaceJson(r.file,x=>{delete x.knowledge_sha256;delete x.author_record.knowledge_sha256;x.request_sha256=h;});
+  assert.equal((await verify(r.file,receiptHash)).knowledge_status,'LEGACY_KNOWLEDGE_UNSPECIFIED_READ_ONLY');
+  await assert.rejects(seal({request:f.req.file,evidence:f.evidence,out:'new.json'}),/LEGACY_KNOWLEDGE_UNSPECIFIED_READ_ONLY/);
+});
+
+test('altered author_task cannot deliver a different source body than the bound packet',async t=>{const f=await fixture(t);await replaceJson(f.req.file,x=>{x.author_task='Use an unrelated old rule.';});await assert.rejects(f.sealIt(),/Author task knowledge/);});

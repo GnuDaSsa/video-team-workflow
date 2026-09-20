@@ -139,3 +139,7 @@ A successful native reservation is distinct from local cadence, actual execution
 ## 2026-09-20 — Native Aside English-default workflow
 
 New native Aside image/Seedance prompts and music production instructions default to English; Korean conversation is not an implicit language override. User literals retain their requested language. Schema-2 request/receipt/payload binds the language contract and actual Astra author; legacy language-unspecified evidence is read-only. The current session executes, Jev advises bounded next actions, and asset/hash/mode/popup/URL gates remain. Native Aside source lives under aside-skills with scoped hash-checked deployment. Existing Codex project contracts and unrelated dirty worktree changes are preserved, not hot-deployed or silently repaired.
+
+## 2026-09-20: Native Aside knowledge binding
+
+Reuse the legacy router idea, not its operational defaults: image/video uses a reviewed 17-card creative corpus, six complete cards/9k cap, live wiki/upstream/source hashes, explicit snapshot fallback, actual Astra packet acknowledgement, and request-to-provider binding. Old language-only receipts stay audit-only. Do not auto-ingest archived/project/owner/API rules or treat community heuristics as provider guarantees. Current tests measure file/data flow, not semantic reasoning or generated visual quality. Legacy projects and dirty worktree are preserved.

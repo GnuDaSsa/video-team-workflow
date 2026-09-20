@@ -60,6 +60,7 @@ try {
       else {
         const verifiedLanguage = JSON.parse(verifiedPayload.stdout);
         if (verifiedLanguage.language_status !== 'CURRENT_POLICY_VALIDATED') errors.push('CURRENT_LANGUAGE_CONTRACT_REQUIRED');
+        if (verifiedLanguage.knowledge_status !== 'CURRENT_KNOWLEDGE_VALIDATED') errors.push('CURRENT_KNOWLEDGE_REQUIRED');
         const payload = JSON.parse(fs.readFileSync(payloadFile, 'utf8'));
         if (verifiedLanguage.language_status === 'CURRENT_POLICY_VALIDATED' && p.prompt_language && p.prompt_language !== payload.language_contract?.language) errors.push('PACKAGE_LANGUAGE_CONTRACT_MISMATCH');
         if (payload.stage !== 'seedance_prompt' || payload.provider !== 'runway_web' || payload.prompt_sha256 !== p.prompt_sha256 || payload.prompt !== prompt) errors.push('PROVIDER_PAYLOAD_PROMPT_OR_STAGE_MISMATCH');

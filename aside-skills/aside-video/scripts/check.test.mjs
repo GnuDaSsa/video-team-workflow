@@ -17,7 +17,8 @@ async function fixture(t) {
   await fs.writeFile(path.join(root,'prompt.txt'), prompt);
   await request({stage:'seedance_prompt',context:{session_id:'FIXTURE_ONLY',prompt_language_override:{language:'ko-KR',reason:'Explicit fixture-only Korean case',user_instruction:'Write this synthetic test prompt in Korean.'},model:{provider:'openai-codex',modelId:'gpt-6-astra',thinkingLevel:'high'}},root,prompt:'prompt.txt',out:'request.json'});
   const req = JSON.parse(await fs.readFile(path.join(root,'request.json'),'utf8'));
-  const mock = {role:'assistant',model:'gpt-6-astra',provider:'openai-codex',api:'openai-codex-responses',responseId:'FIXTURE_NOT_LIVE',usage:{input:1,output:1},timestamp:req.created_at+1,stopReason:'stop',content:[{type:'text',text:prompt}]};
+  const mock = {role:'assistant',model:'gpt-6-astra',provider:'openai-codex',api:'openai-codex-responses',responseId:'FIXTURE_NOT_LIVE',usage:{input:1,output:1},timestamp:req.created_at+1,stopReason:'stop',content:[{type:'text',text:prompt + `
+Knowledge-SHA256: ${req.knowledge.sha256}`}]};
   await fs.writeFile(path.join(root,'messages.jsonl'), JSON.stringify(mock)+'\n');
   await seal({request:path.join(root,'request.json'),evidence:path.join(root,'messages.jsonl'),out:'receipt.json'});
   const receiptHash = sha256(await fs.readFile(path.join(root,'receipt.json')));

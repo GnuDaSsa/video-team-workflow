@@ -79,13 +79,14 @@ export async function prepare({ stage, receipt: receiptFile, sha256: acceptedHas
   absolute(out, 'Output path');
   const { receipt, checked, prompt } = await boundReceipt(receiptFile, acceptedHash, stage);
   if (checked.language_status === LANGUAGE_STATUS.LEGACY) fail('LEGACY_UNSPECIFIED_READ_ONLY');
+  if (stage !== 'music_prompt' && checked.knowledge_status !== 'CURRENT_KNOWLEDGE_VALIDATED') fail('LEGACY_KNOWLEDGE_UNSPECIFIED_READ_ONLY');
   validateLanguageContract(receipt.language_contract);
   validatePromptLanguage(prompt, receipt.language_contract);
   if (referencesFile !== undefined && (typeof referencesFile !== 'string' || !referencesFile)) fail('References JSON path must be nonempty');
   const references = await checkReferences(referencesFile === undefined ? [] : json(await bytes(referencesFile)));
   const payload = {
     schema_version: 2, kind: 'astra_provider_payload', stage, required_author: AUTHOR,
-    provider, language_contract: receipt.language_contract, prompt, prompt_sha256: receipt.prompt.sha256,
+    provider, language_contract: receipt.language_contract, knowledge_sha256: checked.knowledge_sha256, prompt, prompt_sha256: receipt.prompt.sha256,
     author_session_id: receipt.session_id, author_record: checked.author_record,
     receipt: { path: receiptFile, sha256: acceptedHash }, references,
     created_at: new Date().toISOString(), state: STATE,
@@ -108,6 +109,7 @@ export async function verify(payloadFile, acceptedHash) {
   const payload = json(raw);
   const legacy = payload.schema_version === 1;
   const expected = legacy ? ['schema_version', 'kind', 'stage', 'required_author', 'provider', 'prompt', 'prompt_sha256', 'author_session_id', 'author_record', 'receipt', 'references', 'created_at', 'state'] : ['schema_version', 'kind', 'stage', 'required_author', 'provider', 'language_contract', 'prompt', 'prompt_sha256', 'author_session_id', 'author_record', 'receipt', 'references', 'created_at', 'state'];
+  if (Object.hasOwn(payload, 'knowledge_sha256')) expected.push('knowledge_sha256');
   keys(payload, expected, 'payload');
   if (![1, 2].includes(payload.schema_version) || payload.kind !== 'astra_provider_payload' ||
       payload.required_author !== AUTHOR || payload.provider !== stageProvider(payload.stage) || payload.state !== STATE) fail('Invalid payload stage/provider/author/state');
@@ -116,6 +118,7 @@ export async function verify(payloadFile, acceptedHash) {
       new Date(payload.created_at).toISOString() !== payload.created_at) fail('Invalid payload created_at');
   keys(payload.receipt, ['path', 'sha256'], 'receipt');
   const { receipt, checked, prompt } = await boundReceipt(payload.receipt.path, payload.receipt.sha256, payload.stage);
+  if ((payload.knowledge_sha256 ?? null) !== checked.knowledge_sha256) fail('Payload knowledge binding mismatch');
   if (legacy) {
     if (checked.language_status !== LANGUAGE_STATUS.LEGACY) fail('Payload/receipt language schema mismatch');
   } else {
@@ -126,7 +129,7 @@ export async function verify(payloadFile, acceptedHash) {
       payload.prompt_sha256 !== receipt.prompt.sha256 || sha256(Buffer.from(payload.prompt, 'utf8')) !== payload.prompt_sha256) fail('Payload full prompt binding mismatch');
   if (payload.author_session_id !== receipt.session_id || !isDeepStrictEqual(payload.author_record, checked.author_record)) fail('Payload author metadata mismatch');
   await checkReferences(payload.references);
-  return { state: STATE, file: payloadFile, payload_sha256: acceptedHash, stage: payload.stage, provider: payload.provider, language_status: legacy ? LANGUAGE_STATUS.LEGACY : LANGUAGE_STATUS.CURRENT, payload };
+  return { state: STATE, file: payloadFile, payload_sha256: acceptedHash, stage: payload.stage, provider: payload.provider, language_status: legacy ? LANGUAGE_STATUS.LEGACY : LANGUAGE_STATUS.CURRENT, knowledge_status: checked.knowledge_status, knowledge_sha256: checked.knowledge_sha256, payload };
 }
 const USAGE = 'Usage: prepare --stage image_prompt|music_prompt|seedance_prompt --receipt ABS --sha256 ACCEPTED_RECEIPT_SHA256 --out ABS [--references JSON_FILE] | verify ABS_PAYLOAD --sha256 ACCEPTED_PAYLOAD_SHA256';
 export async function main(argv = process.argv.slice(2)) {

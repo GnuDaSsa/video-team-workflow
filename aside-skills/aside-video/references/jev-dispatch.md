@@ -58,7 +58,7 @@ console.log(await fastStep({page, snapshot, log:console.log}, job));
 |---|---|
 | SEARCH_ASSET | asset_name. 관측된 Reference 버튼 열기 → 새 snapshot → 관측된 Search에 이름 fill → snapshot을 한 호출로 수행. SEARCH_OBSERVED는 검색어 수용이며 결과 로딩 완료/파일 부재 판정이 아니다. |
 | SELECT_EXISTING | mode_gate, binding_confirmed, candidate:{role,name}, expected_count. 공용 hash/ID 기록과 live 후보를 대조한 뒤에만 binding_confirmed=true. 모호한 동명 후보는 금지. 정확한 한 후보 double-click 후 Image1.. 수용 확인. 이미 필요한 참조 수가 있으면 다시 toggle하지 않는다. |
-| FILL_PROMPT | Asset selector 등 dialog가 열려 있으면 입력하지 않고 `BLOCKING_DIALOG_CLOSE_AND_REOBSERVE`로 반환한다. 관측된 닫기 control로 닫고 새 snapshot에서 해제된 것을 확인한다. mode_gate, verified_submission=`submission verify`의 실제 반환값, expected_previous_prompt=직전에 관측한 원문. payload.prompt를 한 번 fill하고 DOM 수용 원문과 정확 비교한다. 검증 결과를 직접 조립하지 않는다. 참조 수 일치와 identity/순서 검수는 별개다. |
+| FILL_PROMPT | Asset selector 등 dialog가 열려 있으면 입력하지 않고 `BLOCKING_DIALOG_CLOSE_AND_REOBSERVE`로 반환한다. 관측된 닫기 control로 닫고 새 snapshot에서 해제된 것을 확인한다. mode_gate와 submission={file:<absolute payload path>,sha256:<독립 수락 hash>} 및 expected_previous_prompt=직전 관측 원문을 쓴다. 신뢰된 실행 환경의 verifySubmission(file,hash)가 실제 submission.mjs verify를 호출해야 하며 job.verified_submission은 무시한다. adapter가 없는 REPL에서는 이 fastlane 입력만 HOLD하고, 현재 실행자가 기존 submission CLI 재검증 후 원문 직접 입력 절차를 사용한다. 캐시 객체를 돌려주는 가짜 callback을 만들지 않는다. payload.prompt를 한 번 fill하고 DOM 수용 원문과 정확 비교한다. 참조 수 일치와 identity/순서 검수는 별개다. |
 | UPLOAD_FIRST | mode_gate, search_absence_verified, files_verified, expected_existing_count, observed_file_input_selector, files. 같은 live UI에서 **직접 확인한** 유일한 input[type=file] selector와 검증된 upload-files.json 배열만 전달한다. 숨은 input을 추측하지 않는다. chooser-only UI이면 기존 절차로 처리한다. |
 | VERIFY_INPUTS / REOBSERVE | 관측만. 전체 preflight 또는 최종 승인이 아니다. |
 

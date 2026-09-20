@@ -1,16 +1,14 @@
 {
-  "currentGoal": "Persist the native Aside workflow with English-default Astra authoring and checked deployment",
-  "status": "completed_with_legacy_parity_warning",
-  "currentContract": "docs/contracts/2026-09-20-aside-english-workflow.md",
-  "blockers": [
-    "Pre-existing legacy Codex source/live parity differs in five managed files plus its source manifest; this release does not hot-deploy or rewrite that active runtime."
-  ],
-  "nextStep": "Use the native Aside entry and current-language payload gate for new work. Reconcile legacy Codex drift separately before legacy deployment.",
-  "lastUpdated": "2026-09-20T04:32:17.042Z",
+  "currentGoal": "Audit and connect bounded image/video wiki knowledge to Astra authoring",
+  "status": "completed_with_legacy_warnings",
+  "currentContract": "docs/contracts/2026-09-20-aside-knowledge.md",
+  "blockers": [],
+  "nextStep": "Apply the checked knowledge packet on future native image/video requests. Re-review card/upstream drift before new authorship. Reconcile legacy raw integrity and deployment separately without rewriting old receipts.",
+  "lastUpdated": "2026-09-20T06:18:27.625Z",
   "verification": {
-    "lastCommand": "Aside 368 tests + deployer 5 tests; legacy 188 tests; Python compile; shell syntax; native Aside frozen source/live parity; diff check",
-    "lastResult": "PASS_NATIVE_ASIDE_WITH_LEGACY_PARITY_WARNING",
-    "notes": "Native Aside source and installed skill/AGENTS block match. Legacy deploy --check reports pre-existing SOURCE_MANIFEST_DRIFT and five LIVE_HASH_MISMATCH files. No new provider generation, language rewrite of old media, or global model/category change in this release."
+    "lastCommand": "configured verifyFull: 444 native/deployer tests + 188 legacy tests; compile/shell; native parity; wiki_lint; actual Astra image/video request->seal->payload verify",
+    "lastResult": "PASS_NATIVE_KNOWLEDGE_WITH_EXISTING_LEGACY_WARNINGS",
+    "notes": "444/444 native tests, 188/188 legacy tests, PARITY OK. Real gpt-6-astra direct authoring: two stages, four live-wiki cards each, generated acknowledgements and English payload validation passed. No browser input or media generation/visual quality test. Wiki lint: 0 errors, 46 existing raw hash warnings, 18 info. Configured full command ends nonzero on the unchanged legacy source manifest plus five live-file mismatches. Fastlane requires a real trusted verifier adapter; no real REPL adapter/browser smoke claimed."
   },
   "recentCloseouts": [
     {
@@ -118,5 +116,10 @@
       "Live continuation: Aside currently contains another project session; exact intended session restoration required."
     ],
     "nextStep": "Restore exact original Aside session, then resume existing owner and automation-2. S09/S10 completion/QC unverified."
-  }
+  },
+  "knownWarnings": [
+    "Legacy Codex source manifest/five live files differ; not hot-deployed.",
+    "46 pre-existing raw wiki hash mismatches remain outside the new allowlist.",
+    "No generated-media quality, production speed or real fastlane verifier-adapter claim."
+  ]
 }

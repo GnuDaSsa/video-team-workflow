@@ -34,6 +34,10 @@
 - `prompt-language.md`를 따라 request의 `language_contract`와 `author_task`를 실제 author에게 전달한다. 구형 Codex 원문의 한국어 기본 규칙을 복사하거나 별도 인계 메시지에서 Korean prompt를 요구하지 않는다. 명시적인 현재 작업 언어 예외만 `context.prompt_language_override`에 근거와 함께 기록한다.
 - 언어 검증 실패는 새 Astra 수정 인계로 돌린다. 기존 인수증을 바꾸거나 실행자가 번역하지 않는다. 입력에는 `CURRENT_POLICY_VALIDATED` 결과만 사용하며, 언어 없는 legacy 검증은 보관 증거 확인일 뿐 신규 제출 허가가 아니다.
 
+## 지식 패킷과 확인
+
+이미지·Seedance는 `knowledge.md`를 적용한다. request가 생성한 bounded 지식 본문이 `author_task`에 포함되어야 하며, 실제 Astra가 같은 응답에 `Knowledge-SHA256: <request.knowledge.sha256>`를 남겨야 seal된다. 어떤 카드가 문구에 기여했는지도 원문 밖에서 설명한다. 이 확인은 내부 추론·시각 품질의 증명이 아니다. 전체 원본 스킬/위키를 재로드하여 옛 언어·owner·API 규칙을 섞지 않는다.
+
 ## 필수 실행 순서
 
 1. `aside.sessions.current()`로 **현재 실행 세션 id**를 얻는다. `node scripts/session-context.mjs <id> --out <new-context.json>`로 실제 세션 설정과 category를 읽는다. 전역 default를 실행 모델로 추측하지 않는다.
@@ -64,8 +68,8 @@ Astra 호출 성공과 이미지 품질 성공은 별개다. 승인 자산을 �
 | Astra 작업 | 허용 읽기 범위 | 제외하는 일 |
 |---|---|---|
 | `music_prompt` | `~/.codex/skills/music-director/references/awesome-suno-prompts/INDEX.md`와 관련 prompt/example 1~3개, brief의 확정 음악 방향 | 전체 음악감독 세션, 재질문/선택 회의, Suno 조작, Music Lock, 청취 QC |
-| `image_prompt` | `~/.codex/skills/image-prompt/SKILL.md`에서 문구 컴파일·카테고리 규격만 발췌한 입력, 필요한 category/reference, `web-chatgpt-casting.md`의 인물 서술·프롬프트 가설 부분만 | 원본 `$imagegen`/API 호출, 캐스팅 선택/QC, 웹 조작·다운로드. gpt-image-2 전용 size/API/품질 토큰은 웹 2.5에 강제하지 않음 |
-| `seedance_prompt` | `~/.codex/skills/seedance-prompt-en/seedance-prompting.md`, `prompt-review.md`의 문구 검토 및 필요한 source-role 계약. 명시적 2.5만 `seedance25-prompt-en/prompting.md` | dispatcher의 production/queue/registry 단계, Runway 조작·첨부·Generate·QC |
+| `image_prompt` | request.knowledge의 검토된 image 카드·source-role·현재 brief, 필요하면 현재 웹 캐스팅의 인물 서술만 | 원본 `$imagegen`/API 호출, 캐스팅 선택/QC, 웹 조작·다운로드. gpt-image-2 전용 size/API/품질 토큰은 웹 2.5에 강제하지 않음 |
+| `seedance_prompt` | request.knowledge의 현재 버전 video 카드·source-role·현재 brief. 추가 연구는 실행자가 검토한 새 카드로만 승격 | dispatcher의 production/queue/registry 단계, Runway 조작·첨부·Generate·QC |
 
 Author brief에는 정확한 입력 파일 목록과 유일한 출력 prompt 경로를 적는다. allowed write는 그 파일뿐이다. 브라우저/컴퓨터 유즈, `imagegen.generate`, Suno/Runway/ChatGPT 조작, `openTab`, 외부 생성/업로드, CLI sidecar, 추가 subagent/spawn, 계정/모델 설정 변경을 금지한다. 로컬 파일 읽기와 저작 파일 쓰기/hash 검사는 가능하다. 이러한 도구 제한은 native author에게 전달하는 작업 계약이며 별도의 OS 샌드박스를 구현했다고 주장하지 않는다.
 
@@ -79,7 +83,7 @@ Author brief에는 정확한 입력 파일 목록과 유일한 출력 prompt 경
 node scripts/harness.mjs status
 node scripts/harness.mjs route image_prompt --context '<context.json>'
 node scripts/harness.mjs request image_prompt --context '<context.json>' --root '<package-directory>' --prompt 'image-prompt.txt' --out 'image-request.json'
-# 실제 Astra가 image-prompt.txt를 저작한 뒤 원문 또는 SHA256을 실제 응답에 포함한다.
+# 실제 Astra가 원문 또는 Prompt-SHA256과 Knowledge-SHA256을 같은 실제 응답에 포함한다.
 node scripts/harness.mjs seal --request '<package-directory>/image-request.json' --evidence '<actual-author-session>/messages.jsonl' --out 'image-receipt.json'
 node scripts/harness.mjs verify '<package-directory>/image-receipt.json' --sha256 '<accepted-receipt-sha256>'
 node scripts/submission.mjs prepare --stage image_prompt --receipt '<package-directory>/image-receipt.json' --sha256 '<accepted-receipt-sha256>' --out '<package-directory>/image-payload.json'

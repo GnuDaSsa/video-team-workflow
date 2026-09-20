@@ -30,6 +30,10 @@ description: "Aside 전용 영상팀 하네스. 영상팀, Jev/제브 작업 분
 - 기본 provider는 Runway의 Seedance 2.0. 사용자가 다른 버전/provider를 명시하면 실제 지원을 확인한다. No-I2V를 Keyframe 또는 이미지 생성으로 바꾸지 않는다.
 - 생성 수량은 현재 사용자의 명시 요청/승인된 source 계획이 우선이며, 불명시 단일 컷의 초기 생성은 1개다. 실패 시 실패 원인을 구체적으로 기록하고 한 원인만 수정한다. 유료 무한 재시도·추가 변형 생성은 하지 않는다.
 
+## 필수 이미지·영상 지식 인계
+
+`references/knowledge.md`를 따른다. 새 image/Seedance request는 검토된 wiki 지식을 최대 6개/9,000자로 실제 선택하고 `author_task` 안에 본문을 담는다. Astra는 같은 최종 응답에 `Knowledge-SHA256`를 남기며 seal과 submission, preflight/입력 gate까지 결속한다. 원본 wiki/옛 스킬 전체를 author에게 직접 전달하지 않는다. 지식 없는 옛 인수증은 읽기 검증만 허용한다. 현재 live wiki와 선택 upstream의 drift는 자동 승인하지 않으며, 동봉 snapshot fallback은 별도 표시한다. 선택·전달·확인과 실제 생성물 품질은 구별한다.
+
 ## 1. 브리프와 패키지
 
 사용자 요청에서 목적·길이·실사/애니·피사체·화면비·참조·오디오를 정한다. 빠진 사소한 항목은 합리적으로 선택하고 한 줄로 알린다. `references/directing.md`를 읽고 연출한다.
@@ -41,9 +45,9 @@ description: "Aside 전용 영상팀 하네스. 영상팀, Jev/제브 작업 분
 - 사용한 프롬프트별 `route → request → 실제 Astra 저작 → seal → submission prepare → submission verify`: `scripts/harness.mjs`로 최종 원문·실제 응답 snapshot·인수증을 묶고 `scripts/submission.mjs`로 provider별 검증 payload를 만든다. 이미지/노래도 예외가 아니며 사용자가 거절한 이전 이미지의 인수증을 소급 작성하지 않는다. `seal`이 반환한 `receipt_sha256`을 package의 `author_handoffs[].sha256`에 저장한다. `submission prepare` 반환의 `payload_sha256`과 파일 경로는 `provider_payload={path,sha256}`로 저장하고 생성 직전 `submission verify`한다. Seedance `check.mjs preflight`도 이 payload와 현재 prompt/stage가 일치해야 통과한다. `harness_policy_version`은 policy의 `schema_version`을 복사한다. package 필드만 쓰고 seal/검증을 생략하지 않는다.
 - 실제 다운로드 영상과 전달 파일. 폴더/파일을 추측하거나 다른 프로젝트 영상을 가져오지 않는다.
 
-이미지 프롬프트는 Astra가 `references/author-executor.md`의 **저작 전용 소스 계약**에 따라 공냥의 문구 구성 규칙과 웹 2.5 캐스팅 서술만 참고해 작성한다. 원본 스킬의 이미지 호출·웹 조작·QC 절차를 저작 역할로 가져오지 않는다. **모든 이미지 생성/편집의 기본은 웹 ChatGPT Images 2.5**이며 현재 세션이 브라우저에서 실행한다. 내장 imagegen/API/Grok still로 자동 대체하지 않는다. 인물은 단독 캐스팅 초상 선택 후 승인 identity로 전신·후면·시트를 파생하고 거절된 시트는 재사용하지 않는다. 제품/풍경에는 인물 캐스팅 절차를 강제하지 않는다. 웹에서 실제 관측한 기능만 사용하고 API 모델/품질 옵션이나 미노출 2.5 backend를 확인했다고 가장하지 않는다. 프롬프트 checker와 실제 이미지 QC는 구분한다. 실행자가 패널·identity·의상·손발을 검사하며 참조 시트의 패널/배경이 최종 영상 구도가 아니라는 역할은 Astra가 영상 prompt에 명시한다.
+이미지 프롬프트는 Astra가 `references/author-executor.md`와 request의 **검토된 지식 패킷**을 사용해 작성한다. 기존 공냥 카테고리·스타일에서 추가 지식이 필요하면 실행자가 해당 창작 section만 검토하여 CURRENT/catalog에 정식 반영한 뒤 새 인계를 만든다. 구형 한국어 기본값·AR/API 토큰·형식 강제나 원본 이미지 호출·웹 조작·QC 절차를 author에게 가져오지 않는다. **모든 이미지 생성/편집의 기본은 웹 ChatGPT Images 2.5**이며 현재 세션이 브라우저에서 실행한다. 내장 imagegen/API/Grok still로 자동 대체하지 않는다. 인물은 단독 캐스팅 초상 선택 후 승인 identity로 전신·후면·시트를 파생하고 거절된 시트는 재사용하지 않는다. 제품/풍경에는 인물 캐스팅 절차를 강제하지 않는다. 웹에서 실제 관측한 기능만 사용하고 API 모델/품질 옵션이나 미노출 2.5 backend를 확인했다고 가장하지 않는다. 프롬프트 checker와 실제 이미지 QC는 구분한다. 실행자가 패널·identity·의상·손발을 검사하며 참조 시트의 패널/배경이 최종 영상 구도가 아니라는 역할은 Astra가 영상 prompt에 명시한다.
 
-노래가 필요한 경우 Astra는 `music-director/references/awesome-suno-prompts/INDEX.md`와 관련 corpus 1~3개만 참고해 실행자가 정한 음악 방향의 가사·스타일·구조 프롬프트를 작성한다. 전체 음악감독 세션·사용자 선택 워크플로우를 새로 시작하지 않는다. Suno 조작·오디오 다운로드·청취 QC·Music Lock은 현재 세션이 한다. Seedance는 Astra가 `seedance-prompt-en/seedance-prompting.md`와 `prompt-review.md`의 문구 검토를 적용하고 명시적 2.5는 `seedance25-prompt-en/prompting.md`만 사용한다. 이 경로들은 `~/.codex/skills/` 아래다. 전체 dispatcher나 production 문서의 Generate·queue·다운로드를 author가 실행하지 않는다. 같은 block에 버전 규칙을 섞지 않는다.
+노래가 필요한 경우 Astra는 `music-director/references/awesome-suno-prompts/INDEX.md`와 관련 corpus 1~3개만 참고해 실행자가 정한 음악 방향의 가사·스타일·구조 프롬프트를 작성한다. 전체 음악감독 세션·사용자 선택 워크플로우를 새로 시작하지 않는다. Suno 조작·오디오 다운로드·청취 QC·Music Lock은 현재 세션이 한다. Seedance도 현재 선택 버전에 맞춘 request의 지식 패킷만 기본 사용한다. Codex prompting/review 원문은 실행자의 targeted 연구 대상이지 author의 자동 로드 대상이 아니다. 음악 소스 경로만 `~/.codex/skills/` 아래다. 전체 dispatcher나 production 문서의 Generate·queue·다운로드를 author가 실행하지 않는다. 같은 block에 버전 규칙을 섞지 않는다.
 
 **신규 이미지·Seedance 생성용 프롬프트의 기본 언어는 영어(en-US)다.** 대화·브리프·진행 설명이 한국어라는 이유로 생성용 원문을 한국어로 쓰지 않는다. 음악의 스타일·제작 지시도 기본 영어이며 실제 가사·대사·화면에 표시할 문구는 사용자가 지정한 원문 언어를 보존한다. 특정 작업에서 다른 프롬프트 언어를 명시한 경우에만 근거 있는 `prompt_language_override`로 기록한다. 예전 Codex 문서의 Korean-default/block-only-English 규칙은 신규 Aside 작업의 언어 기본값을 덮어쓰지 않는다. 영어 저작과 번역·언어 수정도 Astra가 맡으며 실행자가 승인 문구를 번역하지 않는다. 보통 700~1500자이며 Seedance UI 한도 3500자 이하로 쓰되, 분량을 맞추려고 승인된 고유 인과·참조 결속·복합 연출을 삭제하지 않는다. 시각적 사실·시간별 동작·카메라 경로·물리적 반응·끝 구도·소리를 쓴다. 파일 경로, 내부 상태, QC/승인 지시, 스킬 이름을 prompt에 넣지 않는다. 메타데이터와 prompt는 분리한다.
 

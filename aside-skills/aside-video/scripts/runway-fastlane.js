@@ -1,6 +1,10 @@
-async function runwayFastStep({page, snapshot, log, claimUpload}, job) {
+async function runwayFastStep({page, snapshot, log, claimUpload, verifySubmission}, job) {
   // Trusted local helper, loaded in the existing REPL. No imports, hidden API,
   // model calls, loops, Generate, authoring, or permission escalation.
+  // The executor supplies verifySubmission(file, acceptedHash) as an async adapter
+  // to the real submission.mjs verify, never from Jev/job data. This environment
+  // already owns page/snapshot and is trusted code, not OS/cryptographic anti-forgery.
+  // With no real adapter available, FILL_PROMPT holds. Never fabricate a callback.
   const started = Date.now();
   const result = (status, extra = {}) => ({status, action: job?.action, ...extra,
     elapsed_ms: Date.now() - started, generation_submitted: false});
@@ -8,6 +12,34 @@ async function runwayFastStep({page, snapshot, log, claimUpload}, job) {
   if (!job || !permitted.includes(job.action)) return result('UNSUPPORTED_ACTION');
   if (typeof job.expected_url !== 'string' || !/^https:\/\/app\.runwayml\.com\//.test(job.expected_url)) return result('SESSION_MISMATCH');
   if (typeof log !== 'function') throw new Error('Snapshot logger is required');
+  const hold = reason => result('HOLD', {reason});
+  let verified;
+  if (job.action === 'FILL_PROMPT') {
+    // job.verified_submission is deliberately ignored. Only the independently
+    // accepted file/hash link crosses from job data into the trusted verifier.
+    if (typeof verifySubmission !== 'function') return hold('SUBMISSION_VERIFIER_REQUIRED');
+    const file = job.submission?.file, acceptedHash = job.submission?.sha256;
+    if (typeof file !== 'string' || !file.startsWith('/') || file.includes('\0') ||
+        typeof acceptedHash !== 'string' || !/^[a-f0-9]{64}$/.test(acceptedHash)) return hold('SUBMISSION_LINK_REQUIRED');
+    try {
+      verified = await verifySubmission(file, acceptedHash);
+      if (!verified || typeof verified !== 'object' || Array.isArray(verified)) return hold('SUBMISSION_VERIFICATION_REJECTED');
+      if (verified.file !== file || verified.payload_sha256 !== acceptedHash) return hold('SUBMISSION_LINK_MISMATCH');
+      if (verified.language_status !== 'CURRENT_POLICY_VALIDATED') return hold('CURRENT_LANGUAGE_CONTRACT_REQUIRED');
+      if (verified.knowledge_status !== 'CURRENT_KNOWLEDGE_VALIDATED') return hold('CURRENT_KNOWLEDGE_REQUIRED');
+      const p = verified.payload;
+      if (verified.state !== 'READY_FOR_PROVIDER_INPUT' || verified.stage !== 'seedance_prompt' || verified.provider !== 'runway_web' ||
+          p?.required_author !== 'gpt-6-astra' || p.state !== verified.state || p.stage !== verified.stage || p.provider !== verified.provider ||
+          typeof p.prompt !== 'string' || !p.prompt.trim() || p.prompt !== p.prompt.normalize('NFC') || p.prompt.length > 3500 ||
+          !Array.isArray(p.references)) return hold('VERIFIED_ASTRA_PAYLOAD_REQUIRED');
+    } catch {
+      // Verification errors are distinct from browser action timeouts. No page
+      // observation/mutation or fallback to caller-supplied evidence is allowed.
+      return hold('SUBMISSION_VERIFICATION_FAILED');
+    }
+  }
+  // Observe only after async verification, so live UI guards cannot go stale
+  // while waiting for the trusted adapter.
   const observe = async (initial = false) => {
     const s = await snapshot(page, {interactive: true});
     log(initial ? s.tree : s.diff);
@@ -67,9 +99,7 @@ async function runwayFastStep({page, snapshot, log, claimUpload}, job) {
       return result(mode(tree) && ordered(tree, job.expected_count) ? 'REFERENCE_SLOT_ACCEPTED' : 'SELECTION_UNCONFIRMED', {reference_slots:slots(tree), identity_qc_proven:false});
     }
     if (job.action === 'FILL_PROMPT') {
-      const verified = job.verified_submission, p = verified?.payload;
-      if (verified?.language_status !== 'CURRENT_POLICY_VALIDATED') return result('CURRENT_LANGUAGE_CONTRACT_REQUIRED');
-      if (verified?.state !== 'READY_FOR_PROVIDER_INPUT' || verified.stage !== 'seedance_prompt' || verified.provider !== 'runway_web' || !/^[a-f0-9]{64}$/.test(verified.payload_sha256 ?? '') || p?.required_author !== 'gpt-6-astra' || p.stage !== verified.stage || p.provider !== verified.provider || typeof p.prompt !== 'string' || !p.prompt.trim() || p.prompt !== p.prompt.normalize('NFC') || p.prompt.length > 3500 || !Array.isArray(p.references)) return result('VERIFIED_ASTRA_PAYLOAD_REQUIRED');
+      const p = verified.payload;
       if (!ordered(tree, p.references.length)) return result('REFERENCE_COUNT_MISMATCH');
       const promptRef = ref(tree, 'textbox', 'Prompt');
       if (!promptRef) return result('PROMPT_NOT_OBSERVED');

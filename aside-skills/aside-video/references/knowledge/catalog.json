@@ -1,0 +1,516 @@
+{
+  "schema_version": 1,
+  "revision": "2026-09-20.1",
+  "reviewed_at": "2026-09-20",
+  "wiki_file": "concepts/aside-image-video-prompting.md",
+  "source_file": "aside-image-video-prompting.md",
+  "source_sha256": "82260dc07ceb5428cc8011dd36f2a72701613515a890a3ecda6208ab514774ea",
+  "max_cards": 6,
+  "max_chars": 9000,
+  "cards": [
+    {
+      "id": "image-core",
+      "heading": "### image-core",
+      "stages": [
+        "image_prompt"
+      ],
+      "versions": [
+        "chatgpt-web"
+      ],
+      "tags": [],
+      "always": true,
+      "status": "active",
+      "evidence": "official_guidance",
+      "sources": [
+        {
+          "kind": "web",
+          "url": "https://developers.openai.com/api/docs/guides/image-prompting",
+          "reviewed_at": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "id": "reference-roles",
+      "heading": "### reference-roles",
+      "stages": [
+        "image_prompt",
+        "seedance_prompt"
+      ],
+      "versions": [
+        "chatgpt-web",
+        "seedance-2.0",
+        "seedance-2.5"
+      ],
+      "tags": [
+        "reference"
+      ],
+      "always": false,
+      "status": "active",
+      "evidence": "official_guidance",
+      "sources": [
+        {
+          "kind": "web",
+          "url": "https://developers.openai.com/api/docs/guides/image-prompting",
+          "reviewed_at": "2026-09-20"
+        },
+        {
+          "kind": "web",
+          "url": "https://help.runwayml.com/hc/en-us/articles/50488490233363-Creating-with-Seedance-2-0",
+          "reviewed_at": "2026-09-20"
+        },
+        {
+          "kind": "web",
+          "url": "https://help.runwayml.com/hc/en-us/articles/53542207042323-Creating-with-Seedance-2-5",
+          "reviewed_at": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "id": "image-edit",
+      "heading": "### image-edit",
+      "stages": [
+        "image_prompt"
+      ],
+      "versions": [
+        "chatgpt-web"
+      ],
+      "tags": [
+        "edit"
+      ],
+      "always": false,
+      "status": "active",
+      "evidence": "official_guidance",
+      "sources": [
+        {
+          "kind": "web",
+          "url": "https://developers.openai.com/api/docs/guides/image-prompting",
+          "reviewed_at": "2026-09-20"
+        },
+        {
+          "kind": "wiki",
+          "path": "concepts/video-prompting-live-action.md",
+          "sha256": "636c75a2d8bd00b9f8cfed09962e01be34b27efc4863e328a475edf2108d58e3",
+          "section": "CURRENT"
+        }
+      ]
+    },
+    {
+      "id": "image-identity",
+      "heading": "### image-identity",
+      "stages": [
+        "image_prompt"
+      ],
+      "versions": [
+        "chatgpt-web"
+      ],
+      "tags": [
+        "identity"
+      ],
+      "always": false,
+      "status": "active",
+      "evidence": "reviewed_heuristic",
+      "sources": [
+        {
+          "kind": "web",
+          "url": "https://developers.openai.com/api/docs/guides/image-prompting",
+          "reviewed_at": "2026-09-20"
+        },
+        {
+          "kind": "wiki",
+          "path": "concepts/video-prompting-live-action.md",
+          "sha256": "636c75a2d8bd00b9f8cfed09962e01be34b27efc4863e328a475edf2108d58e3",
+          "section": "CURRENT"
+        },
+        {
+          "kind": "wiki",
+          "path": "concepts/character-bible-page-prompt-standard.md",
+          "sha256": "56bec32b9655f7a0b093b60ab3a588bb3aa895ab02a166bd74a923958f8737a9",
+          "section": "Immutable identity and state assets / Provider binding"
+        }
+      ]
+    },
+    {
+      "id": "image-product",
+      "heading": "### image-product",
+      "stages": [
+        "image_prompt"
+      ],
+      "versions": [
+        "chatgpt-web"
+      ],
+      "tags": [
+        "product"
+      ],
+      "always": false,
+      "status": "active",
+      "evidence": "official_guidance",
+      "sources": [
+        {
+          "kind": "web",
+          "url": "https://developers.openai.com/api/docs/guides/image-prompting",
+          "reviewed_at": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "id": "image-text",
+      "heading": "### image-text",
+      "stages": [
+        "image_prompt"
+      ],
+      "versions": [
+        "chatgpt-web"
+      ],
+      "tags": [
+        "text"
+      ],
+      "always": false,
+      "status": "active",
+      "evidence": "official_guidance",
+      "sources": [
+        {
+          "kind": "web",
+          "url": "https://developers.openai.com/api/docs/guides/image-prompting",
+          "reviewed_at": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "id": "image-optics",
+      "heading": "### image-optics",
+      "stages": [
+        "image_prompt"
+      ],
+      "versions": [
+        "chatgpt-web"
+      ],
+      "tags": [
+        "live_action",
+        "camera"
+      ],
+      "always": false,
+      "status": "active",
+      "evidence": "reviewed_heuristic",
+      "sources": [
+        {
+          "kind": "web",
+          "url": "https://developers.openai.com/api/docs/guides/image-prompting",
+          "reviewed_at": "2026-09-20"
+        },
+        {
+          "kind": "wiki",
+          "path": "concepts/video-prompting-live-action.md",
+          "sha256": "636c75a2d8bd00b9f8cfed09962e01be34b27efc4863e328a475edf2108d58e3",
+          "section": "CURRENT"
+        },
+        {
+          "kind": "wiki",
+          "path": "concepts/video-camera-composition-grammar.md",
+          "sha256": "87cd6fa3a440844c032e29498f60ed346a0a5ae2b4d54f0de7acbec87d5a5d4b",
+          "section": "CURRENT / Composition order"
+        }
+      ]
+    },
+    {
+      "id": "image-animation",
+      "heading": "### image-animation",
+      "stages": [
+        "image_prompt"
+      ],
+      "versions": [
+        "chatgpt-web"
+      ],
+      "tags": [
+        "animation"
+      ],
+      "always": false,
+      "status": "active",
+      "evidence": "reviewed_heuristic",
+      "sources": [
+        {
+          "kind": "wiki",
+          "path": "concepts/video-prompting-2d-animation.md",
+          "sha256": "d62a289031162005b052106628e74e0d63f9abf1341dacbdf7e1e2bd078ec4af",
+          "section": "CURRENT / Medium lock / Motion grammar"
+        }
+      ]
+    },
+    {
+      "id": "video-core",
+      "heading": "### video-core",
+      "stages": [
+        "seedance_prompt"
+      ],
+      "versions": [
+        "seedance-2.0",
+        "seedance-2.5"
+      ],
+      "tags": [],
+      "always": true,
+      "status": "active",
+      "evidence": "official_guidance",
+      "sources": [
+        {
+          "kind": "web",
+          "url": "https://help.runwayml.com/hc/en-us/articles/50488490233363-Creating-with-Seedance-2-0",
+          "reviewed_at": "2026-09-20"
+        },
+        {
+          "kind": "web",
+          "url": "https://help.runwayml.com/hc/en-us/articles/53542207042323-Creating-with-Seedance-2-5",
+          "reviewed_at": "2026-09-20"
+        },
+        {
+          "kind": "wiki",
+          "path": "concepts/video-camera-composition-grammar.md",
+          "sha256": "87cd6fa3a440844c032e29498f60ed346a0a5ae2b4d54f0de7acbec87d5a5d4b",
+          "section": "CURRENT / Composition order"
+        }
+      ]
+    },
+    {
+      "id": "video-camera",
+      "heading": "### video-camera",
+      "stages": [
+        "seedance_prompt"
+      ],
+      "versions": [
+        "seedance-2.0",
+        "seedance-2.5"
+      ],
+      "tags": [
+        "camera",
+        "live_action"
+      ],
+      "always": false,
+      "status": "active",
+      "evidence": "reviewed_heuristic",
+      "sources": [
+        {
+          "kind": "wiki",
+          "path": "concepts/video-camera-composition-grammar.md",
+          "sha256": "87cd6fa3a440844c032e29498f60ed346a0a5ae2b4d54f0de7acbec87d5a5d4b",
+          "section": "CURRENT / Composition order"
+        },
+        {
+          "kind": "wiki",
+          "path": "concepts/video-prompting-live-action.md",
+          "sha256": "636c75a2d8bd00b9f8cfed09962e01be34b27efc4863e328a475edf2108d58e3",
+          "section": "CURRENT"
+        }
+      ]
+    },
+    {
+      "id": "video-physics",
+      "heading": "### video-physics",
+      "stages": [
+        "seedance_prompt"
+      ],
+      "versions": [
+        "seedance-2.0",
+        "seedance-2.5"
+      ],
+      "tags": [
+        "action",
+        "product"
+      ],
+      "always": false,
+      "status": "active",
+      "evidence": "reviewed_heuristic",
+      "sources": [
+        {
+          "kind": "wiki",
+          "path": "concepts/video-prompting-live-action.md",
+          "sha256": "636c75a2d8bd00b9f8cfed09962e01be34b27efc4863e328a475edf2108d58e3",
+          "section": "CURRENT"
+        },
+        {
+          "kind": "wiki",
+          "path": "concepts/video-camera-composition-grammar.md",
+          "sha256": "87cd6fa3a440844c032e29498f60ed346a0a5ae2b4d54f0de7acbec87d5a5d4b",
+          "section": "CURRENT / Composition order"
+        }
+      ]
+    },
+    {
+      "id": "video-identity",
+      "heading": "### video-identity",
+      "stages": [
+        "seedance_prompt"
+      ],
+      "versions": [
+        "seedance-2.0",
+        "seedance-2.5"
+      ],
+      "tags": [
+        "identity"
+      ],
+      "always": false,
+      "status": "active",
+      "evidence": "reviewed_heuristic",
+      "sources": [
+        {
+          "kind": "wiki",
+          "path": "concepts/character-bible-page-prompt-standard.md",
+          "sha256": "56bec32b9655f7a0b093b60ab3a588bb3aa895ab02a166bd74a923958f8737a9",
+          "section": "Immutable identity and state assets / Provider binding"
+        },
+        {
+          "kind": "wiki",
+          "path": "concepts/video-prompting-live-action.md",
+          "sha256": "636c75a2d8bd00b9f8cfed09962e01be34b27efc4863e328a475edf2108d58e3",
+          "section": "CURRENT"
+        }
+      ]
+    },
+    {
+      "id": "video-audio",
+      "heading": "### video-audio",
+      "stages": [
+        "seedance_prompt"
+      ],
+      "versions": [
+        "seedance-2.0",
+        "seedance-2.5"
+      ],
+      "tags": [
+        "audio"
+      ],
+      "always": false,
+      "status": "active",
+      "evidence": "official_guidance",
+      "sources": [
+        {
+          "kind": "web",
+          "url": "https://help.runwayml.com/hc/en-us/articles/50488490233363-Creating-with-Seedance-2-0",
+          "reviewed_at": "2026-09-20"
+        },
+        {
+          "kind": "web",
+          "url": "https://help.runwayml.com/hc/en-us/articles/53542207042323-Creating-with-Seedance-2-5",
+          "reviewed_at": "2026-09-20"
+        },
+        {
+          "kind": "wiki",
+          "path": "concepts/video-prompting-live-action.md",
+          "sha256": "636c75a2d8bd00b9f8cfed09962e01be34b27efc4863e328a475edf2108d58e3",
+          "section": "CURRENT"
+        }
+      ]
+    },
+    {
+      "id": "video-storyboard",
+      "heading": "### video-storyboard",
+      "stages": [
+        "seedance_prompt"
+      ],
+      "versions": [
+        "seedance-2.0",
+        "seedance-2.5"
+      ],
+      "tags": [
+        "storyboard"
+      ],
+      "always": false,
+      "status": "active",
+      "evidence": "reviewed_heuristic",
+      "sources": [
+        {
+          "kind": "wiki",
+          "path": "concepts/storyboard-production-blueprint-standard.md",
+          "sha256": "a14d0626c3f9eef0743f2eec89ee5c12caf019aa76360ef270f4c397033c70c4",
+          "section": "CURRENT / production blueprint"
+        },
+        {
+          "kind": "web",
+          "url": "https://help.runwayml.com/hc/en-us/articles/50488490233363-Creating-with-Seedance-2-0",
+          "reviewed_at": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "id": "video-text",
+      "heading": "### video-text",
+      "stages": [
+        "seedance_prompt"
+      ],
+      "versions": [
+        "seedance-2.0",
+        "seedance-2.5"
+      ],
+      "tags": [
+        "text"
+      ],
+      "always": false,
+      "status": "active",
+      "evidence": "reviewed_heuristic",
+      "sources": [
+        {
+          "kind": "wiki",
+          "path": "concepts/video-typography-operating-manual.md",
+          "sha256": "a65537196d4a30ac90ffd8cdda41f08199890a54852f6284771450e5a048f7c0",
+          "section": "모드별 선택 로직 / 타이포 역할 시스템"
+        },
+        {
+          "kind": "web",
+          "url": "https://developers.openai.com/api/docs/guides/image-prompting",
+          "reviewed_at": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "id": "video-edit",
+      "heading": "### video-edit",
+      "stages": [
+        "seedance_prompt"
+      ],
+      "versions": [
+        "seedance-2.0",
+        "seedance-2.5"
+      ],
+      "tags": [
+        "edit"
+      ],
+      "always": false,
+      "status": "active",
+      "evidence": "official_guidance",
+      "sources": [
+        {
+          "kind": "web",
+          "url": "https://help.runwayml.com/hc/en-us/articles/50488490233363-Creating-with-Seedance-2-0",
+          "reviewed_at": "2026-09-20"
+        },
+        {
+          "kind": "web",
+          "url": "https://help.runwayml.com/hc/en-us/articles/53542207042323-Creating-with-Seedance-2-5",
+          "reviewed_at": "2026-09-20"
+        }
+      ]
+    },
+    {
+      "id": "video-animation",
+      "heading": "### video-animation",
+      "stages": [
+        "seedance_prompt"
+      ],
+      "versions": [
+        "seedance-2.0",
+        "seedance-2.5"
+      ],
+      "tags": [
+        "animation"
+      ],
+      "always": false,
+      "status": "active",
+      "evidence": "reviewed_heuristic",
+      "sources": [
+        {
+          "kind": "wiki",
+          "path": "concepts/video-prompting-2d-animation.md",
+          "sha256": "d62a289031162005b052106628e74e0d63f9abf1341dacbdf7e1e2bd078ec4af",
+          "section": "CURRENT / Medium lock / Motion grammar"
+        }
+      ]
+    }
+  ]
+}

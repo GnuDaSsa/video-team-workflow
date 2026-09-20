@@ -102,3 +102,7 @@ identity/physics/temporal QC와 실제 CapCut preview/export 검사가 따로 �
 
 포함하지 않는 것: 프로젝트 폴더, 영상/음원, CapCut draft, 세션 URL/계정 상태,
 비밀정보, 개인 제출 양식. 별도 에이전트/스케줄러/브라우저 루프는 만들지 않는다.
+
+### Image/video prompting knowledge
+
+Native Aside now binds a reviewed, task-scoped wiki packet into image and Seedance author requests and checks the actual Astra acknowledgement through provider input. See [knowledge contract](docs/contracts/2026-09-20-aside-knowledge.md) and [source/lifecycle guide](aside-skills/aside-video/references/knowledge.md). The portable snapshot is explicitly labeled when a live wiki is absent; live source drift never silently falls back. This is an authorship/data-flow gate, not a claim of generated-media quality.

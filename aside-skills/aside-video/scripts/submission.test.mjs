@@ -22,7 +22,7 @@ async function fixture(t, stage = 'image_prompt', prompt = 'Synthetic fixture on
     role: 'assistant', model: 'gpt-6-astra', provider: 'synthetic-test-provider', api: 'synthetic-test-api',
     responseId: 'SYNTHETIC-response-not-production', session_id: 'SYNTHETIC-author-not-production',
     usage: { input: 1, output: 1 }, timestamp: requested.created_at + 1,
-    stopReason: 'stop', content: [{ type: 'text', text: `Prompt-SHA256: ${sha256(Buffer.from(prompt))}` }],
+    stopReason: 'stop', content: [{ type: 'text', text: `Prompt-SHA256: ${sha256(Buffer.from(prompt))}` + (requested.knowledge ? `\nKnowledge-SHA256: ${requested.knowledge.sha256}` : '') }],
   }) + '\n', { mode: 0o600 });
   const receipt = await seal({ request: requested.file, evidence, out: 'receipt.json' });
   const out = path.join(root, 'payload.json');
@@ -210,13 +210,13 @@ test('schema1 historical payload is read-only verifiable and cannot be freshly p
   const f = await fixture(t), current = await prepare(f.options);
   const reqFile = path.join(f.root, f.receipt.request);
   const req = await readJSON(reqFile);
-  req.schema_version = 1; delete req.language_contract;
+  req.schema_version = 1; delete req.language_contract; delete req.knowledge;
   const reqHash = await rewrite(reqFile, req);
   const receipt = await readJSON(f.receipt.file);
-  receipt.schema_version = 1; delete receipt.language_contract; receipt.request_sha256 = reqHash;
+  receipt.schema_version = 1; delete receipt.language_contract; delete receipt.knowledge_sha256; delete receipt.author_record.knowledge_sha256; receipt.request_sha256 = reqHash;
   const receiptHash = await rewrite(f.receipt.file, receipt);
   const payload = await readJSON(f.out);
-  payload.schema_version = 1; delete payload.language_contract; payload.receipt.sha256 = receiptHash;
+  payload.schema_version = 1; delete payload.language_contract; delete payload.knowledge_sha256; delete payload.author_record.knowledge_sha256; payload.receipt.sha256 = receiptHash;
   const payloadHash = await rewrite(f.out, payload);
   assert.equal((await verify(f.out, payloadHash)).language_status, 'LEGACY_UNSPECIFIED_READ_ONLY');
   await assert.rejects(prepare({ ...f.options, out: path.join(f.root, 'fresh.json'), sha256: receiptHash }), /LEGACY_UNSPECIFIED_READ_ONLY/);
@@ -234,4 +234,17 @@ test('reference manifest may be relative while every bound entry remains absolut
   const result = await main(['prepare', '--stage', f.options.stage, '--receipt', f.options.receipt,
     '--sha256', f.options.sha256, '--out', f.out, '--references', path.relative(process.cwd(), refs.file)]);
   assert.deepEqual((await verify(f.out, result.payload_sha256)).payload.references, refs.references);
+});
+
+test('knowledge metadata is independently bound in provider payload',async t=>{
+  const f=await fixture(t);const p=await prepare(f.options),payload=await readJSON(f.out);
+  assert.equal((await verify(f.out,p.payload_sha256)).knowledge_status,'CURRENT_KNOWLEDGE_VALIDATED');
+  payload.knowledge_sha256='0'.repeat(64);const h=await rewrite(f.out,payload);
+  await assert.rejects(verify(f.out,h),/Payload knowledge binding/);
+});
+test('old language-only schema2 receipt cannot prepare new provider input',async t=>{
+  const f=await fixture(t),r=await readJSON(f.receipt.file),reqFile=path.join(f.root,r.request),req=await readJSON(reqFile);
+  delete req.knowledge;r.request_sha256=await rewrite(reqFile,req);delete r.knowledge_sha256;delete r.author_record.knowledge_sha256;
+  const h=await rewrite(f.receipt.file,r);
+  await assert.rejects(prepare({...f.options,sha256:h}),/LEGACY_KNOWLEDGE_UNSPECIFIED_READ_ONLY/);
 });

@@ -3,15 +3,15 @@
   "files": [
     {
       "path": "AGENTS.fragment.md",
-      "sha256": "90f05948fdb12d47b1657e5e1c991f2b50660f5d3c9f500e1a73af35ee2e4a11"
+      "sha256": "c0295e5aaad98259a380230b5fac2e64b6af14a0a59b8657b0e4860445a55ddd"
     },
     {
       "path": "aside-video/SKILL.md",
-      "sha256": "756c27707a2745fbef687e93ecd6a2fc175de8b63a31d5e258a82accd528d5f4"
+      "sha256": "6eed748f9c32f29379e3b73a3fa97b9e818becbbf9dde51d9c1f2777e1ec724c"
     },
     {
       "path": "aside-video/references/author-executor.md",
-      "sha256": "e775a78d9b97f4d6c1e8407fa7a800aea395cf0491e92eb35fd426d8d816e003"
+      "sha256": "52d628380ed2e52292ea6d46612efca092bd00a37b25e7cc7d8eae19663e2861"
     },
     {
       "path": "aside-video/references/directing.md",
@@ -23,11 +23,35 @@
     },
     {
       "path": "aside-video/references/jev-dispatch.md",
-      "sha256": "ebd7311c93c4813a9906cc4bb0e49bceb8323353cf760eb71e31fcbb31c3c376"
+      "sha256": "3814745a1505591da5e90aa9c4f003a0e700da88bf4a1d85c93e6da8d9240a75"
     },
     {
       "path": "aside-video/references/jev-qc.md",
       "sha256": "74423390319ea204455600b77c21a9838fb329c63424de25275cbf60bd6470e3"
+    },
+    {
+      "path": "aside-video/references/knowledge.md",
+      "sha256": "cbe8089077f755a6b74ae90c1f873c6486c601e586ad81d226ed9c3bd109b3bf"
+    },
+    {
+      "path": "aside-video/references/knowledge/aside-image-video-prompting.md",
+      "sha256": "82260dc07ceb5428cc8011dd36f2a72701613515a890a3ecda6208ab514774ea"
+    },
+    {
+      "path": "aside-video/references/knowledge/catalog.json",
+      "sha256": "5d20a4ed7e69eaa605b73088e7bdb4e45549965c477aecff120007cffb29fe98"
+    },
+    {
+      "path": "aside-video/references/knowledge/source-notes/aside-image-prompting-review-2026-09-20.md",
+      "sha256": "c1e55ca7e6068da2b136338420c96dd023525bc53117eb9e672719aa29e0abdb"
+    },
+    {
+      "path": "aside-video/references/knowledge/source-notes/aside-v20-prompting-review-2026-09-20.md",
+      "sha256": "51da8741ab1eba98c30239c18db6be7b96bc0d5f0784cd0003e9428af1016923"
+    },
+    {
+      "path": "aside-video/references/knowledge/source-notes/aside-v25-prompting-review-2026-09-20.md",
+      "sha256": "8cd9ac1a11c3a65b41b92a670dc07cb4ff058e775a2ecee81fd404ea68871988"
     },
     {
       "path": "aside-video/references/prompt-language.md",
@@ -43,19 +67,19 @@
     },
     {
       "path": "aside-video/scripts/check.mjs",
-      "sha256": "3822228ff4cabf9f4e7d4530c48358313953341f0d96562a231beb70d37829fd"
+      "sha256": "cb2d7a6164c9d9265dd00f0632e1e4b1c4103bcfdfa154c4177c1a55bac03ada"
     },
     {
       "path": "aside-video/scripts/check.test.mjs",
-      "sha256": "ded94681911892714f5d71f574227943cadbfac0f20693d83693c088c1d2e3eb"
+      "sha256": "d7bab32a8d411c18a888902eaeb6f49beb3d11c950e7a0b185a6eba522e7f34b"
     },
     {
       "path": "aside-video/scripts/harness.mjs",
-      "sha256": "e6bde375c8ecf5dba59f5211edac594c053b2ce8257c8bbec57b72e1d0cf9e97"
+      "sha256": "a2b222ee1abeeb931c3f8855f53cb4f2ab1897057dce19519d4faaeddfb8959f"
     },
     {
       "path": "aside-video/scripts/harness.test.mjs",
-      "sha256": "d33c9d5018144d4f7c4b85870ff814be23bb782b8e4fdf88c385422435c35c0b"
+      "sha256": "2f2940d02120eae4515899e5dc6cd3732ef884c1a19ac836282905ce41d492d7"
     },
     {
       "path": "aside-video/scripts/jev-dispatch.mjs",
@@ -90,6 +114,14 @@
       "sha256": "dd33b52f90d586bb487f554a765dee09033fc2b7a7f9a9bd436f0446d7725014"
     },
     {
+      "path": "aside-video/scripts/knowledge.mjs",
+      "sha256": "4c18e9fa20a09efce3f7ecc27e55c9671d4e400195700d9f53b1447d2316e32c"
+    },
+    {
+      "path": "aside-video/scripts/knowledge.test.mjs",
+      "sha256": "8fd2a92ca8f32bab349af83be8cd03dee84f41717d1b094042f40b388f2c2d7e"
+    },
+    {
       "path": "aside-video/scripts/mode-lock.mjs",
       "sha256": "49757c7c1ca82476070a7f1f18f44d4c7058c328bd967ef0bdb7e014037f9050"
     },
@@ -115,11 +147,11 @@
     },
     {
       "path": "aside-video/scripts/runway-fastlane.js",
-      "sha256": "5f64c9e3d56a99293bc178eaef41aca8e75af97379c000bece789cd64be9b564"
+      "sha256": "ecb58297ab3f9aed27e40217da33337d94678e09127cbdc56d880928046e6ed8"
     },
     {
       "path": "aside-video/scripts/runway-fastlane.test.mjs",
-      "sha256": "b6d317fe859c49d1e87654395a820babb5c7e85e733150fb9a440652bfa7c2bd"
+      "sha256": "39def7980eb921e34b340d9919466fb8d79f57bcd836f22580a847983dee6955"
     },
     {
       "path": "aside-video/scripts/seedance-references.mjs",
@@ -127,7 +159,7 @@
     },
     {
       "path": "aside-video/scripts/seedance-references.test.mjs",
-      "sha256": "df02c26507eaf58d2979c5e464d56190c84792e630d1016fd6057a9b5bdba2a4"
+      "sha256": "1a164dfedbc654ebfc1047a18d6af5c960af015cca84deee7f305813d9c55a5b"
     },
     {
       "path": "aside-video/scripts/session-context.mjs",
@@ -135,11 +167,11 @@
     },
     {
       "path": "aside-video/scripts/submission.mjs",
-      "sha256": "116b03c8be8310f81cc9da89cfc4cac00e10d62e6a04b78a3dd5951bdcdac335"
+      "sha256": "91ffb78dbac66af2121486aec01675a11fbd429d5c7c7063847cdad2aa0f5edf"
     },
     {
       "path": "aside-video/scripts/submission.test.mjs",
-      "sha256": "161e5928edcbe16e05a0e01412e3cf421d3a202ae5a522fc90196af19b8c5caf"
+      "sha256": "c4c88bc87fdd53958e68d6527222b2447f471f73d5e25f7423e221bdccbb4ffe"
     }
   ]
 }

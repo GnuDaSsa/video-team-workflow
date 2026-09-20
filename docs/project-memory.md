@@ -95,3 +95,7 @@ Use the canonical Seedance production branch for native schedule state and runti
 ## Native Aside workflow entry and prompt language
 
 For every new native Aside image/video/music task or follow-up edit, load aside-skills/aside-video and the managed account AGENTS entry. English provider prose is the standing default; task-specific explicit language overrides and exact spoken/lyric/on-screen literals are separate. The executor never translates an accepted Astra payload. Reuse identical uploaded assets by workspace plus content hash; first-upload staging must be inside the actual executor session. Do not fill behind an open dialog or trust a cached newSession URL. See the 2026-09-20 contract for deployment and legacy compatibility boundaries.
+
+## Image/video wiki use
+
+New native requests automatically select and embed scoped creative knowledge before Astra authorship. Keep Knowledge-SHA256 alongside Prompt-SHA256 in the actual author response. Never substitute full old image/Seedance skill reads for this reviewed packet. Missing/mutated live source is review-needed, not permission to fallback to an old snapshot. See references/knowledge.md and the current contract for observable selection/acknowledgement versus semantic/quality claims.
