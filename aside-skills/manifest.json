@@ -3,19 +3,19 @@
   "files": [
     {
       "path": "AGENTS.fragment.md",
-      "sha256": "c0295e5aaad98259a380230b5fac2e64b6af14a0a59b8657b0e4860445a55ddd"
+      "sha256": "95413ff75f95b61320697d5e9a5e19c05aa69513357268fb0de86f7cdd7160a9"
     },
     {
       "path": "aside-video/SKILL.md",
-      "sha256": "6eed748f9c32f29379e3b73a3fa97b9e818becbbf9dde51d9c1f2777e1ec724c"
+      "sha256": "1125adee0141c9bbeb2017eaf035605acab609a1d4ecec78e784486318c7afc1"
     },
     {
       "path": "aside-video/references/author-executor.md",
-      "sha256": "52d628380ed2e52292ea6d46612efca092bd00a37b25e7cc7d8eae19663e2861"
+      "sha256": "99b92e798b3445ff0ab1d239d35fa2e3398aa6dc74f71d817d3bfce48e991125"
     },
     {
       "path": "aside-video/references/directing.md",
-      "sha256": "7ae80beef22817358a4e376716d99e2c5a00c1b5f37a55cc470fdd7abd5c9564"
+      "sha256": "9111f1b23d63851760011da05a9ac8e505e0fbcde6b5d0010c6f60b8987b2a1d"
     },
     {
       "path": "aside-video/references/harness-policy.json",
@@ -23,15 +23,15 @@
     },
     {
       "path": "aside-video/references/jev-dispatch.md",
-      "sha256": "3814745a1505591da5e90aa9c4f003a0e700da88bf4a1d85c93e6da8d9240a75"
+      "sha256": "3a8fb81b96a03dd161eb0bd12651b89c5d0b5fd7964a1ba1db357283a297e53d"
     },
     {
       "path": "aside-video/references/jev-qc.md",
-      "sha256": "74423390319ea204455600b77c21a9838fb329c63424de25275cbf60bd6470e3"
+      "sha256": "51337bc58e7efae76bdfea67f8bc3f356436b18d49a70218190ff9b919b265a8"
     },
     {
       "path": "aside-video/references/knowledge.md",
-      "sha256": "cbe8089077f755a6b74ae90c1f873c6486c601e586ad81d226ed9c3bd109b3bf"
+      "sha256": "cfcc4349da2a63e04403c13d94afd9357ba05c862bd92bd2350baf4a286cba6a"
     },
     {
       "path": "aside-video/references/knowledge/aside-image-video-prompting.md",
@@ -55,15 +55,15 @@
     },
     {
       "path": "aside-video/references/prompt-language.md",
-      "sha256": "bbb6d98d702c15fef84575d5ef478bd35d14b986867da2806c0d385b52720f69"
+      "sha256": "f0e1b80d2b976008f58e13f8bddd28955e64df9a1c5d059a1d71404dcce7cb31"
     },
     {
       "path": "aside-video/references/seedance-upload.md",
-      "sha256": "579fd77fbc9f0e9cd1c795c1b4c3f67d9fb9026634330f4bab697b6787cd2b17"
+      "sha256": "6948e420a248874c130db727dfa8a4d851ce3e001e5eb3dc9956a431d2fa6cf3"
     },
     {
       "path": "aside-video/references/web-chatgpt-casting.md",
-      "sha256": "9500009c22d03cd96c9a07cbd4ca32430c9f4734abe9e6dc304d91fa3fe0ad98"
+      "sha256": "f8fa22f897d04b15ece4f3a6d0feab8059fb188b7a52f62b1a9cac06c7ed3efd"
     },
     {
       "path": "aside-video/scripts/check.mjs",
@@ -74,8 +74,12 @@
       "sha256": "d7bab32a8d411c18a888902eaeb6f49beb3d11c950e7a0b185a6eba522e7f34b"
     },
     {
+      "path": "aside-video/scripts/cli-output.test.mjs",
+      "sha256": "cba9d7f00ca800f8175cdd770c35658ff097395c26cb74eb6d540bdeb7be8722"
+    },
+    {
       "path": "aside-video/scripts/harness.mjs",
-      "sha256": "a2b222ee1abeeb931c3f8855f53cb4f2ab1897057dce19519d4faaeddfb8959f"
+      "sha256": "a066b47d99a778571d8357b97ce8e08dd113e7d1f7938b770cc96400d3e24b24"
     },
     {
       "path": "aside-video/scripts/harness.test.mjs",
@@ -120,6 +124,10 @@
     {
       "path": "aside-video/scripts/knowledge.test.mjs",
       "sha256": "8fd2a92ca8f32bab349af83be8cd03dee84f41717d1b094042f40b388f2c2d7e"
+    },
+    {
+      "path": "aside-video/scripts/lean-docs.test.mjs",
+      "sha256": "72df26647def165a02595df64e29f7300908d4eb33876d9a236f5a258ceff4b5"
     },
     {
       "path": "aside-video/scripts/mode-lock.mjs",
@@ -167,7 +175,7 @@
     },
     {
       "path": "aside-video/scripts/submission.mjs",
-      "sha256": "91ffb78dbac66af2121486aec01675a11fbd429d5c7c7063847cdad2aa0f5edf"
+      "sha256": "c364936569b31637bca2e1f2d930004d90e22782246e99561dc6b2fc63b17e83"
     },
     {
       "path": "aside-video/scripts/submission.test.mjs",

@@ -1,125 +1,17 @@
 {
-  "currentGoal": "Audit and connect bounded image/video wiki knowledge to Astra authoring",
-  "status": "completed_with_legacy_warnings",
-  "currentContract": "docs/contracts/2026-09-20-aside-knowledge.md",
+  "currentGoal": "Remove native video instruction and output bloat while retaining production-critical gates",
+  "status": "completed",
+  "currentContract": "docs/contracts/2026-09-20-native-lean.md",
   "blockers": [],
-  "nextStep": "Apply the checked knowledge packet on future native image/video requests. Re-review card/upstream drift before new authorship. Reconcile legacy raw integrity and deployment separately without rewriting old receipts.",
-  "lastUpdated": "2026-09-20T06:18:27.625Z",
+  "nextStep": "Use the concise stage entry and compact CLI output; load --full or optional references only for a concrete diagnostic need.",
+  "lastUpdated": "2026-09-20T06:39:40.090Z",
   "verification": {
-    "lastCommand": "configured verifyFull: 444 native/deployer tests + 188 legacy tests; compile/shell; native parity; wiki_lint; actual Astra image/video request->seal->payload verify",
-    "lastResult": "PASS_NATIVE_KNOWLEDGE_WITH_EXISTING_LEGACY_WARNINGS",
-    "notes": "444/444 native tests, 188/188 legacy tests, PARITY OK. Real gpt-6-astra direct authoring: two stages, four live-wiki cards each, generated acknowledgements and English payload validation passed. No browser input or media generation/visual quality test. Wiki lint: 0 errors, 46 existing raw hash warnings, 18 info. Configured full command ends nonzero on the unchanged legacy source manifest plus five live-file mismatches. Fastlane requires a real trusted verifier adapter; no real REPL adapter/browser smoke claimed."
-  },
-  "recentCloseouts": [
-    {
-      "id": "2026-09-08-hell-grind-live-action",
-      "status": "complete",
-      "contract": "docs/contracts/2026-09-08-hell-grind-live-action.md",
-      "completedAt": "2026-09-08T07:40:38+09:00",
-      "verification": {
-        "lastResult": "PASS_SCOPED_ROUTES_AND_DEPLOYMENT",
-        "lastCommand": "7 router cases; 3 compiler examples; 14 compiler fixtures; videodirector quick_validate; 143 unit tests; Python/shell/diff checks; wiki lint and source/deployed hashes",
-        "notes": "No actual media generation or full-film playback. Existing image-prompt generic-validator version-key warning and unrelated full-release source drift remain scoped out. See release.md."
-      },
-      "nextStep": "Apply matching profile on the next real photoreal request; assess generated image/video quality separately."
-    },
-    {
-      "id": "2026-09-05-seedance-25-explicit-skill",
-      "status": "complete",
-      "contract": "docs/contracts/2026-09-05-seedance-25-explicit-skill.md",
-      "commit": "420bec8",
-      "deployment": "/Users/gnudas/.codex/skills/seedance25-prompt-en; /Users/gnudas/.codex/skills/seedance-prompt-en routing boundary; /Users/gnudas/.codex/AGENTS.md; /Users/gnudas/Documents/Codex/video-team-runtime/AGENTS.md; /Users/gnudas/Documents/Codex/video-team-runtime/runtime/templates/seedance.md",
-      "verification": {
-        "lastCommand": "quick_validate seedance25-prompt-en; py_compile runtime and 2.5 adapter; python3 -m unittest discover -s runtime/tests -v (70 tests); source/live diff+cmp; git diff --check; remote-main SHA equality",
-        "lastResult": "PASS",
-        "notes": "Added natural-language explicit Seedance 2.5 routing with only prompting and production branches. The 2.5 adapter reuses the canonical 2.0 Runway helper implementation while reversing only the fail-closed model guard. Local/live 2.0 rejects 2.5 and local/live 2.5 rejects 2.0. Deployed skills and runtime routing pointers match source; commit 420bec8 is on origin/main. No Runway Generate, upload, browser production, provider job, or media mutation occurred."
-      },
-      "nextStep": "When the user explicitly names Seedance 2.5, use seedance25-prompt-en; otherwise keep Seedance 2.0/default. Evaluate the first real 2.5 clips against the physical-motion and AI-artifact QC gates before promoting more rules."
-    },
-    {
-      "id": "2026-09-02-toonkit-2d-snappy-animation-grammar",
-      "status": "complete",
-      "contract": "docs/contracts/2026-09-02-toonkit-2d-snappy-animation-grammar.md",
-      "commit": "a86de74",
-      "deployment": "/Users/gnudas/.codex/skills/seedance-prompt-en and /Users/gnudas/.codex/skills/videodirector/SKILL.md",
-      "verification": {
-        "lastCommand": "canonical/live profile-marker assertions; zsh -n tools/deploy_one_skill_to_codex.sh; targeted Seedance deploy preflight; wiki raw provenance hash; python3 -m py_compile runtime/scripts/*.py; python3 -m unittest discover -s runtime/tests -v (65 tests); git diff --check",
-        "lastResult": "PASS",
-        "notes": "Added opt-in toonkit_2d_snappy_v1 routing in videodirector and visible Korean prompt semantics in seedance-prompt-en. Seedance was deployed using the one-skill deployer and archived at ~/.codex/archive/20260902_073641_single_skill_deploy/seedance-prompt-en. Videodirector received only the new option markers to preserve unrelated live-file drift. No provider, browser, queue, agent, or media action occurred."
-      },
-      "nextStep": "Use only after an explicit Toonkit/12-laws request for a 2D/stylized block."
-    },
-    {
-      "id": "2026-08-28-ai-vocal-naturalness-gate",
-      "status": "complete",
-      "contract": "codex-skills/music-director/SKILL.md",
-      "commit": "4cd61fe",
-      "deployment": "/Users/gnudas/.codex/skills/music-director",
-      "verification": {
-        "lastCommand": "zsh -n tools/deploy_one_skill_to_codex.sh; targeted deploy smoke; marker assertions; git diff --check; source/live diff and SHA-256",
-        "lastResult": "PASS",
-        "notes": "User-rejected Link Up and Rewind vocal families are negative references; preventive single-identity Korean vocal prompting and full-track playback gate are deployed. Project audit: 40 MP3s = 8 REJECT, 32 HOLD, 0 PASS."
-      },
-      "nextStep": "Apply the full-track vocal listening gate before recommending any new Suno vocal candidate.",
-      "commits": [
-        "00dcfa7",
-        "408e95f",
-        "4cd61fe"
-      ]
-    },
-    {
-      "id": "2026-09-09-resume-composer-capacity",
-      "status": "complete",
-      "contract": "docs/contracts/2026-09-09-resume-composer-capacity.md",
-      "completedAt": "2026-09-09T19:22:04.526318+09:00",
-      "verification": {
-        "lastResult": "PASS",
-        "lastCommand": "154 tests; Python compile; shell syntax; diff check; canonical release freeze/preflight/apply/check",
-        "notes": "66-file parity; two live files updated at no-wait/no-queue boundary. Capacity enums are operator-supplied, not automatic UI detection. Independent production is held for foreign unsent composer selection; AX18 harvested, no full playback QC."
-      }
-    },
-    {
-      "id": "2026-09-09-execution-responsibility",
-      "status": "complete",
-      "scope": "GLOBAL_AGENTS top-priority user execution responsibility; preserve safety/approval and stop boundaries",
-      "verification": "154 tests PASS; release freeze/preflight/apply/check PASS; 66-file parity; one deployed global instruction file. Behavioral adherence is not established by tests."
-    },
-    {
-      "id": "2026-09-09-native-main-and-six-shots",
-      "status": "verified",
-      "verification": "155 tests PASS, release parity66 PASS. Exact CLI window/URL gates retained; native guard selects sole AXMain instead of index1. Explicit user six-shot request supported only Seedance2.5; existing duration/timeline checks retained. Live: native guard progressed to IME gate, CUA no-key file-open uploaded six refs; OP02 accepted. Picker-select still has independent layout assumptions; not claimed repaired."
-    },
-    {
-      "scope": "explicit_seedance20_six_shots",
-      "verification": "155 tests PASS; release parity 66 files PASS",
-      "contract": "docs/contracts/2026-09-09-seedance20-explicit-six.md"
-    },
-    {
-      "id": "2026-09-14-scheduled-production-and-qc",
-      "status": "complete",
-      "contract": "docs/contracts/2026-09-14-scheduled-production-and-qc.md",
-      "completedAt": "2026-09-14T17:42:14+09:00",
-      "blockers": [],
-      "verification": {
-        "lastResult": "PASS_SHARED_DEPLOYMENT_AND_LOCAL_LIVE_SMOKE",
-        "lastCommand": "185 tests; Python compile; shell syntax; skill validation; release freeze/preflight/apply/check; native snapshot and registered-video QC smoke",
-        "notes": "68-file parity. Existing native reservation same ID/task/30min/policy verified after stable prompt update; local 20min drift corrected. Actual QC evidence reuse verified, no media promotion. No post-update scheduled run or new generated-quality verification."
-      },
-      "nextStep": "Existing authorized task continues unresolved QC under deployed workflow; observe the next scheduled run separately. Preserve unrelated blocked main goal."
-    }
-  ],
-  "preservedProductionState": {
-    "currentGoal": "Resume existing production owner without fabricating idle; verify direct executor action",
-    "status": "blocked",
-    "currentContract": "docs/contracts/2026-09-08-session-monitor-consistency.md",
-    "blockers": [
-      "Live continuation: Aside currently contains another project session; exact intended session restoration required."
-    ],
-    "nextStep": "Restore exact original Aside session, then resume existing owner and automation-2. S09/S10 completion/QC unverified."
+    "lastCommand": "configured verifyQuick; frontmatter; installed source parity; real existing image/video payload CLI verification",
+    "lastResult": "PASS_NATIVE_LEAN",
+    "notes": "451 native/deployer tests and 188 legacy tests pass. Instruction chars: 56,726 -> 13795; SKILL: 14,464 -> 2,247. Global account entry: 2,161 -> 615. Synthetic request stdout -87.2%; existing real payload verification stdout -49%/-56%. Actual prior Astra/English/knowledge receipts remain valid. No media generation or measured production token/latency claim. Existing legacy deployment drift remains outside scope."
   },
   "knownWarnings": [
-    "Legacy Codex source manifest/five live files differ; not hot-deployed.",
-    "46 pre-existing raw wiki hash mismatches remain outside the new allowlist.",
-    "No generated-media quality, production speed or real fastlane verifier-adapter claim."
+    "Existing legacy Codex source/live deployment drift is unchanged.",
+    "Character/byte reductions are measured; production model-token/latency gains are not."
   ]
 }

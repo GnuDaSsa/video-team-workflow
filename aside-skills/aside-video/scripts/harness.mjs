@@ -110,7 +110,7 @@ export async function request({ stage, context = {}, root, prompt, out }, policy
   };
   return immutable(output, data);
 }
-async function checkedRequest(requestFile, policy, { allowLegacy = true } = {}) {
+async function checkedRequest(requestFile, policy, { allowLegacy = true, allowMissingPrompt = false } = {}) {
   policyCheck(policy);
   if (!path.isAbsolute(requestFile)) fail('Request path must be absolute');
   const loaded = await jsonFile(requestFile);
@@ -128,7 +128,16 @@ async function checkedRequest(requestFile, policy, { allowLegacy = true } = {}) 
     if (r.author_task !== authorTask(r.stage, r.language_contract, r.knowledge)) fail('Author task knowledge/language content mismatch');
   } else if (needsKnowledge && !allowLegacy) fail('LEGACY_KNOWLEDGE_UNSPECIFIED_READ_ONLY');
   if (r.route?.role !== 'author' || r.route?.execution_model !== 'inherit_session' || r.route?.settings_writes !== false || r.route?.actual_execution_proven !== false || r.route?.stage !== r.stage || r.route?.required_model !== policy.author_model || r.route?.planned_model?.modelId !== policy.author_model || !['direct', 'functions.subagent'].includes(r.route?.mode) || r.role_boundary !== BOUNDARY) fail('Invalid request role/route boundary');
-  const promptFile = await rootFile(root, relativeName(r.prompt));
+  const name = relativeName(r.prompt);
+  let promptFile;
+  try { promptFile = await rootFile(root, name); }
+  catch (error) {
+    if (!allowMissingPrompt || error.code !== 'ENOENT') throw error;
+    // Only an absent future file is allowed, never a dangling symlink.
+    try { await fs.lstat(path.resolve(root, name)); }
+    catch (missing) { if (missing.code !== 'ENOENT') throw missing; promptFile = await rootFile(root, name, true); }
+    if (!promptFile) throw error;
+  }
   return { ...loaded, root, promptFile, requestFile: await fs.realpath(requestFile), legacy };
 }
 function assistantText(record) {
@@ -240,26 +249,69 @@ export async function readContext(input) {
   if (!context || typeof context !== 'object' || Array.isArray(context)) fail('Context must be a JSON object');
   return context;
 }
-export async function main(argv = process.argv.slice(2)) {
+const USAGE = 'Usage: status | route <stage> --context <json> | request <stage> --context <json> --root <absolute> --prompt <relative> --out <relative> | seal --request <absolute> --evidence <absolute> --out <relative> | verify <receipt> --sha256 <accepted hash> | author-task ABS_REQUEST; optional standalone --full';
+function parseCli(argv) {
   const [command, ...args] = argv;
-  const positional = [], options = {};
+  const allowed = { status: [], route: ['context'], request: ['context', 'root', 'prompt', 'out'], seal: ['request', 'evidence', 'out'], verify: ['sha256'], 'author-task': [] };
+  if (!Object.hasOwn(allowed, command)) fail(USAGE);
+  const positional = [], options = Object.create(null);
+  let full = false;
   for (let i = 0; i < args.length; i++) {
-    if (!args[i].startsWith('--')) { positional.push(args[i]); continue; }
-    const key = args[i].slice(2);
-    if (!['context', 'root', 'prompt', 'out', 'request', 'evidence', 'sha256'].includes(key) || options[key] !== undefined || !args[i + 1] || args[i + 1].startsWith('--')) fail(`Invalid option: ${args[i]}`);
+    const arg = args[i];
+    if (arg === '--full') { if (full) fail('Repeated --full'); full = true; continue; }
+    if (!arg.startsWith('-')) { positional.push(arg); continue; }
+    const key = arg.slice(2);
+    if (!arg.startsWith('--') || !allowed[command].includes(key) || Object.hasOwn(options, key) || !args[i + 1] || args[i + 1].startsWith('-')) fail('Invalid option: ' + arg);
     options[key] = args[++i];
   }
-  const allowed = { status: [], route: ['context'], request: ['context', 'root', 'prompt', 'out'], seal: ['request', 'evidence', 'out'], verify: ['sha256'] };
-  if (!(command in allowed) || Object.keys(options).some(k => !allowed[command].includes(k)) || positional.length !== (['route', 'request', 'verify'].includes(command) ? 1 : 0)) fail('Usage: status | route <stage> --context <json> | request <stage> --context <json> --root <absolute> --prompt <relative> --out <relative> | seal --request <absolute> --evidence <absolute> --out <relative> | verify <receipt> --sha256 <accepted hash>');
-  for (const key of allowed[command]) if (!options[key]) fail(`Missing --${key}`);
+  if (positional.length !== (['route', 'request', 'verify', 'author-task'].includes(command) ? 1 : 0)) fail(USAGE);
+  for (const key of allowed[command]) if (!options[key]) fail('Missing --' + key);
+  return { command, positional, options, full };
+}
+async function runCli({ command, positional, options }) {
   const policy = await loadPolicy();
   const context = options.context ? await readContext(options.context) : {};
   if (command === 'status') return status(policy);
   if (command === 'route') return route(positional[0], context, policy);
   if (command === 'request') return request({ ...options, stage: positional[0], context }, policy);
   if (command === 'seal') return seal(options, policy);
+  if (command === 'author-task') {
+    const checked = await checkedRequest(positional[0], policy, { allowLegacy: false, allowMissingPrompt: true });
+    const r = checked.value;
+    if (r.author_task !== authorTask(r.stage, r.language_contract, r.knowledge)) fail('Author task knowledge/language content mismatch');
+    return { stage: r.stage, prompt_file: checked.promptFile, author_task: r.author_task };
+  }
   return verify(positional[0], options.sha256, policy);
 }
+// Programmatic callers retain the full result, regardless of presentation flags.
+export async function main(argv = process.argv.slice(2)) { return runCli(parseCli(argv)); }
+async function cliSummary(result, parsed) {
+  const { command, positional } = parsed;
+  if (['status', 'route', 'author-task'].includes(command)) return result;
+  const receipt = command === 'verify' ? (await jsonFile(positional[0])).value : result;
+  const req = command === 'request' ? result : (await jsonFile(await rootFile(receipt.root, relativeName(receipt.request)))).value;
+  const knowledge = req.knowledge;
+  return {
+    file: result.file ?? positional[0], sha256: result.sha256,
+    file_sha256: result.file_sha256, receipt_sha256: result.receipt_sha256,
+    state: result.state ?? req.route.state, stage: result.stage,
+    execution_model: result.execution_model, required_model: req.required_model,
+    route: req.route,
+    author_model: result.author_record?.model ?? null, author_record: result.author_record,
+    session_id: receipt.session_id, task_id: receipt.task_id,
+    prompt: command === 'request' ? { path: req.prompt, initial_sha256: req.initial_prompt_sha256 } : result.prompt,
+    language_status: result.language_status ?? (command === 'request' ? 'PENDING_PROMPT_VALIDATION' : LANGUAGE_STATUS.CURRENT),
+    language: req.language_contract?.language ?? null,
+    knowledge_status: result.knowledge_status ?? knowledge?.status ?? (req.stage === 'music_prompt' ? 'NOT_APPLICABLE' : 'LEGACY_KNOWLEDGE_UNSPECIFIED_READ_ONLY'),
+    knowledge_sha256: knowledge?.sha256 ?? null,
+    knowledge: knowledge ? { selected_ids: knowledge.selected_ids, source_mode: knowledge.source.mode } : null,
+  };
+}
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  main().then(result => { console.log(JSON.stringify(result, null, 2)); if (result.state === 'HOLD_ASTRA_AUTHOR_REQUIRED') process.exitCode = 2; }).catch(error => { console.error(error.message); process.exitCode = 1; });
+  (async () => {
+    const parsed = parseCli(process.argv.slice(2));
+    const result = await runCli(parsed);
+    console.log(JSON.stringify(parsed.full ? result : await cliSummary(result, parsed), null, parsed.full ? 2 : undefined));
+    if (result.state === 'HOLD_ASTRA_AUTHOR_REQUIRED') process.exitCode = 2;
+  })().catch(error => { console.error(error.message); process.exitCode = 1; });
 }

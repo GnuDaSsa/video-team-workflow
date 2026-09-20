@@ -143,3 +143,7 @@ New native Aside image/Seedance prompts and music production instructions defaul
 ## 2026-09-20: Native Aside knowledge binding
 
 Reuse the legacy router idea, not its operational defaults: image/video uses a reviewed 17-card creative corpus, six complete cards/9k cap, live wiki/upstream/source hashes, explicit snapshot fallback, actual Astra packet acknowledgement, and request-to-provider binding. Old language-only receipts stay audit-only. Do not auto-ingest archived/project/owner/API rules or treat community heuristics as provider guarantees. Current tests measure file/data flow, not semantic reasoning or generated visual quality. Legacy projects and dirty worktree are preserved.
+
+## 2026-09-20: Lean native entry
+
+Prefer one short entry and stage-only reference loading. Jev is optional for unresolved ambiguity, not a mandatory hop. Compact CLI summaries and a validated author-task view replace repeated JSON dumps; persisted evidence, JS APIs and production safety checks remain intact. Do not reload unchanged docs/status in the same context or retain historical release narratives in active state.

@@ -99,3 +99,7 @@ For every new native Aside image/video/music task or follow-up edit, load aside-
 ## Image/video wiki use
 
 New native requests automatically select and embed scoped creative knowledge before Astra authorship. Keep Knowledge-SHA256 alongside Prompt-SHA256 in the actual author response. Never substitute full old image/Seedance skill reads for this reviewed packet. Missing/mutated live source is review-needed, not permission to fallback to an old snapshot. See references/knowledge.md and the current contract for observable selection/acknowledgement versus semantic/quality claims.
+
+## Lean operating default
+
+Follow the concise current native skill; read only the active stage and reorient after session/context/rule changes. Keep Astra/English/wiki/reference/mode/submission/QC checks, but avoid repetitive policy prose, full request/payload dumps, unnecessary Jev calls and fake-adapter experiments. Use --full only for a specific diagnostic. See the native-lean contract for measured character/byte reductions, not claimed token/latency gains.

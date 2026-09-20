@@ -1,52 +1,12 @@
-# Persistent prompt-language contract
+# 언어 예외
 
-## Default and precedence
+기본은 SKILL.md의 영어 계약이다. 한국어 대화나 옛 예시는 override가 아니다.
 
-- New image and Seedance provider prompts use **English (en-US)** by default.
-- Music style/production instructions are also English by default. Literal lyrics,
-  spoken dialogue and required on-screen text retain the language requested by the
-  user. Korean planning, explanation and progress messages remain fine.
-- A Korean conversation, old example, file/skill name or existing project's old
-  default does not authorize Korean prompt prose for a new task.
-- Only a current explicit task/project language instruction overrides the default.
-  Record it in `context.prompt_language_override` with `language`, a nonempty
-  `reason`, and the actual `user_instruction`. Do not fabricate a quote or infer consent from a language mix.
-- Record required verbatim text in `context.preserved_literals`. This list is for
-  actual lyrics/dialogue/signage, not a way to exempt the entire descriptive prompt.
-- Older Codex Korean-default / block-scoped English rules apply to their historical
-  project contracts only. They do not override the native Aside default here.
+- context.user_instruction에 실제 요청을 넣는다. 가사·대사·화면 문자는 preserved_literals 배열로 원문 보존한다. 설명 전체를 literal로 감싸 검사를 우회하지 않는다.
+- 사용자가 다른 프롬프트 언어를 명시한 작업만 아래 override를 기록한다. 인용이나 승인 근거를 만들지 않는다.
 
-## Enforced handoff
+`{"prompt_language_override":{"language":"ko-KR","reason":"Explicit task language choice","user_instruction":"이번 프롬프트는 한국어로 작성해 주세요."},"preserved_literals":[]}`
 
-1. Copy the read-only session-context result and add `context.user_instruction`
-   containing the actual user request before `harness request`. Do not ask the user
-   to repeat it or invent an English-language approval; English is already the default.
-   `harness request` resolves the language contract before Astra writes the prompt.
-   Include the emitted `author_task` and `language_contract` in the real author
-   assignment; do not prepend a conflicting Korean-writing request.
-2. Astra writes/edits/translates the final prompt. The executor never translates,
-   summarizes, or silently substitutes a different language after acceptance.
-3. `seal`, `submission prepare` and `submission verify` bind and validate the same
-   contract and full original text. Unknown or tampered metadata fails closed.
-4. Current input requires `language_status=CURRENT_POLICY_VALIDATED`. Legacy
-   schema-1 evidence may be read for audit as `LEGACY_UNSPECIFIED_READ_ONLY`, but
-   must not be promoted to a new submission without a new Astra request/handoff.
-5. Keep old accepted prompts, test assets, receipts and submitted jobs unchanged.
-   A new language revision requires new request/receipt/payload files.
+request→seal→payload는 같은 계약과 실제 원문을 검증한다. 실패하면 Astra가 수정하며 실행자는 번역하지 않는다. 신규 입력은 CURRENT_POLICY_VALIDATED만 사용한다. legacy 인수증은 읽기 검증만 허용하며 원본을 덮어쓰지 않는다.
 
-Example task-level exception (only when actually requested):
-
-```json
-{"prompt_language_override":{"language":"ko-KR","reason":"Explicit language choice for this task","user_instruction":"이번 영상 프롬프트는 한국어로 작성해 주세요."},"preserved_literals":[]}
-```
-
-Example English prompt with exact Korean spoken text:
-
-```json
-{"user_instruction":"Make an English video prompt with the exact spoken greeting 안녕하세요.","preserved_literals":["안녕하세요"]}
-```
-
-The local English guard detects unexpected non-Latin scripts outside the declared
-literals. It is **not** a semantic English-language or translation-quality detector;
-Latin-script non-English text still needs Astra/executor review. Language switching
-is not a way around provider policy and is not a proven quality/speed improvement.
+문자 검사는 의미상 영어/번역 품질 검사가 아니다. 언어 변경은 provider 정책 우회나 품질/속도 향상의 증거가 아니다.

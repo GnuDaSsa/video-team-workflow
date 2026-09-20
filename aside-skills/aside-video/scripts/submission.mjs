@@ -131,22 +131,52 @@ export async function verify(payloadFile, acceptedHash) {
   await checkReferences(payload.references);
   return { state: STATE, file: payloadFile, payload_sha256: acceptedHash, stage: payload.stage, provider: payload.provider, language_status: legacy ? LANGUAGE_STATUS.LEGACY : LANGUAGE_STATUS.CURRENT, knowledge_status: checked.knowledge_status, knowledge_sha256: checked.knowledge_sha256, payload };
 }
-const USAGE = 'Usage: prepare --stage image_prompt|music_prompt|seedance_prompt --receipt ABS --sha256 ACCEPTED_RECEIPT_SHA256 --out ABS [--references JSON_FILE] | verify ABS_PAYLOAD --sha256 ACCEPTED_PAYLOAD_SHA256';
-export async function main(argv = process.argv.slice(2)) {
+const USAGE = 'Usage: prepare --stage image_prompt|music_prompt|seedance_prompt --receipt ABS --sha256 ACCEPTED_RECEIPT_SHA256 --out ABS [--references JSON_FILE] | verify ABS_PAYLOAD --sha256 ACCEPTED_PAYLOAD_SHA256 [--full]';
+function parseCli(argv) {
   const [command, ...args] = argv;
   if (!['prepare', 'verify'].includes(command)) fail(USAGE);
   const allowed = command === 'prepare' ? ['stage', 'receipt', 'sha256', 'out', 'references'] : ['sha256'];
   const options = Object.create(null), positional = [];
+  let full = false;
   for (let i = 0; i < args.length; i++) {
-    if (!args[i].startsWith('--')) { positional.push(args[i]); continue; }
+    if (args[i] === '--full') { if (full) fail('Repeated --full'); full = true; continue; }
+    if (!args[i].startsWith('-')) { positional.push(args[i]); continue; }
     const name = args[i].slice(2);
-    if (!allowed.includes(name) || Object.hasOwn(options, name) || !args[i + 1] || args[i + 1].startsWith('--')) fail(`Invalid option: ${args[i]}. ${USAGE}`);
+    if (!args[i].startsWith('--') || !allowed.includes(name) || Object.hasOwn(options, name) || !args[i + 1] || args[i + 1].startsWith('-')) fail(`Invalid option: ${args[i]}. ${USAGE}`);
     options[name] = args[++i];
   }
   if (positional.length !== (command === 'verify' ? 1 : 0)) fail(USAGE);
   for (const name of allowed.filter(name => name !== 'references')) if (!options[name]) fail(`Missing --${name}. ${USAGE}`);
+  return { command, options, positional, full };
+}
+async function runCli({ command, options, positional }) {
   return command === 'prepare' ? prepare(options) : verify(positional[0], options.sha256);
 }
+// Keep the full payload available to trusted JS adapters and existing callers.
+export async function main(argv = process.argv.slice(2)) { return runCli(parseCli(argv)); }
+async function cliSummary(result) {
+  const payload = result.payload ?? json(await bytes(result.file));
+  const receipt = json(await bytes(payload.receipt.path));
+  const request = json(await bytes(path.resolve(receipt.root, receipt.request)));
+  return {
+    state: result.state, file: result.file, file_sha256: result.file_sha256,
+    payload_sha256: result.payload_sha256, receipt_sha256: payload.receipt.sha256,
+    stage: result.stage, provider: result.provider,
+    author_model: payload.author_record.model, author_session_id: payload.author_session_id,
+    author_record: payload.author_record, route: request.route,
+    language_status: result.language_status ?? LANGUAGE_STATUS.CURRENT,
+    language: payload.language_contract?.language ?? null,
+    knowledge_status: result.knowledge_status ?? (request.knowledge ? 'CURRENT_KNOWLEDGE_VALIDATED' : 'NOT_APPLICABLE'),
+    knowledge_sha256: payload.knowledge_sha256 ?? null,
+    knowledge: request.knowledge ? { selected_ids: request.knowledge.selected_ids, source_mode: request.knowledge.source.mode } : null,
+    prompt: { path: receipt.prompt.path, sha256: payload.prompt_sha256, bytes: Buffer.byteLength(payload.prompt, 'utf8'), characters: payload.prompt.length },
+    references_count: payload.references.length,
+  };
+}
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  main().then(result => console.log(JSON.stringify(result, null, 2))).catch(error => { console.error(error.message); process.exitCode = 1; });
+  (async () => {
+    const parsed = parseCli(process.argv.slice(2));
+    const result = await runCli(parsed);
+    console.log(JSON.stringify(parsed.full ? result : await cliSummary(result), null, parsed.full ? 2 : undefined));
+  })().catch(error => { console.error(error.message); process.exitCode = 1; });
 }

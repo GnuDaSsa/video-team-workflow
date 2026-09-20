@@ -1,9 +1,8 @@
 <!-- aside-video-workflow:start -->
-## 영상팀 신규 제작 기본값과 재개
+## 영상팀
 
-- 새 이미지·영상·Seedance 제작 및 후속 수정은 현재 `aside-video` 스킬과 `references/author-executor.md`, `references/prompt-language.md`부터 읽고 시작한다. 새 세션/모델에서도 오래된 대화의 절차를 재사용하지 않는다.
-- **생성용 이미지·영상 프롬프트와 음악 제작 지시는 기본 영어(en-US)**다. 한국어 대화/진행 설명과 실제 가사·대사·화면 문자 원문은 별개다. 현재 작업의 명시적 다른 언어 요청만 근거 있는 override로 남긴다. 예전 Codex 문서의 한국어 기본값이 신규 Aside 영어 기본값을 덮어쓰지 않는다.
-- 실행자는 현재 세션 유지(inherit_session), 저작·번역·의미 수정은 실제 Astra, 다음 작업 추천은 Jev다. 정상 UI 동작은 짧게 묶고 동일 에셋은 hash-bound 기록으로 검색 재사용한다. 새 업로드는 실행자 세션의 허용 경로에 둔 동일 바이트만 사용한다.
-- Astra 언어 계약과 실제 응답·해시 검증을 통과한 `CURRENT_POLICY_VALIDATED` payload만 입력한다. 언어 없는 과거 인수증은 읽기 검증만 가능하고 새 입력으로 자동 승격하지 않는다. 팝업이 열려 있으면 prompt 입력을 멈추고 fresh snapshot의 실제 URL·모드로 다시 확인한다.
-- 신규 이미지·Seedance는 `aside-video/references/knowledge.md`의 bounded wiki 패킷을 실제 Astra 저작에 전달하고 Knowledge-SHA256 확인까지 결속한다. raw/구형 스킬/legacy owner·언어·API 규칙을 자동 로드하지 않는다.
+- 신규 이미지·영상·음악 및 후속 수정은 현재 aside-video/SKILL.md의 해당 단계만 따른다. 새 세션/압축/지침 변경 때 복원하며 같은 문맥의 불변 문서를 매번 전체 재독하지 않는다.
+- 실행은 현재 세션, 문구 저작·수정은 실제 gpt-6-astra. 영어 기본이며 지정 가사·대사·화면 문자는 원문 보존. 이미지는 웹 ChatGPT Images 2.5, 영상은 승인한 Runway Reference 경로다.
+- 입력은 request→실제 Astra 응답→seal→submission 검증 원문만. image/video 지식 확인도 결속한다. 구형 인수증·자기 선언·fixture로 승인하지 않는다.
+- 정상 작업은 직접 진행하고 Jev는 모호할 때만. 정확한 에셋 재사용, fresh URL/모드/모달 확인, 단일 제출과 실제 QC는 유지한다. 전체 규칙·JSON·진행 이력을 반복 출력하지 않는다.
 <!-- aside-video-workflow:end -->
