@@ -1,9 +1,45 @@
-# Codex 영상팀 워크플로
+# 영상팀 워크플로: native Aside + Codex 호환
 
 Canonical source for the user's video workflow. Project/media data stays outside
 this repository. Active rules are latest-only; history belongs to Git/archive.
 
-## 실행 모델
+## 신규 native Aside 제작의 진입점
+
+**새 Aside 제작과 후속 수정은 `aside-skills/aside-video/SKILL.md`가 우선한다.**
+이미지·Seedance 생성용 원문과 음악 제작 지시는 **영어(en-US) 기본**이다.
+한국어 대화·브리프와 실제 가사·대사·화면 문자의 언어는 별개다. 작업별 명시
+예외만 기록하며, 아래 legacy Codex의 한국어 기본값을 신규 Aside에 가져오지 않는다.
+
+- 실행: 사용자가 연 현재 세션 유지(`inherit_session`, Luna로 시작하면 Luna).
+- 저작·번역·의미 수정: 실제 Astra, 요청/응답/해시/언어 계약으로 인수.
+- Jev: 제한된 다음 단계 추천만. 브라우저 실행·Generate·승인 권한 없음.
+- 기존 에셋 hash-bound 검색 재사용, 최초 업로드만 실행자 허용 경로로 첨부.
+- fresh snapshot URL/Reference 모드, 팝업 차단, 검증 원문 입력과 단일 제출 유지.
+- legacy 인수증은 읽기 검증만 허용하며 새 입력 계약으로 자동 승격하지 않는다.
+
+설치 및 같은 내용인지 확인:
+
+```sh
+node tools/deploy_aside_workflow.mjs --apply --account-root /absolute/aside/account
+node tools/deploy_aside_workflow.mjs --check --account-root /absolute/aside/account
+# source 변경을 검토하고 테스트한 뒤에만 manifest 갱신:
+node tools/deploy_aside_workflow.mjs --freeze
+```
+
+이 설치는 해당 계정의 `skills/user/aside-video`와 AGENTS의 관리 블록만 다룬다.
+기존 파일은 백업하며 키·설정·프로젝트/미디어·에셋 원장은 배포하지 않는다.
+Codex 기술 문구/음악 소스가 필요한 경우 해당 로컬 스킬을 별도로 유지한다.
+실제 모델 호출은 native Aside 도구가 수행하며 이 저장소가 상주 실행자를 만들지 않는다.
+
+```sh
+# 기존 scratch 폴더를 지정한다. 테스트는 합성 입력과 mock transport만 사용한다.
+JEV_QC_TEST_TMP=/absolute/scratch TMPDIR=/absolute/scratch \
+  node --test aside-skills/aside-video/scripts/*.test.mjs tools/deploy_aside_workflow.test.mjs
+```
+
+계약과 검증 범위: `docs/contracts/2026-09-20-aside-english-workflow.md`.
+
+## 기존 Codex 프로젝트의 호환 실행 모델
 
 기본은 **현재 대화의 한 작업자**가 아래 역할을 순차 수행한다. 역할 변경은
 새 에이전트 생성이나 자동 모델 변경을 뜻하지 않는다.
@@ -19,7 +55,7 @@ Seedance production → Seedance QC → Editor/CapCut → Package`
 - v4 조회 명령은 자동 정리를 실행하지 않는다. 승인 게이트를 통과한 lane dispatch 경로의 기존
   24시간 정리와 명시적 정리 명령만 해당 정책을 따른다. 미디어 이관은 별도 요청.
 
-## 권위
+## 기존 Codex 호환 경로의 권위
 
 | 범위 | 단일 소유자 |
 |---|---|
@@ -31,7 +67,7 @@ Seedance production → Seedance QC → Editor/CapCut → Package`
 | 스폰 승인 | `team-policies/subagent_approval_gate_20260721.md` |
 | 이야기·연출·편집 품질 | `codex-skills/videodirector/` |
 
-## 배포와 검증
+## 기존 Codex 배포와 검증
 
 ```bash
 python3 -m unittest discover -s runtime/tests -v

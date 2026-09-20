@@ -91,3 +91,7 @@ rules. Canonical content and verification: `docs/releases/2026-09-08-hell-grind/
 ## Scheduled/QC closeout reliability
 
 Use the canonical Seedance production branch for native schedule state and runtime seedance_qc template for coverage. The 2026-09-14 release fixes local/native cadence drift and current-scope history false positives, reuses source-bound reviewed intervals, and keeps frame samples separate from playback/audio. It does not automate perception or prove the next due run. See docs/releases/2026-09-14/scheduled-production-qc.md; do not clone the rules into project folders.
+
+## Native Aside workflow entry and prompt language
+
+For every new native Aside image/video/music task or follow-up edit, load aside-skills/aside-video and the managed account AGENTS entry. English provider prose is the standing default; task-specific explicit language overrides and exact spoken/lyric/on-screen literals are separate. The executor never translates an accepted Astra payload. Reuse identical uploaded assets by workspace plus content hash; first-upload staging must be inside the actual executor session. Do not fill behind an open dialog or trust a cached newSession URL. See the 2026-09-20 contract for deployment and legacy compatibility boundaries.

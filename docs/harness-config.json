@@ -7,8 +7,8 @@
     "contractsDir": "docs/contracts"
   },
   "commands": {
-    "verifyQuick": "python3 -m py_compile runtime/scripts/*.py && python3 -m unittest discover -s runtime/tests -v && zsh -n tools/deploy_skills_to_codex.sh",
-    "verifyFull": "python3 -m unittest discover -s runtime/tests -v && ./tools/deploy_skills_to_codex.sh --check",
+    "verifyQuick": "JEV_QC_TEST_TMP=${JEV_QC_TEST_TMP:-${TMPDIR:-/tmp}} node --test aside-skills/aside-video/scripts/*.test.mjs tools/deploy_aside_workflow.test.mjs && python3 -m py_compile runtime/scripts/*.py && python3 -m unittest discover -s runtime/tests -v && zsh -n tools/deploy_skills_to_codex.sh",
+    "verifyFull": "JEV_QC_TEST_TMP=${JEV_QC_TEST_TMP:-${TMPDIR:-/tmp}} node --test aside-skills/aside-video/scripts/*.test.mjs tools/deploy_aside_workflow.test.mjs && python3 -m py_compile runtime/scripts/*.py && python3 -m unittest discover -s runtime/tests -v && zsh -n tools/deploy_skills_to_codex.sh && node tools/deploy_aside_workflow.mjs --check --account-root \"${ASIDE_ACCOUNT_ROOT:-$HOME/.aside/u/0}\" && ./tools/deploy_skills_to_codex.sh --check",
     "docsGenerate": ""
   },
   "rules": {

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "author_model": "gpt-6-astra",
+  "author_stages": ["music_prompt", "image_prompt", "seedance_prompt"],
+  "executor_stages": ["brief", "planning", "storyboard", "computer_use", "music_generate", "image_generate", "seedance_generate", "download", "image_qc", "video_qc", "audio_qc", "edit", "package"],
+  "execution_model": "inherit_session",
+  "author_effort": "inherit_author_session",
+  "preferred_author_effort": "xhigh",
+  "image_provider": "chatgpt_web",
+  "image_product": "ChatGPT Images 2.5"
+}

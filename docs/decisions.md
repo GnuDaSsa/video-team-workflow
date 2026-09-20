@@ -135,3 +135,7 @@ Evidence, scoped deployment and verification: `docs/releases/2026-09-08-hell-gri
 ## Scheduled continuation and bounded QC evidence
 
 A successful native reservation is distinct from local cadence, actual execution, and media approval. Shared Seedance snapshot/cadence checks and runtime source-bound QC coverage now enforce those distinctions. Stable reservation prompts point to current state rather than freezing mutable counts. Resolved failure is a disposition, not a PASS; repeat input failures require a causal input/spatial correction instead of more negative prose. Canonical owners and live limits: docs/releases/2026-09-14/scheduled-production-qc.md.
+
+## 2026-09-20 — Native Aside English-default workflow
+
+New native Aside image/Seedance prompts and music production instructions default to English; Korean conversation is not an implicit language override. User literals retain their requested language. Schema-2 request/receipt/payload binds the language contract and actual Astra author; legacy language-unspecified evidence is read-only. The current session executes, Jev advises bounded next actions, and asset/hash/mode/popup/URL gates remain. Native Aside source lives under aside-skills with scoped hash-checked deployment. Existing Codex project contracts and unrelated dirty worktree changes are preserved, not hot-deployed or silently repaired.

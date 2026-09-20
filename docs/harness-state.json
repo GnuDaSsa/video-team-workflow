@@ -1,16 +1,16 @@
 {
-  "currentGoal": "Resume existing production owner without fabricating idle; verify direct executor action",
-  "status": "blocked",
-  "currentContract": "docs/contracts/2026-09-08-session-monitor-consistency.md",
+  "currentGoal": "Persist the native Aside workflow with English-default Astra authoring and checked deployment",
+  "status": "completed_with_legacy_parity_warning",
+  "currentContract": "docs/contracts/2026-09-20-aside-english-workflow.md",
   "blockers": [
-    "Live continuation: Aside currently contains another project session; exact intended session restoration required."
+    "Pre-existing legacy Codex source/live parity differs in five managed files plus its source manifest; this release does not hot-deploy or rewrite that active runtime."
   ],
-  "nextStep": "Restore exact original Aside session, then resume existing owner and automation-2. S09/S10 completion/QC unverified.",
-  "lastUpdated": "2026-09-09T19:22:04.526334+09:00",
+  "nextStep": "Use the native Aside entry and current-language payload gate for new work. Reconcile legacy Codex drift separately before legacy deployment.",
+  "lastUpdated": "2026-09-20T04:32:17.042Z",
   "verification": {
-    "lastCommand": "152 tests; Python compile; shell syntax; diff check; release freeze/preflight/apply/check",
-    "lastResult": "PASS_EXPLICIT_RESUME_DEPLOYED",
-    "notes": "152 tests and 66-file parity PASS. Native Luna/high context and actual CUA session read verified, no echo-only result. Found other-project session collision; no media mutations. automation-2 reactivated then PAUSED. Owner still sent substantive result message despite final-only instruction."
+    "lastCommand": "Aside 368 tests + deployer 5 tests; legacy 188 tests; Python compile; shell syntax; native Aside frozen source/live parity; diff check",
+    "lastResult": "PASS_NATIVE_ASIDE_WITH_LEGACY_PARITY_WARNING",
+    "notes": "Native Aside source and installed skill/AGENTS block match. Legacy deploy --check reports pre-existing SOURCE_MANIFEST_DRIFT and five LIVE_HASH_MISMATCH files. No new provider generation, language rewrite of old media, or global model/category change in this release."
   },
   "recentCloseouts": [
     {
@@ -109,5 +109,14 @@
       },
       "nextStep": "Existing authorized task continues unresolved QC under deployed workflow; observe the next scheduled run separately. Preserve unrelated blocked main goal."
     }
-  ]
+  ],
+  "preservedProductionState": {
+    "currentGoal": "Resume existing production owner without fabricating idle; verify direct executor action",
+    "status": "blocked",
+    "currentContract": "docs/contracts/2026-09-08-session-monitor-consistency.md",
+    "blockers": [
+      "Live continuation: Aside currently contains another project session; exact intended session restoration required."
+    ],
+    "nextStep": "Restore exact original Aside session, then resume existing owner and automation-2. S09/S10 completion/QC unverified."
+  }
 }
