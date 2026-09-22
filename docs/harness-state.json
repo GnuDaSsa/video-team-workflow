@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Remove native video instruction and output bloat while retaining production-critical gates",
+  "currentGoal": "Revalidate current typography knowledge source provenance after reviewed upstream change",
   "status": "completed",
-  "currentContract": "docs/contracts/2026-09-20-native-lean.md",
+  "currentContract": "docs/contracts/2026-09-22-typography-source-review.md",
   "blockers": [],
-  "nextStep": "Use the concise stage entry and compact CLI output; load --full or optional references only for a concrete diagnostic need.",
-  "lastUpdated": "2026-09-20T06:39:40.090Z",
+  "nextStep": "Resume the active native typography request with a fresh real Astra acknowledgement; no validator bypass.",
+  "lastUpdated": "2026-09-22T09:23:13.787022+00:00",
   "verification": {
-    "lastCommand": "configured verifyQuick; frontmatter; installed source parity; real existing image/video payload CLI verification",
-    "lastResult": "PASS_NATIVE_LEAN",
-    "notes": "451 native/deployer tests and 188 legacy tests pass. Instruction chars: 56,726 -> 13795; SKILL: 14,464 -> 2,247. Global account entry: 2,161 -> 615. Synthetic request stdout -87.2%; existing real payload verification stdout -49%/-56%. Actual prior Astra/English/knowledge receipts remain valid. No media generation or measured production token/latency claim. Existing legacy deployment drift remains outside scope."
+    "lastCommand": "TMPDIR=/private/tmp JEV_QC_TEST_TMP=/private/tmp node --test aside-skills/aside-video/scripts/*.test.mjs tools/deploy_aside_workflow.test.mjs; deploy freeze/apply/check u1; harness validate; git diff --check",
+    "lastResult": "PASS_451_NATIVE_TESTS_AND_U1_PARITY",
+    "notes": "Reviewed live typography source and unchanged selected mode/role sections. Only catalog provenance metadata/source hash and frozen manifest changed; compiled card prose and validator code unchanged. First targeted run failed on macOS /tmp symlink fixtures; rerun with canonical /private/tmp passed all 451 tests. Legacy Python/full deployment suite not run because no legacy/code change. Real media quality remains outside this provenance maintenance check."
   },
   "knownWarnings": [
     "Existing legacy Codex source/live deployment drift is unchanged.",
