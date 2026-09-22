@@ -91,3 +91,7 @@ rules. Canonical content and verification: `docs/releases/2026-09-08-hell-grind/
 ## Scheduled/QC closeout reliability
 
 Use the canonical Seedance production branch for native schedule state and runtime seedance_qc template for coverage. The 2026-09-14 release fixes local/native cadence drift and current-scope history false positives, reuses source-bound reviewed intervals, and keeps frame samples separate from playback/audio. It does not automate perception or prove the next due run. See docs/releases/2026-09-14/scheduled-production-qc.md; do not clone the rules into project folders.
+
+
+## 퇴역한 타이포 참조
+정선 타이포 스킬 폐기 기록과 검증은 `docs/contracts/2026-09-22-retire-jeongseon-typography.md`에 있다.

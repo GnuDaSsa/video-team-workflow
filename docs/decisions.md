@@ -135,3 +135,7 @@ Evidence, scoped deployment and verification: `docs/releases/2026-09-08-hell-gri
 ## Scheduled continuation and bounded QC evidence
 
 A successful native reservation is distinct from local cadence, actual execution, and media approval. Shared Seedance snapshot/cadence checks and runtime source-bound QC coverage now enforce those distinctions. Stable reservation prompts point to current state rather than freezing mutable counts. Resolved failure is a disposition, not a PASS; repeat input failures require a causal input/spatial correction instead of more negative prose. Canonical owners and live limits: docs/releases/2026-09-14/scheduled-production-qc.md.
+
+
+## 정선 타이포 참조 폐기
+사용자 실패작 지정에 따른 스킬·자동 참조 제거. 단일 소유 기록: `docs/contracts/2026-09-22-retire-jeongseon-typography.md`.

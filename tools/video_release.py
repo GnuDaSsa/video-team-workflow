@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / 'docs/releases/2026-09-06/manifest.json'
 SKILLS = ('seedance-prompt-en', 'seedance25-prompt-en', 'videodirector')
 RETIRED = [
+    '.codex/skills/jeongseon-video-typography',
     '.codex/skills/seedance-creative-prompt-team',
     '.codex/skills/seedance-prompt-en/archive',
     '.local/bin/video-image-cli',

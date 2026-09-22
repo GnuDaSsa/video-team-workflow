@@ -6,7 +6,7 @@
     "Live continuation: Aside currently contains another project session; exact intended session restoration required."
   ],
   "nextStep": "Restore exact original Aside session, then resume existing owner and automation-2. S09/S10 completion/QC unverified.",
-  "lastUpdated": "2026-09-09T19:22:04.526334+09:00",
+  "lastUpdated": "2026-09-22T14:52:03+09:00",
   "verification": {
     "lastCommand": "152 tests; Python compile; shell syntax; diff check; release freeze/preflight/apply/check",
     "lastResult": "PASS_EXPLICIT_RESUME_DEPLOYED",
@@ -108,6 +108,18 @@
         "notes": "68-file parity. Existing native reservation same ID/task/30min/policy verified after stable prompt update; local 20min drift corrected. Actual QC evidence reuse verified, no media promotion. No post-update scheduled run or new generated-quality verification."
       },
       "nextStep": "Existing authorized task continues unresolved QC under deployed workflow; observe the next scheduled run separately. Preserve unrelated blocked main goal."
+    },
+    {
+      "id": "2026-09-22-retire-jeongseon-typography",
+      "status": "complete",
+      "contract": "docs/contracts/2026-09-22-retire-jeongseon-typography.md",
+      "completedAt": "2026-09-22T14:52:03+09:00",
+      "verification": {
+        "result": "PASS_SCOPED_RETIREMENT",
+        "tests": 191,
+        "live_skill_active": false,
+        "not_run": "Full bundle deploy/parity; existing unrelated drift preserved. Fresh app-session discovery UI."
+      }
     }
   ]
 }
