@@ -147,3 +147,7 @@ Reuse the legacy router idea, not its operational defaults: image/video uses a r
 ## 2026-09-20: Lean native entry
 
 Prefer one short entry and stage-only reference loading. Jev is optional for unresolved ambiguity, not a mandatory hop. Compact CLI summaries and a validated author-task view replace repeated JSON dumps; persisted evidence, JS APIs and production safety checks remain intact. Do not reload unchanged docs/status in the same context or retain historical release narratives in active state.
+
+
+## 정선 타이포 참조 폐기
+사용자 실패작 지정에 따른 스킬·자동 참조 제거. 단일 소유 기록: `docs/contracts/2026-09-22-retire-jeongseon-typography.md`.

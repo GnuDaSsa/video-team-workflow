@@ -1,7 +1,7 @@
 ---
 title: Video Typography Operating Manual
 created: 2026-05-12
-updated: 2026-06-09
+updated: 2026-09-22
 type: concept
 tags: [video, multimodal, method]
 sources: [video-typography/hourly/2026-05-12-09.md, video-typography/hourly/2026-05-12-20.md]
@@ -219,11 +219,6 @@ Contrast/size/shadow만 좋아진 export는 “증상 개선”일 수 있지만
 - If a rejected typography project has both an old delivery handoff and a newer study contract, the old handoff must be explicitly marked superseded before editing resumes.
 - A handoff that still classifies many rows as `BODY` or keeps old font-family suggestions can silently pull the editor back into the rejected look, even when a new font file exists.
 - For ACC, the post-04 editor must ignore the old Gothic/Noto/body-caption contract and start from row reduction + Gowun Batang / Wanted Sans / SUIT role pairing.
-
-## Update 2026-06-09 01:12KST — skill assimilation gate for CapCut typography
-- Before resuming a rejected CapCut typography pass, re-apply project skills as execution gates, not advice: layer separation, scene-first placement, cultural signage tone, scene-material shadow, and proof that effects are not hiding weak copy structure.
-- For ACC, VideoDirector + Jeongseon typography rules were converted into `ACC_skill_assimilation_typography_rules_STUDY_ONLY_20260609.md`.
-- Practical gate: no next export until visible proof distinguishes title/theme label/signage/final/disclosure roles; a readable but uniform subtitle system still fails.
 
 ## Update 2026-06-09 01:16KST — institutional palette is not color tweaking
 - For public cultural/institution videos, a palette pass is valid only when tied to brand/institutional hierarchy and scene contrast. Random hue swaps remain a fail.

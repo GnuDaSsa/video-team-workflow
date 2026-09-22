@@ -344,6 +344,7 @@
     }
   ],
   "retired": [
+    ".codex/skills/jeongseon-video-typography",
     ".codex/skills/seedance-creative-prompt-team",
     ".codex/skills/seedance-prompt-en/archive",
     ".local/bin/video-image-cli",

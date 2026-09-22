@@ -4,7 +4,7 @@
   "currentContract": "docs/contracts/2026-09-20-native-lean.md",
   "blockers": [],
   "nextStep": "Use the concise stage entry and compact CLI output; load --full or optional references only for a concrete diagnostic need.",
-  "lastUpdated": "2026-09-20T06:39:40.090Z",
+  "lastUpdated": "2026-09-22T14:54:10+09:00",
   "verification": {
     "lastCommand": "configured verifyQuick; frontmatter; installed source parity; real existing image/video payload CLI verification",
     "lastResult": "PASS_NATIVE_LEAN",
@@ -13,5 +13,21 @@
   "knownWarnings": [
     "Existing legacy Codex source/live deployment drift is unchanged.",
     "Character/byte reductions are measured; production model-token/latency gains are not."
+  ],
+  "recentCloseouts": [
+    {
+      "id": "2026-09-22-retire-jeongseon-typography",
+      "status": "complete",
+      "contract": "docs/contracts/2026-09-22-retire-jeongseon-typography.md",
+      "completedAt": "2026-09-22T14:52:03+09:00",
+      "verification": {
+        "result": "PASS_SCOPED_RETIREMENT",
+        "tests": 191,
+        "live_skill_active": false,
+        "not_run": "Full bundle deploy/parity; existing unrelated drift preserved. Fresh app-session discovery UI.",
+        "native_tests": 451,
+        "native_test_environment": "TMPDIR and JEV_QC_TEST_TMP=/private/tmp to avoid macOS /tmp symlink in strict real-path fixtures"
+      }
+    }
   ]
 }

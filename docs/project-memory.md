@@ -103,3 +103,7 @@ New native requests automatically select and embed scoped creative knowledge bef
 ## Lean operating default
 
 Follow the concise current native skill; read only the active stage and reorient after session/context/rule changes. Keep Astra/English/wiki/reference/mode/submission/QC checks, but avoid repetitive policy prose, full request/payload dumps, unnecessary Jev calls and fake-adapter experiments. Use --full only for a specific diagnostic. See the native-lean contract for measured character/byte reductions, not claimed token/latency gains.
+
+
+## 퇴역한 타이포 참조
+정선 타이포 스킬 폐기 기록과 검증은 `docs/contracts/2026-09-22-retire-jeongseon-typography.md`에 있다.
