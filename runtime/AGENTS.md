@@ -63,16 +63,34 @@ flowchart TD
 - v4 Planner 진입은 `music.status=LOCKED`만으로 통과하지 않는다. 선택된
   `music.asset_id`(또는 정확한 등록 경로), active locked audio, media 내부 실파일,
   hash, 양수 duration/audio codec 증거가 필요하다. 이전 승인 음악을 재사용할 수
-  있으나 누락 증거를 보완하지 않고 새 파일로 가장하지 않는다.
+  있으나 누락 증거를 보완하지 않고 새 파일로 가장하지 않는다. 단, 사용자가 해당
+  프로젝트에서 **음악 없이 이미지·영상 먼저**를 명시한 경우에는 §1.0b의 증거 잠금
+  예외만 Planner 진입을 허용한다.
 - Image Creator 진입은 비어 있지 않은 `multi_reference_block_map.json`의
   `blocks`, 고유 ID와 cut/shot 구조가 필요하다. 빈 `{}`나 Planner DONE 문자열은
   통과 근거가 아니다. 이 두 v4 입력 실패는 `--force`로 우회하지 않는다.
+
+### 1.0b 명시적 영상 선행·오디오 보류
+
+- 기본 음악 우선은 유지한다. 사용자가 특정 프로젝트에서 음악 작업을 중단하고
+  이미지·영상 제작만 지시했을 때만 `manifest.audio_plan.mode=
+  visual_only_no_audio`와 `delivery_scope=visual_assets_only`를 사용한다. `docs/project_overrides.md`의 해당 사용자
+  메시지 ID·프로젝트 예외, SHA-256, 목표 영상 길이, `PROVISIONAL` 타이밍을
+  기계 검증해야 한다. 누락·변조·임의 선언은 음악 잠금 대체 증거가 아니다.
+- 이 예외에서 Music lane은 `PENDING`으로 남고 `next`는 이를 건너뛰어 Planner를
+  반환한다. Planner는 브리프의 임시 시간표로 컷/15초 소스 블록을 설계하되 음악
+  박자·프레이즈·VO 호흡을 측정했다고 주장하지 않는다. 기존의 블록맵·정체성·참조·
+  Seedance attestation·실파일 QC 게이트는 유지한다.
+- 음악/VO를 만들지 않았다고 무음 WAV나 상태 `LOCKED`를 위조하지 않는다. 승인된
+  실파일로 시각 후보·편집 초안·무음 시각 에셋 패키지를 진행할 수 있다. 패키지는
+  `VISUAL_ASSETS_ONLY_NO_AUDIO`로 명시하고, 유음 완성 홍보영상이나 음악 싱크를
+  주장하지 않는다. 이는 No-I2V 자동 옵션이 아니라 프로젝트 한정 범위 예외다.
 
 ### 1.1 생성 모드
 
 - 기본 `standard_i2v`: 계획된 production cut마다 독립 source/styleframe을 만들고 QC한 뒤 I2V 입력으로 사용한다.
 - `no_i2v_reference_native`: **레퍼런스 수와 신규 이미지 생성을 최소화하고, 한글 Seedance 프롬프트로 더 많은 shot 구성·blocking·동작·camera·분위기·시간 진행을 해결한다.**
-- No-I2V에서도 위의 전체 lane 순서, 최대 3개 이미지 실행 예외, 프로젝트 `media/` 구조, `asset_registry.sqlite`, Music Lock, Seedance/편집/QC/패키지/안전 계약은 바뀌지 않는다.
+- No-I2V에서도 위의 전체 lane 순서, 최대 3개 이미지 실행 예외, 프로젝트 `media/` 구조, `asset_registry.sqlite`, Music Lock, Seedance/편집/QC/패키지/안전 계약은 바뀌지 않는다. 단, 음악 제외를 사용자가 명시한 프로젝트는 §1.0b가 해당 범위에서 우선한다.
 - Planner는 이미 승인·등록된 identity/environment reference를 먼저 재사용한다. 충분하면 신규 이미지는 0개이며, 부족할 때만 최소 provider-safe reference를 만든다.
 - No-I2V는 per-cut styleframe/start/end/keyframe을 만들거나 업로드하지 않는다. Reference는 재사용 가능한 identity/environment anchor이고, 최종 한글 prompt가 컷별 구도와 시간적 연출을 담당한다.
 - 사용자가 영상팀 진행 중 `No-I2V`를 호출하면 같은 프로젝트의 아직 제출하지 않은 block만 이 모드로 전환한다. 이미 제출된 provider job과 기존 media/provenance는 그대로 보존하며 자동 삭제·재해석하지 않는다.

@@ -16,6 +16,17 @@
   ],
   "recentCloseouts": [
     {
+      "id": "2026-09-25-seongnam-visual-only-no-audio",
+      "status": "source_verified_deployed",
+      "contract": "docs/contracts/2026-09-25-visual-only-no-audio.md",
+      "verification": {
+        "lastCommand": "194 runtime tests; Python compile; diff check; scoped release preflight/apply; 6 live hashes; project next/validate",
+        "lastResult": "PASS_SCOPED_VISUAL_ONLY_DEPLOYMENT",
+        "notes": "Project Music Lock stays NOT_LOCKED. Live next opens Planner without audio; validation ok; 15 registered images, 0 video. Unrelated source/live model_routing drift preserved."
+      },
+      "nextStep": "Sync this commit to origin/main, then resume existing Luna owner for provisional visual planning and Seedance production without music."
+    },
+    {
       "id": "2026-09-22-retire-jeongseon-typography",
       "status": "complete",
       "contract": "docs/contracts/2026-09-22-retire-jeongseon-typography.md",

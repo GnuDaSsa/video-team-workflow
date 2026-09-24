@@ -144,11 +144,57 @@ def apply(manifest: dict, root: Path, home: Path) -> dict:
     return result
 
 
+def apply_scoped(manifest: dict, root: Path, home: Path, sources: list[str]) -> dict:
+    """Deploy exact reviewed sources without overwriting unrelated live drift."""
+    errors = preflight(manifest, root, home)
+    if errors:
+        raise ValueError('; '.join(errors))
+    if not sources or len(sources) != len(set(sources)):
+        raise ValueError('SCOPED_RELEASE_REQUIRES_UNIQUE_SOURCES')
+    rows = {r['source']: r for r in manifest['files']}
+    if any(source not in rows for source in sources):
+        raise ValueError('UNKNOWN_SCOPED_RELEASE_SOURCE')
+    stamp = dt.datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+    archive = home / '.codex/archive' / (stamp + '_scoped_video_release')
+    archive.mkdir(parents=True, exist_ok=False)
+    changed = []
+    try:
+        for source in sources:
+            row = rows[source]
+            src, dst = safe_path(root, row['source']), safe_path(home, row['target'])
+            if digest(src) != row['sha256']:
+                raise ValueError('SCOPED_SOURCE_HASH_CHANGED: ' + source)
+            if dst.is_file() and digest(dst) == row['sha256']:
+                continue
+            existed = dst.exists()
+            if existed:
+                old = archive / row['target']; old.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(dst, old)
+            changed.append((dst, existed))
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            tmp = dst.with_name(dst.name + '.release-tmp')
+            shutil.copy2(src, tmp); tmp.replace(dst)
+            if digest(dst) != row['sha256']:
+                raise ValueError('SCOPED_POST_DEPLOY_HASH_MISMATCH: ' + source)
+    except Exception:
+        for dst, existed in reversed(changed):
+            if existed:
+                shutil.copy2(archive / dst.relative_to(home), dst)
+            elif dst.exists():
+                dst.unlink()
+        raise
+    result = {'ok': True, 'scope': sources, 'changed_files': len(changed),
+              'full_parity_claimed': False, 'archive': str(archive)}
+    (archive / 'receipt.json').write_text(json.dumps(result, indent=2) + '\n')
+    return result
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('action', choices=['freeze', 'preflight', 'check', 'apply'])
+    p.add_argument('action', choices=['freeze', 'preflight', 'check', 'apply', 'apply-scoped'])
     p.add_argument('--home', type=Path, default=Path.home())
     p.add_argument('--manifest', type=Path, default=MANIFEST)
+    p.add_argument('--source', action='append', default=[], help='Exact mapped source for apply-scoped; repeat per file')
     args = p.parse_args()
     try:
         if args.action == 'freeze':
@@ -162,6 +208,8 @@ def main() -> int:
             elif args.action == 'preflight':
                 errors = preflight(data, ROOT, args.home)
                 result = {'ok': not errors, 'errors': errors, 'note': 'preflight is not live parity'}
+            elif args.action == 'apply-scoped':
+                result = apply_scoped(data, ROOT, args.home, args.source)
             else:
                 result = apply(data, ROOT, args.home)
         print(json.dumps(result, ensure_ascii=False, indent=2))

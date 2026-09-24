@@ -20,6 +20,7 @@ import shot_semantics
 import media_registry as registry
 import lane_inputs
 import lane_gates
+import generation_settings
 import prompt_packet_utils as packets
 import video_release
 import video_codex_runtime as runtime
@@ -168,8 +169,80 @@ class InputEvidenceTests(unittest.TestCase):
         path.write_text(json.dumps({'blocks':[b]}));self.assertEqual(lane_inputs.planner_error(self.p),'')
         path.write_text(json.dumps({'blocks':[b,b]}));self.assertIn('unique',lane_inputs.planner_error(self.p))
 
+    def visual_first_manifest(self):
+        evidence=self.p/'docs/project_overrides.md';evidence.parent.mkdir(parents=True)
+        message='msg_01a0d3a2-1cd3-72d3-90e2-b5803e232fee'
+        evidence.write_text(f'# Project exception\n\nvisual_only_no_audio — {message}\n')
+        plan={'mode':'visual_only_no_audio','source':'explicit_user_request',
+              'source_thread_id':'01a0d33d-bd24-7033-8416-0f9223e4104f',
+              'source_message_id':message,'timing_status':'PROVISIONAL',
+              'delivery_scope':'visual_assets_only',
+              'target_duration_sec':195,'evidence_path':'docs/project_overrides.md',
+              'evidence_sha256':hashlib.sha256(evidence.read_bytes()).hexdigest()}
+        manifest={'media_schema_version':registry.MEDIA_SCHEMA_VERSION,
+                  'music':{'status':'NOT_LOCKED'},'audio_plan':plan}
+        (self.p/'manifest.json').write_text(json.dumps(manifest))
+        (self.p/'state.json').write_text('{}')
+        generation_settings.initialize_duration_lock(self.p)
+        director=self.p/'lanes/director/status.json';director.parent.mkdir(parents=True)
+        director.write_text('{"status":"DONE"}')
+        return manifest,evidence
+
+    def test_visual_first_explicit_evidence_skips_music_without_faking_lock(self):
+        manifest,_=self.visual_first_manifest()
+        self.assertEqual(lane_inputs.visual_first_error(self.p,manifest),'')
+        self.assertEqual(lane_inputs.music_error(self.p,manifest),'')
+        self.assertEqual(manifest['music']['status'],'NOT_LOCKED')
+        self.assertEqual(lane_gates.gate_check(self.p,'music')[0],False)
+        self.assertEqual(lane_gates.gate_check(self.p,'planner'),(True,'OK'))
+        self.assertEqual(lane_gates.next_actions(self.p)['next_lanes'][0],'planner')
+        ok,reason=lane_gates.gate_check(self.p,'image_creator_01')
+        self.assertFalse(ok);self.assertIn('planner block map',reason)
+        self.assertTrue(lane_gates.non_bypassable_reason(self.p,reason))
+        ok,reason=lane_gates.gate_check(self.p,'package')
+        self.assertFalse(ok);self.assertIn('WAIT_EDITOR_DONE',reason)
+
+    def test_visual_first_missing_or_tampered_evidence_fails_hard(self):
+        manifest,evidence=self.visual_first_manifest()
+        evidence.write_text(evidence.read_text()+'tampered')
+        ok,reason=lane_gates.gate_check(self.p,'planner')
+        self.assertFalse(ok);self.assertIn('evidence file changed',reason)
+        self.assertTrue(lane_gates.non_bypassable_reason(self.p,reason))
+        evidence.unlink()
+        self.assertIn('evidence file is missing',lane_inputs.music_error(self.p,manifest))
+        manifest['audio_plan']['source']='planner_assumption'
+        self.assertIn('explicit user',lane_inputs.music_error(self.p,manifest))
+        manifest['audio_plan']['source']='explicit_user_request'
+        manifest['audio_plan']['target_duration_sec']=0
+        self.assertIn('positive seconds',lane_inputs.music_error(self.p,manifest))
+        manifest['audio_plan']['target_duration_sec']=195
+        manifest['audio_plan']['delivery_scope']='complete_film'
+        self.assertIn('visual_assets_only',lane_inputs.music_error(self.p,manifest))
+
 
 class ReleaseTests(unittest.TestCase):
+    def test_scoped_deploy_preserves_unrelated_live_drift(self):
+        with tempfile.TemporaryDirectory() as td:
+            base=Path(td);root=base/'source';home=base/'home'
+            root.mkdir();home.mkdir()
+            rows=[]
+            for name in ('a.txt','b.txt'):
+                f=root/name;f.write_text('new-'+name)
+                target=home/name;target.write_text('old-'+name)
+                rows.append({'source':name,'target':name,'sha256':video_release.digest(f)})
+            manifest={'files':rows,'retired':video_release.RETIRED}
+            with patch.object(video_release,'mappings',return_value=rows):
+                with self.assertRaisesRegex(ValueError,'SCOPED_RELEASE_REQUIRES_UNIQUE_SOURCES'):
+                    video_release.apply_scoped(manifest,root,home,[])
+                with self.assertRaisesRegex(ValueError,'UNKNOWN_SCOPED_RELEASE_SOURCE'):
+                    video_release.apply_scoped(manifest,root,home,['missing.txt'])
+                result=video_release.apply_scoped(manifest,root,home,['a.txt'])
+            self.assertTrue(result['ok'])
+            self.assertFalse(result['full_parity_claimed'])
+            self.assertEqual((home/'a.txt').read_text(),'new-a.txt')
+            self.assertEqual((home/'b.txt').read_text(),'old-b.txt')
+            self.assertEqual((Path(result['archive'])/'b.txt').exists(),False)
+
     def test_release_detects_drift_and_archives_retired_surfaces(self):
         with tempfile.TemporaryDirectory() as td:
             home=Path(td);m=video_release.freeze()

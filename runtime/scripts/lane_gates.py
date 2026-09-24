@@ -551,6 +551,9 @@ def gate_check(project: Path, lane: str) -> tuple[bool, str]:
     if lane == 'director':
         return True, 'OK: director is the entry lane.'
     if lane == 'music':
+        manifest = _json(project / 'manifest.json', {}) or {}
+        if lane_inputs.visual_first_active(project, manifest):
+            return False, 'USER_SKIPPED_MUSIC_VISUAL_ONLY: no music work is authorized for this project.'
         if st('director') in DONE_LIKE:
             return True, 'OK'
         return False, 'WAIT_DIRECTOR: music starts after director locks direction/safety gates (music_first rail).'
@@ -628,6 +631,10 @@ def gate_check(project: Path, lane: str) -> tuple[bool, str]:
                            'exists in the project. Download and verify the clips before editing.' % claimed)
         return True, 'OK'
     if lane == 'package':
+        manifest = _json(project / 'manifest.json', {}) or {}
+        override_error = lane_inputs.visual_first_error(project, manifest)
+        if override_error:
+            return False, 'MEDIA_HARD_GATE: invalid visual-only override: ' + override_error
         if lane_status(project, 'editor')['status'] not in {'DONE', 'READY_FOR_USER_REVIEW', 'PASS'}:
             return False, 'WAIT_EDITOR_DONE: package starts after editor status DONE/READY_FOR_USER_REVIEW/PASS.'
         if _project_video_count(project) == 0:
@@ -702,6 +709,11 @@ def validate_project(project: Path) -> dict:
                         problems.append(f'queues/{q.name}:{i}: invalid JSONL line')
                         break
     manifest = _json(project / 'manifest.json', {}) or {}
+    override_error = lane_inputs.visual_first_error(project, manifest)
+    if override_error:
+        problems.append('visual_first_override_invalid: ' + override_error)
+    elif override_error == '':
+        warnings.append('visual-only delivery: no music/VO; timing remains provisional and package must be labeled visual-assets-only')
     for q in QUEUES:
         if q not in (manifest.get('queues') or {}):
             warnings.append(f'manifest.queues missing registration: {q}')

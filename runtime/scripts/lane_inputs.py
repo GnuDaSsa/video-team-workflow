@@ -1,12 +1,68 @@
 """Small read-only v4 input proofs. Status words and empty files are not assets."""
 from __future__ import annotations
 import json
+import hashlib
 from pathlib import Path
 import sqlite3
 import media_registry
 
 
+VISUAL_FIRST_MODE = 'visual_only_no_audio'
+
+
+def visual_first_error(project: Path, manifest: dict) -> str | None:
+    """None: not requested; empty: verified explicit-user exception; text: invalid."""
+    plan = manifest.get('audio_plan')
+    if plan is None:
+        return None
+    if not isinstance(plan, dict) or plan.get('mode') != VISUAL_FIRST_MODE:
+        return 'audio_plan mode must be visual_only_no_audio'
+    if plan.get('source') != 'explicit_user_request':
+        return 'visual-first requires an explicit user request'
+    if not str(plan.get('source_thread_id') or '').strip():
+        return 'visual-first source thread is missing'
+    message_id = str(plan.get('source_message_id') or '')
+    if not message_id.startswith('msg_') or len(message_id) < 20:
+        return 'visual-first source message ID is missing'
+    if plan.get('timing_status') != 'PROVISIONAL':
+        return 'visual-first timing must remain PROVISIONAL'
+    if plan.get('delivery_scope') != 'visual_assets_only':
+        return 'visual-only delivery scope must be visual_assets_only'
+    seconds = plan.get('target_duration_sec')
+    if not isinstance(seconds, int) or isinstance(seconds, bool) or seconds <= 0:
+        return 'visual-first target duration must be positive seconds'
+    if plan.get('evidence_path') != 'docs/project_overrides.md':
+        return 'visual-first evidence must be docs/project_overrides.md'
+    evidence = Path(project) / plan['evidence_path']
+    if not evidence.is_file():
+        return 'visual-first evidence file is missing'
+    expected_hash = str(plan.get('evidence_sha256') or '')
+    if len(expected_hash) != 64 or any(c not in '0123456789abcdef' for c in expected_hash):
+        return 'visual-first evidence hash is invalid'
+    content = evidence.read_bytes()
+    if hashlib.sha256(content).hexdigest() != expected_hash:
+        return 'visual-first evidence file changed'
+    try:
+        proof = content.decode('utf-8')
+    except UnicodeDecodeError:
+        return 'visual-first evidence is not UTF-8'
+    if VISUAL_FIRST_MODE not in proof or message_id not in proof:
+        return 'visual-first evidence lacks mode or source message'
+    return ''
+
+
+def visual_first_active(project: Path, manifest: dict) -> bool:
+    return visual_first_error(project, manifest) == ''
+
+
 def music_error(project: Path, manifest: dict) -> str:
+    override_error = visual_first_error(project, manifest)
+    if override_error is not None:
+        return 'visual-first override invalid: ' + override_error if override_error else ''
+    return locked_music_error(project, manifest)
+
+
+def locked_music_error(project: Path, manifest: dict) -> str:
     music = manifest.get('music') or {}
     if not isinstance(music, dict) or music.get('status') != 'LOCKED':
         return 'music status must be LOCKED with a registered selected audio'

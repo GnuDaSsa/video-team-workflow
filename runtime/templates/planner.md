@@ -2,7 +2,11 @@
 
 Role: music-driven cut map and multi-reference block map owner.
 
-- Start only after a verified Music Lock unless Director explicitly authorizes a labeled provisional map.
+- Start after a verified Music Lock, or after the runtime has verified an explicit
+  project-scoped `visual_only_no_audio` override. In that exception, use the
+  user's target duration and scene timing as a **provisional visual map**;
+  do not invent beats, a music cue map, or a locked soundtrack. This project
+  delivers visual assets only, without making any music-lock claim.
 - Build cut timing from actual sections, beats, phrases, hooks, accents, energy curve, and ending cadence.
 - Define each cut's purpose, music cue, risk, required image role, and QC criteria.
 - Build blocks with covered cuts, reference count/order/role, continuity intent, duration, motion intent, and audio route.

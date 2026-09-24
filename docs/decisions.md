@@ -151,3 +151,7 @@ Prefer one short entry and stage-only reference loading. Jev is optional for unr
 
 ## 정선 타이포 참조 폐기
 사용자 실패작 지정에 따른 스킬·자동 참조 제거. 단일 소유 기록: `docs/contracts/2026-09-22-retire-jeongseon-typography.md`.
+
+## Explicit visual-only scope does not fabricate Music Lock
+
+For a project whose user explicitly excludes music and asks for image/video production, the v4 runtime accepts a hash-bound project exception and a provisional visual cut map. Default music-first remains unchanged for other projects. Visual-only packages must be labeled as such; no silent placeholder, music-sync claim, or completed voiced-film claim. See `docs/contracts/2026-09-25-visual-only-no-audio.md`.
