@@ -18,3 +18,10 @@ Move the nine detailed craft/QC sections verbatim into four on-demand `videodire
 ## Non-goals
 
 No change to runtime gates, media, browser/provider action, JEV execution, global safety approvals, or user project state. Runtime AGENTS slimming requires its own authority audit.
+
+## Verified result
+
+- Commit `d928f3f` was pushed to `origin/main`. The reviewed manifest preflight passed; scoped deployment changed only global AGENTS, `videodirector/SKILL.md`, and four new calibration references. Six source/live SHA-256 pairs matched after deployment. Full release parity was not claimed because unrelated runtime drift remains.
+- Global instructions: 38,403 → 17,661 Unicode characters, a 54.0% reduction. Nine moved sections were verified byte-for-byte in the new references. Global safety headings remained installed.
+- 451 Aside/deployer tests (with realpath TMPDIR), 198 runtime tests, Python compile, skill validation, release preflight, shell syntax and diff check passed. The first Node test run used macOS `/tmp` and failed strict realpath fixtures; rerun with `/private/tmp` passed 451/451.
+- No JEV API call, agent, provider/browser operation or media generation. Future model-token and production wall-clock benefit is not yet measured.

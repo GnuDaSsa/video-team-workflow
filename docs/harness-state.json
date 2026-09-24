@@ -1,14 +1,14 @@
 {
   "currentGoal": "Cut Codex global video instruction load by moving craft/QC sections to phase-specific references",
-  "status": "in_progress",
+  "status": "complete",
   "currentContract": "docs/contracts/2026-09-25-global-video-lazy-load.md",
   "blockers": [],
-  "nextStep": "Run full configured quick checks, freeze reviewed manifest, commit/push, then scoped deploy global plus four references and router.",
-  "lastUpdated": "2026-09-25T02:05:00+09:00",
+  "nextStep": "Compare first-response token load and time-to-first-media on a future comparable new Codex video task; if still slow, separately audit 31 KB runtime AGENTS with the same authority-preserving lazy-load method.",
+  "lastUpdated": "2026-09-25T02:12:00+09:00",
   "verification": {
-    "lastCommand": "Nine-section verbatim migration check; 451 Aside tests with realpath TMPDIR; 198 runtime tests; Python compile; skill quick_validate; release preflight; diff check",
-    "lastResult": "PASS_SOURCE_PENDING_DEPLOYMENT",
-    "notes": "Global guidance 38,403 -> 17,661 Unicode characters (-54.0%); nine moved sections preserved byte-for-byte; named global safety clauses retained. First node run failed only on /tmp symlink fixture and passed with TMPDIR=/private/tmp. No measured model latency or production media."
+    "lastCommand": "9-section verbatim check; 451 Aside tests; 198 runtime tests; Python compile; skill validation; release preflight; six-file scoped deploy and SHA parity; installed safety smoke; diff check",
+    "lastResult": "PASS_SCOPED_GLOBAL_LAZY_LOAD_DEPLOYMENT",
+    "notes": "Global guidance 38,403 -> 17,661 chars (-54.0%); nine sections preserved. Initial Node run failed /tmp symlink fixture, realpath TMPDIR rerun passed. No Jev/provider/media call or actual production latency A/B. Full release parity not claimed."
   },
   "knownWarnings": [
     "Existing legacy Codex source/live deployment drift is unchanged.",
