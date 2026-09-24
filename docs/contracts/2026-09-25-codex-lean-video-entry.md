@@ -20,3 +20,9 @@ Shrink only the Codex `videodirector` entry skill and enforce task/phase classif
 ## Non-goals
 
 No provider submission, media generation, agent spawn, Jev API call, global AGENTS rewrite, runtime lane bypass or quality-gate relaxation.
+
+## Verified result
+
+- Source commit `a889ed8` was pushed to `origin/main` and targeted `videodirector` deployment passed source/live SHA-256 parity (`0dfcea2ab44749456903b50a53cc21e834ec0708ec6a8b169e5d3ad0d5b48015`).
+- Entry skill changed from 8,249 to 6,007 Unicode characters (27.2% fewer). Python compile, 196 runtime tests, skill quick validation, shell syntax, targeted deploy check and diff check passed.
+- No Jev API request, browser/provider operation, media generation, actual new-project A/B or production wall-clock measurement was run. Global AGENTS and runtime AGENTS remain the larger context sources and are deferred to a separate authority-preserving audit.
