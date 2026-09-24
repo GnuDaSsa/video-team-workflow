@@ -5,116 +5,51 @@ description: "Use for any video work: planning, MV/music video, promo and public
 
 # Video Director
 
-One skill for all video work. MV, promo, contest and shortform are **modes of the same workflow**, not separate teams.
+Start the response with `[videodirector]` on its own line. This skill owns story, shot purpose, visual intent and delivery taste, **not** runtime execution procedure.
 
-This file is the router: modes, order, tool routing, and gates. Depth lives in `references/` and in the wiki, loaded when the job actually needs it.
+## Lean entry — classify before loading
 
-## First-line rule
+1. Distinguish **advice/audit**, **one requested asset or revision**, and **new full production**. A question about the workflow is not a production job: do not initialize a project, open Runway, read all phase references, or create a new owner for it.
+2. For an existing project, restore its `brief.md`, `state.json`, exact current blocker and `video-codex-runtime next --project <p>` before deciding the next action. Do not replay completed lanes or repeatedly dump the full state, transcript or wiki. For a new full project, initialize from the brief once, then follow `next` in the same owner.
+3. Load only the reference for the **current** phase below. Reuse a document already read in this context unless its version or the phase changed. Read the selected Seedance version skill only when authoring or operating Seedance, not for every video question.
+4. Give the first useful decision or artifact promptly. Briefly state chosen defaults when the request is workable but underspecified; ask about style, length or characters only when a missing answer truly blocks production. Never replace actual media/QC evidence with a plan.
 
-Start the response with `[videodirector]` on its own line.
+JEV-style advisory classification is **not** a default startup step. Aside's JEV is optional for genuinely ambiguous next-action or mixed QC notes; importing an extra model call into every Codex step adds latency and does not authorize execution. Do not invoke an external agent/classifier without the applicable explicit approval, and never let advice bypass runtime gates.
 
-## Modes
+## Mode and spine
 
-Pick one and say which. They share the workflow and differ in obligations.
-
-| Mode | Timing spine | Extra obligations |
+| Mode | Timing source | Extra obligation |
 |---|---|---|
-| **MV / music** | the song | beat-driven cut map, lyric/subtitle plan, no stills in the edit |
-| **Promo / public contest / institution** | narration or VO | narrative clarity, AI-use disclosure, submission package, safety gates |
-| **Shortform / reels / trailer** | hook rhythm | fast read, vertical-safe framing, first-second hook |
+| MV/music | Actual song and listening | Beat/phrase cut map, lyric hierarchy, no stills in the edit |
+| Promo/public contest/institution | Requested narration/VO or approved visual-only scope | Story clarity, factual safety, AI-use and submission package |
+| Shortform/reels/trailer | Hook and reading rhythm | Opening hook, vertical-safe composition |
 
-Mode detail: `references/modes.md`.
+Full production follows direction → applicable audio spine → cut map → character/style lock → production blueprint → images/QC → video/QC → CapCut edit → package. The runtime's explicit visual-only exception, not this skill, decides when audio may be deferred. A one-asset request still respects its dependent gates but does not silently enlarge into an entire film.
 
-## Explicit animation option
+## Tool and authority boundaries
 
-When the user says **`툰킷 문법을 적용해봐`**, `Toonkit 문법`, or an
-equivalent request for the analysed snappy 2D-animation grammar, enable the
-opt-in profile `toonkit_2d_snappy_v1` for the affected 2D/stylized animation
-blocks. State that it is active in the planning/package note, then hand the
-prompt construction to `seedance-prompt-en`, which owns the model-facing
-prompt rules. Do not apply this profile by default, to live action, or to a
-quiet/continuous acting beat unless the user explicitly asks for it.
+- Stills, start frames and character sheets: built-in Codex `image_gen` after the Gongnyang `image-prompt` compiler. Production is one cut = one prompt = one standalone image; character triptychs are identity-design exceptions. Never use Grok for stills by default.
+- Video: Seedance by default; Grok only when named for that project, Kling only when explicitly requested. Follow exactly one selected Seedance version skill for prompt/UI/queue procedure.
+- Edit: CapCut is the editable handoff; `ffmpeg` is for QC, normalization and previews, not a substitute final draft. Verify real CapCut playback and export.
+- Runtime rails, lane order, duration, media registry and safety: `/Users/gnudas/Documents/Codex/video-team-runtime/AGENTS.md`. Spawn approval and browser operator policy: `~/.codex/video-team-policies/`. Default is one owner, sequential; no unapproved agent, sidecar, scheduler or second browser loop.
+- A prompt, status string, attestation or provider card is not finished media. Confirm file/path/size/codec/duration and visual/audio QC appropriate to the deliverable.
 
-## Automatic live-action knowledge
+## Read only when the phase needs it
 
-For 실사, 실사풍, 포토리얼, photoreal or live-action work, use
-`/Users/gnudas/wiki/concepts/video-prompting-live-action.md` before planning,
-image authoring or QC; the user need not name Hell Grind. Apply only the matching
-medium and task sections. In v4, declare `medium: live_action` (plus the actual
-component media for mixed work); Seedance receives it through the existing
-bounded `medium-live-action` knowledge selection, not a second full-wiki read.
-This is creative knowledge, not a new production rail or external skill install.
-
-## Workflow
-
-Direction first, the audio spine second, and **QC after every production stage** — never one review at the end.
-
-1. **기획 / Direction** — purpose, mode, audience, story spine, must-avoid list. Nothing generated yet.
-2. **음악·오디오 / Audio spine** — generate and verify the real file: Suno track for music-led work, narration/VO for narration-led. Listen to it. A placeholder or an unheard file is not a spine.
-3. **컷맵 / Cut map** — built **against that spine**: beats, accents, phrase changes, lyric hooks and cadence for music; sentence and breath boundaries for narration. Concept was decided in step 1; timing is decided here, against real audio.
-4. **캐릭터 / 스타일** → **QC** against the approved design. The three-panel master `CHAR_<ID>_TRIPTYCH_R<n>` or its minimum deterministic crop must exist before anything depends on it.
-5. **스토리보드 / Production blueprint** → **QC**: bind the locked cut map and approved identity to set geometry, blocking, numbered shots, distance/angle/lens, camera positions, movement, sound and exit compositions. This is Planner metadata/design reference, not a new lane.
-6. **이미지 / Styleframes** → **QC**: identity, composition, and whether the frame is usable as an I2V source at all.
-7. **I2V / Clips** → **QC**: motion, identity drift, texture, crop preservation, duplicate impressions.
-8. **편집 / Edit** → **패키지 / Package** — QC-passed clips and locked audio only.
-
-A stage that has not passed its QC does not feed the next one. Failures go back to the stage that produced them, not forward. User approval gates sit on top of this where the project needs them — QC is the team checking its own work; approval is the user deciding.
-
-## Start protocol
-
-If the user has not said, confirm three things before producing: **style**, **length**, **characters** (existing / none). If the request is underspecified but workable, choose sensible defaults and say so in one line.
-
-## Tool routing
-
-- **Stills, styleframes, start frames, character sheets** — Codex `imagegen` / built-in `image_gen`, file-backed and non-GUI. Never a browser for image *generation*.
-- **One cut = one prompt = one standalone image.** No 2x2 grids, contact sheets, collages or multi-panel output for production frames. The runtime may execute up to three separate immutable prompts concurrently; additional cuts wait for the next bounded batch.
-- **I2V** — Seedance by default. Grok only when the user names it for that job. Never Grok for stills. Kling only on explicit request.
-- **Edit** — CapCut is the editable surface. `ffmpeg` is for QC/proxy/probe only, never the deliverable.
-- Compile image prompts through the Gongnyang `image-prompt` skill before calling `image_gen`.
-
-## Authority
-
-This skill owns story, shot purpose, visual intent, and delivery taste. It does **not** define execution mechanics.
-
-| Concern | Owner |
+| Work now | Reference |
 |---|---|
-| Seedance prompt spec, Runway UI, attach/Generate/queue | `seedance-prompt-en` |
-| Rails, lanes, gates, ordered library, provider assignment | `video-team-runtime/AGENTS.md` |
-| Spawn approval; browser operation points to Seedance skill | `~/.codex/video-team-policies/` |
+| MV vs public contest details | `references/modes.md` |
+| Production or revision hard rules | `references/production-rules.md` |
+| Deliverable layout/manifest | `references/output-formats.md` |
+| Accepted user typography and packaging taste | `references/user-calibrations.md` |
+| Optional named-role split after approval | `references/role-split.md` |
+| Shinkai/anime appearance or noisy stills | `/Users/gnudas/wiki/concepts/shinkai-style-anti-noise-image-prompting.md` |
+| Storyboard, blocking, shot board | `/Users/gnudas/wiki/concepts/storyboard-production-blueprint-standard.md` |
+| Camera distance/angle | `/Users/gnudas/wiki/concepts/ai-image-composition-distance-angle.md` |
+| Phone/screen geometry | `/Users/gnudas/wiki/concepts/phone-screen-geometry-qc.md` |
+| Character bible or photoreal casting | `/Users/gnudas/wiki/concepts/character-bible-page-prompt-standard.md`; for photoreal people also `live-action-character-authenticity-casting-standard.md` |
+| Broken I2V motion/crop/style | `/Users/gnudas/wiki/concepts/video-image-qc-style-continuity.md` |
 
-Do not spawn delegated lanes, subagents, sidecars, schedulers or parallel loops without explicit per-spawn approval in the current conversation. Default is single-agent sequential.
+For live action, read matching sections of `/Users/gnudas/wiki/concepts/video-prompting-live-action.md` before planning/image authoring/QC, not the whole wiki. `툰킷 문법` activates `toonkit_2d_snappy_v1` only for the named 2D/stylized blocks; the selected Seedance skill owns the actual prompt grammar. Plan and explain in Korean; Seedance prompts are Korean unless an explicit project exception applies.
 
-## Knowledge — load before the matching task
-
-Do not write these from memory; the wiki holds the worked-out version.
-
-| Before you… | Read |
-|---|---|
-| write a Shinkai/anime-look prompt, or the user says AI티·자글자글 | `wiki/concepts/shinkai-style-anti-noise-image-prompting.md` |
-| design a storyboard, conti, shot board, blocking map, or board-to-video handoff | `wiki/concepts/storyboard-production-blueprint-standard.md` |
-| choose shot distance and camera angle | `wiki/concepts/ai-image-composition-distance-angle.md` |
-| put a phone, message or screen in frame | `wiki/concepts/phone-screen-geometry-qc.md` |
-| design a character sheet or bible page | `wiki/concepts/character-bible-page-prompt-standard.md` |
-| diagnose a clip that broke in videoization | `wiki/concepts/video-image-qc-style-continuity.md` |
-| cast or QC a live-action-looking person | `wiki/concepts/live-action-character-authenticity-casting-standard.md` |
-| apply Toonkit/"12 laws" snappy 2D animation grammar | `seedance-prompt-en/seedance-prompting.md` → **Explicit option — Toonkit 2D Snappy Grammar** |
-
-## References
-
-- `references/production-rules.md` — hard rules: character consistency, crop/identity locks, anti-wobble, CapCut, revision scope, request routing
-- `references/output-formats.md` — cut list, character/scene/BGM JSON, narration sheet, style locks, full-package order
-- `references/user-calibrations.md` — subtitle, title and YouTube packaging taste learned from accepted work
-- `references/modes.md` — MV rules, contest submission rules
-- `references/role-split.md` — optional named-role split for bigger jobs
-
-## Operating mode
-
-Default to no-question, one-block execution: analyze → audio/cut design → character lock → storyboard blueprint → images → I2V → edit → QC → package. Stop only for login, payment, CAPTCHA, account choice, sensitive upload, deletion, public publish, or an explicit review gate. Do not present a failed draft as final — mark it failed, say why, and continue.
-
-## Quality bar
-
-Lead with usable deliverables, not theory. Keep outputs copy-paste ready and specific enough to move straight into imagegen, Seedance, Suno, or CapCut.
-
-## Language
-
-Planning, explanation, narration and delivery notes are Korean-first. Seedance video prompts are Korean (`ko-KR`) and are authored by the Seedance production lane. Image and BGM prompt language follows their owning skill/lane. JSON keys remain English.
+Default to no-question execution within the authorized scope. Stop for login, payment, CAPTCHA, account choice, sensitive upload/deletion, public publish/submission or an explicit review gate. Mark failed media honestly and repair it; never present a weak draft as final.

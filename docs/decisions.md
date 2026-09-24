@@ -155,3 +155,9 @@ Prefer one short entry and stage-only reference loading. Jev is optional for unr
 ## Explicit visual-only scope does not fabricate Music Lock
 
 For a project whose user explicitly excludes music and asks for image/video production, the v4 runtime accepts a hash-bound project exception and a provisional visual cut map. Default music-first remains unchanged for other projects. Visual-only packages must be labeled as such; no silent placeholder, music-sync claim, or completed voiced-film claim. Diegetic sound embedded in Seedance clips remains governed by the selected version skill and is not a separately produced music track. See `docs/contracts/2026-09-25-visual-only-no-audio.md`.
+
+## 2026-09-25 — Codex video lean entry before optional Jev
+
+- Use a compact `videodirector` entry to classify advice/audit, one-asset revision and full production before loading phase references. This preserves the runtime's mandatory rails and gates while removing unnecessary startup reads.
+- Aside Jev is an advisory ambiguity classifier, not the source of its measured 76% instruction-character reduction. Do not add a Jev call to Codex's normal path or treat its answer as execution authority. No Jev call or provider/media operation was made for this change.
+- Defer the much larger global/runtime AGENTS slimming to a separate rule-owner audit; blindly deleting the 40 KB global instructions could remove unique safety or user-calibration rules.

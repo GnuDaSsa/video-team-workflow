@@ -107,3 +107,7 @@ Follow the concise current native skill; read only the active stage and reorient
 
 ## 퇴역한 타이포 참조
 정선 타이포 스킬 폐기 기록과 검증은 `docs/contracts/2026-09-22-retire-jeongseon-typography.md`에 있다.
+
+## Codex video lean entry
+
+For Codex video work, classify the requested scope first and load only the active phase's references. Avoid whole-rule/wiki reloads and full-pipeline startup for an audit or one-asset revision. Jev is optional advice for genuine ambiguity, not a routine speed accelerator or permission to execute. The measured improvement in this change is entry-text size; model tokens and real production wall-clock still require A/B evidence. See `docs/contracts/2026-09-25-codex-lean-video-entry.md`.

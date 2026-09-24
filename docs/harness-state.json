@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Remove native video instruction and output bloat while retaining production-critical gates",
-  "status": "completed",
-  "currentContract": "docs/contracts/2026-09-20-native-lean.md",
+  "currentGoal": "Reduce Codex video-team entry overhead without weakening production gates",
+  "status": "in_progress",
+  "currentContract": "docs/contracts/2026-09-25-codex-lean-video-entry.md",
   "blockers": [],
-  "nextStep": "Use the concise stage entry and compact CLI output; load --full or optional references only for a concrete diagnostic need.",
-  "lastUpdated": "2026-09-22T14:54:10+09:00",
+  "nextStep": "Verify lean skill, deploy only videodirector, then compare source/live hash and report unmeasured wall-clock impact.",
+  "lastUpdated": "2026-09-25T01:45:00+09:00",
   "verification": {
-    "lastCommand": "configured verifyQuick; frontmatter; installed source parity; real existing image/video payload CLI verification",
-    "lastResult": "PASS_NATIVE_LEAN",
-    "notes": "451 native/deployer tests and 188 legacy tests pass. Instruction chars: 56,726 -> 13795; SKILL: 14,464 -> 2,247. Global account entry: 2,161 -> 615. Synthetic request stdout -87.2%; existing real payload verification stdout -49%/-56%. Actual prior Astra/English/knowledge receipts remain valid. No media generation or measured production token/latency claim. Existing legacy deployment drift remains outside scope."
+    "lastCommand": "Python compile; 196 runtime unit tests; zsh syntax; videodirector quick_validate; targeted deploy preflight; git diff --check",
+    "lastResult": "PASS_SOURCE_PENDING_DEPLOYMENT",
+    "notes": "videodirector entry 8,249 -> 6,007 Unicode characters (27.2% reduction); no measured model-token or production wall-clock gain. No Jev API call, provider or media operation."
   },
   "knownWarnings": [
     "Existing legacy Codex source/live deployment drift is unchanged.",
