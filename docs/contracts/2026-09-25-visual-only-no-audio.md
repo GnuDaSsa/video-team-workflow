@@ -11,7 +11,8 @@ Project evidence: `/Users/gnudas/Documents/Codex/video-team-runtime/20260924_204
 - Add a **project-scoped, explicit-user, hash-bound** `visual_only_no_audio` audio plan with `delivery_scope=visual_assets_only` to the v4 runtime input gate.
 - When valid, skip the music lane in `next` and let Planner prepare a **provisional time-based** visual block map from the brief, then run existing image/Seedance gates normally. Music and narration remain uncreated/unlocked; no timing or audio-completion claims.
 - Refuse missing/malformed/tampered override evidence. Keep the default registered Music Lock hard gate for every other project.
-- Permit only a clearly labeled `VISUAL_ASSETS_ONLY_NO_AUDIO` package from verified visual files; do not call it a finished voiced/musical film or fabricate audio.
+- Permit only a clearly labeled `VISUAL_ASSETS_ONLY_NO_MUSIC` package from verified visual files; do not call it a finished voiced/musical film or fabricate a standalone audio asset.
+- The internal mode name concerns the absence of a separate music/VO asset. It does not force Seedance video to be silent: causal knocks, room tone, or machine effects embedded in video follow the selected version skill's Audio setting. Label the package `VISUAL_ASSETS_ONLY_NO_MUSIC`.
 - Record a concrete project exception in `docs/project_overrides.md` citing runtime §1.0 and §1.1. Preserve all existing assets/candidates and user holds.
 
 ## Acceptance

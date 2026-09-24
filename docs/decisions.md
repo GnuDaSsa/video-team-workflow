@@ -154,4 +154,4 @@ Prefer one short entry and stage-only reference loading. Jev is optional for unr
 
 ## Explicit visual-only scope does not fabricate Music Lock
 
-For a project whose user explicitly excludes music and asks for image/video production, the v4 runtime accepts a hash-bound project exception and a provisional visual cut map. Default music-first remains unchanged for other projects. Visual-only packages must be labeled as such; no silent placeholder, music-sync claim, or completed voiced-film claim. See `docs/contracts/2026-09-25-visual-only-no-audio.md`.
+For a project whose user explicitly excludes music and asks for image/video production, the v4 runtime accepts a hash-bound project exception and a provisional visual cut map. Default music-first remains unchanged for other projects. Visual-only packages must be labeled as such; no silent placeholder, music-sync claim, or completed voiced-film claim. Diegetic sound embedded in Seedance clips remains governed by the selected version skill and is not a separately produced music track. See `docs/contracts/2026-09-25-visual-only-no-audio.md`.
