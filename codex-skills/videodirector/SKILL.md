@@ -39,6 +39,10 @@ Full production follows direction → applicable audio spine → cut map → cha
 | Work now | Reference |
 |---|---|
 | MV vs public contest details | `references/modes.md` |
+| Accepted mode-specific video memory | `references/mode-calibrations.md` only for the relevant MV/public phase |
+| Song-first MV production/QC | `references/mv-production-calibrations.md` |
+| Recurring character identity lock | `references/character-identity-calibrations.md` |
+| Typography, captions, CapCut alignment or transition QC | `references/typography-calibrations.md` |
 | Production or revision hard rules | `references/production-rules.md` |
 | Deliverable layout/manifest | `references/output-formats.md` |
 | Accepted user typography and packaging taste | `references/user-calibrations.md` |

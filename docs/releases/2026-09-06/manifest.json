@@ -5,7 +5,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/SKILL.md",
       "target": ".codex/skills/seedance-prompt-en/SKILL.md",
-      "sha256": "ea4f42fbb7c562a3291390dde77ddc6c4eac690ddbdb22a8cd27d100475283b5"
+      "sha256": "e9df9d8b7e9c36cd8f9aa47a1cfe1e6e1265d33f34ffc4ecd3df93ad3a5b65cc"
     },
     {
       "source": "codex-skills/seedance-prompt-en/aside-operator.md",
@@ -100,7 +100,7 @@
     {
       "source": "codex-skills/videodirector/SKILL.md",
       "target": ".codex/skills/videodirector/SKILL.md",
-      "sha256": "fe24cd9c8fb8091bad149cc1c6031f5065d57914d9016e2ee51abfd275e8b04d"
+      "sha256": "621897a00cdeec91a2b9c1b6057a76022a913f4bc41c72172e85447cb0837cef"
     },
     {
       "source": "codex-skills/videodirector/agents/openai.yaml",
@@ -108,9 +108,24 @@
       "sha256": "1af387e2c30557ea7c7929c7000fb76dcd7e79c4df1fd9377a56d9839250e926"
     },
     {
+      "source": "codex-skills/videodirector/references/character-identity-calibrations.md",
+      "target": ".codex/skills/videodirector/references/character-identity-calibrations.md",
+      "sha256": "9d9ff0ec21a865f8326fa021b66d7bc8646f17d59d82f745648f04737b0d6bc9"
+    },
+    {
+      "source": "codex-skills/videodirector/references/mode-calibrations.md",
+      "target": ".codex/skills/videodirector/references/mode-calibrations.md",
+      "sha256": "be89d81a3d8016aa9cafbf24c2fbc711f1c045b128a328f6ad9abac0671c4f4b"
+    },
+    {
       "source": "codex-skills/videodirector/references/modes.md",
       "target": ".codex/skills/videodirector/references/modes.md",
       "sha256": "c04e606c5e6935351b9251cad5473ac4fa56507497e640fd4a033b01eab66da3"
+    },
+    {
+      "source": "codex-skills/videodirector/references/mv-production-calibrations.md",
+      "target": ".codex/skills/videodirector/references/mv-production-calibrations.md",
+      "sha256": "0189c10dfa93323733e2e772a1178ece9a2db2e09592ec5db97ac276121c1df2"
     },
     {
       "source": "codex-skills/videodirector/references/mv-team-standing-memory-low-signal-and-hito-neko.md",
@@ -133,9 +148,19 @@
       "sha256": "5d04d4f92429c7047afca9520bfe530da9069a0ed8de6d8f3cf30fa029d32ca5"
     },
     {
+      "source": "codex-skills/videodirector/references/typography-calibrations.md",
+      "target": ".codex/skills/videodirector/references/typography-calibrations.md",
+      "sha256": "73005e3d16ac81cd6dd8ea2c447026e419759d81fbdc7038b3283a2eee99f3ef"
+    },
+    {
       "source": "codex-skills/videodirector/references/user-calibrations.md",
       "target": ".codex/skills/videodirector/references/user-calibrations.md",
       "sha256": "32b0a44453a4bf56557258d6a400e45b6b632b2e0b8ece6bba2cb790373eb7db"
+    },
+    {
+      "source": "runtime/scripts/author_handoff.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/author_handoff.py",
+      "sha256": "25802b90bef922af153bf233b2b5e0bdeea87a80ff3973d95f1d0a6d3682fe7e"
     },
     {
       "source": "runtime/scripts/generation_settings.py",
@@ -150,12 +175,12 @@
     {
       "source": "runtime/scripts/lane_gates.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/lane_gates.py",
-      "sha256": "fdf3b9eb1a3f8ad90309f1a0a10c793b40ae156a0ba8facbe888b62f178cdd05"
+      "sha256": "50213daff6f92bd1f6cbca97b6f159a2f4f9252cc2ed0bb121f1ce53c92bef1d"
     },
     {
       "source": "runtime/scripts/lane_inputs.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/lane_inputs.py",
-      "sha256": "dc058050245b62e72673d3292a2713a73e7f3aa03dce631beb4b486ef9ab7512"
+      "sha256": "89aa13a4d077e340df76d836c235d16fa00cd9f60793d485d6c9d87f06f928e0"
     },
     {
       "source": "runtime/scripts/media_registry.py",
@@ -165,7 +190,7 @@
     {
       "source": "runtime/scripts/model_routing.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/model_routing.py",
-      "sha256": "4c65765263ee85071901f0c5b70ab3c5e4ac12947b36ba97e616ce8a2b833a53"
+      "sha256": "588ad580242ba61a3167600f8823cbcb1d179effe84f0f7cd06acd9d853c040c"
     },
     {
       "source": "runtime/scripts/project_sweep.py",
@@ -200,7 +225,7 @@
     {
       "source": "runtime/scripts/video_codex_runtime.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/video_codex_runtime.py",
-      "sha256": "f9736dbdd50100aadd489f1c21226a9d29abb31f66bc37c9234f869ddf8dafca"
+      "sha256": "6555d6fe4f9b0ab7f32e8e00e9767dbce489945f38d29a1effba779f33d0b730"
     },
     {
       "source": "runtime/scripts/video_knowledge_router.py",
@@ -220,12 +245,12 @@
     {
       "source": "runtime/templates/editor.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/editor.md",
-      "sha256": "3c971324e0b3df3986b2dad006f4a11b6ddd503236f5af435d00364e7f399592"
+      "sha256": "6f9a8b6253746e5c24da99d6299215ebd7d320ebb4b3dbc7a002da7118aa0aac"
     },
     {
       "source": "runtime/templates/image_creator.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/image_creator.md",
-      "sha256": "df9084831802fdcb7eba5aa403f8935ae129f25293659fa3deb436432721c7bd"
+      "sha256": "5ff80ac16fa23e0d36841ca3e850a1079d202ca43155a0efff57ff4c26d5377f"
     },
     {
       "source": "runtime/templates/image_qc.md",
@@ -240,12 +265,12 @@
     {
       "source": "runtime/templates/package.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/package.md",
-      "sha256": "52dfd9838b0d794e4892e6f23f4b74b4caf5586ee9084fb06f02a01cefe65dde"
+      "sha256": "3e56290c1bc7608ecd9f0d1545463df87a370e4d080ec098e17c61cbee78dfe3"
     },
     {
       "source": "runtime/templates/planner.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/planner.md",
-      "sha256": "e4964a7f73dfbf803f38e3bb5e6bd1c02960d0ffd9f11de5df10b195f6e32660"
+      "sha256": "a48f625ba595742deaa29ef462b8fc08ddc6096c2a948292c9b97e34586766f9"
     },
     {
       "source": "runtime/templates/qc.md",
@@ -275,12 +300,12 @@
     {
       "source": "GLOBAL_AGENTS.md",
       "target": ".codex/AGENTS.md",
-      "sha256": "43c61e264e2fc8a090ec112618fe4213db870515484b26bd0790c9cf32756134"
+      "sha256": "e68ce562b76ec6156fa6f4e3780c17af04f861ce73a5f0c4d6d3a712d93f7154"
     },
     {
       "source": "runtime/AGENTS.md",
       "target": "Documents/Codex/video-team-runtime/AGENTS.md",
-      "sha256": "f70ee669575906bd1c4089c559489b44f7027670db464e0fc83089c26817c741"
+      "sha256": "98a24e51eaa952be1a0cb711d54f3bd2124a2f621e54f6f1516625b4b7dc1dad"
     },
     {
       "source": "references/character_sheet_prompt_standard.md",

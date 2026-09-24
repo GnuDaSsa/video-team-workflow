@@ -111,3 +111,7 @@ Follow the concise current native skill; read only the active stage and reorient
 ## Codex video lean entry
 
 For Codex video work, classify the requested scope first and load only the active phase's references. Avoid whole-rule/wiki reloads and full-pipeline startup for an audit or one-asset revision. Jev is optional advice for genuine ambiguity, not a routine speed accelerator or permission to execute. The measured improvement in this change is entry-text size; model tokens and real production wall-clock still require A/B evidence. See `docs/contracts/2026-09-25-codex-lean-video-entry.md`.
+
+## Deferred Codex video calibration
+
+Global Codex instructions keep cross-project safety/authority but route detailed mode, MV, identity and typography calibration to the installed `videodirector/references/*-calibrations.md` files only when that phase is active. The migration preserved all nine moved sections verbatim and does not change runtime or Seedance authority. See `docs/contracts/2026-09-25-global-video-lazy-load.md`.

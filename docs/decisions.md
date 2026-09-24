@@ -161,3 +161,9 @@ For a project whose user explicitly excludes music and asks for image/video prod
 - Use a compact `videodirector` entry to classify advice/audit, one-asset revision and full production before loading phase references. This preserves the runtime's mandatory rails and gates while removing unnecessary startup reads.
 - Aside Jev is an advisory ambiguity classifier, not the source of its measured 76% instruction-character reduction. Do not add a Jev call to Codex's normal path or treat its answer as execution authority. No Jev call or provider/media operation was made for this change.
 - Defer the much larger global/runtime AGENTS slimming to a separate rule-owner audit; blindly deleting the 40 KB global instructions could remove unique safety or user-calibration rules.
+
+## 2026-09-25 — Defer video craft detail from global Codex startup
+
+- Move nine existing video craft/QC sections verbatim from global AGENTS to four phase-specific `videodirector` references. Keep all global execution/spawn/public-submit/browser-send/authority safety rules at startup. The selected skill/runtime authority is unchanged.
+- Load only the matching production phase; unrelated Codex work and workflow audits should not incur full MV, character and typography text. This is an instruction-size optimization, not a measured end-to-end speed gain or a Jev deployment.
+- Preserve the source/live distinction through a reviewed manifest and scoped deployment; do not overwrite unrelated runtime drift.

@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Reduce Codex video-team entry overhead without weakening production gates",
-  "status": "complete",
-  "currentContract": "docs/contracts/2026-09-25-codex-lean-video-entry.md",
+  "currentGoal": "Cut Codex global video instruction load by moving craft/QC sections to phase-specific references",
+  "status": "in_progress",
+  "currentContract": "docs/contracts/2026-09-25-global-video-lazy-load.md",
   "blockers": [],
-  "nextStep": "Measure first-response tokens and time-to-first-media on the next comparable Codex project; separately audit global/runtime AGENTS for safe on-demand extraction.",
-  "lastUpdated": "2026-09-25T01:48:00+09:00",
+  "nextStep": "Run full configured quick checks, freeze reviewed manifest, commit/push, then scoped deploy global plus four references and router.",
+  "lastUpdated": "2026-09-25T02:05:00+09:00",
   "verification": {
-    "lastCommand": "Python compile; 196 runtime tests; videodirector quick_validate; shell syntax; targeted deploy preflight/deploy/parity; git diff --check",
-    "lastResult": "PASS_SCOPED_DEPLOYMENT",
-    "notes": "Entry 8,249 -> 6,007 Unicode characters (-27.2%); source/live SHA-256 parity 0dfcea2a... No Jev API call, provider/media operation or measured production latency gain; global/runtime AGENTS unchanged."
+    "lastCommand": "Nine-section verbatim migration check; 451 Aside tests with realpath TMPDIR; 198 runtime tests; Python compile; skill quick_validate; release preflight; diff check",
+    "lastResult": "PASS_SOURCE_PENDING_DEPLOYMENT",
+    "notes": "Global guidance 38,403 -> 17,661 Unicode characters (-54.0%); nine moved sections preserved byte-for-byte; named global safety clauses retained. First node run failed only on /tmp symlink fixture and passed with TMPDIR=/private/tmp. No measured model latency or production media."
   },
   "knownWarnings": [
     "Existing legacy Codex source/live deployment drift is unchanged.",

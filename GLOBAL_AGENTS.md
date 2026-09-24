@@ -109,165 +109,18 @@ Emit a concise labeled update before starting a meaningful phase and when switch
 - Follow `/Users/gnudas/Documents/Codex/video-team-workflow/docs/video-feedback-promotion-protocol.md` for the evidence, routing, privacy, and release procedure.
 
 
-## Video Agent Memory Routing — MV vs Public Contest — 2026-05-10
+## Video craft memory — load only the matching phase
 
-The user's video-agent history now has two distinct production contexts, but **music-first editing is a shared baseline**, not an MV-only feature. Do not blur project goals together, and separate mainly by typography/story-copy behavior and submission requirements.
+The detailed video craft and QC calibrations are installed under `/Users/gnudas/.codex/skills/videodirector/references/`. They are **not** startup reading for every request. For a matching production phase, read only:
 
-### Shared baseline for all serious video work
-Apply these rules to both MV and public-contest/institution videos unless the user explicitly overrides them.
+| Current work | Reference |
+|---|---|
+| MV vs public-contest story/caption mode | `mode-calibrations.md` |
+| Song-first MV production, cut rhythm, I2V/identity continuity | `mv-production-calibrations.md` |
+| Recurring character identity sheets | `character-identity-calibrations.md` |
+| Typography, CapCut captions, alignment or transition QC | `typography-calibrations.md` |
 
-Core priorities:
-- Music comes first: analyze song/BGM structure, beat, phrase changes, hooks, accents, energy curve, cadence, and ending before final cut timing.
-- Default cut density: use roughly **2.0–2.5 seconds per cut** unless the music or brief clearly calls for a different rhythm. Do not arbitrarily undercut the number of cuts for a 1-minute piece.
-- Effects and transitions must be motivated by music, motion, story, or emotional emphasis; avoid random preset spectacle.
-- Keep story physical and cinematic, but let rhythm drive cut timing and shot duration.
-- For still-image production, use Codex `imagegen` / built-in `image_gen` by default; for I2V/videoization, use Grok/Runway/Seedance only after image QC; no raw stills in final edit.
-- Imagegen production remains one cut = one standalone image; never request a production grid/contact sheet. Character/model sheets may be multi-panel design references only.
-- QC must catch anatomical errors, disappearing limbs/people, repeated shots, bad crops, subtitle overlap, line clipping, weak narrative causality, jitter, freeze frames, and bad transition handles.
-- CapCut JSON/coordinate edits are only helpers; actual CapCut preview is the source of truth for visual alignment, typography timing, and effect intensity.
-- If a generated clip fails QC and the edit cannot hide it cleanly, regenerate or replace the cut instead of presenting a weak final.
-
-### Mode A: Music Video / MV typography and story memory
-Use this mode when the user asks for 뮤직비디오, MV, 노래 기반 영상, 가사/비트/음악 중심 영상, review prototype, or a song-first project.
-
-Typography/story behavior:
-- Typography can be more lyrical, poetic, sparse, rhythmic, and emotionally timed; it does not always need to explain every visual literally.
-- Text should support lyric hooks, repeated motifs, emotional turns, or chorus/bridge structure rather than becoming a public-information caption system.
-- If a narrative exists, keep it cinematic and sensorial; let images, bodies, reflections, hands, shadows, and recurring motifs carry meaning.
-- MV final delivery should include master, clean/no-subtitle master when relevant, ordered clips, audio, EDL/manifest, review contact sheet/keyframes, and notes.
-
-### Mode B: Public contest / tourism / institution typography and submission memory
-Use this mode when the user asks for 공모전, 관광영상, 지자체/공공기관, 제출, 신청서, 유튜브 업로드, 메일 제출, 심사용 영상, or public-sector promotion.
-
-Typography/story behavior:
-- Story clarity beats pure mood: captions must explain why each motif exists and how it relates to the contest theme.
-- Typography should be readable, restrained, culturally appropriate, and not a generic subtitle/presentation template.
-- Do not assume a title/body structure from a prior project; design typography for the current story, footage, and contest brief.
-- CapCut-first handoff remains important; keep editable CapCut text layers where practical and verify in the actual preview.
-- Public-sector copy must distinguish roles: title, chapter/location note, narration/body copy, final statement, AI-use disclosure, synopsis, and submission notes.
-- Submission safety applies: verify official requirements and account/channel/recipient, prepare forms/copy packages carefully, and do not final-submit or publish without explicit user approval.
-- Field-specific copy distinction is mandatory: 제작 의도, 시놉시스, AI 활용 내역, link/password notes, and prior-contest history must not be reused as the same paragraph.
-
-### Memory routing rule
-When the user approves a lesson during a project, save it under the appropriate bucket:
-- music/cut/effect/QC basics → shared baseline;
-- poetic lyric/title behavior → MV typography/story;
-- explanatory public-sector captions, forms, upload, email, compliance → public contest/institution memory.
-
-## Music Video Production Team Standing Rules
-
-These rules apply to all future MV/video-agent work unless the user explicitly overrides them. They are global team memory, not one-project notes.
-
-Mode boundary: this section is primarily for song-first MV production logistics and visual pipeline. Music-first cut timing is now a shared baseline for all serious video work; the main difference for public-contest/tourism/institution videos is typography, explanatory story copy, compliance, and submission workflow.
-
-### Tool routing hard rule
-- For the user's MV/video-agent pipeline, **all still images/styleframes/start frames/character sheets must be generated with Codex `imagegen` / built-in `image_gen` by default** when available.
-- **Do not use Grok for still image generation** unless the user explicitly overrides this for that specific job.
-- **Use Grok only for image-to-video/videoization** after a Codex imagegen frame already exists, has been saved, and has passed image QC.
-- If Codex imagegen still-image production is blocked mid-project, do **not** switch Grok into still-image generation by default. Continue production by using Grok/Runway/Seedance only for I2V/videoization from any approved/saved existing frame, acceptable fallback frame, or other user-approved source frame so the edit can keep moving without a question.
-- Do not use Kling in this user's default MV/video pipeline unless explicitly requested.
-- If any local plan, prompt package, or older skill says `Grok image prompt`, `grok_image`, or “ChatGPT Image 2 browser generation”, reinterpret/update it as `Codex imagegen styleframe prompt` unless the user explicitly requests browser generation.
-- For a **new project**, create/save character sheets and production styleframes through Codex imagegen first; ChatGPT web/new-tab generation is fallback/manual only when imagegen is unavailable or explicitly requested.
-- Codex imagegen production must remain **one cut = one prompt = one standalone image**. Do not request 2x2 grids, contact sheets, collages, or multi-panel sheets for production styleframes.
-- Fast production may run up to three separate bounded Codex imagegen calls concurrently, one immutable one-cut prompt per worker, then fan in and QC the independent images. Additional cuts wait for the next batch; never combine cuts into one prompt or request a production grid/contact sheet.
-
-### Operating mode
-- Default to **no-question, one-block execution** for MV production: analyze → cut design → image generation → image-to-video → edit → QC → package, without asking between routine steps.
-- Ask only for login/payment/CAPTCHA/account/sensitive upload/deletion or when the user explicitly requests a review gate.
-- Do not present a weak draft as final. If quality fails, mark it as failed, write the reason, and continue with the next production correction.
-
-### Music-first editing
-- Cut structure must come from the song: beat, accents, phrase changes, lyric hooks, energy curve, and natural cadence/ending.
-- Do not force a prewritten visual table onto the music.
-- For ~1 minute review prototypes, make reviewable MV cuts that test rhythm/story/look before longer versions.
-
-### No stills in final edit
-- Raw PNG/JPG styleframes are only source frames for I2V. They must never be placed directly in a final/review edit.
-- No static-image zoompan filler in final/review masters. If a videoized clip is missing, generate/regenerate the clip.
-
-### Unique media rule
-- One generated video clip may appear in the timeline exactly once.
-- Avoid image reuse. If the same location/motif returns, generate a new frame with changed composition, angle, action, lighting, or story function.
-- Repeated motif is allowed; repeated image/video file is not.
-
-### Story and scene sense
-- Every cut needs a reason: new action, new information, emotional shift, rhythmic accent, or narrative transition.
-- Keep a one-sentence premise and cause→discovery→turn/pursuit→resolution spine before batch production.
-- Good user-approved shots become structural anchors, not decorative inserts.
-
-### Low Signal lessons carried forward
-- Do not cap MV cuts arbitrarily; cut count follows song density and story needs.
-- Self-contained delivery is mandatory: final master, clean/no-subtitle master when relevant, ordered clips, audio, EDL/manifest CSV+JSON, review contact sheet/keyframes, notes.
-- Review contact sheets are mandatory before claiming completion; inspect repeated impressions, missing anchors, unwanted motifs, and unclear story.
-- Avoid unwanted motifs after rejection. For `mv-low-signal`: no earpiece/earbuds/headset/cable-to-ear, no talking-mouth/lip-sync/dialogue-looking shots.
-- Prefer physical/visual storytelling through body, hands, eyes, silhouettes, reflections, walls, floors, puddles, shadows, light traces, and city layers.
-
-### I2V crop and identity lock
-- For partial-face, eye, hand, object, silhouette, reflection, macro, or symbolic source frames, the I2V model must preserve the original crop and composition. Do not allow zoom-out, reframing, or expansion into a full face/body unless the cut brief explicitly asks for that reveal.
-- If a source frame only shows eyes or a facial fragment, the generated clip must remain an extreme close-up. A full-face hallucination is a character-consistency failure and must be rejected/regenerated.
-- Character identity is judged by the whole face silhouette, nose, jaw, eye spacing, hair mass, age impression, and costume continuity, not only by eye color/hair color. If an I2V output “looks like another person,” reject it even when technically polished.
-- For fragile close-ups, prompts must include explicit locks such as: `preserve exact crop`, `do not reveal full face`, `no zoom out`, `no new facial structure`, `only eyelid/iris/reflection micro-motion`.
-
-## Typography and transition QC standing rule — 2026-05-06
-
-Mode note: these typography/transition rules are shared, but public-contest videos require extra narrative clarity and compliance; MV videos require extra song/beat sensitivity.
-
-The user strongly dislikes lower-center narration subtitles inside obvious rounded boxes. For MV/public-contest edits, avoid generic YouTube/presentation subtitle styling. Narration text should feel quiet, cinematic, and literary: usually unboxed or near-unboxed, with restrained shadow/gradient only when legibility requires it. Use a separate, calmer/static-feeling font for narration/body copy rather than the same bold public-presentation font used for chapter cards.
-
-Typography QC must explicitly check:
-- no subtitle/card overlap at any time;
-- no `SCENE 03`-style mechanical labels unless the user asks;
-- no direct contest-title wording such as “2026 영상 공모전” in the picture unless strategically required;
-- lower-center narration must not cover too much image, must not sit in a big black rounded rectangle, and must feel integrated with the scene;
-- chapter cards, location notes, and narration should be separated by role, font, size, opacity, and timing;
-- tourism/MV location labels must not remain thin, bland, low-visibility museum captions. If rejected, redesign as a full title system: heavier Hangul, larger phone-readable scale, clear kicker/main hierarchy, warm ivory/gold palette, culturally specific motifs, and composition-aware placement;
-- after readability is secured, remove obvious translucent boxes/plates unless absolutely required; rely on stroke/shadow/local vignette first;
-- underline/route-line motifs must have finished craft: thinner tapered/feathered strokes, rounded caps/joins, soft glow/blur, eased opacity, and no crude rectangular endpoints;
-- for right-aligned labels, ornaments/seals/bullets/route-line starts stay on the visual left of the text block. Do not let symbols jump to the far right just because the text is right-aligned.
-
-Transition QC must explicitly check the first third of the edit for cut-to-cut frame jitter, micro stutters, duplicate/freezing frames, bad crossfade handles, optical-flow artifacts, and 1-frame flashes. If jitter is visible, fix with clean cut handles, short dip/dissolve only where motivated, re-encoding/normalization, or by trimming unstable first/last frames of generated clips before final export.
-
-
-## CapCut Korean caption shadow/legibility rule — KAIA lesson — 2026-05-13
-
-Apply this globally for the user's MV, public-contest, tourism, institution, and CapCut typography work.
-
-Core lesson from the user's final KAIA CapCut export:
-- Do **not** try to fix low-visibility Korean captions by randomly changing colors such as mint, bright yellow, or other flashy accents.
-- First make the caption readable with fundamentals: **short copy, large type, actual shadow enabled, shadow opacity around 50–70% as the default starting point, subtle dark stroke, and enough hold time**.
-- For bright sky, sunset, city-light, glass, HUD, and complex backgrounds, shadow must be treated as a required legibility layer, not an optional decoration. Start near 50% opacity, then raise/lower by actual CapCut preview/export.
-- Prefer white or warm/cool off-white text with dark shadow/stroke for public-sector technology videos. Use accent color only when it has a clear narrative/information role and passes preview QC.
-- Avoid ugly rounded subtitle boxes. Use shadow/stroke/local placement first; boxes or plates are last resort.
-- Reduce or remove tiny helper labels if they compete with the main caption. Short, large, readable main phrases beat cluttered multi-layer information.
-- QC must inspect CapCut actual preview and exported full-frame stills, because contact sheets can make fade-in/out frames look weaker than real playback. The hold section of every key caption must be clearly readable.
-
-Default workflow for future CapCut captions:
-1. Write the shortest usable Korean phrase.
-2. Set readable size and safe placement away from faces, landmarks, HUD, and the brightest background band.
-3. Enable shadow; start opacity about **50–70%**, with moderate blur/smoothing and a small distance.
-4. Add a subtle dark stroke if needed; do not jump to random colors.
-5. Verify in actual CapCut preview, then export/sample-frame QC before claiming PASS.
-
-## CapCut-first typography revision rule — 2026-05-06
-
-For this user's MV/public-contest edit revisions, if the user asks why CapCut is not being used or has previously required CapCut editing, do not keep presenting arbitrary baked local-render typography masters as the main answer. Build or update an editable CapCut draft first, keep typography as editable CapCut text layers where practical, and only render preview MP4s as secondary review aids. Preserve the previous draft before modifying it.
-
-Typography-specific corrections from Sangju V26:
-- Reject translucent rounded/oval cards if any text can escape the card boundary; prefer no box or guaranteed fixed-width safe layout.
-- Do not let old lyric-subtitle color habits bias public video typography into yellow/white everywhere. Use a broader restrained palette such as ivory, stone, sage, muted clay, charcoal, and only minimal accent color.
-- Opening title and final statement must be redesigned, not patched with the same box style.
-- Final mnemonic/statement cards must be optically centered and aligned; no pill/box misalignment.
-
-## CapCut font limitation / baked typography exception — 2026-05-06
-
-CapCut remains the required edit-handoff environment when the user asks for CapCut, but macOS CapCut may flatten or fail to expose desirable Korean fonts. In that case, use this workflow instead of forcing bad generic typography:
-
-1. Preserve/update a CapCut draft for timeline review and handoff.
-2. Design high-fidelity typography externally with the intended Korean font, layout, timing, and alpha treatment.
-3. Render the typography as transparent overlays or a baked master, import/align it back into the CapCut draft when practical, and clearly label it as an intentional font-fidelity workaround.
-4. QC must compare the CapCut draft and final rendered master so the delivered video is not merely a local render detached from the user's CapCut workflow.
-
-For public-sector contest films, typography must help explain the work without looking like a presentation template: bigger when needed, timed to reading rhythm, optically aligned, and role-separated into title/chapter/narration/final statement systems.
+The unchanged safety/approval clauses below and the runtime authority order still apply. A video-workflow question or unrelated Codex task does not require loading these references.
 
 ## Public contest upload/submission safety and copy workflow — 2026-05-06
 
@@ -295,44 +148,6 @@ Required safeguards:
 - If only a voice/받아쓰기 button is visible, do not click it. Wait, refocus the composer, dispatch an input/change event, or use Enter only if it has already been verified not to trigger voice mode in that UI state.
 - If Voice mode or “음성으로 연결 중” is accidentally opened, cancel/close it immediately and record the incident in the local run notes before retrying.
 - For fallback ChatGPT web image production only, prefer this safe sequence: set composer text via direct DOM setter/computer-use `set_value`/direct typing → verify composer contains expected text → verify `send-button` identity → click once → verify a normal chat turn started. Do not use `pbcopy`, AppleScript clipboard, or clipboard paste for Codex GUI prompt insertion on this Mac; it can fail silently or return exit 1. Do not use coordinate clicks for ChatGPT submit unless there is no DOM alternative and the user has approved a manual fallback.
-
-## Three-panel character identity standard
-
-Apply this to every new video-team/MV/public-contest/institution project with recurring people or characters. The canonical details live only in `runtime/references/character_sheet_prompt_standard.md`.
-
-- Before production styleframes, create and QC one `CHAR_<ID>_TRIPTYCH_R<n>` per recurring identity: **left headless front full body, middle back full body with head, right large 3/4 portrait**, text-free on neutral mid-gray in neutral light.
-- The front body's deliberate head omission prevents tiny full-body faces from competing with the large portrait. It must read as a clean, non-graphic studio-reference crop; never injury, gore, or a mannequin.
-- The sheet is intentionally plain. Do not bake cinematic lighting, rain, smoke, film grain, LUT, typography, scene background, or beauty retouch into the identity master.
-- Identity is an immutable descriptor plus a verified image reference. Every materially different state—wet, wounded, transformed, coat on/off, damaged costume, age stage—is a separately registered derivative made one change at a time.
-- Stress-test the triptych across 10 varied pose/light/distance/action generations, including multi-character scenes when relevant. Lock only at 10/10 recognizable identity.
-- Deterministic `_FACE`, `_FRONT_BODY`, and `_BACK_BODY` crops may be made from the approved master with source hash and crop coordinates. They are not new generated identities.
-- Attach the approved triptych or minimum required crop to every dependent image/video generation. The model-facing prompt must bind face identity to the right portrait, front body/wardrobe to the left panel, and rear silhouette/wardrobe to the middle panel, while excluding the gray background, panel seams, and missing front head from the scene.
-- Supporting recurring people receive their own triptych. Hand/prop, scale/chemistry, expression, or construction sheets are optional story-specific QC assets, not a mandatory seven-sheet package.
-- Production styleframes remain one cut = one prompt = one standalone image. A triptych is an identity-design exception, never a production frame, final edit image, or storyboard sequence.
-- Styleframes made before identity lock remain `HOLD_LOOKDEV_ONLY` / `INVALID_PRE_CHARACTER_LOCK_SOURCE` and must be regenerated from the approved triptych before I2V. If attachment cannot be verified, mark `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED`.
-
-### Existing-project continuity — 오늘의 자동완성
-
-- Existing approved MAIN / COUPLE / GUARDIANS sheets remain the required identity sources for the current project; do not invalidate completed assets retroactively.
-- At the next major character-lock revision, migrate each recurring identity to the three-panel standard and register provenance from the last approved source.
-- Seedance/Runway receives only post-lock, QC-passed styleframes plus the minimum approved identity reference. Never upload an unapproved design sheet or pretend an attachment was used.
-
-## MV typography/editing lesson — 교차 문구 편집 호흡 — 2026-05-10
-- In Korean MV/public-contest typography, when transforming phrase A into phrase B in the same position, give B an equivalent solo reading breath to A before introducing any subordinate/lower explanatory line.
-- Do not stack the lower line immediately on top of B; sequence as: A appears/holds/fades → B appears/holds in the same visual position → lower support line appears beneath B while preserving the established top/bottom layout.
-- QC must inspect the actual CapCut preview for line order, hierarchy, scale, and overlap; JSON timing alone is not enough.
-
-## CapCut editable text visual alignment lesson — 2026-05-10
-
-For this user's CapCut typography work, **equal JSON/transform X values do not guarantee visual alignment**. CapCut editable text is effectively positioned by text-box center and rendered text width, so captions with different Korean line lengths can appear visually misaligned even when their transform coordinates are identical.
-
-Required workflow for future CapCut typography alignment:
-- Use the actual CapCut preview as the source of truth, not JSON equality.
-- When the user asks to align caption positions, align by the **visible first glyph / left edge in the preview**, not by raw transform coordinates.
-- If using draft JSON as a helper, calculate or adjust per-caption X offsets based on rendered text width, then reopen CapCut and visually QC.
-- For important public-contest typography, select representative clips in CapCut, inspect the actual preview, and capture screenshots before claiming alignment is fixed.
-- If one short line still feels visually off after formulaic correction, apply a direct screen-based manual nudge; visual balance beats numeric symmetry.
-- Record this as a CapCut-first typography rule: editable text layer remains preferred, but CapCut UI/preview proof is mandatory for alignment claims.
 
 ## Kim Gu contest submission email workflow — 2026-05-10
 
