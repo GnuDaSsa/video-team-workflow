@@ -1,20 +1,35 @@
 {
   "currentGoal": "Recover video throughput, user intent and lean QC/prompting from the Seongnam production audit",
-  "status": "in_progress",
+  "status": "complete",
   "currentContract": "docs/contracts/2026-09-26-video-production-throughput-and-intent.md",
   "blockers": [],
-  "nextStep": "Commit and sync the verified common-rule change, deploy exact source scope, migrate Seongnam visual-only receipt, and recheck live next/validate.",
-  "lastUpdated": "2026-09-26T02:46:13+09:00",
+  "nextStep": "For the active Seongnam production, create and validate a Planner R3 that restores an illustrative Seedance city shot without falsifying GIS, preserves the eating payoff as a clearly gated or functional alternative, and binds current approved identity IDs; then measure actual generation quality/time. Researcher and dog 3/3 preflights remain.",
+  "lastUpdated": "2026-09-26T02:53:26+09:00",
   "verification": {
-    "lastCommand": "TMPDIR=/private/tmp JEV_QC_TEST_TMP=/private/tmp verifyQuick equivalent; video_release.py freeze/preflight; git diff --check",
-    "lastResult": "PASS_451_NODE_204_RUNTIME_PREFLIGHT",
-    "notes": "451/451 Node and 204/204 Python runtime tests pass; source release preflight clean. Actual media quality and latency are not yet tested."
+    "lastCommand": "451 Node + 204 runtime tests; video_release preflight and 14 scoped source/live hashes; native Aside parity; Seongnam validate/next; child registry/hash/image review",
+    "lastResult": "PASS_COMMON_WORKFLOW_DEPLOYED_PROJECT_AUDIO_GATE_REPAIRED_CHILD_3_OF_5_LOCKED",
+    "notes": "Common workflow changed and synced. Seongnam Planner R2 creative omissions and stale references are documented but not silently re-attested. 0 videos generated; output quality and elapsed-time gain unproven. Full Codex parity retains unrelated model_routing drift."
   },
   "knownWarnings": [
-    "Existing legacy Codex source/live deployment drift is unchanged.",
-    "Character/byte reductions are measured; production model-token/latency gains are not."
+    "Seongnam Planner R2 remains a historical accepted package but not safe to reuse unchanged: creative city/eating omissions, old candidate IDs and stale brief/override hashes; rebuild R3 before production.",
+    "Researcher and dog identity preflight and all actual video QC remain pending.",
+    "Pre-existing live model_routing.py drift is outside this scoped release; full Codex parity is not claimed.",
+    "Model-token, media quality and end-to-end latency gains have not been measured in an actual comparable run."
   ],
   "recentCloseouts": [
+    {
+      "id": "2026-09-26-video-production-throughput-and-intent",
+      "status": "source_verified_deployed",
+      "contract": "docs/contracts/2026-09-26-video-production-throughput-and-intent.md",
+      "verification": {
+        "lastResult": "PASS_SCOPED_THROUGHPUT_DEPLOYMENT",
+        "tests": "451 Node + 204 runtime",
+        "live_files": "14 Codex scoped + 1 native Aside catalog",
+        "project": "Seongnam validate ok; Music skipped, child identity 3/5 locked, 0 videos",
+        "not_run": "Actual Seedance generation/QC, project Planner R3, controlled GPT-5.5/6 quality or wall-clock A/B, full parity due unrelated drift"
+      },
+      "nextStep": "For the active Seongnam production, create and validate a Planner R3 that restores an illustrative Seedance city shot without falsifying GIS, preserves the eating payoff as a clearly gated or functional alternative, and binds current approved identity IDs; then measure actual generation quality/time. Researcher and dog 3/3 preflights remain."
+    },
     {
       "id": "2026-09-25-continuous-single-owner",
       "status": "source_verified_deployed",

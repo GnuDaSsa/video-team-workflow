@@ -68,3 +68,29 @@ change, not permission to spawn more agents or browser loops.
 - Native Aside's reviewed knowledge catalog hashes were refreshed for the
   current live wiki pages (including an already-edited typography page) after
   bounded content review; the creative corpus itself was not rewritten.
+
+## Closeout and live limits
+
+- GitHub `main` contains commits `3a0e27f` and `52c260a`. The 13 initial
+  changed Codex files and one follow-up identity-standard file were deployed
+  with `video_release.py apply-scoped`; each source/live hash matched. The
+  native Aside reviewed knowledge catalog was frozen/deployed through
+  `deploy_aside_workflow.mjs`; its installed parity check passed.
+- Seongnam now uses a dedicated SHA-bound visual-only authorization receipt.
+  `validate` returned `ok: true`, no problems, and `next` skipped Music with
+  no user action required. Existing child T01–T03 image files and master were
+  visually inspected and registry/hash/dimension verified; the child master
+  is now the third approved identity (3/5 total), with a 3/3 preflight and
+  explicit 4.47/5 scored crop rubric. Researcher and dog remain candidates.
+- Project evidence and exact residual blockers are in
+  `docs/throughput_intent_audit_20260926.md` inside the Seongnam project.
+  Planner R2 still holds the user's creative city shot outside the generated
+  block map, still omits actual eating, and binds outdated candidate IDs and
+  stale source hashes. It must become a separately proven R3 before those
+  blocks are submitted. This release does not claim that project-specific
+  creative plan adoption or actual video quality is complete.
+- Full Codex release parity is deliberately not claimed: the pre-existing
+  unrelated live `model_routing.py` drift remains. Scoped changed-file hashes
+  and native Aside parity were checked. No Seedance clip was generated for this
+  workflow audit; no controlled GPT-5.5 comparison or wall-clock production
+  speedup has yet been measured.
