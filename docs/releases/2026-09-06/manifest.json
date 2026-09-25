@@ -310,7 +310,7 @@
     {
       "source": "references/character_sheet_prompt_standard.md",
       "target": "Documents/Codex/video-team-runtime/runtime/references/character_sheet_prompt_standard.md",
-      "sha256": "5547fc05129f7ffadedfd759d8b84e12bb0c9a36e7f136af3766bbecd875582d"
+      "sha256": "3899b2b170a925308954084fb00d22f3cb154f630539760ffcf5a59d39f66a8b"
     },
     {
       "source": "references/seedance_prompting_rulebook.md",

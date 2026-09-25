@@ -12,9 +12,9 @@ Every new recurring protagonist, pair member, guardian, mascot, performer, or re
 
 The three panels depict the same identity, body, grooming state, outfit, materials, palette, and accessories. Use a neutral mid-gray seamless background, flat or softly one-directional studio light, neutral color response, and medium-true rendering. The sheet is deliberately plain: story lighting, rain, smoke, lens effects, dramatic camera language, film grain, LUTs, typography, UI, and worldbuilding belong in production frames and video prompts, not in the identity master.
 
-### Why the face appears only once
+### Why the large portrait stays primary
 
-Full-body faces are usually too small to be reliable identity evidence. Keeping one large portrait as the sole face source gives image/video models an unambiguous identity anchor, while the two full-body panels carry body and wardrobe construction. In the default headless layout, do not invent a front head downstream or treat the gray background/panel layout as scene content; the recorded fallback below has a different truthful binding.
+Full-body faces are usually too small to be reliable identity evidence. Keeping one large portrait as the primary face source gives image/video models a clear identity anchor, while the two full-body panels carry body and wardrobe construction. In the default headless layout, do not invent a front head downstream or treat the gray background/panel layout as scene content; the recorded fallback below has a different truthful binding.
 
 ### Fast fallback for failed headless edits
 
