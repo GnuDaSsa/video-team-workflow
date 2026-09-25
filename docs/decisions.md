@@ -11,6 +11,13 @@ Record notable technical or product decisions here so they do not live only in c
 - Consequences:
 - Follow-up:
 
+### 2026-09-25 - Keep video production in one conversation by default
+
+- Context: In the Seongnam food-tech project, the current `gpt-6-sol` owner could continue locally but §1.3 still required Astra xhigh authorship and a newly approved child. The resulting routine approval request stopped image repairs despite the user's explicit preference for uninterrupted work.
+- Decision: The current owner writes prompts, operates the authorized browser, and performs QC sequentially with its actual session model. Astra xhigh remains the preferred optional author route, not a hard prerequisite or implicit spawn request. An explicitly Astra-only output remains on hold if this model is unavailable; actual new-owner dispatch still requires exact current-conversation approval.
+- Consequences: `next.default_execution` states `inherit_session` authorship and does not label the creative step `author_required`; optional dispatch remains separately protected. Identity QC, reference, duration, registry, and public-action gates do not change. Sol-authored work must never be attributed to Astra.
+- Follow-up: Verify the deployed runtime against the live Seongnam project, then resume ChatGPT web Images 2.5 character-sheet repair without any new agent or routine approval prompt.
+
 ### 2026-07-21 - Deploy Chrome-hybrid Seedance package with bundled policies
 
 - Context: Fable/Grok updated the GitHub workflow to use one Chrome Runway board, phase-locked Codex tools, dual in-flight capacity, and explicit approval before agent/scheduler fan-out.

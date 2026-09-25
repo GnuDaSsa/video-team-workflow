@@ -56,8 +56,8 @@ Use this file for durable context that should survive across threads.
 
 ## Astra creative prompt routing
 
-- The user explicitly changed image and video prompt authorship from 5.6 Sol to Astra. The three creative routes now use `gpt-6-astra` at existing `xhigh`; flow/QC/edit and Seedance production routes retain Luna high.
-- This is an authoring-model preference, not a change to image_gen/Seedance providers or permission to spawn another owner. The current conversation continues sequentially.
+- Astra xhigh remains the preferred creative route, but the user later rejected stopping production to request a new author-child approval. The current conversation now authors and executes sequentially using its actual selected session model unless the user explicitly specifies Astra-only for a particular output.
+- This preference does not change image or video providers, authorize another owner, or soften prompt, identity, duration, media or safety QC gates. Optional new-owner dispatch still requires its exact approval.
 - Canonical routing: `runtime/scripts/model_routing.py`; acceptance: `docs/contracts/2026-09-06-astra-prompt-routing.md`.
 
 ## Role-aware reference overlap

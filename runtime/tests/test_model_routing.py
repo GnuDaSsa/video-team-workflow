@@ -114,8 +114,37 @@ class ModelRoutingTests(unittest.TestCase):
             self.assertEqual(value['default_execution']['action'], 'CONTINUE_IN_CURRENT_CONVERSATION')
             self.assertFalse(value['default_execution']['new_approval_for_role_change'])
             self.assertFalse(value['default_execution']['automatic_model_switch'])
+            self.assertEqual(value['default_execution']['authoring_model'], 'inherit_session')
+            self.assertTrue(value['default_execution']['same_owner_authoring_allowed'])
+            self.assertTrue(value['default_execution']['next_roles'][0]['author_model_preference_only'])
+            self.assertIsNone(value['default_execution']['next_roles'][0]['preferred_author_model'])
+            self.assertNotIn('author_required', value['default_execution']['next_roles'][0])
             self.assertTrue(value['next_dispatch'][0]['dispatch_requires_explicit_action'])
             self.assertEqual(value['next_dispatch'][0]['required_spawn_approval'], 'seedance:production')
+
+    def test_next_creative_prefers_astra_without_blocking_same_owner(self) -> None:
+        for lane, phase in (('image_creator_02', None), ('seedance', 'prompting')):
+            with self.subTest(lane=lane):
+                with tempfile.TemporaryDirectory() as td:
+                    out = io.StringIO()
+                    with mock.patch.object(video_codex_runtime.lane_gates, 'next_actions',
+                                           return_value={'next_lanes': [lane]}), \
+                            mock.patch.object(video_codex_runtime, 'seedance_phase', return_value=phase), \
+                            contextlib.redirect_stdout(out):
+                        video_codex_runtime.next_cmd(SimpleNamespace(project=td))
+                    value = json.loads(out.getvalue())
+                    current = value['default_execution']
+                    self.assertEqual(current['action'], 'CONTINUE_IN_CURRENT_CONVERSATION')
+                    self.assertEqual(current['authoring_model'], 'inherit_session')
+                    self.assertTrue(current['same_owner_authoring_allowed'])
+                    self.assertFalse(current['new_approval_for_role_change'])
+                    self.assertEqual(current['next_roles'][0]['preferred_author_model'], 'gpt-6-astra')
+                    self.assertTrue(current['next_roles'][0]['author_model_preference_only'])
+                    self.assertNotIn('author_required', current['next_roles'][0])
+                    optional = value['next_dispatch'][0]
+                    self.assertTrue(optional['dispatch_requires_explicit_action'])
+                    self.assertEqual(optional['required_spawn_approval'],
+                                     f'{lane}:{phase if lane == "seedance" else "lane"}')
 
 
 if __name__ == '__main__':

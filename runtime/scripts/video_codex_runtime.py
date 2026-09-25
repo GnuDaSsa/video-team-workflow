@@ -375,7 +375,7 @@ def _seedance_phase_contract(project: Path, phase: str, route: dict) -> str:
 
 - This foreground owner is `{route['model'] or 'inherit_session'}` with `{route['reasoning_effort'] or 'session-selected'}` reasoning.
 - Use only current `ATTESTED` prompt packages. Do not rewrite, improve, or silently replace a
-  prompt; return to the Astra prompting phase when a creative revision is required.
+  prompt; return to the same owner's prompting step when a creative revision is required.
 - Aside is the sole visible Runway owner. Bind the exact existing Runway tab with deterministic
   `aside repl` (`listBrowserTabs()` -> exact targetId -> `attachBrowserTab(targetId)`). Never
   open a new Runway tab or use Chrome, Safari, in-app browser, connector, or API.
@@ -850,17 +850,20 @@ def next_cmd(args) -> None:
     for lane in result.get('next_lanes') or []:
         phase = seedance_phase(project, 'auto') if lane == 'seedance' else None
         dispatch.append(model_routing.resolve(lane, phase))
-    result['next_dispatch'] = dispatch
     result['default_execution'] = {
         'action': 'CONTINUE_IN_CURRENT_CONVERSATION',
         'new_owner': False,
         'new_approval_for_role_change': False,
         'automatic_model_switch': False,
+        'authoring_model': 'inherit_session',
+        'same_owner_authoring_allowed': True,
         'next_roles': [{'lane': row['lane'], 'phase': row['phase'],
-                        'author_required': row['model_selection'] == 'astra_author',
+                        'preferred_author_model': row['model'],
+                        'author_model_preference_only': True,
                         'author_protocol': 'AGENTS.md §1.3'} for row in dispatch],
-        'dispatch_note': 'next_dispatch is optional new-owner routing, not an instruction to spawn or ask again for routine steps.',
+        'dispatch_note': 'next_dispatch is optional new-owner routing only. Continue prompting and production here with the actual session model; do not spawn or request routine approval.',
     }
+    result['next_dispatch'] = dispatch
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
@@ -943,7 +946,7 @@ def main() -> None:
     p.add_argument('--lanes', nargs='+', required=True, help='exactly one lane for dispatch; multi-lane aliases are rejected')
     p.add_argument('--force', action='store_true', help='bypass eligible rail gates with a warning; v4 MEDIA_HARD_GATE is never bypassed')
     p.add_argument('--phase', choices=['auto', 'prompting', 'production'], default='auto',
-                   help='seedance only: auto resolves the next sequential Astra/Luna phase')
+                   help='seedance only: auto resolves the next sequential prompting/production phase')
     p.add_argument('--approved-spawn',
                    help='exact current-conversation spawn approval token shown by next/model-route')
     p.set_defaults(func=dispatch)

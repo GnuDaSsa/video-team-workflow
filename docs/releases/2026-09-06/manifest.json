@@ -5,7 +5,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/SKILL.md",
       "target": ".codex/skills/seedance-prompt-en/SKILL.md",
-      "sha256": "e9df9d8b7e9c36cd8f9aa47a1cfe1e6e1265d33f34ffc4ecd3df93ad3a5b65cc"
+      "sha256": "e5a25435d603a81ad7f4a07c093944a198949c49247f513b7da9b6e51721e69f"
     },
     {
       "source": "codex-skills/seedance-prompt-en/aside-operator.md",
@@ -225,7 +225,7 @@
     {
       "source": "runtime/scripts/video_codex_runtime.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/video_codex_runtime.py",
-      "sha256": "6555d6fe4f9b0ab7f32e8e00e9767dbce489945f38d29a1effba779f33d0b730"
+      "sha256": "0b03cf56d8f520eacaf410699e4c3de23e885d24dfc025ee338c7ff1aad14146"
     },
     {
       "source": "runtime/scripts/video_knowledge_router.py",
@@ -250,7 +250,7 @@
     {
       "source": "runtime/templates/image_creator.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/image_creator.md",
-      "sha256": "5ff80ac16fa23e0d36841ca3e850a1079d202ca43155a0efff57ff4c26d5377f"
+      "sha256": "139b9a1d440c095c129bbfffbc3e817f93d9277f50c6c0c349855e6ae6c4534a"
     },
     {
       "source": "runtime/templates/image_qc.md",
@@ -305,7 +305,7 @@
     {
       "source": "runtime/AGENTS.md",
       "target": "Documents/Codex/video-team-runtime/AGENTS.md",
-      "sha256": "ecde449bb0feed24e21826d6dda203d82e71fdb5b04058389a0ed9794dead23a"
+      "sha256": "12a2d787f1d6187eb48f82e3cfaec4e900308a7c4b536b2ed7c46a2bdf6c3d29"
     },
     {
       "source": "references/character_sheet_prompt_standard.md",

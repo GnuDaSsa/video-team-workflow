@@ -111,26 +111,26 @@ flowchart TD
 - 잠금이 바뀌면 기존 attestation은 무효다. 아직 제출하지 않은 불일치 pack은 `HOLD_DURATION_LOCK_MISMATCH`로 두고 프롬프트의 시간 진행까지 다시 저작·attest한다.
 - Runway UI 조작 직전의 visible model+duration 비교 절차는 canonical Seedance skill의 `settings-verify`가 소유한다. 이 파일은 그 UI 절차를 복제하지 않는다.
 
-### 1.3 세션 실행자와 Astra 저작
+### 1.3 세션 실행자와 창작 모델 선호
 
 - 실행 모델을 Luna로 고정하지 않는다. 사용자가 고른 현재 세션이 컴퓨터유즈, 이미지 생성 호출, 영상 생성, 다운로드, QC, 편집, 폴더링을 맡는다. 실행 native follow-up에는 model/thinking override를 넣지 않는다. 기존 override로 바뀐 세션은 원래 사용자 선택을 확인해야 하며 null을 복귀 증거로 삼지 않는다.
-- 기획의 창작 결정·컷 설계, 이미지/영상 프롬프트의 작성·의미 수정·창작 검토는 실제 `gpt-6-astra` / `xhigh`가 맡는다. 이미 검증된 패키지를 읽고 실행하는 일은 저작이 아니다. 음악 등 다른 lane도 이미지/영상 저작을 만나면 이 경계를 적용한다.
-- 현재 세션이 Astra라면 같은 owner가 직접 저작한다. 다른 모델이면 원래 세션을 바꾸지 않고 **한 번의 bounded native author child**에 저작만 맡긴다. 별도 상주 관리자, CLI sidecar, 브라우저 owner, 자동 자기 자신 메시지 전환은 만들지 않는다.
-- 새 child에는 현재 대화에서 역할·목적·산출물이 특정된 spawn 승인이 필요하다. 워크플로우 설치나 일반 “영상팀 실행”을 향후 모든 spawn의 허가로 간주하지 않는다. 승인이 없으면 해당 저작 호출만 한 번 요청하고, 승인된 동일 범위 내 일상 동작을 재승인받지 않는다.
+- 기획·이미지·영상의 창작 저작에는 `gpt-6-astra` / `xhigh`를 선호한다. **기본 실행은 현재 대화의 같은 owner가 사용자가 선택한 실제 세션 모델로 저작·생성·QC까지 직렬 진행**한다. 모델 선호를 별도 agent 생성이나 매 단계 승인 요청의 이유로 삼지 않는다. 실제 저작 모델을 기록하고 Astra가 아닌 결과를 Astra 저작으로 표시하지 않는다.
+- 사용자가 특정 산출물에 `Astra만`을 명시했다면 현재 모델이 다를 때 대신 저작하지 않는다. 이때도 자의로 child를 만들거나 일반 제작을 전부 중단하지 않는다. 다른 독립 작업은 계속하고, 해당 산출물만 `HOLD_EXPLICIT_AUTHOR_MODEL`로 남긴다.
+- bounded Astra author child는 사용자가 그 **별도 spawn**을 현재 대화에서 역할·목적·산출물까지 특정해 승인한 경우에만 쓰는 선택 경로다. 워크플로우 설치나 일반 “영상팀 실행”은 spawn 승인이 아니다. 승인 없는 상태에서는 child를 제안·요구하는 루틴 체크포인트를 만들지 않는다. 별도 상주 관리자, CLI sidecar, 브라우저 owner, 자동 자기 자신 메시지 전환도 만들지 않는다.
 - 호출 준비: `python3 runtime/scripts/author_handoff.py request --project <p> --block <id> --kind planning|image|video --input <project-relative-source> ... --output <owned-output-dir> --approval astra-author:<kind>:<id>`. 이 명령은 native `spawn_agent`용 JSON만 출력하며 모델을 실행하지 않는다. 출력의 실제 model/reasoning_effort/fork_turns 인자를 사용한다. full-history fork 대신 brief·현재 계획·정확한 참조/패키지·거절 피드백의 bounded 파일을 전달한다.
-- child 시작 때 `[아스트라 프롬프팅]`, 복귀 때 `[executor] 세션 모델 유지`를 표시한다. parent는 브라우저를 조작하지 않고 입력 무결성·기존 패키지 상태 등 독립적인 로컬 검증을 수행한 뒤 반환을 기다린다. child는 저작 파일만 수정하고 생성·컴퓨터유즈·추가 spawn을 하지 않는다. 도구가 없거나 실제 모델이 확인되지 않으면 `HOLD_ASTRA_AUTHOR_REQUIRED`; 다른 모델의 대행 또는 metadata 이름만 바꾸기는 금지한다.
+- 승인된 child를 실제 사용하는 경우에만 시작 때 `[아스트라 프롬프팅]`, 복귀 때 `[executor] 세션 모델 유지`를 표시한다. parent는 브라우저를 조작하지 않고 입력 무결성·기존 패키지 상태 등 독립적인 로컬 검증을 수행한 뒤 반환을 기다린다. child는 저작 파일만 수정하고 생성·컴퓨터유즈·추가 spawn을 하지 않는다. Astra-only 요청에서 모델 확인이 안 되면 해당 산출물만 보류하며, 다른 모델의 대행 또는 metadata 이름만 바꾸기는 금지한다.
 - 반환 시 parent는 실제 native 호출/반환의 agent 또는 task/turn 식별자·모델 근거와 파일 hash를 기록한다. 자기 선언이나 요청 성공은 저작 완료 증거가 아니다. 관련 skill의 critic/attestation을 통과한 원본 pack을 사용한다.
 - 실행 인수증에는 `block_id`, `status=READY_FOR_EXECUTION`, `prompt`, `settings`, `pack`과 순서 있는 `references`를 기록한다. 각 항목은 project-relative `path`와 `sha256`이다. 기존 handoff/attestation에 이 정보를 통합하고 인수 당시 receipt hash를 유지한다. `author_handoff.py verify --project <p> --block <id> --receipt <file> --receipt-sha256 <accepted-hash>`는 파일 무결성만 검증하며 실제 저작 모델·참조 첨부·창작 품질을 증명하지 않는다.
 - 실행자는 매 재개 시 다음 block ID와 원본 pack/참조/설정을 다시 읽는다. “두 개씩”은 shelf의 다음 두 eligible block이지 임의 변형 두 개가 아니다. 누락·해시 불일치·다른 block·거절 패키지는 제출하지 않는다. 요약/문장 변경/참조 축소는 저작으로 되돌린다. UI 제출 전 검증·queue-doctor·복구·exactly-once 제출은 선택된 Seedance skill만 소유한다.
-- `model_routing.py`는 저작을 Astra로, 실행을 `inherit_session`으로 반환한다. CLI는 실행 세션 모델을 상속할 수 없으므로 실행 dispatch를 거부하고 현재 대화로 돌려보낸다. 이미지 lane은 prompting과 production을 분리한다. 기존 owner 전환 호환 경로는 별도 승인된 경우에만 사용하며 자동으로 Luna를 강제하지 않는다.
+- `model_routing.py`의 Astra 저작 경로는 **선택적 새 owner dispatch의 선호값**이다. `next.default_execution`은 모든 lane에서 현재 세션 모델을 상속하며, CLI는 이를 대신 실행할 수 없어 현재 대화로 돌려보낸다. 이미지 lane은 prompting과 production 책임을 구분하되 owner를 강제 분리하지 않는다. 기존 owner 전환 호환 경로는 별도 승인된 경우에만 사용하며 자동으로 Luna를 강제하지 않는다.
 
 ## 2. 프롬프트 소유권
 
 ### 2.1 저작 책임
 
-- 상주 prompt bridge는 사용하지 않는다. 필요한 bounded Astra 저작 호출은 §1.3을 따른다.
+- 상주 prompt bridge는 사용하지 않는다. 별도로 승인된 bounded Astra 저작 호출만 §1.3을 따른다.
 - Planner는 컷·블록 구조, 참조 역할, 음악 큐, 동작 의도까지만 정의한다.
-- lane 이름이 저작 권한을 주지 않는다. 최종 프롬프트는 §1.3 아스트라 저작 게이트를 통과한 prompting 단계가 소유하고 production 단계는 불변 입력을 소비한다.
+- lane 이름이 별도 agent 생성 권한을 주지 않는다. 최종 프롬프트는 §1.3의 실제 모델 표시와 이 lane의 검증을 거친 prompting 단계가 소유하고 production 단계는 불변 입력을 소비한다.
 
 ### 2.2 이미지
 
