@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Cut Codex global video instruction load by moving craft/QC sections to phase-specific references",
-  "status": "complete",
-  "currentContract": "docs/contracts/2026-09-25-global-video-lazy-load.md",
+  "currentGoal": "Stop Music Director at Suno generation; user alone chooses/downloads, without weakening video Music Lock",
+  "status": "in_progress",
+  "currentContract": "docs/contracts/2026-09-25-suno-generation-only.md",
   "blockers": [],
-  "nextStep": "Compare first-response token load and time-to-first-media on a future comparable new Codex video task; if still slow, separately audit 31 KB runtime AGENTS with the same authority-preserving lazy-load method.",
-  "lastUpdated": "2026-09-25T02:12:00+09:00",
+  "nextStep": "Validate changed skill/runtime and reviewed manifest, commit/push isolated change, then deploy targeted live files and verify hashes.",
+  "lastUpdated": "2026-09-25T21:10:00+09:00",
   "verification": {
-    "lastCommand": "9-section verbatim check; 451 Aside tests; 198 runtime tests; Python compile; skill validation; release preflight; six-file scoped deploy and SHA parity; installed safety smoke; diff check",
-    "lastResult": "PASS_SCOPED_GLOBAL_LAZY_LOAD_DEPLOYMENT",
-    "notes": "Global guidance 38,403 -> 17,661 chars (-54.0%); nine sections preserved. Initial Node run failed /tmp symlink fixture, realpath TMPDIR rerun passed. No Jev/provider/media call or actual production latency A/B. Full release parity not claimed."
+    "lastCommand": "451 Aside tests; 200 runtime tests; Python compile; shell syntax; targeted handoff tests; release preflight",
+    "lastResult": "PASS_SOURCE_PREDEPLOY",
+    "notes": "Initial Node run used macOS symlinked temp and failed fixtures; rerun with TMPDIR=/private/tmp passed. No Suno generation/live download attempted."
   },
   "knownWarnings": [
     "Existing legacy Codex source/live deployment drift is unchanged.",

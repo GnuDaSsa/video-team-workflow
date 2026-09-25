@@ -23,7 +23,7 @@ from prompt_packet_utils import prompt_sha256
 STATUS_ENUM = {
     'PENDING', 'LAUNCHING', 'RUNNING', 'DONE', 'PARTIAL_DONE', 'PARTIAL_BLOCKED',
     'BLOCKED', 'FAILED', 'KILLED', 'NOT_LOCKED', 'LOCKED', 'PASS', 'FAIL',
-    'REWORK_ONLY', 'READY_FOR_USER_REVIEW',
+    'REWORK_ONLY', 'READY_FOR_USER_REVIEW', 'PENDING_USER_AUDIO',
     'READY_FOR_PRODUCTION',
 }
 DONE_LIKE = {'DONE', 'PASS', 'READY_FOR_USER_REVIEW', 'LOCKED', 'PARTIAL_DONE'}
@@ -660,7 +660,12 @@ def next_actions(project: Path) -> dict:
         recovery = _seedance_recovery(project) if lane == 'seedance' else {}
         recovery_user_action = bool(
             recovery.get('valid') and recovery.get('status') == 'USER_ACTION_REQUIRED')
-        if recovery_user_action:
+        if lane == 'music' and info['status'] == 'PENDING_USER_AUDIO':
+            user_actions.append({
+                'lane': lane,
+                'detail': 'Suno generation is complete. The user chooses and downloads the song; provide the selected audio in a separate follow-up to resume video work.',
+            })
+        elif recovery_user_action:
             user_actions.append({
                 'lane': lane,
                 'detail': recovery.get('required_user_action') or 'exact user action is missing',

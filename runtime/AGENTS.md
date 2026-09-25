@@ -47,7 +47,7 @@ flowchart TD
 
 ### 1.0a 불필요한 확인 금지
 
-- 사용자가 요청한 프로젝트 범위의 프롬프트 작성·검수, 승인 참조의 비공개 생성 입력, 설정 확인, Generate, 다운로드, 재시도 규칙 안의 수정, QC, 로컬 CapCut 편집·export는 같은 owner가 이어간다. 다음 컷이나 단계마다 “진행할까요?”를 묻지 않는다.
+- 사용자가 요청한 프로젝트 범위의 프롬프트 작성·검수, 승인 참조의 비공개 생성 입력, 설정 확인, Generate, 재시도 규칙 안의 수정, QC, 로컬 CapCut 편집·export는 같은 owner가 이어간다. 다음 컷이나 단계마다 “진행할까요?”를 묻지 않는다. **Suno 음악은 예외**: 음악감독은 생성까지만 수행하고 다운로드·생성물 평가/추천/선정은 하지 않는다. 세부 생성 경계는 `music-director/SKILL.md`가 소유한다. Seedance 영상 다운로드 등 다른 매체의 승인된 작업은 이 예외로 바뀌지 않는다.
 - Seedance의 같은-turn foreground wait는 매 15분마다 새 승인을 받는 작업이 아니다. 대기와 실제 예약의 구분·진단은 선택된 Seedance skill이 소유한다.
 - 별도 실행자/실제 scheduler를 처음 생성하는 승인과 결제·로그인·공개 게시·외부 제출·개인정보·비가역 삭제 gate는 그대로다. 역할 표나 포괄적 자동화 선호를 개별 spawn 승인으로 바꾸지 않는다.
 - safe same-tab 새 프로젝트 세션 준비는 Seedance `aside-operator.md`의 구체적 보존·확인 조건을 따른다. 이 파일은 UI 절차를 복제하지 않는다.
@@ -66,6 +66,10 @@ flowchart TD
   있으나 누락 증거를 보완하지 않고 새 파일로 가장하지 않는다. 단, 사용자가 해당
   프로젝트에서 **음악 없이 이미지·영상 먼저**를 명시한 경우에는 §1.0b의 증거 잠금
   예외만 Planner 진입을 허용한다.
+- Suno 생성 직후에는 `music.status=NOT_LOCKED`, Music lane `PENDING_USER_AUDIO`로
+  멈춘다. 생성 ID/링크는 음악 잠금이나 다운로드 허가가 아니다. 사용자가 직접
+  선택·다운로드한 파일을 별도 후속 작업으로 제공하기 전에는 자동으로 음악을
+  가져오거나 평가·추천·선정하지 않는다. 기존 실파일 Music Lock 검증은 유지한다.
 - Image Creator 진입은 비어 있지 않은 `multi_reference_block_map.json`의
   `blocks`, 고유 ID와 cut/shot 구조가 필요하다. 빈 `{}`나 Planner DONE 문자열은
   통과 근거가 아니다. 이 두 v4 입력 실패는 `--force`로 우회하지 않는다.

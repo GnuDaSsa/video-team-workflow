@@ -64,7 +64,14 @@ Record notable technical or product decisions here so they do not live only in c
 - Context: The user rejected the generated vocals in `링크 업!` and `리와인드 없는 오늘` as conspicuously artificial even though earlier intro/onset and technical checks had passed.
 - Decision: The canonical owner is `codex-skills/music-director/SKILL.md` with the listening checklist at `references/vocal-naturalness-qc.md`. Automated analysis may screen but cannot certify vocal naturalness.
 - Consequences: Prior recommendations for those performances are invalid. A candidate with obvious synthesis artifacts is rejected regardless of composition quality; unlistened vocal candidates remain on hold.
-- Follow-up: Do not duplicate the checklist in project folders; keep only user-feedback evidence and a pointer to the canonical skill.
+- Follow-up: **Superseded for Music Director by the 2026-09-25 Suno generation-only boundary below.** The rejected performances remain negative pre-generation examples, not a reason for the assistant to listen/rank/recommend new Suno songs.
+
+### 2026-09-25 - Stop Music Director at Suno generation
+
+- Context: Suno now limits downloads, and the user explicitly reserved all song choice and downloading to themself. The prior Music lane still instructed the assistant to download, listen, rank TOP candidates and lock music.
+- Decision: Music Director writes prompts/settings, generates a bounded set in the authorized Suno session, records song IDs/links, then stops. `PENDING_USER_AUDIO` exposes a user-action handoff and never advances the registered-audio Music Lock gate. The user alone selects and downloads. A separate later video request may consume the user-provided file without restoring Music Director post-generation selection duties.
+- Consequences: No assistant Suno download/export, listening/QC, ranking/recommendation, candidate choice, credit purchase, or Music Lock claim from generation. Pre-generation vocal guardrails remain, while the old playback checklist becomes a prompt-only reference. Other media downloads and the existing video asset gate remain unchanged.
+- Follow-up: Confirm the deployed music skill and runtime/template hashes; verify in the next actual Suno task that generation ends at the user handoff without consuming a download allowance.
 
 ### 2026-09-05 - Route explicit Seedance 2.5 work through a separate skill
 

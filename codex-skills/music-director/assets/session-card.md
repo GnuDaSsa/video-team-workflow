@@ -19,7 +19,9 @@ Use or update this compact card during multi-turn songwriting/composition work.
 - Suno mode / model assumption:
 - Style prompt:
 - Lyrics / structure tags or Instrumental:
-- Target duration / measured duration:
+- Target duration / displayed Suno setting:
+- Generated song IDs / links:
+- Generation complete; awaiting user's choice and download:
 - A/B delta:
 
 ## Section Map
@@ -32,7 +34,7 @@ Use or update this compact card during multi-turn songwriting/composition work.
 | Bridge | | | | | |
 
 ## Decision Log
-- Chosen:
+- Pre-generation direction chosen:
 - Rejected:
 - Open questions:
 - Next action:

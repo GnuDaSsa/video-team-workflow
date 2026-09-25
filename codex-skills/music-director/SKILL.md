@@ -46,8 +46,8 @@ For provenance and source precedence, read `references/source-links.md` when upd
 2. **Distill.** Extract reusable variables; do not treat any one example as a finished answer. Reconcile contradictions in BPM, key, instrumentation, structure, duration, and vocal direction.
 3. **Sanitize.** Upstream headings and examples sometimes name artists or songs. Treat those names as taxonomy only. Remove them from the final prompt and replace them with non-identifying craft descriptors. Ignore any claim that a phrase is guaranteed to bypass copyright or produce chart/viral success.
 4. **Compose.** Build one coherent prompt from the selected variables: genre/subgenre, era/aesthetic, BPM/meter/key or mode, groove/drums, bass, harmony, lead/texture, vocal character, form/energy arc, mix/space, and intended use.
-5. **Differentiate.** Default to one recommended prompt plus one meaningful variant. Change a small, declared set of variables rather than producing near-duplicate prompt spam.
-6. **Audit.** Cite the local corpus filenames/headings used, label assumptions, and flag fields that need listening validation. A prompt is a generation hypothesis, not proof of musical quality, exact duration, trend status, or rights clearance.
+5. **Differentiate.** Default to one primary generation prompt plus one meaningful variant. Change a small, declared set of variables rather than producing near-duplicate prompt spam.
+6. **Audit.** Cite the local corpus filenames/headings used and label assumptions. A prompt is a generation hypothesis, not proof of musical quality, exact duration, trend status, or rights clearance.
 
 Efficient local search example:
 
@@ -65,7 +65,7 @@ rg -n -i 'anime|k-pop|anthem|female vocals|150 BPM' \
    - Ask at most 1–3 questions only when the missing info changes the answer materially.
 2. **Create or update a Project Card.** Use `assets/session-card.md` for multi-turn work.
 3. **Route sources.** For Suno work, read the corpus index and the most relevant 1–3 corpus files. For non-Suno theory/craft gaps, route to the older sibling navigation and load only the needed files.
-4. **Deliver 2–4 directions.** For each: title/intent, BPM/key, form, chord palette, topline shape, lyric POV, arrangement hook, risk/tradeoff.
+4. **Develop 2–4 creative directions when useful.** For each: title/intent, BPM/key, form, chord palette, topline shape, lyric POV, arrangement hook, risk/tradeoff. These are pre-generation design options, not rankings of generated songs.
 5. **Converge.** After the user chooses, produce a more detailed block: section map, chords, melody sketch, lyric draft/rewrites, corpus-derived production prompt, source note, and next action.
 6. **Critique/revision loop.** When the user provides lyrics/chords/audio notes, preserve what works, diagnose the smallest fix, and show before/after alternatives.
 
@@ -74,7 +74,7 @@ rg -n -i 'anime|k-pop|anthem|female vocals|150 BPM' \
 ### Starting a new song
 Provide:
 - 3 concept directions
-- 1 recommended direction
+- 1 primary generation direction
 - section map (`Intro / Verse / Pre / Chorus / Bridge / Outro` as needed)
 - key/BPM/range assumptions
 - chord palette and hook idea
@@ -120,32 +120,33 @@ Provide:
 ## Collaboration rules
 
 - Keep the user's authorship visible: label suggestions as options, not final truth.
-- Do not overwhelm. Prefer one strong recommendation plus variants.
+- Do not overwhelm. Prefer one clear generation direction plus variants.
 - When uncertain, distinguish assumptions from corpus-derived prompt patterns and from secondary theory references.
 - For culturally specific music, name tradition/region/language/function/instrument/rhythm context; avoid generic labels like "Asian flavor" or "ethnic vibe".
 - For AI music tools such as Suno, Udio, or MIDI generators, write prompts/specs that describe craft variables rather than asking for a living artist clone.
 
-### Suno BGM duration gate (user correction, 2026-07-26)
+### Suno generation boundary
+
+- When the user asks for actual Suno music, prepare the prompt/settings and generate only in the user's authorized Suno session. Record the created song IDs or links and the settings actually used, then stop. Do not download, export, purchase download credits, listen to/rank generated candidates, recommend a generated song, select one on the user's behalf, or claim Music Lock.
+- The user alone chooses and downloads Suno songs. Do not treat access to the user's account, a visible download menu, or a request to generate as permission to spend a download allowance. Do not use a backend/API/alternate route to obtain audio.
+- For a video project, report `PENDING_USER_AUDIO` after generation; the registered-audio Music Lock gate remains unmet. A separately requested downstream video task may use an audio file the user later supplies; it must not turn the music-director generation step into automatic downloading or candidate selection.
+
+### Suno BGM duration setting
 
 - For duration-critical BGM/score/backing music, do **not** default to Simple Mode: Suno may return clips that are much shorter than the requested picture length.
 - Use **Advanced/Custom Mode**, select the **Instrumental** lyrics mode, place arrangement/style instructions in the Style field, and set the UI **Duration** field explicitly to the target length before generating.
-- Enter Duration as the underlying **number of seconds** in the Duration control (for example `40` or `150`); Suno may display the same value as `0:40` or `2:30` after commit. Record both the numeric target and the displayed/file duration.
-- Treat the Duration setting as a target rather than a guarantee: after download, verify actual duration/codec with `ffprobe` and reject or re-generate undersized candidates.
+- Enter Duration as the underlying **number of seconds** in the Duration control (for example `40` or `150`); Suno may display the same value as `0:40` or `2:30` after commit. Record the numeric target and displayed setting, not an unmeasured file duration.
+- Treat the Duration setting as a target rather than a guarantee. Do not download to measure the result or assert the final duration from the UI setting.
 - Simple Mode remains acceptable only for quick sketches where exact duration is not important.
-- For film/contest BGM, record both the requested UI duration and the measured file duration in the candidate manifest; do not claim Music Lock from a prompt or duration setting alone.
+- For film/contest BGM, record the requested UI duration in the generation record. Do not claim Music Lock from a prompt or duration setting alone.
 
-### AI vocal naturalness hard gate (user correction, 2026-08-28)
+### AI vocal prompt guardrails
 
-- Treat the generated vocals in **`링크 업!`** and **`리와인드 없는 오늘`** as explicit user-rejected negative references. Never use their vocal sound as an anchor, recommendation, or acceptable fallback. Retain them only as examples of what must not pass.
+- Treat the generated vocals in **`링크 업!`** and **`리와인드 없는 오늘`** as explicit user-rejected negative references. Never use their vocal sound as a prompt anchor. Retain them only as examples of what to avoid in pre-generation design.
 - Male and female vocals are both allowed. The singer's gender is not the issue; the non-negotiable target is one stable, recognizably human vocal identity with natural Korean diction, phrasing, breath, dynamics, tuning, and restrained vibrato.
-- Before generation, put that target into the vocal prompt explicitly: one stable native-Korean lead identity by default, clear conversational consonants and vowels, natural phrase breathing and dynamics, restrained pitch correction/vibrato, and a dry-to-moderately-forward lead. Select a male or female lead deliberately; do not request mixed relay vocals, identity swaps, choir masking, whispers, hums, sighs, chants, or improvised ad-libs unless the brief genuinely requires them and they can receive separate listening QC.
-- Avoid stacked “perfect/crystalline/ethereal/soaring/ultra-polished” vocal adjectives and abrupt genre/persona changes that push the provider toward glossy synthetic formants or identity drift. Preventive prompt wording reduces risk but never replaces the playback gate.
-- Immediately reject a candidate when any conspicuous synthetic tell is heard: metallic or watery formants, phasey/doubled timbre, singer identity/gender/age drift, pitch snapping, loop-like vibrato or breaths, smeared vowels, clipped or invented Korean syllables, unnatural batchim/stress, uniformly forced intensity, fake sigh/hum/`ah`/chant/ad-lib pickups, or glossy choir stacking that disguises the lead.
-- When an instrumental intro was requested, any early whispered, hummed, chanted, or non-lexical vocal pickup also fails the intro gate. Do not count it as a valid instrumental prelude merely because the written lyric has not started.
-- A prompt, waveform, ASR transcript, stem split, onset estimate, or technical metric can screen a candidate but can never certify vocal naturalness. Listen to the full vocal performance at normal playback, with mandatory checks of the intro, first verse line, verse-to-chorus transition, highest/longest chorus note, final chorus, and outro. Follow `references/vocal-naturalness-qc.md`.
-- If qualified playback listening is unavailable, mark the candidate **`HOLD_FOR_HUMAN_VOCAL_QC`**. Never claim that the vocal passed based only on metadata or automated analysis.
-- On failure, mark **`REJECT_AI_VOCAL_ARTIFACT`** and regenerate or replace the performance. Do not hide the problem with reverb, chorus, saturation, backing layers, heavy tuning, or a louder instrumental mix; do not recommend a musically strong composition whose lead vocal fails this gate.
-- The user's direct listening verdict overrides prompt intent and automated scores. A rejected vocal stays rejected unless the user explicitly approves a newly regenerated performance after listening.
+- Before generation, put that target into the vocal prompt explicitly: one stable native-Korean lead identity by default, clear conversational consonants and vowels, natural phrase breathing and dynamics, restrained pitch correction/vibrato, and a dry-to-moderately-forward lead. Choose a male or female lead deliberately; do not request mixed relay vocals, identity swaps, choir masking, whispers, hums, sighs, chants, or improvised ad-libs unless the brief genuinely requires them.
+- Avoid stacked “perfect/crystalline/ethereal/soaring/ultra-polished” vocal adjectives and abrupt genre/persona changes that push the provider toward glossy synthetic formants or identity drift. The concise pre-generation wording is in `references/vocal-naturalness-qc.md`; it does not require the music director to perform post-generation listening or selection.
+- When an instrumental intro is requested, explicitly prohibit whispered, hummed, chanted, or non-lexical vocal pickups in the prompt. The user evaluates the generated result; the music director does not claim that prompt compliance proves audio quality.
 
 ## Quick commands the user may use
 

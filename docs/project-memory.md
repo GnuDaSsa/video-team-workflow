@@ -33,8 +33,8 @@ Use this file for durable context that should survive across threads.
 ## Generated-vocal naturalness preference
 
 - The user explicitly rejects the vocal sound of `링크 업!` and `리와인드 없는 오늘` as obvious AI output. Those performances are negative references only.
-- Use `/Users/gnudas/.codex/skills/music-director/references/vocal-naturalness-qc.md` as the canonical listening gate. Male and female vocals are both allowed; stable human identity, fluent Korean diction, breathing, dynamics, tuning, and restrained vibrato determine acceptance.
-- ASR, stems, onset timing, waveforms, and prompt quality cannot produce a PASS without full-track playback.
+- Use `/Users/gnudas/.codex/skills/music-director/references/vocal-naturalness-qc.md` only for **pre-generation prompt guardrails**. Male and female vocals are both allowed; ask for stable human identity, fluent Korean diction, breathing, dynamics, restrained tuning, and vibrato.
+- Music Director generates in Suno and stops. The user alone chooses and downloads. No assistant download, post-generation listening/QC, ranking, recommendation, or selection; generated IDs/links do not prove Music Lock. Subsequent video work requires a separately supplied user file and the existing registered-audio gate.
 
 ## Explicit Seedance 2.5 branch — 2026-09-05
 

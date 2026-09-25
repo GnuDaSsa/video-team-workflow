@@ -154,6 +154,26 @@ class InputEvidenceTests(unittest.TestCase):
         ok,reason=lane_gates.gate_check(self.p,'image_creator_01')
         self.assertFalse(ok);self.assertTrue(lane_gates.non_bypassable_reason(self.p,reason))
 
+    def test_suno_generation_waits_for_user_audio_without_restarting_music(self):
+        (self.p/'manifest.json').write_text(json.dumps({
+            'media_schema_version':registry.MEDIA_SCHEMA_VERSION,
+            'music':{'status':'NOT_LOCKED'}}))
+        (self.p/'state.json').write_text('{}')
+        generation_settings.initialize_duration_lock(self.p)
+        director=self.p/'lanes/director/status.json';director.parent.mkdir(parents=True)
+        director.write_text('{"status":"DONE"}')
+        music=self.p/'lanes/music/status.json';music.parent.mkdir(parents=True)
+        music.write_text('{"status":"PENDING_USER_AUDIO","detail":"Suno generation complete"}')
+        actions=lane_gates.next_actions(self.p)
+        self.assertEqual(lane_gates.lane_status(self.p,'music')['status'],'PENDING_USER_AUDIO')
+        self.assertNotIn('music',actions['next_lanes'])
+        self.assertNotIn('planner',actions['next_lanes'])
+        self.assertEqual(actions['user_actions_required'][0]['lane'],'music')
+        self.assertIn('user chooses and downloads',actions['user_actions_required'][0]['detail'])
+        ok,reason=lane_gates.gate_check(self.p,'planner')
+        self.assertFalse(ok)
+        self.assertIn('music status must be LOCKED',reason)
+
     def test_registered_lock_hash_and_probe_evidence_required(self):
         f=self.p/'source.wav';f.write_bytes(b'unit-test-audio-fixture')
         a=registry.ingest(self.p,f,work_item_id='MUSIC',kind='audio',state='locked',

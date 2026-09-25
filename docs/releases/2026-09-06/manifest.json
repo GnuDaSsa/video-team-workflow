@@ -175,7 +175,7 @@
     {
       "source": "runtime/scripts/lane_gates.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/lane_gates.py",
-      "sha256": "50213daff6f92bd1f6cbca97b6f159a2f4f9252cc2ed0bb121f1ce53c92bef1d"
+      "sha256": "93362a53c193167970107bbae13b038d8802ae6497f355cf37bc0c0b4d6a803c"
     },
     {
       "source": "runtime/scripts/lane_inputs.py",
@@ -260,7 +260,7 @@
     {
       "source": "runtime/templates/music.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/music.md",
-      "sha256": "4ec208bc2bed5fedc30f8cfefd90b16547de4a2f69d0bde19c10d6eae9005018"
+      "sha256": "d2a40e6c495fbe9ce5b55cd184a7256f7883ea92fb46410bf025ad55685fbac7"
     },
     {
       "source": "runtime/templates/package.md",
@@ -305,7 +305,7 @@
     {
       "source": "runtime/AGENTS.md",
       "target": "Documents/Codex/video-team-runtime/AGENTS.md",
-      "sha256": "98a24e51eaa952be1a0cb711d54f3bd2124a2f621e54f6f1516625b4b7dc1dad"
+      "sha256": "ecde449bb0feed24e21826d6dda203d82e71fdb5b04058389a0ed9794dead23a"
     },
     {
       "source": "references/character_sheet_prompt_standard.md",
