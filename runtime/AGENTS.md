@@ -78,9 +78,13 @@ flowchart TD
 
 - 기본 음악 우선은 유지한다. 사용자가 특정 프로젝트에서 음악 작업을 중단하고
   이미지·영상 제작만 지시했을 때만 `manifest.audio_plan.mode=
-  visual_only_no_audio`와 `delivery_scope=visual_assets_only`를 사용한다. `docs/project_overrides.md`의 해당 사용자
-  메시지 ID·프로젝트 예외, SHA-256, 목표 영상 길이, `PROVISIONAL` 타이밍을
-  기계 검증해야 한다. 누락·변조·임의 선언은 음악 잠금 대체 증거가 아니다.
+  visual_only_no_audio`와 `delivery_scope=visual_assets_only`를 사용한다. 승인된
+  사용자 메시지 ID·프로젝트 범위·목표 영상 길이·`PROVISIONAL` 타이밍을
+  기계 검증해야 한다. 승인 근거와 그 SHA-256은 별도 불변
+  `docs/visual_only_authorization.md`에 두고 `docs/project_overrides.md`는
+  계속 편집 가능한 예외 설명으로 유지한다. 기존 프로젝트의 전체 overrides 해시는
+  명시적으로 이관하기 전까지 레거시 검증한다. 누락·변조·임의 선언은 음악 잠금
+  대체 증거가 아니며, 잘못된 예외를 일반 Music 작업으로 되돌리지 않는다.
 - 이 예외에서 Music lane은 `PENDING`으로 남고 `next`는 이를 건너뛰어 Planner를
   반환한다. Planner는 브리프의 임시 시간표로 컷/15초 소스 블록을 설계하되 음악
   박자·프레이즈·VO 호흡을 측정했다고 주장하지 않는다. 기존의 블록맵·정체성·참조·
@@ -107,7 +111,7 @@ flowchart TD
 - Planner는 Seedance handoff 전에 lock을 확인한다. `video-codex-runtime lock-duration`으로 5–14초를 설정하려면 source가 반드시 `user:<evidence>` 또는 `brief:<artifact>`여야 한다. `planner_revision:`은 15초를 재확인하거나 명시적 근거가 반영된 revision을 기록할 수 있지만 혼자서는 단축 권한이 아니다.
 - 모든 Seedance pack은 `duration_sec`을 선언하고 `prompt_packet_utils.py attest --project <p>`에서 현재 lock과 일치해야 한다. project 없는 attestation은 제출 권한이 없다.
 - **15초는 권고가 아니라 하드 기본값**이다. lock 파일을 수동 편집해 5–14초로 낮추더라도 현재 source가 `user:<evidence>` 또는 `brief:<artifact>`가 아니면 `duration_lock_shorter_without_explicit_user_or_brief`로 gate/attestation/settings verification을 모두 실패시킨다.
-- 15초 source의 수율을 우선한다. 최종 컷이 짧고 같은 음악 프레이즈/스토리 인과 안에서 여러 컷이 필요하면 Planner는 생성 시간을 줄이지 않고 연속 컷 2–4개를 하나의 `PLANNED_MULTI_SHOT_SOURCE` block으로 묶는다. 각 scene의 시간, covered cut, reference token, 행동, camera, edit-out을 block map에 쓴다. 서로 무관한 장면을 절약 목적으로 억지로 묶지는 않는다.
+- 15초 source의 **사용 가능한 수율**을 우선한다. 한 장면의 카메라·행동·끝 프레임이 좋으면 `SINGLE_CONTINUOUS_SHOT` 하나로 두고 편집 핸들을 확보한다. 사용자 의도와 인과에 맞는 경우에만 연속 컷 2–4개를 `PLANNED_MULTI_SHOT_SOURCE`로 묶는다. 각 scene의 시간, covered cut, reference token, 행동, camera, edit-out을 쓰되 숫자를 채우려고 이질적인 장면을 억지로 묶지 않는다.
 - 잠금이 바뀌면 기존 attestation은 무효다. 아직 제출하지 않은 불일치 pack은 `HOLD_DURATION_LOCK_MISMATCH`로 두고 프롬프트의 시간 진행까지 다시 저작·attest한다.
 - Runway UI 조작 직전의 visible model+duration 비교 절차는 canonical Seedance skill의 `settings-verify`가 소유한다. 이 파일은 그 UI 절차를 복제하지 않는다.
 
@@ -136,6 +140,7 @@ flowchart TD
 
 - Image Creator lane이 Gongnyang `image-prompt` 스킬을 적용해 이미지 프롬프트를 쓴다.
 - 반복 인물/캐릭터는 승인된 모델시트를 먼저 만들고 실제 참조로 첨부한 뒤 production frame을 생성한다.
+- 승인 전 정체성 QC의 현재 세부 기준은 `runtime/references/character_sheet_prompt_standard.md` 한 곳이 소유한다. 모든 인물에 10개 QC 전용 이미지를 습관적으로 생성하지 않는다. 캐릭터가 없는 독립 블록은 다른 인물의 QC 대기와 분리해 진행한다.
 - 한 production cut은 한 프롬프트, 한 독립 이미지다. production grid/contact sheet는 금지한다.
 - 이미지 실행은 현재 owner의 내장 image_gen 호출이다. `prepare-image-batch`
   (구형 별칭 `dispatch-image-shards`)는 hash-bound 전달 목록만 만들며 process,
@@ -161,7 +166,7 @@ flowchart TD
 - Director가 프로젝트 `medium/project_type`을 분류하고 Planner가 `lanes/planner/video_attributes.json`에 block별 `shot_roles/cameras/risks/methods/audio`를 기록한다.
 - Seedance는 prompt 작성 전에 `video-codex-runtime knowledge-select --project <p> --block <BLOCK>`을 실행한다. 로컬 라우터는 `/Users/gnudas/wiki/_meta/video-knowledge-catalog.json`에서 최대 6개 섹션, 기본 9,000자만 골라 context packet과 hash receipt를 만든다.
 - 기본 선택은 hot core + 카메라 구도 core + 현재 2D/3D/실사 매체 profile이며, shot/camera/risk/method/audio 문서는 해당 속성이 있을 때만 추가한다. Mixed는 `mixed` 하나로 뭉개지 않고 실제 component media도 함께 선언해 해당 profile들을 선택한다.
-- 창작 지식 내부에서는 사용자 최신 지시와 프로젝트/identity/medium lock을 지킨 뒤, `video-prompting-higgsfield-community-grammar`의 camera-first·시간 동사 chain·motion-preset 물리 번역·2–4 physical layers·명시적 end frame을 일반 camera 참고보다 우선 적용한다. Community prompt 문장·celebrity/IP·preset ID를 그대로 복사하지 않는다.
+- 창작 지식 내부에서는 사용자 최신 지시와 프로젝트/identity/medium lock을 지킨 뒤, `video-prompting-higgsfield-community-grammar`의 camera-first·시간 동사 chain·motion-preset 물리 번역·필요한 만큼의 물리 단서·명시적 end frame을 일반 camera 참고보다 우선 적용한다. 물리 레이어 수를 형식적으로 채우거나 Community prompt 문장·celebrity/IP·preset ID를 그대로 복사하지 않는다.
 - 최종 prompt pack과 attestation은 현재 selection ID/context hash를 가져야 한다. 전체 wiki/raw/archive 자동 읽기, 키워드 stuffing, 모델 검색용 background agent는 금지한다.
 - 이 라우터는 로컬 파일 선택기이며 agent·scheduler·RAG service가 아니다. Notion 작업 일지는 진행 상태/결정만 저장하며 이 creative knowledge packet에 자동 주입하지 않는다.
 

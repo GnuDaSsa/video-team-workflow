@@ -181,3 +181,11 @@ For a project whose user explicitly excludes music and asks for image/video prod
 - Move nine existing video craft/QC sections verbatim from global AGENTS to four phase-specific `videodirector` references. Keep all global execution/spawn/public-submit/browser-send/authority safety rules at startup. The selected skill/runtime authority is unchanged.
 - Load only the matching production phase; unrelated Codex work and workflow audits should not incur full MV, character and typography text. This is an instruction-size optimization, not a measured end-to-end speed gain or a Jev deployment.
 - Preserve the source/live distinction through a reviewed manifest and scoped deployment; do not overwrite unrelated runtime drift.
+
+## 2026-09-26 — Throughput without losing the user's shot
+
+- Seongnam's 23 identity-only QC stills and zero clips exposed a bad default: production waited for ten extra images per character while an approved visual-only audio exception was invalidated by unrelated edits to a whole-file evidence hash. Keep the real attachment, master-crop and generated-video QC gates, but use three varied reference-bound identity checks before dependent character shots. Character-free shots can start independently.
+- Bind visual-only authorization to a dedicated immutable receipt, not the editable project exception document. An invalid receipt is a hard gate; it must not silently return the user to Music. Legacy projects retain the old proof until explicitly migrated.
+- Record each material user idea as KEEP, functional ADAPT or evidenced HOLD in the Planner's existing result and revise the affected unsubmitted block map. A review memo is not an adopted plan. Do not force a 15-second source into multiple shots when a sustained city/building view is the point.
+- No-I2V reference images define named roles, not an implicit first frame. Start Seedance prose with the intended visual event, and load the large adapters only for matching shot risk. The reviewed native Aside knowledge catalog tracks the current upstream wiki hashes; a hash update is not a new claim of provider quality.
+- The 3/3 gate is a speed/coverage compromise, not proof of stable identity throughout a video. The real wall-clock gain and output quality still need a comparable production run. See `docs/contracts/2026-09-26-video-production-throughput-and-intent.md`.

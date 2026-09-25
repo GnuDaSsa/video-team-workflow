@@ -552,7 +552,10 @@ def gate_check(project: Path, lane: str) -> tuple[bool, str]:
         return True, 'OK: director is the entry lane.'
     if lane == 'music':
         manifest = _json(project / 'manifest.json', {}) or {}
-        if lane_inputs.visual_first_active(project, manifest):
+        visual_error = lane_inputs.visual_first_error(project, manifest)
+        if visual_error is not None:
+            if visual_error:
+                return False, 'MEDIA_HARD_GATE: visual-first override invalid: ' + visual_error
             return False, 'USER_SKIPPED_MUSIC_VISUAL_ONLY: no music work is authorized for this project.'
         if st('director') in DONE_LIKE:
             return True, 'OK'

@@ -97,7 +97,7 @@ production_status: "FINAL_CANDIDATE | PREVIS_HOLD"
   "attach_instruction": "attach the approved identity/casting source and verify its hash",
   "layout": ["left: headless front full body", "middle: back full body with head", "right: large 3/4 face portrait"],
   "rendering": "text-free neutral mid-gray, neutral studio light, true skin/material color, 16:9",
-  "stress_gate": "10 varied generations, same recognizable identity 10/10",
+  "stress_gate": "three targeted attached-reference checks, recognizable identity 3/3; then clip-level QC",
   "derivatives": ["_FACE", "_FRONT_BODY", "_BACK_BODY"]
 }
 ```

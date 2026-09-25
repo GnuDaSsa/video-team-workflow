@@ -5,7 +5,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/SKILL.md",
       "target": ".codex/skills/seedance-prompt-en/SKILL.md",
-      "sha256": "e5a25435d603a81ad7f4a07c093944a198949c49247f513b7da9b6e51721e69f"
+      "sha256": "6fcb173ddbb8821c09d573a127dc166565b83255b20c67f56717bec9a7a5b0b8"
     },
     {
       "source": "codex-skills/seedance-prompt-en/aside-operator.md",
@@ -20,7 +20,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/hell-grind-production-prompting-adapter.md",
       "target": ".codex/skills/seedance-prompt-en/hell-grind-production-prompting-adapter.md",
-      "sha256": "115c4c51de09cfb5b489a1d4e5e46842e9c17a0d68abdec8a8ebccdc099e171d"
+      "sha256": "8c874dc26a9aede7b4ecc70c3e1d9261bd6e2ee9596f7595cb056fa3551c25f3"
     },
     {
       "source": "codex-skills/seedance-prompt-en/image-qc-source-frame-standard.md",
@@ -30,7 +30,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/prompt-review.md",
       "target": ".codex/skills/seedance-prompt-en/prompt-review.md",
-      "sha256": "98417dd85ab9888677b75f29b3fa92ec057830dfa40830d4c46785ad992b432f"
+      "sha256": "619b9c53028614ffe51bfd136ec2037b1bfbd2fa8efb1a1186f4842c7cb5fbba"
     },
     {
       "source": "codex-skills/seedance-prompt-en/scripts/aside_bridge.py",
@@ -55,12 +55,12 @@
     {
       "source": "codex-skills/seedance-prompt-en/seedance-prompting.md",
       "target": ".codex/skills/seedance-prompt-en/seedance-prompting.md",
-      "sha256": "a4a8868090f011b64e6c32a339ab47ffa25880f7080e2047e115427bef1a220e"
+      "sha256": "1a1eab4c92c9984582ad5832f039c111a06cb3dff262a066962d4c4070fd44be"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-shared-contract.md",
       "target": ".codex/skills/seedance-prompt-en/seedance-shared-contract.md",
-      "sha256": "1b2d4145396221efa0836efd6c235abd38e66f5f346d9b2abb33a5116a9140ff"
+      "sha256": "754c6a29a6366079cac13cb60c70db6b31c4df6b61da86a8828634ddf6663d82"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance2-prompt-patterns.md",
@@ -110,7 +110,7 @@
     {
       "source": "codex-skills/videodirector/references/character-identity-calibrations.md",
       "target": ".codex/skills/videodirector/references/character-identity-calibrations.md",
-      "sha256": "9d9ff0ec21a865f8326fa021b66d7bc8646f17d59d82f745648f04737b0d6bc9"
+      "sha256": "2fcff8518b31e6d57fea42e28e88e6ff1dde32d4835d206eaefa4f0f2129f543"
     },
     {
       "source": "codex-skills/videodirector/references/mode-calibrations.md",
@@ -135,7 +135,7 @@
     {
       "source": "codex-skills/videodirector/references/output-formats.md",
       "target": ".codex/skills/videodirector/references/output-formats.md",
-      "sha256": "a34246f26d95fcdb2b27740faad9f152a430e18188fc81e06c547207666f16af"
+      "sha256": "aa538c301df0c929a57c00cd6f1362a6444b1b44e237f4ad730a5671c228bf22"
     },
     {
       "source": "codex-skills/videodirector/references/production-rules.md",
@@ -175,12 +175,12 @@
     {
       "source": "runtime/scripts/lane_gates.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/lane_gates.py",
-      "sha256": "93362a53c193167970107bbae13b038d8802ae6497f355cf37bc0c0b4d6a803c"
+      "sha256": "e5870a36f460eba88c84454af9313e3f14ee6dadb82234cc9af939ed1fec0db2"
     },
     {
       "source": "runtime/scripts/lane_inputs.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/lane_inputs.py",
-      "sha256": "89aa13a4d077e340df76d836c235d16fa00cd9f60793d485d6c9d87f06f928e0"
+      "sha256": "3368dae761ad2c02bb1701d2d3161517ab2e3329c2790eb1f39820d621d00940"
     },
     {
       "source": "runtime/scripts/media_registry.py",
@@ -250,7 +250,7 @@
     {
       "source": "runtime/templates/image_creator.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/image_creator.md",
-      "sha256": "139b9a1d440c095c129bbfffbc3e817f93d9277f50c6c0c349855e6ae6c4534a"
+      "sha256": "90035353942d20e9c39ea371596c478d56426e2c6bf7becd7c555bbcbb1fee3b"
     },
     {
       "source": "runtime/templates/image_qc.md",
@@ -270,7 +270,7 @@
     {
       "source": "runtime/templates/planner.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/planner.md",
-      "sha256": "a48f625ba595742deaa29ef462b8fc08ddc6096c2a948292c9b97e34586766f9"
+      "sha256": "0232874be15bd61d3789e2088bb37f056a64b3ccaed51e546035bace6b952cf8"
     },
     {
       "source": "runtime/templates/qc.md",
@@ -305,12 +305,12 @@
     {
       "source": "runtime/AGENTS.md",
       "target": "Documents/Codex/video-team-runtime/AGENTS.md",
-      "sha256": "12a2d787f1d6187eb48f82e3cfaec4e900308a7c4b536b2ed7c46a2bdf6c3d29"
+      "sha256": "66fd198f12acacaec5cde17e14f3e65e3501ee7ac895470eeb6ade709d5dc323"
     },
     {
       "source": "references/character_sheet_prompt_standard.md",
       "target": "Documents/Codex/video-team-runtime/runtime/references/character_sheet_prompt_standard.md",
-      "sha256": "366793090c3c9e92ab15d75fd56f89e2ea947ffd36bed946a69004a5f583eb67"
+      "sha256": "5547fc05129f7ffadedfd759d8b84e12bb0c9a36e7f136af3766bbecd875582d"
     },
     {
       "source": "references/seedance_prompting_rulebook.md",

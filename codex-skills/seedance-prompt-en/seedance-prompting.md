@@ -48,9 +48,9 @@ A change of medium, character rules or camera grammar starts a new sequence — 
 ## Writing the SHOT block
 
 - **One event.** Cause → contact → response, all visible.
-- Start from the visible composition of `@Image1`.
+- Start from the user's intended visible event and shot composition. In `standard_i2v`, an approved source frame may establish the opening composition. In `no_i2v_reference_native`, `@ImageN` supplies only its named identity/environment role; never copy its composition or treat it as an implicit start frame.
 - **One camera move.** Do not stack tricks into the locked duration.
-- 2–4 physical layers, and only where the cause is actually present in frame (steam, cloth, reflection, foreground occlusion, dust, vibration, focus breathing).
+- Add only physical consequences that actually help this event read (for example cloth, reflection, or foreground parallax). Zero extra layers is valid for a clean view; never pad a prompt to reach a layer count.
 - Specify the closing frame — stable enough for the next cut to take over.
 - Do not name emotions; show them. Not "he is sad" but "his gaze drops and his shoulders lower."
 
@@ -120,9 +120,11 @@ the handoff package with four items: `incoming_story_state`,
 
 ## Scene-density and cut-ownership gate
 
-The workflow prefers a useful 15-second source. When the final video is short or
-cut-dense, the Planner groups 2–4 consecutive, causally related cuts into one
-`PLANNED_MULTI_SHOT_SOURCE` instead of shortening generation. A written scene
+The workflow prefers a useful 15-second source. A single sustained shot with
+editorial handles is often stronger than an overloaded sequence. When the
+user's story genuinely calls for multiple causally related cuts, the Planner
+may group 2–4 into one `PLANNED_MULTI_SHOT_SOURCE` instead of shortening
+generation. A written scene
 plan may drive final-production multi-shot output in `GENERAL_REFERENCE_MODE`;
 reference attachment order still does not define story order. This is a source
 yield design, not a claim about final edit duration.

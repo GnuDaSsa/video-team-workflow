@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "revision": "2026-09-20.1",
-  "reviewed_at": "2026-09-20",
+  "revision": "2026-09-26.1",
+  "reviewed_at": "2026-09-26",
   "wiki_file": "concepts/aside-image-video-prompting.md",
   "source_file": "aside-image-video-prompting.md",
   "source_sha256": "82260dc07ceb5428cc8011dd36f2a72701613515a890a3ecda6208ab514774ea",
@@ -89,7 +89,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "636c75a2d8bd00b9f8cfed09962e01be34b27efc4863e328a475edf2108d58e3",
+          "sha256": "cfb00a5786abe5c89057e9c7cca5ec16ec2b5b573c6223fc237afd00cf24cba1",
           "section": "CURRENT"
         }
       ]
@@ -118,13 +118,13 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "636c75a2d8bd00b9f8cfed09962e01be34b27efc4863e328a475edf2108d58e3",
+          "sha256": "cfb00a5786abe5c89057e9c7cca5ec16ec2b5b573c6223fc237afd00cf24cba1",
           "section": "CURRENT"
         },
         {
           "kind": "wiki",
           "path": "concepts/character-bible-page-prompt-standard.md",
-          "sha256": "56bec32b9655f7a0b093b60ab3a588bb3aa895ab02a166bd74a923958f8737a9",
+          "sha256": "9f06f8a4b8fafb70b36cfa01bc1763dce4de5f78c0a30fddbfb84011e20613cc",
           "section": "Immutable identity and state assets / Provider binding"
         }
       ]
@@ -200,7 +200,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "636c75a2d8bd00b9f8cfed09962e01be34b27efc4863e328a475edf2108d58e3",
+          "sha256": "cfb00a5786abe5c89057e9c7cca5ec16ec2b5b573c6223fc237afd00cf24cba1",
           "section": "CURRENT"
         },
         {
@@ -295,7 +295,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "636c75a2d8bd00b9f8cfed09962e01be34b27efc4863e328a475edf2108d58e3",
+          "sha256": "cfb00a5786abe5c89057e9c7cca5ec16ec2b5b573c6223fc237afd00cf24cba1",
           "section": "CURRENT"
         }
       ]
@@ -321,7 +321,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "636c75a2d8bd00b9f8cfed09962e01be34b27efc4863e328a475edf2108d58e3",
+          "sha256": "cfb00a5786abe5c89057e9c7cca5ec16ec2b5b573c6223fc237afd00cf24cba1",
           "section": "CURRENT"
         },
         {
@@ -352,13 +352,13 @@
         {
           "kind": "wiki",
           "path": "concepts/character-bible-page-prompt-standard.md",
-          "sha256": "56bec32b9655f7a0b093b60ab3a588bb3aa895ab02a166bd74a923958f8737a9",
+          "sha256": "9f06f8a4b8fafb70b36cfa01bc1763dce4de5f78c0a30fddbfb84011e20613cc",
           "section": "Immutable identity and state assets / Provider binding"
         },
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "636c75a2d8bd00b9f8cfed09962e01be34b27efc4863e328a475edf2108d58e3",
+          "sha256": "cfb00a5786abe5c89057e9c7cca5ec16ec2b5b573c6223fc237afd00cf24cba1",
           "section": "CURRENT"
         }
       ]
@@ -393,7 +393,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "636c75a2d8bd00b9f8cfed09962e01be34b27efc4863e328a475edf2108d58e3",
+          "sha256": "cfb00a5786abe5c89057e9c7cca5ec16ec2b5b573c6223fc237afd00cf24cba1",
           "section": "CURRENT"
         }
       ]
@@ -448,7 +448,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-typography-operating-manual.md",
-          "sha256": "a65537196d4a30ac90ffd8cdda41f08199890a54852f6284771450e5a048f7c0",
+          "sha256": "ca6f8dc840903fa5e3b0b5f50225ab76d2838aab32e9944e53aa9be1b542d484",
           "section": "모드별 선택 로직 / 타이포 역할 시스템"
         },
         {

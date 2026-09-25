@@ -8,6 +8,10 @@ import media_registry
 
 
 VISUAL_FIRST_MODE = 'visual_only_no_audio'
+VISUAL_FIRST_EVIDENCE_PATHS = {
+    'docs/project_overrides.md',  # legacy projects
+    'docs/visual_only_authorization.md',  # immutable authorization receipt
+}
 
 
 def visual_first_error(project: Path, manifest: dict) -> str | None:
@@ -31,8 +35,8 @@ def visual_first_error(project: Path, manifest: dict) -> str | None:
     seconds = plan.get('target_duration_sec')
     if not isinstance(seconds, int) or isinstance(seconds, bool) or seconds <= 0:
         return 'visual-first target duration must be positive seconds'
-    if plan.get('evidence_path') != 'docs/project_overrides.md':
-        return 'visual-first evidence must be docs/project_overrides.md'
+    if plan.get('evidence_path') not in VISUAL_FIRST_EVIDENCE_PATHS:
+        return 'visual-first evidence path is not an approved project receipt'
     evidence = Path(project) / plan['evidence_path']
     if not evidence.is_file():
         return 'visual-first evidence file is missing'

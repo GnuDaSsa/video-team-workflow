@@ -49,7 +49,7 @@ revision_ledger:
 When `CHAR_<ID>_TRIPTYCH_R<n>` is attached, include a compact role binding equivalent to:
 
 ```text
-@ImageN의 오른쪽 큰 3/4 초상은 얼굴 정체성·피부·눈빛 기준, 왼쪽 머리 없는 정면 전신은 체형·의상 전면 기준, 가운데 후면 전신은 헤어 뒤 실루엣·의상 후면 기준으로만 사용한다. 회색 배경·3분할·패널 경계·빈 머리 부분은 결과에 재현하지 않는다. 포즈와 장면은 현재 샷 지시를 따른다.
+@ImageN의 오른쪽 큰 3/4 초상은 주 얼굴 정체성·피부·눈빛 기준, 왼쪽 정면 전신은 체형·의상 전면 기준, 가운데 후면 전신은 헤어 뒤 실루엣·의상 후면 기준으로만 사용한다. 회색 배경·3분할·패널 경계는 결과에 재현하지 않는다. 승인된 왼쪽 패널이 실제로 머리 없는 기본형이면 빈 머리 부분도 재현하지 않고, 완전한 머리의 예외형이면 그 작은 얼굴은 보조 확인용으로만 쓴다. 포즈와 장면은 현재 샷 지시를 따른다.
 ```
 
 For a fragile face close-up, prefer the deterministic `_FACE` crop. For a body/wardrobe shot, use the full triptych or the one necessary body crop. Never ask the identity reference to supply composition, pose, or story lighting.

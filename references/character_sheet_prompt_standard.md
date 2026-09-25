@@ -8,13 +8,24 @@ Every new recurring protagonist, pair member, guardian, mascot, performer, or re
 
 1. **Left — headless front full body.** Show the complete body, shoes, proportions, outfit front, accessories, and relaxed hand position. Deliberately omit the head above a clean collar/neckline boundary so downstream wide shots cannot copy a tiny, blurry face from the full-body panel. The omission must look like a clean studio-reference crop, never injury, gore, a severed neck, or a mannequin display.
 2. **Middle — back full body with head.** Show back silhouette, hair mass, outfit back, closures, footwear, and accessory placement on the same baseline and at the same scale as the front body.
-3. **Right — large 3/4 head-and-shoulders portrait.** This is the only face source in the master. It must be large enough to resolve face silhouette, eye spacing, eyelids, nose, jaw, ears, hairline, skin response, age impression, and a natural catchlight.
+3. **Right — large 3/4 head-and-shoulders portrait.** This is the primary face source in the master. It must be large enough to resolve face silhouette, eye spacing, eyelids, nose, jaw, ears, hairline, skin response, age impression, and a natural catchlight.
 
 The three panels depict the same identity, body, grooming state, outfit, materials, palette, and accessories. Use a neutral mid-gray seamless background, flat or softly one-directional studio light, neutral color response, and medium-true rendering. The sheet is deliberately plain: story lighting, rain, smoke, lens effects, dramatic camera language, film grain, LUTs, typography, UI, and worldbuilding belong in production frames and video prompts, not in the identity master.
 
 ### Why the face appears only once
 
-Full-body faces are usually too small to be reliable identity evidence. Keeping one large portrait as the sole face source gives image/video models an unambiguous identity anchor, while the two full-body panels carry body and wardrobe construction. Do not regenerate the missing front head or treat the gray background/panel layout as scene content.
+Full-body faces are usually too small to be reliable identity evidence. Keeping one large portrait as the sole face source gives image/video models an unambiguous identity anchor, while the two full-body panels carry body and wardrobe construction. In the default headless layout, do not invent a front head downstream or treat the gray background/panel layout as scene content; the recorded fallback below has a different truthful binding.
+
+### Fast fallback for failed headless edits
+
+If the provider does not return a usable clean headless-front panel after one
+targeted edit, stop repeating the same layout repair. Make a fresh three-view
+sheet with a normal complete front head/body, matching rear view and large
+right portrait. The right portrait remains the **primary** face authority;
+the smaller front face is only a body/wardrobe consistency check. This is an
+accepted provider/layout fallback, not a new character or a reason to restart
+valid identity tests. Record the actual chosen layout and bind it accurately
+in downstream prompts; never call a full-head front panel “headless.”
 
 ## Required lock before production
 
@@ -24,9 +35,9 @@ Before dependent styleframes or I2V:
 2. generate the triptych with Codex `imagegen`, using the approved casting/identity image as an actual reference when one exists;
 3. record prompt hash, reference paths/hashes, generation ID, dimensions, bytes, output SHA256, and revision;
 4. run anatomical and identity QC at 100% crop;
-5. stress-test the approved triptych in **10 varied generations** across pose, distance, lighting, action, and—when relevant—multi-character scenes. Lock only if the same person is recognizable in 10/10 without costume, age, role, or face drift.
+5. run **three targeted, reference-bound generations** before dependent production: (a) face/close or medium view, (b) full-body/action under changed light or distance, and (c) a relationship/multi-character view when relevant (otherwise a second difficult angle). Lock for production only at 3/3 recognizable identity, with no hard crop/anatomy/wardrobe fail. This is a lean preflight, not proof that every future video frame will match; inspect identity again in actual generated clips. A user-requested 10-case study is optional, not the default gate.
 
-If reference attachment cannot be verified, mark `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED`. If the triptych does not pass 10/10, revise one descriptor/layout variable at a time and repeat; do not compensate with a longer cinematic prompt.
+If reference attachment cannot be verified, mark `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED`. If a targeted test fails, correct the observed descriptor/layout or attachment issue and repeat that failed axis plus any dependent affected checks; do not discard valid tests or compensate with a longer cinematic prompt. A background-only or character-free block need not wait for unrelated identities.
 
 ## Deterministic derivatives
 
@@ -45,8 +56,10 @@ Use the full triptych for general multi-reference identity binding when the prov
 When the full triptych is attached to a video model, the Korean prompt must state its roles explicitly:
 
 ```text
-@ImageN의 오른쪽 큰 3/4 초상은 얼굴 정체성·피부·눈빛 기준, 왼쪽 머리 없는 정면 전신은 체형·의상 전면 기준, 가운데 후면 전신은 헤어 뒤 실루엣·의상 후면 기준으로만 사용한다. 회색 배경, 3분할 패널, 패널 경계, 앞 전신의 빈 머리 부분은 결과 화면에 재현하지 않는다. 실제 장면의 포즈·구도·조명은 아래 샷 지시를 따른다.
+@ImageN의 오른쪽 큰 3/4 초상은 주 얼굴 정체성·피부·눈빛 기준, 왼쪽 정면 전신은 체형·의상 전면 기준, 가운데 후면 전신은 헤어 뒤 실루엣·의상 후면 기준으로만 사용한다. 회색 배경, 3분할 패널, 패널 경계는 결과 화면에 재현하지 않는다. 실제 장면의 포즈·구도·조명은 아래 샷 지시를 따른다.
 ```
+
+For an approved headless default, add a short instruction not to reproduce its missing front head. For an approved complete-front-head fallback, say the small left face is only a consistency check and the large right portrait is primary. Never paste both alternatives or an if/else placeholder into a model-facing prompt.
 
 The identity reference never dictates scene composition, pose, camera angle, color grade, or starting frame. Those belong to the shot contract.
 
@@ -80,14 +93,14 @@ Compile high-value prompts through `/Users/gnudas/.codex/skills/image-prompt/` a
 ## QC checklist
 
 - [ ] Exactly three side-by-side roles in the required order.
-- [ ] Left front body has no small face and the omission is clean, non-graphic, and visually unambiguous.
+- [ ] Left front body follows the recorded default headless layout or its full-head fallback; no ambiguous injury-like crop.
 - [ ] Middle back view retains the head/hair rear silhouette.
-- [ ] Right portrait is a large 3/4 face and the only face source.
+- [ ] Right portrait is a large 3/4 face and the primary face source; any small full-head front face is only a consistency check.
 - [ ] Face silhouette, eye spacing, nose/jaw, ears, hairline/mass, age and skin remain one identity.
 - [ ] Front/back height, shoulders, torso, limb length, hands, footwear and outfit construction agree.
 - [ ] Neutral gray, neutral light, true colors; no scene lighting, LUT, grain, text, logo, UI, or beauty campaign finish.
 - [ ] Full triptych and any deterministic crops have recorded hashes/provenance.
-- [ ] Ten varied stress generations recognize the same identity 10/10.
+- [ ] Three targeted attached-reference tests pass 3/3; actual video identity QC remains required.
 
 ## Route boundary
 

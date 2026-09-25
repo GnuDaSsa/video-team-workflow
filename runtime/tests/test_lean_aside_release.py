@@ -228,6 +228,9 @@ class InputEvidenceTests(unittest.TestCase):
         ok,reason=lane_gates.gate_check(self.p,'planner')
         self.assertFalse(ok);self.assertIn('evidence file changed',reason)
         self.assertTrue(lane_gates.non_bypassable_reason(self.p,reason))
+        ok,reason=lane_gates.gate_check(self.p,'music')
+        self.assertFalse(ok);self.assertIn('visual-first override invalid',reason)
+        self.assertNotIn('music',lane_gates.next_actions(self.p)['next_lanes'])
         evidence.unlink()
         self.assertIn('evidence file is missing',lane_inputs.music_error(self.p,manifest))
         manifest['audio_plan']['source']='planner_assumption'
@@ -238,6 +241,20 @@ class InputEvidenceTests(unittest.TestCase):
         manifest['audio_plan']['target_duration_sec']=195
         manifest['audio_plan']['delivery_scope']='complete_film'
         self.assertIn('visual_assets_only',lane_inputs.music_error(self.p,manifest))
+
+    def test_dedicated_visual_authorization_survives_unrelated_override_edit(self):
+        manifest,overrides=self.visual_first_manifest()
+        auth=self.p/'docs/visual_only_authorization.md'
+        auth.write_text(overrides.read_text())
+        manifest['audio_plan']['evidence_path']='docs/visual_only_authorization.md'
+        manifest['audio_plan']['evidence_sha256']=hashlib.sha256(auth.read_bytes()).hexdigest()
+        (self.p/'manifest.json').write_text(json.dumps(manifest))
+        overrides.write_text(overrides.read_text()+'\n## Later independent character exception\n')
+        self.assertEqual(lane_inputs.visual_first_error(self.p,manifest),'')
+        self.assertFalse(lane_gates.gate_check(self.p,'music')[0])
+        self.assertEqual(lane_gates.gate_check(self.p,'planner'),(True,'OK'))
+        auth.write_text(auth.read_text()+'tampered')
+        self.assertIn('evidence file changed',lane_inputs.music_error(self.p,manifest))
 
 
 class ReleaseTests(unittest.TestCase):
