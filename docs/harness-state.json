@@ -1,14 +1,14 @@
 {
   "currentGoal": "Stop Music Director at Suno generation; user alone chooses/downloads, without weakening video Music Lock",
-  "status": "in_progress",
+  "status": "complete",
   "currentContract": "docs/contracts/2026-09-25-suno-generation-only.md",
   "blockers": [],
-  "nextStep": "Validate changed skill/runtime and reviewed manifest, commit/push isolated change, then deploy targeted live files and verify hashes.",
-  "lastUpdated": "2026-09-25T21:10:00+09:00",
+  "nextStep": "On the next user-authorized Suno request, verify actual UI generation ends with song IDs/links and PENDING_USER_AUDIO; do not download or recommend. If user later supplies a chosen file for video, validate it under existing Music Lock as a separate request.",
+  "lastUpdated": "2026-09-25T21:08:28+09:00",
   "verification": {
-    "lastCommand": "451 Aside tests; 200 runtime tests; Python compile; shell syntax; targeted handoff tests; release preflight",
-    "lastResult": "PASS_SOURCE_PREDEPLOY",
-    "notes": "Initial Node run used macOS symlinked temp and failed fixtures; rerun with TMPDIR=/private/tmp passed. No Suno generation/live download attempted."
+    "lastCommand": "451 Aside tests; 200 runtime tests; Python compile; shell syntax; skill quick_validate; release preflight; source/live SHA-256 parity for 6 installed files; harness validation",
+    "lastResult": "PASS_SCOPED_SUNO_GENERATION_BOUNDARY_DEPLOYMENT",
+    "notes": "Commit 11066fb pushed to origin/main. Targeted music-director deploy and three-file runtime apply-scoped passed; full release parity not claimed due pre-existing unrelated live drift. No Suno browser/provider generation or download used in this instruction-change task."
   },
   "knownWarnings": [
     "Existing legacy Codex source/live deployment drift is unchanged.",
