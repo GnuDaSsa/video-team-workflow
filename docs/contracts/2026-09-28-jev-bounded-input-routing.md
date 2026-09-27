@@ -44,5 +44,7 @@ latency improvement is claimed. A future authorized production run should
 compare input time and model calls, raw-prompt preservation and duplicate acts.
 
 ## State
-Source implementation and 706 offline tests pass. Scoped deployment is pending;
-see `docs/releases/2026-09-28-jev-input-routing.md`.
+Complete: source pushed, 706 offline tests pass, native deployment parity and
+three scoped Codex hashes pass, installed routing smoke and 38-case rerun pass.
+No live JEV/browser accuracy or speed claim. See
+`docs/releases/2026-09-28-jev-input-routing.md`.
