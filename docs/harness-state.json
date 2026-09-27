@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Recover video throughput, user intent and lean QC/prompting from the Seongnam production audit",
-  "status": "complete",
-  "currentContract": "docs/contracts/2026-09-26-video-production-throughput-and-intent.md",
+  "currentGoal": "Deploy local-first bounded JEV input routing without adding owners or weakening UI/author gates",
+  "status": "in_progress",
+  "currentContract": "docs/contracts/2026-09-28-jev-bounded-input-routing.md",
   "blockers": [],
-  "nextStep": "For the active Seongnam production, create and validate a Planner R3 that restores an illustrative Seedance city shot without falsifying GIS, preserves the eating payoff as a clearly gated or functional alternative, and binds current approved identity IDs; then measure actual generation quality/time. Researcher and dog 3/3 preflights remain.",
-  "lastUpdated": "2026-09-26T02:53:26+09:00",
+  "nextStep": "Commit/push isolated source; deploy five native source changes and three Codex files, then check installed parity",
+  "lastUpdated": "2026-09-28T00:19:47.867601+09:00",
   "verification": {
-    "lastCommand": "451 Node + 204 runtime tests; video_release preflight and 14 scoped source/live hashes; native Aside parity; Seongnam validate/next; child registry/hash/image review",
-    "lastResult": "PASS_COMMON_WORKFLOW_DEPLOYED_PROJECT_AUDIO_GATE_REPAIRED_CHILD_3_OF_5_LOCKED",
-    "notes": "Common workflow changed and synced. Seongnam Planner R2 creative omissions and stale references are documented but not silently re-attested. 0 videos generated; output quality and elapsed-time gain unproven. Full Codex parity retains unrelated model_routing drift."
+    "lastCommand": "489 Node tests; 217 Python runtime tests; py_compile; zsh -n; git diff --check; 3 skill validations; release preflight",
+    "lastResult": "PASS_SOURCE_VERIFIED_DEPLOYMENT_PENDING",
+    "notes": "All new JEV responses and browser DOM fixtures are synthetic. No live API or browser activity. Canonical TMPDIR fixes pre-existing test fixture issue."
   },
   "knownWarnings": [
     "Seongnam Planner R2 remains a historical accepted package but not safe to reuse unchanged: creative city/eating omissions, old candidate IDs and stale brief/override hashes; rebuild R3 before production.",

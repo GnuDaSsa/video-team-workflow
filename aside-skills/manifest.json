@@ -7,7 +7,7 @@
     },
     {
       "path": "aside-video/SKILL.md",
-      "sha256": "1125adee0141c9bbeb2017eaf035605acab609a1d4ecec78e784486318c7afc1"
+      "sha256": "242e517aed6b5b7cc8734b54a98baf2d35167e331681a890cddec63b5e53e32b"
     },
     {
       "path": "aside-video/references/author-executor.md",
@@ -23,7 +23,7 @@
     },
     {
       "path": "aside-video/references/jev-dispatch.md",
-      "sha256": "3a8fb81b96a03dd161eb0bd12651b89c5d0b5fd7964a1ba1db357283a297e53d"
+      "sha256": "c6b98e80df834c556ff80595dea63d3ba03dde27e60db935a1f75940f85ed6e2"
     },
     {
       "path": "aside-video/references/jev-qc.md",
@@ -59,7 +59,7 @@
     },
     {
       "path": "aside-video/references/seedance-upload.md",
-      "sha256": "6948e420a248874c130db727dfa8a4d851ce3e001e5eb3dc9956a431d2fa6cf3"
+      "sha256": "fcfc60b2f3e6f01798122477843d49d5b5c2c8badc313c3a4217eec47fb6bbb4"
     },
     {
       "path": "aside-video/references/web-chatgpt-casting.md",
@@ -78,6 +78,10 @@
       "sha256": "cba9d7f00ca800f8175cdd770c35658ff097395c26cb74eb6d540bdeb7be8722"
     },
     {
+      "path": "aside-video/scripts/execution-routing.test.mjs",
+      "sha256": "4b47a7a2e209f58934bfa43d4ffd9b18f49e4cccf2c221079d669d0889ac1655"
+    },
+    {
       "path": "aside-video/scripts/harness.mjs",
       "sha256": "a066b47d99a778571d8357b97ce8e08dd113e7d1f7938b770cc96400d3e24b24"
     },
@@ -87,7 +91,7 @@
     },
     {
       "path": "aside-video/scripts/jev-dispatch.mjs",
-      "sha256": "1708c593841c0d4e5baf538567fb8637bd8f3fabf152bda7c93ad3b299dacaab"
+      "sha256": "600c25e7675ce8e498585e8122300d2875c073c086fba51f9f644cad9324ddee"
     },
     {
       "path": "aside-video/scripts/jev-dispatch.test.mjs",

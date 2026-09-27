@@ -110,7 +110,15 @@ Follow the concise current native skill; read only the active stage and reorient
 
 ## Codex video lean entry
 
-For Codex video work, classify the requested scope first and load only the active phase's references. Avoid whole-rule/wiki reloads and full-pipeline startup for an audit or one-asset revision. Jev is optional advice for genuine ambiguity, not a routine speed accelerator or permission to execute. The measured improvement in this change is entry-text size; model tokens and real production wall-clock still require A/B evidence. See `docs/contracts/2026-09-25-codex-lean-video-entry.md`.
+For Codex video work, classify scope first and load only active-phase references.
+Routine input uses the existing exact-session guarded helper, not another model
+hop. The shared JEV dispatch `route` supports bounded semantic action selection
+with explicit current-scope approval; it never imports native Aside authorship
+or language policy into Codex. Missing approval/key, low certainty and failures
+return to the current owner. Codex prompt paste is idempotent and blocks visible
+dialogs, including during recovery reads. Existing reference/Generate/QC gates
+remain. See `docs/contracts/2026-09-28-jev-bounded-input-routing.md`; mock tests
+and source/live parity do not establish Korean classifier accuracy or speedup.
 
 ## Deferred Codex video calibration
 

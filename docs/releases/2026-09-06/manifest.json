@@ -10,7 +10,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/aside-operator.md",
       "target": ".codex/skills/seedance-prompt-en/aside-operator.md",
-      "sha256": "abfb35a069193e0ec8192d7920481356e1d0880d1e5e2f87bc0499826605f5a6"
+      "sha256": "56fbc36cff6a1292441bb5a90c846fab2b8387e71578ca2807743c9d55f4b8f3"
     },
     {
       "source": "codex-skills/seedance-prompt-en/blender-previs-prompting.md",
@@ -40,7 +40,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/scripts/runway_ui_helper.py",
       "target": ".codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py",
-      "sha256": "1ed40f6ba231fa1ea5fb6816a8304e9ff5635e901ce226648c5e0294fad9a56f"
+      "sha256": "5d4846e181075e77aa7f4f472262bb303b1ea1e97a46bb6c933657ad0ed3a95f"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-field-lessons.md",
@@ -100,7 +100,7 @@
     {
       "source": "codex-skills/videodirector/SKILL.md",
       "target": ".codex/skills/videodirector/SKILL.md",
-      "sha256": "621897a00cdeec91a2b9c1b6057a76022a913f4bc41c72172e85447cb0837cef"
+      "sha256": "d5491b732f342d5624e5bf976df127c9d6b0de55e742d5033ffca29a76e08939"
     },
     {
       "source": "codex-skills/videodirector/agents/openai.yaml",

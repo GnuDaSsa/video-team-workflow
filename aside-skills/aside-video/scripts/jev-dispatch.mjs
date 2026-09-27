@@ -73,12 +73,109 @@ function ledger(dir) { const f=path.join(dir,'ledger.jsonl'); if(!exists(f)){if(
 function recordFor(dir, attempt) { const f=path.join(dir,attempt.id+'.json'); if(!exists(f))return null; const state={stage:attempt.stage,blockers:'record',ready_actions:attempt.ready_actions}; const r=readJSON(f,'INVALID_RECORD'); exact(r,['schema_version','question_version','input_sha256','timestamp','model_actual','chosen_action','confidence','probabilities','tokens','status','reason','latency_ms','advisory','execution_authorized'],'INVALID_RECORD'); if(r.schema_version!==1||r.question_version!==QUESTION_VERSION||r.input_sha256!==attempt.input_sha256||typeof r.timestamp!=='string'||new Date(r.timestamp).toISOString()!==r.timestamp||!Number.isSafeInteger(r.latency_ms)||r.latency_ms<0||r.advisory!==true||r.execution_authorized!==false)fail('INVALID_RECORD'); if(r.status==='CLASSIFIED'){if(r.reason!==null)fail('INVALID_RECORD');try{validateResponse({model:r.model_actual,answers:{next_action:{type:'choice',choice:r.chosen_action,confidence:r.confidence,probabilities:r.probabilities}},usage:r.tokens},state)}catch{fail('INVALID_RECORD')}}else if(r.status!=='UNAVAILABLE'||!FAILURES.has(r.reason)||[r.model_actual,r.chosen_action,r.confidence,r.probabilities,r.tokens].some(v=>v!==null))fail('INVALID_RECORD');return r; }
 function withRoute(result, state, context) { if (!result.chosen_action) return result; const planned = result.chosen_action === 'AUTHOR_ASTRA' ? route(state.stage, context ?? {}) : { role: 'executor', mode: 'inherit_session', execution_model: 'inherit_session', state: 'PLANNED' }; return { ...result, route: planned, advisory: true, execution_authorized: false }; }
 export async function next(options, deps = {}) {
+  const state = validateInput(readJSON(options.input, 'INVALID_INPUT', false));
+  return classifyState(options, state, deps);
+}
+
+async function classifyState(options, state, deps = {}) {
   let root; try { root = path.resolve(options.root); if (!fs.lstatSync(root).isDirectory() || fs.realpathSync(root) !== root) fail('INVALID_ROOT'); } catch { fail('INVALID_ROOT'); }
-  const state = validateInput(readJSON(options.input, 'INVALID_INPUT', false)); const context = options.context ?? {};
+  const context = options.context ?? {};
   if (!obj(context)) fail('INVALID_CONTEXT'); const timeoutMs = deps.timeoutMs ?? TIMEOUT_MS; if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > TIMEOUT_MS) fail('INVALID_TIMEOUT');
   const dir = path.join(root, '.jev-dispatch'); if (!exists(dir)) { fs.mkdirSync(dir, {mode:0o700}); syncDir(root); } const ds=fs.lstatSync(dir); if (!ds.isDirectory() || ds.uid !== process.getuid() || (ds.mode & 0o7777)!==0o700) fail('INVALID_STATE_DIR');
   const lock=path.join(dir,'lock'); let fd; try { fd=fs.openSync(lock,'wx',0o600); } catch { fail('LOCKED_OR_UNWRITABLE'); } const ls=fs.fstatSync(fd);
   try { const entries=ledger(dir), input_sha256=hash(state), cache_key=requestKey(state); const records=new Map(entries.map(a=>[a.id,recordFor(dir,a)])); for (const a of entries) { const r=records.get(a.id); if (a.cache_key===cache_key && r?.status==='CLASSIFIED') return withRoute({...r,status:'CACHED'},state,context); } if (entries.length>=3) return summary('LIMIT_REACHED'); const keyFile=options.keyFile??DEFAULT_KEY_FILE; if ((await (deps.status??status)({keyFile}))?.key_present!==true) return summary('SKIPPED_NO_KEY'); const key=await (deps.readKey??readKey)({keyFile}); if (typeof key!=='string'||!key||key.length>8192||!/^[\x21-\x7e]+$/.test(key)) fail('INVALID_KEY_FILE'); const a={id:crypto.randomUUID(),input_sha256,cache_key,stage:state.stage,ready_actions:state.ready_actions}; appendLedger(path.join(dir,'ledger.jsonl'),a); syncDir(dir); const output=path.join(dir,a.id+'.json'); const outfd=fs.openSync(output,'wx',0o600); const record={schema_version:1,question_version:QUESTION_VERSION,input_sha256,timestamp:new Date().toISOString(),model_actual:null,chosen_action:null,confidence:null,probabilities:null,tokens:null,status:'UNAVAILABLE',reason:null,latency_ms:0,advisory:true,execution_authorized:false}; let timer; const started=Date.now(); try { fs.fchmodSync(outfd,0o600); const controller=new AbortController(); try { const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(new SafeError('TIMEOUT'));},timeoutMs);}); const response=await Promise.race([Promise.resolve().then(()=> (deps.transport??createTransport())({body:JSON.stringify(buildRequest(state)),key,signal:controller.signal})),timeout]); const valid=validateResponse(response,state), answer=valid.answers.next_action; Object.assign(record,{status:'CLASSIFIED',model_actual:valid.model,chosen_action:answer.choice,confidence:answer.confidence,probabilities:answer.probabilities,tokens:valid.usage}); } catch(e) { record.reason=e instanceof SafeError&&FAILURES.has(e.code)?e.code:'REQUEST_FAILED'; } finally { clearTimeout(timer); record.latency_ms=Date.now()-started; } fs.writeFileSync(outfd,JSON.stringify(record)+'\n'); fs.fsyncSync(outfd); syncDir(dir); return withRoute(record,state,context); } finally { fs.closeSync(outfd); } } finally { fs.closeSync(fd); if(exists(lock)){const s=fs.lstatSync(lock);if(!s.isSymbolicLink()&&s.ino===ls.ino&&s.dev===ls.dev)fs.unlinkSync(lock);} }
 }
-export async function main(args = process.argv.slice(2), deps = {}) { try { const [command,...rest]=args, opts={}; if(command!=='next')fail('INVALID_ARGUMENTS'); for(let i=0;i<rest.length;i+=2){if(!['--root','--input','--context','--key-file'].includes(rest[i])||Object.hasOwn(opts,rest[i])||!rest[i+1]||rest[i+1].startsWith('--'))fail('INVALID_ARGUMENTS');opts[rest[i]]=rest[i+1];} if(!opts['--root']||!opts['--input'])fail('INVALID_ARGUMENTS'); let context={}; if(opts['--context']) { try { context=opts['--context'].trimStart().startsWith('{')?JSON.parse(opts['--context']):readJSON(opts['--context'],'INVALID_CONTEXT',false); } catch { fail('INVALID_CONTEXT'); } } const result=await next({root:opts['--root'],input:opts['--input'],context,keyFile:opts['--key-file']},deps); return {code:result.status==='UNAVAILABLE'?1:0,result}; } catch(e) { return {code:2,result:summary(safeCode(e))}; } }
+// These conservative triage floors are NOT calibrated Korean accuracy or permission.
+export const ROUTING_POLICY = Object.freeze({
+  max_observation_age_ms: 30000, min_confidence: 0.9, min_choice_probability: 0.9,
+});
+const DIRECT_ACTIONS = new Set(['SEARCH_ASSET', 'SELECT_EXISTING', 'UPLOAD_FIRST',
+  'FILL_PROMPT', 'VERIFY_INPUTS', 'REOBSERVE']);
+
+export async function routeStep(options, deps = {}) {
+  const state = validateInput(readJSON(options.input, 'INVALID_INPUT', false));
+  const kind = options.kind ?? 'routine';
+  if (!['routine', 'semantic', 'creative', 'visual'].includes(kind)) fail('INVALID_ROUTE_KIND');
+  if (options.knownAction !== undefined &&
+      (kind !== 'routine' || !DIRECT_ACTIONS.has(options.knownAction) ||
+       !state.ready_actions.includes(options.knownAction))) fail('INVALID_KNOWN_ACTION');
+  const now = deps.now ?? Date.now;
+  const result = (routing, reason, action = null, extra = {}) => ({
+    status: 'ROUTED', routing, reason, action, input_sha256: hash(state),
+    observed_at: options.observedAt ?? null, ...extra,
+    advisory: true, execution_authorized: false, execution_model: 'inherit_session',
+  });
+  // Never use native author-model routing for Codex or create a new owner here.
+  if (state.stage !== 'computer_use' || ['creative', 'visual'].includes(kind))
+    return result('OWNER', 'AUTHOR_OR_VISUAL_REASONING_REQUIRED');
+  const at = typeof options.observedAt === 'string' ? Date.parse(options.observedAt) : NaN;
+  const fresh = () => {
+    const age = now() - at;
+    return Number.isFinite(age) && age >= 0 && age <= ROUTING_POLICY.max_observation_age_ms;
+  };
+  if (!fresh()) return result('DIRECT', 'FRESH_OBSERVATION_REQUIRED', 'REOBSERVE');
+  if (options.knownAction !== undefined)
+    return result('DIRECT', 'KNOWN_ELIGIBLE_ACTION', options.knownAction);
+  // A sole candidate is not evidence that it is correct; REVIEW may be correct.
+  if (kind === 'routine') return result('OWNER', 'ACTION_NOT_ESTABLISHED');
+  if (!state.ready_actions.some(a => DIRECT_ACTIONS.has(a)))
+    return result('OWNER', 'NO_ELIGIBLE_INPUT_ACTION');
+  // Caller must hold an actual current-scope approval, not merely a configured key.
+  // The reference is data, not a permanent permission or cryptographic attestation.
+  if (typeof options.jevApproval !== 'string' ||
+      !/^[A-Za-z0-9][A-Za-z0-9_.:-]{0,159}$/.test(options.jevApproval))
+    return result('OWNER', 'JEV_SCOPE_APPROVAL_REQUIRED');
+  let advice;
+  try {
+    // Reuse the existing cache/three-attempt ledger/timeout. No new root, retry,
+    // context dump, target IDs, paths, prompts or settings enter the request.
+    advice = await classifyState({...options, context: {}}, state, deps);
+  } catch {
+    return result('OWNER', 'JEV_LOCAL_STATE_UNAVAILABLE');
+  }
+  const meta = {classification_status: advice.status,
+    approval_evidence_sha256: hash(options.jevApproval)};
+  if (!fresh()) return result('DIRECT', 'OBSERVATION_EXPIRED_DURING_CLASSIFICATION', 'REOBSERVE', meta);
+  if (!['CLASSIFIED', 'CACHED'].includes(advice.status))
+    return result('OWNER', 'JEV_UNAVAILABLE_OR_LIMITED', null, meta);
+  if (!DIRECT_ACTIONS.has(advice.chosen_action))
+    return result('OWNER', 'JEV_REQUESTED_OWNER_REVIEW', null, meta);
+  if (advice.confidence < ROUTING_POLICY.min_confidence ||
+      advice.probabilities[advice.chosen_action] < ROUTING_POLICY.min_choice_probability)
+    return result('OWNER', 'JEV_LOW_CERTAINTY', null, meta);
+  return result('JEV_ADVISORY', 'REVALIDATE_WITH_EXISTING_GUARDED_HELPER', advice.chosen_action,
+    {...meta, confidence: advice.confidence,
+      choice_probability: advice.probabilities[advice.chosen_action]});
+}
+
+export async function main(args = process.argv.slice(2), deps = {}) {
+  try {
+    const [command, ...rest] = args;
+    if (!['next', 'route'].includes(command)) fail('INVALID_ARGUMENTS');
+    const allowed = ['--root', '--input', '--key-file', ...(command === 'next'
+      ? ['--context'] : ['--kind', '--known-action', '--observed-at', '--jev-approval'])];
+    const opts = {};
+    for (let i = 0; i < rest.length; i += 2) {
+      if (!allowed.includes(rest[i]) || Object.hasOwn(opts, rest[i]) ||
+          !rest[i + 1] || rest[i + 1].startsWith('--')) fail('INVALID_ARGUMENTS');
+      opts[rest[i]] = rest[i + 1];
+    }
+    if (!opts['--root'] || !opts['--input']) fail('INVALID_ARGUMENTS');
+    const options = {root: opts['--root'], input: opts['--input'], keyFile: opts['--key-file']};
+    let result;
+    if (command === 'route') {
+      result = await routeStep({...options, kind: opts['--kind'], knownAction: opts['--known-action'],
+        observedAt: opts['--observed-at'], jevApproval: opts['--jev-approval']}, deps);
+    } else {
+      let context = {};
+      if (opts['--context']) {
+        try { context = opts['--context'].trimStart().startsWith('{')
+          ? JSON.parse(opts['--context']) : readJSON(opts['--context'], 'INVALID_CONTEXT', false); }
+        catch { fail('INVALID_CONTEXT'); }
+      }
+      result = await next({...options, context}, deps);
+    }
+    return {code: result.status === 'UNAVAILABLE' ? 1 : 0, result};
+  } catch (e) { return {code: 2, result: summary(safeCode(e))}; }
+}
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){const {code,result}=await main();console.log(JSON.stringify(result));process.exitCode=code;}

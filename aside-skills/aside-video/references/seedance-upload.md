@@ -25,4 +25,9 @@
 - 모델·길이·비율·해상도·오디오·참조 순서·비용 범위를 대조하고 `check.mjs preflight <package>`. 통과 후 SUBMITTING을 기록해 Generate를 한 번 클릭하고 새 job의 수용을 확인한다. timeout은 재클릭 허가가 아니다.
 - 실제 진행 중일 때만 bounded wait한다. 장기 대기는 플랫폼의 notification/routine 정책을 따른다. 해당 job의 원본 Download만 저장하고 media 검사를 한다.
 
-정상 검색/선택/입력은 실행자가 직접 한다. 짧은 묶음 helper가 필요할 때만 jev-dispatch.md의 fastlane 절을 읽는다. 애매한 업로드 안내문만 `jev-seedance.mjs diagnose --root <same task root> --input <notice.json>`: 입력은 익명화한 실제 notice 한 필드(1500자 이하), 3회 한도·캐시·자동 재시도 없음. dispatch와 이중 호출하지 않으며 추천은 실행 권한이 아니다.
+정상 검색/선택/입력은 `jev-dispatch.md`의 기존 fastlane helper로 짧게 묶고 실제
+검증을 유지한다. 알려진 다음 행동을 매번 모델/JEV에 다시 묻지 않는다. FILL의
+실제 verifier adapter가 없으면 검증 후 직접 입력 경로를 사용하며 연결을 흉내
+내거나 매 컷 재실험하지 않는다. 복수 적격 행동의 의미 선택만 같은 문서의
+`route`로 분기한다. 기존 `jev-seedance.mjs diagnose`는 업로드 notice 전용
+진단으로 남으며 같은 상황을 두 모듈로 이중 분류하지 않는다.

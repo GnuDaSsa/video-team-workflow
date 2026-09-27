@@ -1058,6 +1058,12 @@ def read_generate_state() -> dict:
 # Require the unique visible Lexical editor; never a generic contenteditable.
 PROMPT_SEL = '[contenteditable][data-lexical-editor]'
 
+# An editor behind a provider dialog is not eligible for input or acceptance.
+# Check again in the mutating callback, not only in the earlier observation.
+PROMPT_BLOCKING_DIALOG_JS = r"""(() => [...document.querySelectorAll(
+  '[role="dialog"], [role="alertdialog"], dialog[open], [aria-modal="true"]'
+)].some(e => e.getClientRects().length > 0))()"""
+
 
 # innerText of the editor adds CSS paragraph separators; read actual P blocks
 # without collapsing spaces, intentional blank paragraphs, or inline BRs.
@@ -1133,23 +1139,40 @@ def cmd_paste_prompt(args) -> int:
     except (OSError, ValueError) as exc:
         evidence(args, 'paste-prompt', 'prompt belongs to the bound project', str(exc), 'ASIDE_BINDING_ERROR')
         return 3
-    # Lexical's replace selection has been observed to append instead. Refuse to
-    # touch a non-empty editor; the visible operator must clear it and verify an
-    # empty field first. This prevents duplicated prompts after a false replace.
+    # Idempotent ensure: matching accepted text needs no second paste. Preserve
+    # every other non-empty editor; Lexical replace has been seen to append.
     rc, before_out, before_err = browser_js("""(() => {
+  if (%s) return JSON.stringify({ok:false, error:'BLOCKING_DIALOG_CLOSE_AND_REOBSERVE'});
   const el = (() => { const a = [...document.querySelectorAll('%s')].filter(e => e.getClientRects().length); return a.length === 1 ? a[0] : null; })();
   return JSON.stringify(el ? {ok:true, text:(%s)(el)} : {ok:false});
-})()""" % (PROMPT_SEL, PROMPT_DOM_TEXT_JS))
+})()""" % (PROMPT_BLOCKING_DIALOG_JS, PROMPT_SEL, PROMPT_DOM_TEXT_JS))
     if rc != 0:
         evidence(args, 'paste-prompt-preflight', 'read empty Lexical editor',
                  before_err[-200:], 'ASIDE_CONTROL_ERROR')
         return 3
-    before_state = json.loads(before_out)
+    try:
+        before_state = json.loads(before_out)
+        if not isinstance(before_state, dict):
+            raise ValueError('Non-object observation')
+    except (ValueError, TypeError):
+        evidence(args, 'paste-prompt-preflight', 'read current editor',
+                 'invalid observation', 'PARSE_ERROR')
+        return 3
     if not before_state.get('ok'):
         evidence(args, 'paste-prompt-preflight', 'read empty Lexical editor',
-                 before_out, 'NO_PROMPT_EDITOR')
+                 before_out, before_state.get('error', 'NO_PROMPT_EDITOR'))
         return 1
     before_normalized = normalize_prompt(str(before_state.get('text', '')))
+    if before_normalized == expected_normalized:
+        st = {'ok': True, 'verdict': 'PROMPT_ALREADY_MATCHED',
+              'write_dispatched': False, 'content_match': True,
+              'expected': len(expected_normalized),
+              'expected_prompt_sha256': prompt_sha256(expected_normalized),
+              'actual_prompt_sha256': prompt_sha256(before_normalized)}
+        evidence(args, 'paste-prompt', 'accepted prompt already present',
+                 json.dumps(st, ensure_ascii=False), st['verdict'])
+        print(json.dumps(st, ensure_ascii=False))
+        return 0
     if before_normalized:
         verdict = ('REPLACE_UNSAFE_CLEAR_VISIBLE_EDITOR_FIRST' if args.replace
                    else 'PROMPT_NOT_EMPTY_DO_NOT_APPEND')
@@ -1162,6 +1185,7 @@ def cmd_paste_prompt(args) -> int:
     payload = json.dumps({'text': text, 'replace': bool(args.replace), 'sel': PROMPT_SEL})
     js = """(() => {
   const cfg = %s;
+  if (%s) return JSON.stringify({ok:false, error:'BLOCKING_DIALOG_CLOSE_AND_REOBSERVE'});
   const el = (() => { const a = [...document.querySelectorAll(cfg.sel)].filter(e => e.getClientRects().length); return a.length === 1 ? a[0] : null; })();
   if (!el) return JSON.stringify({ok:false, error:'NO_PROMPT_EDITOR'});
   if ((el.innerText || '').trim()) return JSON.stringify({ok:false,error:'PROMPT_CHANGED_BEFORE_PASTE'});
@@ -1174,18 +1198,20 @@ def cmd_paste_prompt(args) -> int:
   dt.setData('text/plain', cfg.text);
   el.dispatchEvent(new ClipboardEvent('paste', {clipboardData: dt, bubbles: true, cancelable: true}));
   return JSON.stringify({ok:true, dispatched:true});
-})()""" % payload
+})()""" % (payload, PROMPT_BLOCKING_DIALOG_JS)
     rc, out, err = browser_js(js)
     if rc != 0:
         evidence(args, 'paste-prompt', 'lexical paste', err[-200:], 'ASIDE_CONTROL_ERROR')
         return 3
     try:
         st = json.loads(out)
-    except Exception:
-        evidence(args, 'paste-prompt', 'lexical paste', out[:200], 'PARSE_ERROR')
+        if not isinstance(st, dict):
+            raise ValueError('Non-object paste result')
+    except (ValueError, TypeError):
+        evidence(args, 'paste-prompt', 'lexical paste', 'invalid result; read before recovery', 'PARSE_ERROR')
         return 3
     if not st.get('ok'):
-        evidence(args, 'paste-prompt', 'lexical paste', out, 'NO_PROMPT_EDITOR')
+        evidence(args, 'paste-prompt', 'lexical paste', out, st.get('error', 'NO_PROMPT_EDITOR'))
         return 1
     # The paste event returns before Lexical commits its React state. Poll the
     # actual editor for up to two seconds instead of emitting a false mismatch.
@@ -1193,14 +1219,27 @@ def cmd_paste_prompt(args) -> int:
     waited_ms = 0
     for attempt in range(11):
         rc, read_out, read_err = browser_js("""(() => {
+  if (%s) return JSON.stringify({ok:false, error:'BLOCKING_DIALOG_CLOSE_AND_REOBSERVE'});
   const el = (() => { const a = [...document.querySelectorAll('%s')].filter(e => e.getClientRects().length); return a.length === 1 ? a[0] : null; })();
   return JSON.stringify(el ? {ok:true, text:(%s)(el)} : {ok:false});
-})()""" % (PROMPT_SEL, PROMPT_DOM_TEXT_JS))
+})()""" % (PROMPT_BLOCKING_DIALOG_JS, PROMPT_SEL, PROMPT_DOM_TEXT_JS))
         if rc != 0:
             evidence(args, 'paste-prompt-verify', 'read committed Lexical text',
                      read_err[-200:], 'ASIDE_CONTROL_ERROR')
             return 3
-        read_state = json.loads(read_out)
+        try:
+            read_state = json.loads(read_out)
+            if not isinstance(read_state, dict):
+                raise ValueError('Non-object observation')
+        except (ValueError, TypeError):
+            evidence(args, 'paste-prompt-verify', 'read committed text',
+                     'invalid observation; re-read, never re-paste', 'PARSE_ERROR')
+            return 3
+        if not read_state.get('ok'):
+            evidence(args, 'paste-prompt-verify', 'read committed text',
+                     're-observe without another paste',
+                     read_state.get('error', 'NO_PROMPT_EDITOR'))
+            return 1
         actual_text = str(read_state.get('text', ''))
         if normalize_prompt(actual_text) == expected_normalized:
             break
@@ -1211,6 +1250,7 @@ def cmd_paste_prompt(args) -> int:
     actual_stats = language_stats(actual_normalized)
     content_match = actual_normalized == expected_normalized
     st.update({
+        'write_dispatched': True,
         'before': 0,
         'after': len(actual_text),
         'expected': len(expected_normalized),
@@ -1228,6 +1268,7 @@ def cmd_paste_prompt(args) -> int:
     st['content_match'] = content_match
     st['language'] = actual_stats
     st['verdict'] = verdict
+    st['ok'] = verdict == 'OK'
     evidence(args, 'paste-prompt', f"expect {st['expected']} chars", json.dumps(st, ensure_ascii=False), verdict)
     print(json.dumps(st, ensure_ascii=False))
     return 0 if verdict == 'OK' else 1
@@ -1236,13 +1277,14 @@ def cmd_paste_prompt(args) -> int:
 def cmd_read_prompt(args) -> int:
     """Report what is actually in the prompt box."""
     rc, out, err = browser_js("""(() => {
+  if (%s) return JSON.stringify({ok:false, error:'BLOCKING_DIALOG_CLOSE_AND_REOBSERVE'});
   const el = (() => { const a = [...document.querySelectorAll('%s')].filter(e => e.getClientRects().length); return a.length === 1 ? a[0] : null; })();
   if (!el) return JSON.stringify({ok:false, error:'NO_PROMPT_EDITOR'});
   const t = (%s)(el);
   return JSON.stringify({ok:true, text:t, len:t.length, over_limit:t.length>3500,
     hangul_runs:(t.match(/[가-힣]+/g)||[]).length,
     head:t.slice(0,60), tail:t.slice(-60)});
-})()""" % (PROMPT_SEL, PROMPT_DOM_TEXT_JS))
+})()""" % (PROMPT_BLOCKING_DIALOG_JS, PROMPT_SEL, PROMPT_DOM_TEXT_JS))
     if rc != 0:
         evidence(args, 'read-prompt', 'read editor', err[-200:], 'ASIDE_CONTROL_ERROR')
         return 3

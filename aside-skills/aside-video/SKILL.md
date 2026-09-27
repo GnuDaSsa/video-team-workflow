@@ -23,10 +23,10 @@ description: "Aside 영상팀: 이미지·노래·Seedance/MV/No-I2V 제작과 �
 | Runway 참조 준비·입력·생성 | `references/seedance-upload.md` |
 | 지식 선택 오류/새 지식 검토 | `references/knowledge.md` |
 | 명시적 언어 예외/언어 검사 실패 | `references/prompt-language.md` |
-| 다음 행동이 정말 모호하여 Jev 보조가 필요 | `references/jev-dispatch.md` |
+| 반복 입력 helper 또는 의미 기반 행동 선택 | `references/jev-dispatch.md` |
 | 복합/반복/모호한 QC 노트 분류가 필요 | `references/jev-qc.md` |
 
-같은 문맥에서 이미 읽었고 지침·단계가 바뀌지 않았으면 전체 문서를 재독하거나 status를 반복 호출하지 않는다. 새 세션·압축 후·규칙 변경 시 해당 단계만 복원한다. 정상 작업은 실행자가 바로 진행한다. Jev는 선택형이며 성공·숫자·해시 검사에 끼워 넣지 않는다. 역할은 실제 전환 때 한 줄로만 알린다.
+같은 문맥에서 이미 읽었고 지침·단계가 바뀌지 않았으면 전체 문서를 재독하거나 status를 반복 호출하지 않는다. 새 세션·압축 후·규칙 변경 시 해당 단계만 복원한다. 정상 입력은 기존 guarded helper로 묶어 진행한다. 행동이 이미 정해졌으면 모델 왕복을 추가하지 않는다. 의미 기반 후보 선택만 JEV route, 창작·시각 해석·복합 복구는 현재 실행자가 맡는다. JEV를 성공·숫자·해시 검사나 시작 단계에 끼워 넣지 않는다. 역할은 실제 전환 때 한 줄로만 알린다.
 
 ## 최소 실행
 

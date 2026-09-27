@@ -14,7 +14,7 @@ Start the response with `[videodirector]` on its own line. This skill owns story
 3. Load only the reference for the **current** phase below. Reuse a document already read in this context unless its version or the phase changed. Read the selected Seedance version skill only when authoring or operating Seedance, not for every video question.
 4. Give the first useful decision or artifact promptly. Briefly state chosen defaults when the request is workable but underspecified; ask about style, length or characters only when a missing answer truly blocks production. Never replace actual media/QC evidence with a plan.
 
-JEV-style advisory classification is **not** a default startup step. Aside's JEV is optional for genuinely ambiguous next-action or mixed QC notes; importing an extra model call into every Codex step adds latency and does not authorize execution. Do not invoke an external agent/classifier without the applicable explicit approval, and never let advice bypass runtime gates.
+JEV-style advisory classification is **not** a default startup step. Use code for established input steps, bounded JEV advice for semantic candidate selection, and the current owner for authoring, visual judgment and novel recovery. No new agent is created. Seedance's `aside-operator.md` owns the concrete integration; do not import native Aside author/language/UI rules into Codex. External classifier calls still require current-scope explicit approval, and advice never bypasses execution gates.
 
 ## Mode and spine
 

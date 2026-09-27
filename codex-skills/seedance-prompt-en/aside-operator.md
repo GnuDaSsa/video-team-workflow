@@ -58,7 +58,7 @@ Only before any binding, checkpoint, accepted/uncertain Generate or project queu
 | BIND | exact project/target/session, one owner |
 | CHECKPOINT | current attestation/prompt hash, registered deck, slots, settings |
 | ATTACH | each expected modality/token mapped to approved asset; enlarged visible thumbnail verified |
-| PROMPT | unique visible Lexical editor; empty immediately before one paste; NFC content/hash equality |
+| PROMPT | unique visible Lexical editor; matching text is a no-write success, otherwise empty before one paste; no visible dialog; NFC content/hash equality |
 | SETTINGS | fresh closed model/mode/time/ratio/audio/resolution where exposed, matched to current pack |
 | GENERATE | eight-check preflight; exactly one visible Generate control; one click |
 | ACCEPT | matching newly accepted provider card/output; evidence distinguishes old cards |
@@ -88,10 +88,16 @@ OS focus atomic with a user's simultaneous click. A focus change means stop the
 input and re-observe, not send more keystrokes. Never upload through hidden DOM
 file inputs, clipboard images, or unapproved drag fallback.
 
-Use `paste-prompt --file <BLOCK>_prompt.txt` once, then `read-prompt --file <BLOCK>_prompt.txt` for a non-mutating exact content/hash comparison and visible
-counter/hold inspection. Non-empty or ambiguous editor is a repair state, not
-permission to append, use `--replace`, or inject text into another field.
-An uncertain paste call is followed by a read, not another paste.
+Use the existing `paste-prompt --file <BLOCK>_prompt.txt --pack <attested-pack>`
+as one bounded input transaction: pre-read, no-write `PROMPT_ALREADY_MATCHED`
+when normalized text already agrees, otherwise one paste into an empty editor
+and actual committed-text/hash verification. A visible dialog blocks both
+acceptance and mutation; it is checked again immediately before paste. Never
+append/replace different existing text or guess another editor. A successful
+transaction already includes a read-back; do not repeat it mechanically without
+an intervening change. An uncertain call, resume or changed UI requires
+`read-prompt --file <BLOCK>_prompt.txt`, never blind re-paste. Visible counter,
+hold inspection and the fresh before-Generate preflight remain mandatory.
 
 `settings-verify` rechecks the current pack with the current validator as well
 as attestation/lock hashes. It is a consistency guard, not a screenshot sensor:
@@ -111,6 +117,31 @@ stale checkpoint. An unresolved ownership conflict needs exact user selection;
 verified completed cards from the bound project can still be harvested without
 changing the composer. This is a manual visible preflight, not an automatic
 ownership detector or permission to start another operator.
+
+### Established input steps versus semantic decisions
+
+Prefer the existing guarded CLI/Computer Use helpers for an established action;
+do not ask the model or JEV to re-decide every known paste/search/verification.
+Computer Use still performs the actual UI operation. The current owner retains
+prompt authoring, screenshot/identity judgment, and novel multi-step recovery.
+
+Only when a short observed text state requires a choice between locally eligible
+input actions, reuse the installed Aside decision module (not its native UI or
+Astra/language policy): `node ~/.aside/u/0/skills/user/aside-video/scripts/jev-dispatch.mjs
+route --root <same project> --input <anonymized-state.json> --kind semantic
+--observed-at <actual ISO observation> --jev-approval <current-scope approval ref>`.
+Input/output/approval/triage details are owned by that module and its adjacent
+`references/jev-dispatch.md`. If unavailable or unapproved, reason in this owner
+without installing/starting a replacement agent. Do not pass author context.
+The decision module never runs a browser, changes models, or authorizes execution.
+
+Consume only its candidate action, then revalidate the existing exact-session,
+reference, prompt and settings gates. Keep selectors, paths and immutable pack
+text local. Never feed raw snapshots/media/private account data to JEV. Do not
+use native `runway-fastlane.js` to bypass this Codex operator's paste/native
+chooser restrictions. Generate, publication/payment, quality PASS and new owner
+creation are outside this router; an existing runtime recovery rung takes
+precedence over semantic advice. No second loop, automatic retry or scheduler.
 
 ## C. Uncertainty is not permission to repeat
 

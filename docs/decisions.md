@@ -170,11 +170,20 @@ Prefer one short entry and stage-only reference loading. Jev is optional for unr
 
 For a project whose user explicitly excludes music and asks for image/video production, the v4 runtime accepts a hash-bound project exception and a provisional visual cut map. Default music-first remains unchanged for other projects. Visual-only packages must be labeled as such; no silent placeholder, music-sync claim, or completed voiced-film claim. Diegetic sound embedded in Seedance clips remains governed by the selected version skill and is not a separately produced music track. See `docs/contracts/2026-09-25-visual-only-no-audio.md`.
 
-## 2026-09-25 — Codex video lean entry before optional Jev
+## Bounded code / JEV / current-owner input routing
 
-- Use a compact `videodirector` entry to classify advice/audit, one-asset revision and full production before loading phase references. This preserves the runtime's mandatory rails and gates while removing unnecessary startup reads.
-- Aside Jev is an advisory ambiguity classifier, not the source of its measured 76% instruction-character reduction. Do not add a Jev call to Codex's normal path or treat its answer as execution authority. No Jev call or provider/media operation was made for this change.
-- Defer the much larger global/runtime AGENTS slimming to a separate rule-owner audit; blindly deleting the 40 KB global instructions could remove unique safety or user-calibration rules.
+- Keep phase-specific lean entry. Established UI input uses the existing guarded
+  helper directly; do not add mandatory route/JEV calls to known steps.
+- Reuse the existing JEV dispatcher/cache/three-attempt ledger for semantic
+  candidate selection through `route`. Missing current-scope approval, unavailable
+  key/service, stale observation, low certainty and non-input/visual/authoring work
+  return to the current owner or fresh observation. Triage floors are not calibrated
+  safety guarantees. No new owner, authority, prompt generation or browser loop.
+- The Codex paste helper now accepts already-matching normalized text without a
+  write and preserves foreign text. Check dialogs before/at/after input and on
+  recovery read. Do not transplant native Aside's fill or Astra-only requirements.
+- Contract: `docs/contracts/2026-09-28-jev-bounded-input-routing.md`. No live API,
+  browser operation or end-to-end performance claim accompanies the offline tests.
 
 ## 2026-09-25 — Defer video craft detail from global Codex startup
 
