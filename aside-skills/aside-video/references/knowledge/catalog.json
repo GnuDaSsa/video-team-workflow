@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "revision": "2026-09-26.1",
-  "reviewed_at": "2026-09-26",
+  "revision": "2026-09-28.natural-light",
+  "reviewed_at": "2026-09-28",
   "wiki_file": "concepts/aside-image-video-prompting.md",
   "source_file": "aside-image-video-prompting.md",
-  "source_sha256": "82260dc07ceb5428cc8011dd36f2a72701613515a890a3ecda6208ab514774ea",
+  "source_sha256": "dad2edd6b2d9a096a9a50e0044275ab4f49de18721b9307affa5be0b1171040b",
   "max_cards": 6,
   "max_chars": 9000,
   "cards": [
@@ -89,7 +89,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "cfb00a5786abe5c89057e9c7cca5ec16ec2b5b573c6223fc237afd00cf24cba1",
+          "sha256": "c9db1c042aec046b45ac61d046113b75c79a12ec4bb469aecb8bd2f9baacbcf0",
           "section": "CURRENT"
         }
       ]
@@ -118,7 +118,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "cfb00a5786abe5c89057e9c7cca5ec16ec2b5b573c6223fc237afd00cf24cba1",
+          "sha256": "c9db1c042aec046b45ac61d046113b75c79a12ec4bb469aecb8bd2f9baacbcf0",
           "section": "CURRENT"
         },
         {
@@ -200,7 +200,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "cfb00a5786abe5c89057e9c7cca5ec16ec2b5b573c6223fc237afd00cf24cba1",
+          "sha256": "c9db1c042aec046b45ac61d046113b75c79a12ec4bb469aecb8bd2f9baacbcf0",
           "section": "CURRENT"
         },
         {
@@ -208,6 +208,11 @@
           "path": "concepts/video-camera-composition-grammar.md",
           "sha256": "87cd6fa3a440844c032e29498f60ed346a0a5ae2b4d54f0de7acbec87d5a5d4b",
           "section": "CURRENT / Composition order"
+        },
+        {
+          "kind": "web",
+          "url": "https://www.youtube.com/watch?v=VvvzHA-xfAE&t=350",
+          "reviewed_at": "2026-09-28"
         }
       ]
     },
@@ -295,8 +300,13 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "cfb00a5786abe5c89057e9c7cca5ec16ec2b5b573c6223fc237afd00cf24cba1",
+          "sha256": "c9db1c042aec046b45ac61d046113b75c79a12ec4bb469aecb8bd2f9baacbcf0",
           "section": "CURRENT"
+        },
+        {
+          "kind": "web",
+          "url": "https://www.youtube.com/watch?v=VvvzHA-xfAE&t=350",
+          "reviewed_at": "2026-09-28"
         }
       ]
     },
@@ -321,7 +331,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "cfb00a5786abe5c89057e9c7cca5ec16ec2b5b573c6223fc237afd00cf24cba1",
+          "sha256": "c9db1c042aec046b45ac61d046113b75c79a12ec4bb469aecb8bd2f9baacbcf0",
           "section": "CURRENT"
         },
         {
@@ -358,7 +368,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "cfb00a5786abe5c89057e9c7cca5ec16ec2b5b573c6223fc237afd00cf24cba1",
+          "sha256": "c9db1c042aec046b45ac61d046113b75c79a12ec4bb469aecb8bd2f9baacbcf0",
           "section": "CURRENT"
         }
       ]
@@ -393,7 +403,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "cfb00a5786abe5c89057e9c7cca5ec16ec2b5b573c6223fc237afd00cf24cba1",
+          "sha256": "c9db1c042aec046b45ac61d046113b75c79a12ec4bb469aecb8bd2f9baacbcf0",
           "section": "CURRENT"
         }
       ]

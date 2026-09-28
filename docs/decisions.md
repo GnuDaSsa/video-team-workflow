@@ -198,3 +198,11 @@ For a project whose user explicitly excludes music and asks for image/video prod
 - Record each material user idea as KEEP, functional ADAPT or evidenced HOLD in the Planner's existing result and revise the affected unsubmitted block map. A review memo is not an adopted plan. Do not force a 15-second source into multiple shots when a sustained city/building view is the point.
 - No-I2V reference images define named roles, not an implicit first frame. Start Seedance prose with the intended visual event, and load the large adapters only for matching shot risk. The reviewed native Aside knowledge catalog tracks the current upstream wiki hashes; a hash update is not a new claim of provider quality.
 - The 3/3 gate is a speed/coverage compromise, not proof of stable identity throughout a video. The real wall-clock gain and output quality still need a comparable production run. See `docs/contracts/2026-09-26-video-production-throughput-and-intent.md`.
+
+## 2026-09-28 — Natural light/materials as a photoreal default
+
+Adopt the user's source-linked creative preference at the existing live-action
+wiki owner; update only its snapshot and existing bounded native derivatives.
+Keep positive image compilation, explicit style/edit intent and real-playback QC.
+Source observation is not an efficacy guarantee. Contract and release evidence:
+`docs/contracts/2026-09-28-natural-light.md`, `docs/releases/2026-09-28-natural-light/`.

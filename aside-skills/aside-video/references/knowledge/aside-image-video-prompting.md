@@ -1,7 +1,7 @@
 ---
 title: Aside Image and Video Prompting Knowledge
 created: 2026-09-20
-updated: 2026-09-20
+updated: 2026-09-28
 type: concept
 tags: [video, video-production, multimodal, retrieval, qc]
 sources: [raw/articles/aside-image-prompting-review-2026-09-20.md, raw/articles/aside-v20-prompting-review-2026-09-20.md, raw/articles/aside-v25-prompting-review-2026-09-20.md]
@@ -57,6 +57,7 @@ Reviewed creative guidance, not execution authority. The native Aside selector l
 - Decide distance, viewing angle, subject scale, foreground/midground/background and light direction before adding gear names.
 - Keep the scene's fixed geography distinct from screen-left/right placement; a reverse angle is not a simple horizontal mirror.
 - Use lighting, shadow direction and surface response consistently. Avoid automatically adding neon, fog, rim light, grain or a shallow-focus look to unrelated requests.
+- For photoreal/live-action portions, anchor illumination to the actual sun, window or fixture; match lit planes and contact shadows. Keep modest local luminance variation, distance-appropriate material grain, gentle highlight roll-off and restrained sharpness. Preserve real gloss, approved identity and clean equipment; do not manufacture dirt, wrinkles or noise. Use concrete positive appearance language under the active compiler. QC rejects excessive HDR, uniform orange wash, plastic skin and oversharpened edges; video also needs start/middle/end samples and playback for light jumps or texture crawl. This is a default heuristic, not a quality guarantee or an override of explicit style/edit intent.
 
 ### image-animation
 
@@ -75,6 +76,7 @@ Reviewed creative guidance, not execution authority. The native Aside selector l
 - Select the shot purpose, distance, angle and spatial depth before specifying a dominant camera path. Describe start position, path, acceleration/deceleration and exit frame where relevant.
 - Keep subject speed separate from camera speed. Use parallax or occlusion only when they clarify movement, not as decorative motion.
 - Keep critical hands, feet, prop contact and reveals readable. Do not stack incompatible orbit, zoom, whip and tracking directions; do not remove a deliberately causal complex path merely to shorten prose.
+- For photoreal/live-action portions, anchor illumination to the actual sun, window or fixture; match lit planes and contact shadows. Keep modest local luminance variation, distance-appropriate material grain, gentle highlight roll-off and restrained sharpness. Preserve real gloss, approved identity and clean equipment; do not manufacture dirt, wrinkles or noise. Use concrete positive appearance language under the active compiler. QC rejects excessive HDR, uniform orange wash, plastic skin and oversharpened edges; video also needs start/middle/end samples and playback for light jumps or texture crawl. This is a default heuristic, not a quality guarantee or an override of explicit style/edit intent.
 
 ### video-physics
 

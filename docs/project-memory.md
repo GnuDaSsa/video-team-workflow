@@ -123,3 +123,11 @@ and source/live parity do not establish Korean classifier accuracy or speedup.
 ## Deferred Codex video calibration
 
 Global Codex instructions keep cross-project safety/authority but route detailed mode, MV, identity and typography calibration to the installed `videodirector/references/*-calibrations.md` files only when that phase is active. The migration preserved all nine moved sections verbatim and does not change runtime or Seedance authority. See `docs/contracts/2026-09-25-global-video-lazy-load.md`.
+
+## Live-action naturalness default
+
+The user explicitly wants the 5:50 lighting/material lesson applied without
+repeating the request. Canonical content remains the live-action wiki CURRENT;
+Codex pointers and native reviewed cards supply it. Do not replace natural
+variation with grime/noise or confuse instruction routing with generated QC.
+Release: `docs/releases/2026-09-28-natural-light/`.

@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Deploy local-first bounded JEV input routing without adding owners or weakening UI/author gates",
-  "status": "complete",
-  "currentContract": "docs/contracts/2026-09-28-jev-bounded-input-routing.md",
+  "currentGoal": "Apply verified natural-light/material defaults for photoreal work",
+  "status": "in_progress",
+  "currentContract": "docs/contracts/2026-09-28-natural-light.md",
   "blockers": [],
-  "nextStep": "No implementation blocker. On the next authorized production run, compare input time/model hops and duplicate events; validate Korean JEV advice with an approved shadow sample before widening its role. Existing project holds are unchanged.",
-  "lastUpdated": "2026-09-28T00:24:21.084213+09:00",
+  "nextStep": "Verify bounded selection, deploy reviewed wiki/card changes, commit and sync.",
+  "lastUpdated": "2026-09-28T22:20:01.398716+09:00",
   "verification": {
-    "lastCommand": "489 Node + 217 Python tests; py_compile; zsh -n; diff check; 3 skill validations; release preflight; native apply/check; 3 Codex scoped deploy + independent hashes; installed CLI smoke + 38-case rerun",
-    "lastResult": "PASS_SCOPED_INPUT_ROUTING_DEPLOYMENT",
-    "notes": "706 unique synthetic/offline tests pass. Installed native full managed parity and 3 Codex hashes pass. Installed 38 tests are a rerun, not extra unique coverage. No live JEV, production UI, media or performance benchmark. Unrelated full-Codex drift preserved."
+    "lastCommand": "14 routing cases; 2 compiler examples; 55 targeted Node + 217 runtime tests; wiki dry-run; native freeze and two-file diff; git diff --check",
+    "lastResult": "PASS_SOURCE_READY_DEPLOYMENT_PENDING",
+    "notes": "No new media generation, independent author behavior or playback quality test."
   },
   "knownWarnings": [
     "Seongnam Planner R2 remains a historical accepted package but not safe to reuse unchanged: creative city/eating omissions, old candidate IDs and stale brief/override hashes; rebuild R3 before production.",
