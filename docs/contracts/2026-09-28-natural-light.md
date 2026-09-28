@@ -31,3 +31,13 @@ reuse, provider change, experimental accuracy claim or wholesale project remake.
 
 ## Result
 Source synchronized; wiki patch and official native deployment verified. 46-file native parity, 14 routes, two compiler examples and 272 existing targeted/runtime tests pass. Generated-output quality remains untested; see release record.
+
+## Screen-grounded follow-up
+User requests actual screenshots and text analysis, not only narration summary.
+Save unaltered timestamped PNGs, sizes/hashes and visible/obscured boundaries.
+Provide a short quotation with clearly labeled paraphrase and new prompt, not
+an invented complete transcription. Add the visible source's original-structure,
+shot-to-shot lighting continuity and conditional whole-object/support cues to
+the existing owner. Preserve its 2400-character bound, deployed derivatives and
+clinical/reference/provider holds. Verify changed routing/compiler/deployment;
+do not claim new media or full-playback quality.

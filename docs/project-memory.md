@@ -129,5 +129,5 @@ Global Codex instructions keep cross-project safety/authority but route detailed
 The user explicitly wants the 5:50 lighting/material lesson applied without
 repeating the request. Canonical content remains the live-action wiki CURRENT;
 Codex pointers and native reviewed cards supply it. Do not replace natural
-variation with grime/noise or confuse instruction routing with generated QC.
+variation with grime/noise or confuse instruction routing with generated QC. When the user asks to inspect a shown prompt, retain actual timestamped screenshots and distinguish visible evidence from narration, paraphrase and missing text.
 Release: `docs/releases/2026-09-28-natural-light/`.

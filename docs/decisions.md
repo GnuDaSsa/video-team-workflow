@@ -204,5 +204,5 @@ For a project whose user explicitly excludes music and asks for image/video prod
 Adopt the user's source-linked creative preference at the existing live-action
 wiki owner; update only its snapshot and existing bounded native derivatives.
 Keep positive image compilation, explicit style/edit intent and real-playback QC.
-Source observation is not an efficacy guarantee. Contract and release evidence:
+Source observation is not an efficacy guarantee. Actual prompt-screen captures and a clearly labeled paraphrase now supply evidence for structure/continuity/support cues; obscured lines are not reconstructed. Contract and release evidence:
 `docs/contracts/2026-09-28-natural-light.md`, `docs/releases/2026-09-28-natural-light/`.

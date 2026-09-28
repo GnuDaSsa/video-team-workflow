@@ -27,7 +27,7 @@ for name,attrs,expected in [
   if expected:assert not hits[0]['truncated'] and profile in text
   report['legacy'].append({'name':name,'pass':True,'selected':[x['id'] for x in r['selected']]})
 # Mandatory content and protected creative boundaries, including existing identity/edit/motion rules.
-for marker in ['실사 기본값','접지 그림자','작은 밝기 편차','절제된 선명도','긍정형','과한 HDR','의료 공간의 청결','미검증이면 PASS하지 않는다','승인 참조','역숏은 단순 좌우 반전이 아니다','목적→방해/자극']:
+for marker in ['건축·배치·물체 형상','시간대·색온도·노출','실제 지지점·연결부','실사 기본값','접지 그림자','작은 밝기 편차','절제된 선명도','긍정형','과한 HDR','의료 공간의 청결','미검증이면 PASS하지 않는다','승인 참조','역숏은 단순 좌우 반전이 아니다','목적→방해/자극']:
  assert marker in profile,marker
 module=(a.native_root/'scripts/knowledge.mjs').as_uri()
 js=r'''import {selectKnowledge,verifyKnowledge} from '__MODULE__';

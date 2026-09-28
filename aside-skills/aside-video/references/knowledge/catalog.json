@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "revision": "2026-09-28.natural-light",
+  "revision": "2026-09-28.prompt-screen",
   "reviewed_at": "2026-09-28",
   "wiki_file": "concepts/aside-image-video-prompting.md",
   "source_file": "aside-image-video-prompting.md",
-  "source_sha256": "dad2edd6b2d9a096a9a50e0044275ab4f49de18721b9307affa5be0b1171040b",
+  "source_sha256": "2e831ca1de1fc09835ea89d1e7f8497011217e2a4239eb18c713e39a9a212902",
   "max_cards": 6,
   "max_chars": 9000,
   "cards": [
@@ -89,7 +89,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "c9db1c042aec046b45ac61d046113b75c79a12ec4bb469aecb8bd2f9baacbcf0",
+          "sha256": "87a2cc62d457299cd1ab7f4243448a9bc15bf27295ad95435fe9073e3c01a607",
           "section": "CURRENT"
         }
       ]
@@ -118,7 +118,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "c9db1c042aec046b45ac61d046113b75c79a12ec4bb469aecb8bd2f9baacbcf0",
+          "sha256": "87a2cc62d457299cd1ab7f4243448a9bc15bf27295ad95435fe9073e3c01a607",
           "section": "CURRENT"
         },
         {
@@ -200,7 +200,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "c9db1c042aec046b45ac61d046113b75c79a12ec4bb469aecb8bd2f9baacbcf0",
+          "sha256": "87a2cc62d457299cd1ab7f4243448a9bc15bf27295ad95435fe9073e3c01a607",
           "section": "CURRENT"
         },
         {
@@ -300,7 +300,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "c9db1c042aec046b45ac61d046113b75c79a12ec4bb469aecb8bd2f9baacbcf0",
+          "sha256": "87a2cc62d457299cd1ab7f4243448a9bc15bf27295ad95435fe9073e3c01a607",
           "section": "CURRENT"
         },
         {
@@ -331,7 +331,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "c9db1c042aec046b45ac61d046113b75c79a12ec4bb469aecb8bd2f9baacbcf0",
+          "sha256": "87a2cc62d457299cd1ab7f4243448a9bc15bf27295ad95435fe9073e3c01a607",
           "section": "CURRENT"
         },
         {
@@ -368,7 +368,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "c9db1c042aec046b45ac61d046113b75c79a12ec4bb469aecb8bd2f9baacbcf0",
+          "sha256": "87a2cc62d457299cd1ab7f4243448a9bc15bf27295ad95435fe9073e3c01a607",
           "section": "CURRENT"
         }
       ]
@@ -403,7 +403,7 @@
         {
           "kind": "wiki",
           "path": "concepts/video-prompting-live-action.md",
-          "sha256": "c9db1c042aec046b45ac61d046113b75c79a12ec4bb469aecb8bd2f9baacbcf0",
+          "sha256": "87a2cc62d457299cd1ab7f4243448a9bc15bf27295ad95435fe9073e3c01a607",
           "section": "CURRENT"
         }
       ]

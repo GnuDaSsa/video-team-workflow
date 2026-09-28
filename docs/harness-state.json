@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Apply verified natural-light/material defaults for photoreal work",
-  "status": "complete",
+  "currentGoal": "Capture and analyze the actual prompt screen and refine the live-action default",
+  "status": "in_progress",
   "currentContract": "docs/contracts/2026-09-28-natural-light.md",
   "blockers": [],
-  "nextStep": "Apply the deployed light/material default on the next photoreal authoring request; verify generated output by real playback. Existing production holds and deferred narration remain.",
-  "lastUpdated": "2026-09-28T22:24:45+09:00",
+  "nextStep": "Verify screen-bound source changes and deploy reviewed knowledge derivatives.",
+  "lastUpdated": "2026-09-28T23:17:21+09:00",
   "verification": {
-    "lastCommand": "55 Node + 217 Python tests; 14 Codex/native routes + 2 compiler examples; patch preimage/dry-run; native apply/check (46-file parity); installed route rerun; git diff checks",
-    "lastResult": "PASS_SCOPED_NATURAL_LIGHT_DEPLOYMENT",
-    "notes": "Canonical wiki and two derived native knowledge files deployed. No new generated media, independent author behavior or playback quality claim."
+    "lastCommand": "14 routes; 3 compiler examples; 55 targeted tests; image dimensions/hashes; wiki preimage/dry-run; native two-file preflight",
+    "lastResult": "PASS_SCREEN_SOURCE_DEPLOYMENT_PENDING",
+    "notes": "No complete transcription, new media, playback QC or full runtime rerun claimed."
   },
   "knownWarnings": [
     "Seongnam Planner R2 remains a historical accepted package but not safe to reuse unchanged: creative city/eating omissions, old candidate IDs and stale brief/override hashes; rebuild R3 before production.",

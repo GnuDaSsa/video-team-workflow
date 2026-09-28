@@ -1,0 +1,28 @@
+{
+  "source_url": "https://www.youtube.com/watch?v=VvvzHA-xfAE&t=359",
+  "captured_at": "2026-09-28T23:17:21+09:00",
+  "capture_method": "CUA browser full-screen screenshot; no image regeneration or enhancement",
+  "files": [
+    {
+      "path": "/Users/gnudas/Documents/영상작업/실사_프롬프트_화면분석_20260928/youtube_0559_fullscreen.png",
+      "video_time": "05:59",
+      "dimensions": [
+        2560,
+        1440
+      ],
+      "bytes": 316776,
+      "sha256": "9ae596de70df9847d6aed0c45b21f7d63d06c66c71dc9c58c805d76022365b21"
+    },
+    {
+      "path": "/Users/gnudas/Documents/영상작업/실사_프롬프트_화면분석_20260928/youtube_0602_fullscreen.png",
+      "video_time": "06:02",
+      "dimensions": [
+        2560,
+        1440
+      ],
+      "bytes": 318969,
+      "sha256": "6e2a321f6272a96a45c3113afdcc75f07bb58d6ddad2626ec3e62d8a3875df0b"
+    }
+  ],
+  "scope": "Visible prompt screen only; captions/controls obscure the bottom; not a complete source prompt transcript."
+}

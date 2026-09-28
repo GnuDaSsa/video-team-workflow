@@ -4,7 +4,7 @@ created: 2026-08-01
 updated: 2026-09-28
 type: concept
 tags: [video, video-production, qc]
-sources: [concepts/live-action-character-authenticity-casting-standard.md, concepts/ai-photoreal-portrait-prompting-2026-05-30.md, concepts/seedance-prompting-knowledge.md, raw/articles/higgsfield-hell-grind-live-action-review-2026-09-08.md, raw/articles/paperloge-natural-light-review-2026-09-28.md]
+sources: [concepts/live-action-character-authenticity-casting-standard.md, concepts/ai-photoreal-portrait-prompting-2026-05-30.md, concepts/seedance-prompting-knowledge.md, raw/articles/higgsfield-hell-grind-live-action-review-2026-09-08.md, raw/articles/paperloge-natural-light-review-2026-09-28.md, raw/articles/paperloge-prompt-screen-review-2026-09-28.md]
 confidence: medium
 contested: false
 contradictions: []
@@ -20,16 +20,16 @@ retrieval_mediums: [live_action]
 
 ### Identity
 
-- 자연스러움을 완벽한 좌우대칭·V라인·도자기 피부로 번역하지 않는다. 승인 얼굴의 윤곽·눈 간격·코·턱·헤어·체형·의상과 고유 비대칭을 유지한다. 피부결·눈 반사광은 실제 광원과 촬영 거리에 맞춘다. 과도한 모공·반짝임·필름 입자를 새로 만들지 않는다.
-- 반복 인물의 중립 triptych·상태별 파생·stress test는 기존 character-sheet 표준을 따른다. 단발 사진에 triptych/정체성 전용 stress test를 강제하지 않는다. 인물 시트의 조명과 장면 룩을 분리한다.
+- 자연스러움을 완벽한 좌우대칭·V라인·도자기 피부로 번역하지 않는다. 승인 얼굴의 윤곽·눈 간격·코·턱·헤어·체형·의상과 고유 비대칭을 유지한다. 피부결·눈 반사광은 실제 광원과 촬영 거리에 맞춘다. 과장 모공·반짝임·입자를 추가하지 않는다.
+- 반복 인물의 중립 triptych·상태별 파생·stress test는 기존 character-sheet 표준을 따른다. 단발 사진에 triptych/정체성 전용 stress test를 강제하지 않는다. 인물 시트 조명과 장면 룩을 구분한다.
 - 수정은 승인 원본 기준으로 변경 대상과 보존할 얼굴·구도·광원·재질을 나눈다. 변경하지 않은 영역까지 반복 재생성하지 않는다. 픽셀 보존은 지시만으로 보장되지 않으므로 비교 QC한다.
 
 ### Optics
 
-- 장소의 고정 지도(문·기둥·창문·기준점 거리·광원)와 컷별 blocking(카메라 위치·화면 좌우·몸 방향·시선·소품을 쥔 손)을 분리한다. 같은 공간은 유지하되 카메라 각도가 바뀌면 화면 좌우를 재계산한다. 역숏은 단순 좌우 반전이 아니다.
-- 참조마다 얼굴/의상/공간/재질/구도 중 사용 역할을 구분한다. 사용자 지정 첫 프레임·크롭은 유지한다. 장소 참고 이미지를 자동으로 첫 프레임으로 취급하지 않는다.
+- 참조의 건축·배치·물체 형상을 보존한다. 고정 지도(문·창·거리·광원)와 컷별 blocking(카메라·좌우·몸 방향·시선·손)을 구분한다. 카메라가 바뀌면 좌우를 재계산한다. 역숏은 단순 좌우 반전이 아니다.
+- 참조마다 얼굴/의상/공간/재질/구도 중 사용 역할을 구분한다. 지정 첫 프레임·크롭은 유지하되 장소 참조를 첫 프레임으로 오인하지 않는다.
 - 장비명보다 거리·높이·화면 크기·원근·배경 선명도를 정한다. 얼굴 클로즈업에 전신 reveal을 섞지 않는다. 역광·연무·네온은 필요할 때만 쓴다.
-- 실사 기본값: 실제 해·창·조명을 정하고 밝은 면·그늘·접지 그림자의 방향을 맞춘다. 온기는 광원 색과 닿는 면에 국한한다. 작은 밝기 편차, 촬영 거리에서 읽히는 피부·나무·금속·유리의 결, 부드러운 하이라이트와 절제된 선명도를 유지한다. 재료 본래의 광택·의료 공간의 청결·승인 얼굴을 보존한다. 불균일함을 오염·과장 모공·주름·노이즈 추가로 번역하지 않는다. 이미지 프롬프트에는 해당 컴파일러의 긍정형으로 구체화한다.
+- 실사 기본값: 인접 컷의 시간대·색온도·노출을 연결한다. 실제 해·창·조명을 정하고 밝은 면·그늘·접지 그림자의 방향을 맞춘다. 온기는 광원 색과 닿는 면에 국한한다. 작은 밝기 편차, 촬영 거리에서 읽히는 피부·나무·금속·유리의 결, 부드러운 하이라이트와 절제된 선명도를 유지한다. 재료 본래의 광택·의료 공간의 청결·승인 얼굴을 보존한다. 불균일함을 오염·과장 모공·주름·노이즈 추가로 번역하지 않는다. 이미지 프롬프트에는 해당 컴파일러의 긍정형으로 구체화한다.
 
 ### Performance — video only
 
@@ -40,7 +40,7 @@ retrieval_mediums: [live_action]
 
 ### QC
 
-- 다인물 공간 샷만 필요할 때 짧은 배치 확인을 둔다. 액션 중간 시작은 첫 프레임과 양립할 때만 사용한다. 공간 전환은 문턱 같은 구조로, 거대 피사체는 화면 내 크기 기준으로 증명한다.
+- 다인물 공간 샷만 필요할 때 짧은 배치 확인을 둔다. 액션 중간 시작은 첫 프레임과 양립할 때만 사용한다. 공간 전환·크기는 문턱·비교물로 증명한다. 전체상 숏은 상하 여백, 부품은 실제 지지점·연결부를 확인한다.
 - 과한 HDR·전면 주황빛·플라스틱 피부·과선명 테두리를 QC한다. 영상은 시작·중간·끝 표본과 실제 재생으로 광원 튐·질감 끓음을 확인한다. 미검증이면 PASS하지 않는다.
 - 얼굴 교체·인물 복제·죽은 눈·과장 연기·손 접촉·피부/재질 끓음·광원/시선/스케일 오류를 QC한다. 한 원인씩 수정·기록하고 반복 실패는 동작 분할/구도 변경으로 푼다. 손·얼굴 결함 정리 후 인접 컷의 색과 현장 분위기음을 맞춘다. 불안정한 핸들만 검사 후 자른다.
 
