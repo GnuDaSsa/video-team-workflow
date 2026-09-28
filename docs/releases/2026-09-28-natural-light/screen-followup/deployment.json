@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "updated_at": "2026-09-28T23:19:51+09:00",
+  "managed_native_files": 46,
+  "parity": "PASS",
+  "source_commit": "a11e2bd",
+  "native_backup": ".workflow-backups/2026-09-28T14-18-43-977Z-e7d12ac4-fd7a-4403-8e04-2ce2b65cd423",
+  "wiki_sha256": "87a2cc62d457299cd1ab7f4243448a9bc15bf27295ad95435fe9073e3c01a607",
+  "tests": {
+    "targeted_existing_tests": 55,
+    "route_cases": 14,
+    "compiler_examples": 3
+  },
+  "not_run": [
+    "new generated image/video",
+    "full playback quality experiment",
+    "217-test runtime rerun",
+    "independent author behavior test"
+  ]
+}

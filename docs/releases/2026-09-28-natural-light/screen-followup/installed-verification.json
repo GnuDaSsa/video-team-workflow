@@ -1,0 +1,185 @@
+{
+  "scope": "offline routing/content/parity only",
+  "legacy": [
+    {
+      "name": "portrait",
+      "pass": true,
+      "selected": [
+        "hot-core",
+        "higgsfield-community-core",
+        "composition-order",
+        "higgsfield-community-camera-physics",
+        "medium-live-action",
+        "risk-identity-clone"
+      ]
+    },
+    {
+      "name": "object",
+      "pass": true,
+      "selected": [
+        "hot-core",
+        "higgsfield-community-core",
+        "composition-order",
+        "higgsfield-community-camera-physics",
+        "higgsfield-community-product-ugc",
+        "medium-live-action"
+      ]
+    },
+    {
+      "name": "environment",
+      "pass": true,
+      "selected": [
+        "hot-core",
+        "higgsfield-community-core",
+        "composition-order",
+        "higgsfield-community-camera-physics",
+        "medium-live-action",
+        "camera-identity-closeup-family"
+      ]
+    },
+    {
+      "name": "no_i2v",
+      "pass": true,
+      "selected": [
+        "hot-core",
+        "higgsfield-community-core",
+        "composition-order",
+        "higgsfield-community-camera-physics",
+        "medium-live-action",
+        "mode-no-i2v"
+      ]
+    },
+    {
+      "name": "mixed",
+      "pass": true,
+      "selected": [
+        "hot-core",
+        "higgsfield-community-core",
+        "composition-order",
+        "higgsfield-community-camera-physics",
+        "medium-2d",
+        "medium-live-action"
+      ]
+    },
+    {
+      "name": "pure_2d",
+      "pass": true,
+      "selected": [
+        "hot-core",
+        "higgsfield-community-core",
+        "composition-order",
+        "higgsfield-community-camera-physics",
+        "medium-2d"
+      ]
+    },
+    {
+      "name": "pure_3d",
+      "pass": true,
+      "selected": [
+        "hot-core",
+        "higgsfield-community-core",
+        "composition-order",
+        "higgsfield-community-camera-physics",
+        "medium-3d",
+        "camera-action-tracking"
+      ]
+    }
+  ],
+  "native": [
+    {
+      "name": "still",
+      "pass": true,
+      "cards": [
+        "image-core",
+        "image-product",
+        "image-optics"
+      ],
+      "chars": 2353,
+      "mode": "live_wiki"
+    },
+    {
+      "name": "edit",
+      "pass": true,
+      "cards": [
+        "image-core",
+        "reference-roles",
+        "image-edit",
+        "image-identity",
+        "image-optics"
+      ],
+      "chars": 3500,
+      "mode": "live_wiki"
+    },
+    {
+      "name": "video20",
+      "pass": true,
+      "cards": [
+        "video-core",
+        "video-camera"
+      ],
+      "chars": 2031,
+      "mode": "live_wiki"
+    },
+    {
+      "name": "video25",
+      "pass": true,
+      "cards": [
+        "video-core",
+        "video-camera"
+      ],
+      "chars": 2031,
+      "mode": "live_wiki"
+    },
+    {
+      "name": "mixed",
+      "pass": true,
+      "cards": [
+        "video-core",
+        "video-camera",
+        "video-animation"
+      ],
+      "chars": 2561,
+      "mode": "live_wiki"
+    },
+    {
+      "name": "2d",
+      "pass": true,
+      "cards": [
+        "video-core",
+        "video-animation"
+      ],
+      "chars": 1065,
+      "mode": "live_wiki"
+    },
+    {
+      "name": "2dstill",
+      "pass": true,
+      "cards": [
+        "image-core",
+        "image-animation"
+      ],
+      "chars": 1001,
+      "mode": "live_wiki"
+    }
+  ],
+  "compiler": [
+    {
+      "name": "home",
+      "ok": true,
+      "warnings": []
+    },
+    {
+      "name": "lab",
+      "ok": true,
+      "warnings": []
+    }
+  ],
+  "profile_chars": 2375,
+  "not_run": [
+    "new media generation",
+    "full video playback QC",
+    "independent author behavioral evaluation",
+    "broad unrelated deployment"
+  ],
+  "ok": true
+}

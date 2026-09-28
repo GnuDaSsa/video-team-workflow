@@ -22,3 +22,6 @@ diff checks pass. Original wiki preimages are archived under
 No new media generation, full playback or independent author behavior experiment.
 The217 runtime tests passed in the preceding release and were not rerun in this
 content-only follow-up. No unrelated full Codex deployment is claimed.
+
+## Installed result
+Canonical wiki patched after preimage/dry-run verification. Official native apply backed up and changed only the two knowledge files;46file PARITY OK. Installed14case route/verification and two compiler checks pass; the third user-facing prompt separately passes. Final capture files remain local, not republished to GitHub. Harness, decision/memory and current project pointer updated; no production job or hold changed.

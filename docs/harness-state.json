@@ -1,14 +1,14 @@
 {
   "currentGoal": "Capture and analyze the actual prompt screen and refine the live-action default",
-  "status": "in_progress",
+  "status": "complete",
   "currentContract": "docs/contracts/2026-09-28-natural-light.md",
   "blockers": [],
-  "nextStep": "Verify screen-bound source changes and deploy reviewed knowledge derivatives.",
-  "lastUpdated": "2026-09-28T23:17:21+09:00",
+  "nextStep": "Use current live-action profile for future unsubmitted authoring; inspect actual generated clips separately. Capture/analysis files are delivered locally; medical/device/rights/identity holds and deferred narration stay unchanged.",
+  "lastUpdated": "2026-09-28T23:19:51+09:00",
   "verification": {
-    "lastCommand": "14 routes; 3 compiler examples; 55 targeted tests; image dimensions/hashes; wiki preimage/dry-run; native two-file preflight",
-    "lastResult": "PASS_SCREEN_SOURCE_DEPLOYMENT_PENDING",
-    "notes": "No complete transcription, new media, playback QC or full runtime rerun claimed."
+    "lastCommand": "2 PNG dimension/size/hash checks;14routes;3compiler examples;55targeted tests;wiki preimages/dry-run;official native apply/check46file parity;installed rerun;diff/harness checks",
+    "lastResult": "PASS_SCREEN_GROUNDED_RULE_DEPLOYED",
+    "notes": "Short quote plus labeled paraphrase/new prose, not full transcription. No new generated media/playback experiment or full runtime rerun."
   },
   "knownWarnings": [
     "Seongnam Planner R2 remains a historical accepted package but not safe to reuse unchanged: creative city/eating omissions, old candidate IDs and stale brief/override hashes; rebuild R3 before production.",
@@ -17,6 +17,16 @@
     "Model-token, media quality and end-to-end latency gains have not been measured in an actual comparable run."
   ],
   "recentCloseouts": [
+    {
+      "id": "2026-09-28-prompt-screen-followup",
+      "status": "complete",
+      "contract": "docs/contracts/2026-09-28-natural-light.md",
+      "verification": {
+        "lastCommand": "2 PNG dimension/size/hash checks;14routes;3compiler examples;55targeted tests;wiki preimages/dry-run;official native apply/check46file parity;installed rerun;diff/harness checks",
+        "lastResult": "PASS_SCREEN_GROUNDED_RULE_DEPLOYED",
+        "notes": "Short quote plus labeled paraphrase/new prose, not full transcription. No new generated media/playback experiment or full runtime rerun."
+      }
+    },
     {
       "id": "2026-09-28-natural-light",
       "status": "complete",
