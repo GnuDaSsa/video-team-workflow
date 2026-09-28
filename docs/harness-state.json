@@ -1,14 +1,14 @@
 {
   "currentGoal": "Apply verified natural-light/material defaults for photoreal work",
-  "status": "in_progress",
+  "status": "complete",
   "currentContract": "docs/contracts/2026-09-28-natural-light.md",
   "blockers": [],
-  "nextStep": "Verify bounded selection, deploy reviewed wiki/card changes, commit and sync.",
-  "lastUpdated": "2026-09-28T22:20:01.398716+09:00",
+  "nextStep": "Apply the deployed light/material default on the next photoreal authoring request; verify generated output by real playback. Existing production holds and deferred narration remain.",
+  "lastUpdated": "2026-09-28T22:24:45+09:00",
   "verification": {
-    "lastCommand": "14 routing cases; 2 compiler examples; 55 targeted Node + 217 runtime tests; wiki dry-run; native freeze and two-file diff; git diff --check",
-    "lastResult": "PASS_SOURCE_READY_DEPLOYMENT_PENDING",
-    "notes": "No new media generation, independent author behavior or playback quality test."
+    "lastCommand": "55 Node + 217 Python tests; 14 Codex/native routes + 2 compiler examples; patch preimage/dry-run; native apply/check (46-file parity); installed route rerun; git diff checks",
+    "lastResult": "PASS_SCOPED_NATURAL_LIGHT_DEPLOYMENT",
+    "notes": "Canonical wiki and two derived native knowledge files deployed. No new generated media, independent author behavior or playback quality claim."
   },
   "knownWarnings": [
     "Seongnam Planner R2 remains a historical accepted package but not safe to reuse unchanged: creative city/eating omissions, old candidate IDs and stale brief/override hashes; rebuild R3 before production.",
@@ -17,6 +17,16 @@
     "Model-token, media quality and end-to-end latency gains have not been measured in an actual comparable run."
   ],
   "recentCloseouts": [
+    {
+      "id": "2026-09-28-natural-light",
+      "status": "complete",
+      "contract": "docs/contracts/2026-09-28-natural-light.md",
+      "verification": {
+        "lastCommand": "55 Node + 217 Python tests; 14 Codex/native routes + 2 compiler examples; patch preimage/dry-run; native apply/check (46-file parity); installed route rerun; git diff checks",
+        "lastResult": "PASS_SCOPED_NATURAL_LIGHT_DEPLOYMENT",
+        "notes": "Canonical wiki and two derived native knowledge files deployed. No new generated media, independent author behavior or playback quality claim."
+      }
+    },
     {
       "id": "2026-09-26-video-production-throughput-and-intent",
       "status": "source_verified_deployed",

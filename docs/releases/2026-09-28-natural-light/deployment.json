@@ -1,0 +1,26 @@
+{
+  "updated_at": "2026-09-28T22:24:45+09:00",
+  "ok": true,
+  "scope": "wiki and two native knowledge files only",
+  "native_managed_files": 46,
+  "native_parity": "PASS",
+  "archive": "/Users/gnudas/.codex/archive/20260928_natural_light/wiki",
+  "native_backup": ".workflow-backups/2026-09-28T13-23-11-303Z-c4a45c0a-4253-4965-b58f-37ea2e6c1f82",
+  "sha256": {
+    "/Users/gnudas/wiki/concepts/video-prompting-live-action.md": "c9db1c042aec046b45ac61d046113b75c79a12ec4bb469aecb8bd2f9baacbcf0",
+    "/Users/gnudas/wiki/concepts/aside-image-video-prompting.md": "dad2edd6b2d9a096a9a50e0044275ab4f49de18721b9307affa5be0b1171040b",
+    "/Users/gnudas/.aside/u/0/skills/user/aside-video/references/knowledge/catalog.json": "3db17d08866909a4e86414422a39db9271c9b442bb0bfba02782ddc5868f68ca"
+  },
+  "tests": {
+    "targeted_node": 55,
+    "runtime_python": 217,
+    "routing_cases": 14,
+    "compiler_examples": 2
+  },
+  "not_run": [
+    "new media generation",
+    "full playback quality test",
+    "independent model behavior test",
+    "full unrelated Codex deployment"
+  ]
+}

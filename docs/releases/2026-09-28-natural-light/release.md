@@ -46,3 +46,26 @@ No new image/video generation, full-playback quality experiment, independent
 model behavioral check or end-to-end improvement guarantee. No paid service,
 new agent, browser owner, scheduler or source-video reuse. Project clinical/fact/
 rights and identity holds stay in effect; male Fish narration remains deferred.
+
+## Installed result
+Wiki preimage hashes and zero-context patch dry-run passed; archived originals
+are retained. The original staged unified patch triggered whitespace checks on
+blank context lines; it was replaced by a zero-context patch and rechecked before
+application. Source fixes were pushed without rewriting history.
+
+The two canonical wiki files were patched; the official native deployer applied
+only the two reviewed knowledge files with a backup. All 46 managed files have
+PARITY OK. Installed-root verification repeats 14 routing and two compiler cases
+successfully, with live upstream checks. Existing Codex image/videodirector
+pointers still load the same canonical path. See deployment.json and
+installed-verification.json. No other runtime/skill deployment occurred.
+
+The current foodtech planner status/result now points to this common owner for
+future unsubmitted authoring; existing media and clinical/factual/rights/identity
+holds and deferred narration remain unchanged. Historical sealed requests must
+not have hashes silently rewritten; author a fresh request when continuing.
+
+Closeout also re-ran the current foodtech R4 verifier (315 checks PASS), harness
+validation and the full branch diff whitespace check. Source-note hash and both
+installed Codex automatic pointers pass. Wiki lint retains pre-existing raw-hash
+warnings; they were not silently recalculated or repaired in this change.

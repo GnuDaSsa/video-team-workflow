@@ -28,3 +28,6 @@ not an experimentally proven cure for every temporal or anatomical defect.
 ## Non-goals
 No new agent, browser owner, scheduler, API call, paid generation, source-media
 reuse, provider change, experimental accuracy claim or wholesale project remake.
+
+## Result
+Source synchronized; wiki patch and official native deployment verified. 46-file native parity, 14 routes, two compiler examples and 272 existing targeted/runtime tests pass. Generated-output quality remains untested; see release record.
