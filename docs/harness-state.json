@@ -123,7 +123,7 @@
     },
     {
       "id": "2026-09-29-seedance-english-default",
-      "status": "complete",
+      "status": "deployed_branch_synced_main_merge_pending",
       "contract": "docs/contracts/2026-09-12-seedance-explicit-english.md",
       "completedAt": "2026-09-29T20:35:10.811934+09:00",
       "verification": {
@@ -134,7 +134,11 @@
         "not_run": "Generated video download, complete playback/audio QC and selected voice asset extraction",
         "isolated_tree_tests": 198
       },
-      "decision": "Standing English directions, literal requested spoken language; accepted Korean job preserved. Unrelated blocked main goal retained."
+      "decision": "Standing English directions, literal requested spoken language; accepted Korean job preserved. Unrelated blocked main goal retained.",
+      "sync": {
+        "branch": "codex/seedance-english-default",
+        "main": "blocked_by_existing_divergence; no force or conflict resolution"
+      }
     }
   ]
 }
