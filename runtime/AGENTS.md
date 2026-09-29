@@ -7,14 +7,14 @@
 | 순위 | 문서 | 소유 범위 |
 |---|---|---|
 | 1 | 이 파일 | 레일, lane 순서, 실행 예산, 미디어 구조, 게이트, 안전 |
-| 2 | `~/.codex/skills/seedance-prompt-en/` (2.0/기본) 또는 `~/.codex/skills/seedance25-prompt-en/` (사용자가 2.5 명시) | 선택된 버전의 Seedance 한글 프롬프트 규격과 Runway UI 조작 |
+| 2 | `~/.codex/skills/seedance-prompt-en/` (2.0/기본) 또는 `~/.codex/skills/seedance25-prompt-en/` (사용자가 2.5 명시) | 선택된 버전의 Seedance 제작 프롬프트 규격과 Runway UI 조작 |
 | 3 | `~/.codex/video-team-policies/` | 스폰 승인, 브라우저 오퍼레이터 정책 |
 | 4 | `videodirector` | 이야기·연출·품질 기준 |
 
 - 같은 규칙을 여러 문서에 복제하지 않는다. 소유 문서 한 곳에만 본문을 두고 나머지는 포인터만 둔다.
 - 프로젝트 안에 규칙 사본을 만들지 않는다. 프로젝트 예외는 `docs/project_overrides.md`에 조항 번호와 함께 기록한다.
 - 이 v4 미디어 구조는 **이 버전으로 새로 초기화한 프로젝트에만** 적용한다. 기존 프로젝트는 사용자가 별도 이관을 요청하기 전까지 이동·정리하지 않는다.
-- No-I2V는 별도 팀이 아니라 이 전체 레일의 `generation_mode=no_i2v_reference_native`다. 달라지는 것은 이미지/레퍼런스 생성 전략과 Seedance 입력 방식뿐이며, 음악·기획·한글 프롬프트 ownership·QC·media registry·정리·편집·패키지·스폰·안전 규칙은 모두 동일하다.
+- No-I2V는 별도 팀이 아니라 이 전체 레일의 `generation_mode=no_i2v_reference_native`다. 달라지는 것은 이미지/레퍼런스 생성 전략과 Seedance 입력 방식뿐이며, 음악·기획·제작 프롬프트 ownership·QC·media registry·정리·편집·패키지·스폰·안전 규칙은 모두 동일하다.
 
 ## 1. 실행 모델: 기본 직렬, 이미지 생성만 최대 3개
 
@@ -71,10 +71,10 @@ flowchart TD
 ### 1.1 생성 모드
 
 - 기본 `standard_i2v`: 계획된 production cut마다 독립 source/styleframe을 만들고 QC한 뒤 I2V 입력으로 사용한다.
-- `no_i2v_reference_native`: **레퍼런스 수와 신규 이미지 생성을 최소화하고, 한글 Seedance 프롬프트로 더 많은 shot 구성·blocking·동작·camera·분위기·시간 진행을 해결한다.**
+- `no_i2v_reference_native`: **레퍼런스 수와 신규 이미지 생성을 최소화하고, Seedance 제작 프롬프트로 더 많은 shot 구성·blocking·동작·camera·분위기·시간 진행을 해결한다.**
 - No-I2V에서도 위의 전체 lane 순서, 최대 3개 이미지 실행 예외, 프로젝트 `media/` 구조, `asset_registry.sqlite`, Music Lock, Seedance/편집/QC/패키지/안전 계약은 바뀌지 않는다.
 - Planner는 이미 승인·등록된 identity/environment reference를 먼저 재사용한다. 충분하면 신규 이미지는 0개이며, 부족할 때만 최소 provider-safe reference를 만든다.
-- No-I2V는 per-cut styleframe/start/end/keyframe을 만들거나 업로드하지 않는다. Reference는 재사용 가능한 identity/environment anchor이고, 최종 한글 prompt가 컷별 구도와 시간적 연출을 담당한다.
+- No-I2V는 per-cut styleframe/start/end/keyframe을 만들거나 업로드하지 않는다. Reference는 재사용 가능한 identity/environment anchor이고, 최종 제작 prompt가 컷별 구도와 시간적 연출을 담당한다.
 - 사용자가 영상팀 진행 중 `No-I2V`를 호출하면 같은 프로젝트의 아직 제출하지 않은 block만 이 모드로 전환한다. 이미 제출된 provider job과 기존 media/provenance는 그대로 보존하며 자동 삭제·재해석하지 않는다.
 
 ### 1.2 생성 시간 잠금
@@ -122,11 +122,10 @@ flowchart TD
 
 ### 2.3 Seedance
 
-- Seedance lane이 최종 영상 프롬프트를 **한글(`ko-KR`)로 직접 작성**하고 같은 lane에서 순차적으로 Runway를 실행한다.
-- 최종 팩은 `prompt_language=ko-KR`, `prompt_style_version=creative_seedance_ko_v4_20260731`, `authoring_contract=seedance_lane_owned_ko`를 선언한다.
-- `prompt_packet_utils.py validate/attest`에서 한글 우세·길이·운영문서 누출·해시를 통과하지 못하면 Runway에 붙여넣지 않는다.
+- Seedance lane이 최종 영상 프롬프트를 직접 작성하고 같은 lane에서 순차적으로 Runway를 실행한다. 제작 지시문·실제 대사의 언어 및 팩 필드는 `seedance-shared-contract.md`의 Handoff contract가 단독 소유한다.
+- `prompt_packet_utils.py validate/attest`에서 해당 언어 계약·길이·운영문서 누출·해시를 통과하지 못하면 Runway에 붙여넣지 않는다.
 - 최종 Seedance 시각 프롬프트는 먼저 **UTF-8 NFC `*_prompt.txt`**로 저장한다. 한글/비ASCII 입력이나 IME 상태가 불확실할 때 synthetic typing을 재시도하지 않고, 이 txt를 `paste-prompt --file`의 IME-safe paste event로 한 번만 넣는다.
-- `~/.codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py paste-prompt`는 `.txt`/UTF-8/NFC/한글 우세를 검사하고, 붙여넣기 뒤 정규화 본문과 해시가 일치할 때만 성공한다. `runtime/scripts/runway_ui_helper.py`는 기존 호출 호환 shim일 뿐 구현 소유자가 아니다.
+- `~/.codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py paste-prompt`는 `.txt`/UTF-8/NFC/선택된 언어 계약을 검사하고, 붙여넣기 뒤 정규화 본문과 해시가 일치할 때만 성공한다. `runtime/scripts/runway_ui_helper.py`는 기존 호출 호환 shim일 뿐 구현 소유자가 아니다.
 - 사용자가 현재 요청에서 `Seedance 2.5`/`씨댄스 2.5`를 명시하면 `~/.codex/skills/seedance25-prompt-en/`을 선택하고, 명시적 2.0 또는 버전 없는 Seedance 요청은 `~/.codex/skills/seedance-prompt-en/`을 선택한다. 한 block에서 두 버전 스킬을 함께 읽지 않는다.
 - 세부 프롬프트 규격과 Runway UI 절차는 위에서 선택된 한 버전 스킬만 따른다.
 - 사용자 제공 Seedance 2.0 프롬프팅 ZIP의 검증된 멀티모달 바인딩·타임 비트·원샷/멀티샷·연장/수정 문법은 `~/.codex/skills/seedance-prompt-en/seedance2-prompt-patterns.md` 포인터로만 참조하며, 별도 경쟁 스킬로 설치하지 않는다.

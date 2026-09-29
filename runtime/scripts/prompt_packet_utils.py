@@ -2,7 +2,7 @@
 """Validate and attest lane-authored Seedance prompt packages.
 
 Runtime v4 has no dedicated prompt-authoring agent or model bridge. The
-Seedance lane writes the Korean prompt and this module enforces the handoff
+Seedance lane writes the English production prompt and this module enforces the handoff
 contract before visible Runway operation.
 """
 from __future__ import annotations
@@ -22,11 +22,13 @@ import shot_semantics
 
 
 SEEDANCE_PROMPT_CHAR_LIMIT = 3500
-SEEDANCE_PROMPT_STYLE_VERSION = 'creative_seedance_ko_v4_20260731'
-SEEDANCE_AUTHORING_CONTRACT = 'seedance_lane_owned_ko'
-PROMPT_LANGUAGE = 'ko-KR'
+KOREAN_PROMPT_STYLE_VERSION = 'creative_seedance_ko_v4_20260731'
+KOREAN_AUTHORING_CONTRACT = 'seedance_lane_owned_ko'
+PROMPT_LANGUAGE = 'en-US'
 ENGLISH_PROMPT_STYLE_VERSION = 'creative_seedance_en_v4_20260912'
 ENGLISH_AUTHORING_CONTRACT = 'seedance_lane_owned_en'
+SEEDANCE_PROMPT_STYLE_VERSION = ENGLISH_PROMPT_STYLE_VERSION
+SEEDANCE_AUTHORING_CONTRACT = ENGLISH_AUTHORING_CONTRACT
 MULTIMODAL_BINDING_RULE = 'model_facing_multimodal_binding_v1'
 SINGLE_SHOT_GRAMMAR = 'SINGLE_CONTINUOUS_SHOT'
 MULTI_SHOT_GRAMMAR = 'PLANNED_MULTI_SHOT_SOURCE'
@@ -86,14 +88,19 @@ def language_stats(text: str) -> dict:
 
 
 def validate_language_override(pack: dict, project: Path | None = None) -> list[str]:
-    """English is opt-in per user-requested project/block; never a moderation bypass."""
-    if pack.get('prompt_language') == PROMPT_LANGUAGE:
+    """English is default; other direction language needs scoped explicit intent.
+
+    Legacy English evidence, when present, is still checked rather than ignored.
+    Accepted historical jobs are never changed by this prospective input gate.
+    """
+    language = pack.get('prompt_language')
+    if language == PROMPT_LANGUAGE and 'prompt_language_override' not in pack:
         return []
-    if pack.get('prompt_language') != 'en-US':
+    if language not in {'en-US', 'ko-KR'}:
         return [f'wrong_prompt_language:{pack.get("prompt_language")}']
     override = pack.get('prompt_language_override')
     if not isinstance(override, dict):
-        return ['english_user_request_required']
+        return ['korean_user_request_required']
     try:
         root = Path(override['project']).expanduser().resolve(strict=True)
         evidence = Path(override['evidence_path']).expanduser().resolve(strict=True)
@@ -109,7 +116,7 @@ def validate_language_override(pack: dict, project: Path | None = None) -> list[
         return ['language_request_evidence_invalid']
     if not isinstance(request, dict) or not isinstance(request.get('block_ids'), list):
         return ['language_request_scope_mismatch']
-    if (request.get('language') != 'en-US' or request.get('source') != 'explicit_user_request'
+    if (request.get('language') != language or request.get('source') != 'explicit_user_request'
             or not request.get('user_quote') or not request.get('turn_id')
             or pack.get('block_id') not in request.get('block_ids', [])):
         return ['language_request_scope_mismatch']
@@ -122,7 +129,7 @@ def prompt_language_matches(text: str, language: str) -> bool:
 
 
 def validate_paste_pack(pack_path: Path, text: str, project: Path) -> str:
-    """Require an unchanged attested pack for the optional English paste route."""
+    """Require an unchanged attested pack under the current language policy."""
     pack_path = pack_path.expanduser().resolve()
     project = project.expanduser().resolve()
     if not pack_path.is_relative_to(project):
@@ -265,8 +272,8 @@ def validate_seedance(pack: dict) -> list[str]:
             errors.append(f'missing:{key}')
     errors.extend(validate_language_override(pack))
     english = pack.get('prompt_language') == 'en-US'
-    style = ENGLISH_PROMPT_STYLE_VERSION if english else SEEDANCE_PROMPT_STYLE_VERSION
-    contract = ENGLISH_AUTHORING_CONTRACT if english else SEEDANCE_AUTHORING_CONTRACT
+    style = ENGLISH_PROMPT_STYLE_VERSION if english else KOREAN_PROMPT_STYLE_VERSION
+    contract = ENGLISH_AUTHORING_CONTRACT if english else KOREAN_AUTHORING_CONTRACT
     if pack.get('prompt_style_version') != style:
         errors.append(f'wrong_prompt_style_version:{pack.get("prompt_style_version")}')
     if pack.get('authoring_contract') != contract:

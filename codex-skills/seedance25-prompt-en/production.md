@@ -44,7 +44,7 @@ inside the shared helper. If that shared helper is missing, stop with
    visible mode rather than assuming the previous state survived refresh.
 5. Attach only the ordered, approved, registry-backed sources. Verify each
    thumbnail by enlarged visible content, not filename or upload progress alone.
-6. Paste the UTF-8 NFC Korean prompt file, then compare normalized visible text
+6. Paste the UTF-8 NFC production prompt file, then compare normalized visible text
    and hash with the attested prompt.
 7. Reference/Keyframe/Extend: verify the exposed duration against the runtime
    lock. Edit: duration and ratio inherit the verified input video; there is no

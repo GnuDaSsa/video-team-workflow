@@ -67,7 +67,8 @@ import aside_bridge
 import media_registry
 import generation_settings
 from prompt_packet_utils import (language_stats, normalize_prompt, prompt_sha256,
-                                 validate_seedance, validate_paste_pack, prompt_language_matches)
+                                 validate_seedance, validate_paste_pack, prompt_language_matches,
+                                 validate_language_override)
 
 
 UPLOAD_ALIAS_ROOT = Path(os.environ.get('RUNWAY_UPLOAD_ALIAS_ROOT', '/tmp/codex-runway-upload'))
@@ -1107,7 +1108,7 @@ def cmd_paste_prompt(args) -> int:
         return 1
     expected_normalized = normalize_prompt(text)
     expected_stats = language_stats(expected_normalized)
-    prompt_language = 'ko-KR'
+    prompt_language = 'en-US'
     if getattr(args, 'pack', None):
         try:
             project = aside_bridge.require_project(prompt_file=prompt_path)
@@ -1452,7 +1453,7 @@ def verify_attested_generation_settings(
     verified_model = require_seedance_20(visible_model)
     # Historic ATTESTED receipts do not bypass the currently installed compiler.
     current_pack = _json_file(pack_path)
-    pack_errors = validate_seedance(current_pack)
+    pack_errors = validate_seedance(current_pack) + validate_language_override(current_pack, project)
     if pack_errors:
         raise ValueError('SETTINGS_CURRENT_PACK_INVALID_REAUTHOR_REQUIRED: ' + ','.join(pack_errors))
     duration_errors, _current_duration = generation_settings.validate_pack_duration(current_pack, project)
@@ -2700,7 +2701,7 @@ def main() -> int:
     p = sub.add_parser('paste-prompt', help='insert prompt text into the Lexical editor via a dispatched paste event (no keystrokes, IME-safe)')
     p.add_argument('--file', required=True)
     p.add_argument('--replace', action='store_true', help='replace all existing text instead of appending')
-    p.add_argument('--pack', help='Attested project pack; required for explicit English override')
+    p.add_argument('--pack', help='Attested project pack; required for explicit non-default language')
     p.set_defaults(fn=cmd_paste_prompt)
     p = sub.add_parser('read-prompt'); p.add_argument('--file'); p.set_defaults(fn=cmd_read_prompt)
     sub.add_parser('ime-check', help='is the active input source safe for synthetic keystrokes?').set_defaults(fn=cmd_ime_check)

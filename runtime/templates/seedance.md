@@ -13,7 +13,7 @@ Load only the selected version branch. Runtime owns rails/media/safety.
 3. Apply the selected skill's prompting branch and shared `prompt-review.md`.
    Declare `render_scope`; remove irrelevant entities, undecided camera choices,
    operator prose and filenames. Bind each attached token to its narrow role.
-4. Write a UTF-8 NFC `<BLOCK>_prompt.txt` containing only Korean visual/audible
+4. Write a UTF-8 NFC `<BLOCK>_prompt.txt` containing only model-facing visual/audible
    direction, plus the separate machine-readable package. Include
    `model_facing_multimodal_binding_v1`, `duration_sec`, `shot_grammar` and, for
    multi-shot sources, scene IDs/times/cut ownership/reference tokens/action/

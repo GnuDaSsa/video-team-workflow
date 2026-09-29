@@ -40,7 +40,7 @@ revision_ledger:
 ### Entity and reference lock
 
 - State `exactly N` for each visible recurring role when count matters. Name every required character; do not use vague plural nouns.
-- Give every `@ImageN/@VideoN/@AudioN` one narrow visible or audible role in both the package and Korean prompt.
+- Give every `@ImageN/@VideoN/@AudioN` one narrow visible or audible role in both the package and production prompt.
 - Treat a location reference as geometry/material/atmosphere evidence only. Unless explicitly required, it must not dictate the generated opening frame, camera angle, grade, or frozen composition.
 - Treat identity descriptors and approved state assets as immutable. Wet, wounded, damaged-costume, age-stage, disguise, or transformation states are separate assets, not adjectives casually added to a clean master.
 

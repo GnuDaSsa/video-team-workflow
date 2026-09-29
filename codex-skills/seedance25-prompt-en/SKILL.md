@@ -1,6 +1,6 @@
 ---
 name: seedance25-prompt-en
-description: Use only when the user explicitly requests Seedance 2.5 or 씨댄스 2.5. Author Korean 2.5 prompts and run the matching visible Runway production path; do not activate for generic Seedance or Seedance 2.0 work.
+description: Use only when the user explicitly requests Seedance 2.5 or 씨댄스 2.5. Author 2.5 production prompts and run the matching visible Runway production path; do not activate for generic Seedance or Seedance 2.0 work.
 ---
 
 # Seedance 2.5 prompt and production router
@@ -42,7 +42,7 @@ and provider-visible capabilities outrank those adapters.
 
 ## Two serial branches
 
-1. For mode choice, reference roles, Korean prompt compilation, timeline beats,
+1. For mode choice, reference roles, production prompt compilation, timeline beats,
    or prompt repair, read `prompting.md`.
 2. After the package is current and attested, for visible Runway operation,
    model/settings verification, attachment, Generate, recovery, queue handling,

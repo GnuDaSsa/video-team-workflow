@@ -55,7 +55,7 @@ class SeedanceQueueContinuationTests(unittest.TestCase):
             'prompt_language': packets.PROMPT_LANGUAGE,
             'prompt_style_version': packets.SEEDANCE_PROMPT_STYLE_VERSION,
             'authoring_contract': packets.SEEDANCE_AUTHORING_CONTRACT,
-            'prompt': '카메라는 골목을 천천히 따라가고 인물이 문을 여는 순간 따뜻한 빛이 바닥으로 번진다. 마지막 프레임은 인물의 안정된 중간 구도로 끝난다.',
+            'prompt': 'The camera tracks the person along an alley. As she opens the door, warm light spills across the floor. End on a steady medium view of her looking inside.',
             'reference_role_map': [{'reference': '@Image1', 'role': '인물과 공간 기준'}],
             'audio_route': 'Audio ON, 현장음 중심',
             'prompt_rules_used': ['references_are_anchor_not_cage'],

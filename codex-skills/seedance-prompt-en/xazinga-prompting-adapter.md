@@ -2,13 +2,13 @@
 
 Source reviewed: `https://www.xazinga.com/apps` (2026-08-21), including its Seedance 2.0, Seedance 2.5, video-prompt-builder, guide, and director skill summaries/downloads.
 
-This is an **adapter**, not a competing provider authority. It retains only provider-agnostic authoring patterns that are compatible with the Korean-prompt, visible-Runway, project-duration-lock, identity, and audio rules in this skill. Do not copy source claims about model limits, product features, or preferred languages as permanent facts.
+This is an **adapter**, not a competing provider authority. It retains only provider-agnostic authoring patterns that are compatible with the production-language, visible-Runway, project-duration-lock, identity, and audio rules in this skill. Do not copy source claims about model limits, product features, or preferred languages as permanent facts.
 
 ## Compile additions
 
 ### 1. Every attachment has a scoped job
 
-For each `@ImageN`, `@VideoN`, or `@AudioN`, the handoff map and the Korean prompt must declare:
+For each `@ImageN`, `@VideoN`, or `@AudioN`, the handoff map and the production prompt must declare:
 
 - **use** — exactly which visible attributes are borrowed (identity silhouette, outfit, building geometry, camera motion, action rhythm, sound texture);
 - **exclude** — which attributes must not transfer (for example, a character sheet's other panels/background; a building image's occupants; a camera reference's cast/look);
@@ -18,7 +18,7 @@ Attachments are independent anchors in `GENERAL_REFERENCE_MODE`; numbering does 
 
 ### 2. Five visual blocks + package-only planning audit
 
-Model-facing Korean text remains compact and visual:
+Model-facing direction remains compact and visual:
 
 1. **source binding** — attribute-scoped `@` roles;
 2. **style/continuity** — medium, identity, costume, spatial and light locks;
@@ -51,7 +51,7 @@ These are prompt-authoring structures only. The actual provider mode and capabil
 
 ### 5. Audio and language precedence
 
-Korean is the final prompt language. Do not append English/Chinese merely because an external guide recommends it. User/project audio instructions outrank generic defaults. If the project requires effects-only, explicitly state: **no background music, song, narration, dialogue, or continuous ambience; only short effects caused by visible action.**
+The shared Handoff contract owns production and spoken-line language; an external guide does not override it. User/project audio instructions outrank generic defaults. If the project requires effects-only, explicitly state: **no background music, song, narration, dialogue, or continuous ambience; only short effects caused by visible action.**
 
 ## Critic checklist additions
 

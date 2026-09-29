@@ -42,7 +42,7 @@ Use the full triptych for general multi-reference identity binding when the prov
 
 ## Model-facing role binding
 
-When the full triptych is attached to a video model, the Korean prompt must state its roles explicitly:
+When the full triptych is attached to a video model, the production prompt must state its roles explicitly:
 
 ```text
 @ImageN의 오른쪽 큰 3/4 초상은 얼굴 정체성·피부·눈빛 기준, 왼쪽 머리 없는 정면 전신은 체형·의상 전면 기준, 가운데 후면 전신은 헤어 뒤 실루엣·의상 후면 기준으로만 사용한다. 회색 배경, 3분할 패널, 패널 경계, 앞 전신의 빈 머리 부분은 결과 화면에 재현하지 않는다. 실제 장면의 포즈·구도·조명은 아래 샷 지시를 따른다.

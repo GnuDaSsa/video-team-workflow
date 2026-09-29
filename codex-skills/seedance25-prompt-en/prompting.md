@@ -32,7 +32,7 @@ regenerating the whole shot.
 ## Reference-role compiler
 
 For every attached source, write one role in both the package and the visible
-Korean prompt:
+production prompt:
 
 ```text
 @Image1은 주인공 얼굴·머리 실루엣·연령 인상의 유일한 기준이다.
@@ -113,20 +113,21 @@ Unrelated scenes stay separate. A planned multi-shot source may contain 2–4
 causally connected cuts only when the project cut-ownership and duration locks
 already authorize it.
 
-## Korean model-facing prompt shape
+## Model-facing prompt shape
 
-Write natural Korean, not package keys. Use the smallest set of sections that
+Follow `../seedance-prompt-en/seedance-shared-contract.md` → Handoff contract
+for production and spoken-line language. Do not paste package keys. Use the smallest set of sections that
 changes the model's behavior:
 
 ```text
-[결과와 샷 의도]
-[참조 역할]
-[시작 상태와 물리 동작]
-[시간대별 비트]
-[카메라와 공간 반응]
-[스타일·정체성·구도 불변 조건]
-[현장음/대사/음악 역할]
-[마지막 유지 구도]
+[Result and shot intent]
+[Reference roles]
+[Start state and physical action]
+[Timed beats]
+[Camera and spatial response]
+[Style, identity and composition invariants]
+[Sound, dialogue and music roles]
+[Final composition]
 ```
 
 Use positive proof constraints first. Add a short forbidden clause only for a

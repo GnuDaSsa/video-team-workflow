@@ -61,7 +61,7 @@ For v4 projects, keep `storyboard_blueprint.md/json` and `storyboard_qc.md` unde
 
 ### Storyboard-to-Seedance handoff
 
-The Seedance lane owns the final Korean prompt. The director/planner supplies metadata only:
+The Seedance lane owns the final production prompt. The director/planner supplies metadata only:
 
 ```yaml
 storyboard_mode: "STORYBOARD_SHOT_MODE | STORYBOARD_SEQUENCE_PREVIS_MODE"

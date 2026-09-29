@@ -139,3 +139,9 @@ A successful native reservation is distinct from local cadence, actual execution
 
 ## 정선 타이포 참조 폐기
 사용자 실패작 지정에 따른 스킬·자동 참조 제거. 단일 소유 기록: `docs/contracts/2026-09-22-retire-jeongseon-typography.md`.
+
+## Seedance production language
+The shared Seedance Handoff contract owns the standing English direction
+default; spoken Korean remains literal. Non-default Korean directions require
+scoped explicit intent. See docs/contracts/2026-09-12-seedance-explicit-english.md
+and docs/releases/2026-09-29-seedance-english-default.md.

@@ -95,3 +95,9 @@ Use the canonical Seedance production branch for native schedule state and runti
 
 ## 퇴역한 타이포 참조
 정선 타이포 스킬 폐기 기록과 검증은 `docs/contracts/2026-09-22-retire-jeongseon-typography.md`에 있다.
+
+## Seedance production language
+The shared Seedance Handoff contract owns the standing English direction
+default; spoken Korean remains literal. Non-default Korean directions require
+scoped explicit intent. See docs/contracts/2026-09-12-seedance-explicit-english.md
+and docs/releases/2026-09-29-seedance-english-default.md.

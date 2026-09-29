@@ -93,7 +93,7 @@ The Runway tab remains Multi-reference; these names describe how the prompt pack
 
 - `GENERAL_REFERENCE_MODE` — default. Each `@ImageN` has an independent role. Deck order is attachment order only.
 - `STORYBOARD_SHOT_MODE` — final-production storyboard use. One generation executes one internal board `shot_id`. In `standard_i2v`, the approved per-cut styleframe carries the scene, the minimum `TRIPTYCH`/identity crop carries identity, and the unified board carries shot purpose, blocking, lens/camera intent, sound cue, and exit composition. Other board cells are context, not scenes to replay.
-- `STORYBOARD_SEQUENCE_PREVIS_MODE` — opt-in prototype/previsualization only. One approved unified board carries internally numbered beats, and the Korean prompt restates a duration-feasible order. The output must be actual cinematic scenes, never the board sheet, panels, labels, diagrams, UI, or printed layout. The package status is `PREVIS_HOLD` until order, identity, timing, and board-artifact contamination pass QC.
+- `STORYBOARD_SEQUENCE_PREVIS_MODE` — opt-in prototype/previsualization only. One approved unified board carries internally numbered beats, and the production prompt restates a duration-feasible order. The output must be actual cinematic scenes, never the board sheet, panels, labels, diagrams, UI, or printed layout. The package status is `PREVIS_HOLD` until order, identity, timing, and board-artifact contamination pass QC.
 
 Shot grammar is separate from reference interpretation. `GENERAL_REFERENCE_MODE` may produce either `SINGLE_CONTINUOUS_SHOT` or final-production `PLANNED_MULTI_SHOT_SOURCE`. In the latter, the Planner's written 0–15s scene plan—not `@ImageN` order—defines 2–4 scene order. Each scene binds only its relevant approved references and ends on an edit-ready frame. `STORYBOARD_SEQUENCE_PREVIS_MODE` remains reserved for a unified multi-panel board prototype.
 
@@ -118,7 +118,7 @@ Spec and generation rules: `runtime/references/character_sheet_prompt_standard.m
 Generation mode decides whether a per-cut styleframe exists; the identity gate itself does not change.
 
 - `standard_i2v`: the identity asset **does not replace** the per-cut styleframe. Attach `styleframe(s) + minimum required TRIPTYCH/crop` — the styleframe carries the scene and the character asset carries identity/body construction.
-- `no_i2v_reference_native`: a per-cut styleframe is intentionally absent. Attach only the minimum approved reusable identity/environment references needed by this shot family. The Korean prompt carries the omitted frame's composition, blocking, action, camera, atmosphere, and timing.
+- `no_i2v_reference_native`: a per-cut styleframe is intentionally absent. Attach only the minimum approved reusable identity/environment references needed by this shot family. The production prompt carries the omitted frame's composition, blocking, action, camera, atmosphere, and timing.
 
 ## Generate-ready queue resume protocol
 
@@ -151,24 +151,37 @@ Two artifacts, and the split is the point:
 
 Keeping metadata out of the prompt file makes the paste accident structurally impossible. Put both in one file and it eventually gets pasted whole — which is exactly how 1,100 of 3,207 characters (34%) ended up in a live prompt.
 
-**Prompts default to Korean**, creative prompts included, so the user can read, approve and correct them. An explicit user English request may use the block-scoped English contract below; changing language is not a remedy for, or permission to bypass, provider moderation. Spoken lines stay verbatim Korean; proper nouns, on-screen text and format tokens (`15s`, `9:16`) keep their original form.
+**Production directions default to English**, including reference bindings,
+scene/action/camera/light/physics/timing and voice delivery descriptions. This is
+the user's standing video-team preference, not a per-project opt-in. User-facing
+planning, explanations and review may stay Korean. Spoken dialogue/narration stays
+verbatim in the requested language (normally Korean); never translate the spoken
+line merely because the surrounding direction is English. Proper nouns, required
+on-screen text and format tokens retain their intended form.
 
-### Explicit English request exception
-
-For explicitly requested blocks only, use `prompt_language: en-US`,
+Use `prompt_language: en-US`,
 `prompt_style_version: creative_seedance_en_v4_20260912`, and
-`authoring_contract: seedance_lane_owned_en`. Record `prompt_language_override`
-with the absolute `project`, `evidence_path` under that project's `docs/`, and
-`evidence_sha256`. The referenced JSON records `source: explicit_user_request`,
-`language: en-US`, the verbatim `user_quote`, `turn_id`, and exact `block_ids`.
-Note the exception in the project's `docs/project_overrides.md`.
+`authoring_contract: seedance_lane_owned_en`. No language-approval note is needed
+for this default. English multi-shot prompts declare `15 seconds, N shots` and
+`Shot 1..N`. Attest with `--project` and paste the immutable text with its pack.
+Attestation, paste and fresh settings checks must all use the same language policy.
 
-English multi-shot prompts declare `15 seconds, N shots` and `Shot 1..N`.
-Attest normally with `--project`; use `paste-prompt --file <txt> --pack <json>`
-so the English route checks scope, unchanged attestation and exact prompt hash.
-Korean remains the default without this evidence. Reference, safety, settings,
-duration, semantic and character-limit checks are unchanged. Never infer that
-an English prompt will resolve a policy rejection.
+### Explicit non-default language
+
+Only an explicit user request for Korean production directions authorizes
+`prompt_language: ko-KR`, `prompt_style_version: creative_seedance_ko_v4_20260731`,
+and `authoring_contract: seedance_lane_owned_ko`. Record `prompt_language_override`
+with absolute `project`, `evidence_path` under that project's `docs/`, and
+`evidence_sha256`. The JSON records `source: explicit_user_request`,
+`language: ko-KR`, verbatim `user_quote`, `turn_id`, and exact `block_ids`.
+A Korean conversation or Korean spoken line is not that request. Legacy English
+request records remain valid when their hashes/scope still match.
+
+Do not rewrite or repeat already accepted/uncertain provider transactions when
+changing language. Preserve their original provenance; reauthor only unsubmitted
+packs before any further Generate. Reference, safety, settings, duration, semantic
+and character-limit gates remain unchanged. Language change is never permission
+to bypass moderation and does not establish the cause of a policy rejection.
 
 ### Package (`<BLOCK>_package.md`)
 

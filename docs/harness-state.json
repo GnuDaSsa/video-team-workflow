@@ -120,6 +120,20 @@
         "live_skill_active": false,
         "not_run": "Full bundle deploy/parity; existing unrelated drift preserved. Fresh app-session discovery UI."
       }
+    },
+    {
+      "id": "2026-09-29-seedance-english-default",
+      "status": "complete",
+      "contract": "docs/contracts/2026-09-12-seedance-explicit-english.md",
+      "completedAt": "2026-09-29T20:35:10.811934+09:00",
+      "verification": {
+        "result": "PASS_SCOPED_DEPLOYMENT_AND_LIVE_ENGLISH_ACCEPTANCE",
+        "tests": 197,
+        "changed_live_files": 16,
+        "full_bundle_parity": false,
+        "not_run": "Generated video download, complete playback/audio QC and selected voice asset extraction"
+      },
+      "decision": "Standing English directions, literal requested spoken language; accepted Korean job preserved. Unrelated blocked main goal retained."
     }
   ]
 }

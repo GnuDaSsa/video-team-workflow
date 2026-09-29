@@ -65,7 +65,7 @@ The video-team generation mode still applies:
 
 - `standard_i2v` uses the approved per-cut source frame plus required identity
   references.
-- `no_i2v_reference_native` omits per-cut frames and makes the Korean prompt own
+- `no_i2v_reference_native` omits per-cut frames and makes the production prompt own
   the missing composition, blocking, action, camera, atmosphere, and timing.
 
 ## Five-block compile audit

@@ -18,6 +18,7 @@ SCRIPTS = Path(__file__).resolve().parents[1] / 'scripts'
 os.environ.setdefault('VIDEO_TEAM_RUNTIME_SCRIPTS', str(SCRIPTS))
 sys.path.insert(0, str(SCRIPTS))
 
+from fixtures_seedance import korean_request
 import lane_gates  # noqa: E402
 import generation_settings  # noqa: E402
 import media_registry  # noqa: E402
@@ -100,18 +101,18 @@ class RuntimeV4Tests(unittest.TestCase):
             video_codex_runtime.PROJECT_ROOT = old_root
 
     def valid_pack(self, block: str = 'B01') -> dict:
-        return {
+        return korean_request({
             'block_id': block,
-            'prompt_language': prompt_packet_utils.PROMPT_LANGUAGE,
+            'prompt_language': 'ko-KR',
             'prompt': VALID_KOREAN_PROMPT,
             'reference_role_map': [{'reference': '@Image1', 'role': '인물과 공간 기준'}],
             'duration_sec': 15,
             'shot_grammar': prompt_packet_utils.SINGLE_SHOT_GRAMMAR,
             'audio_route': 'Audio ON, 현장음 중심',
             'prompt_rules_used': ['references_are_anchor_not_cage'],
-            'prompt_style_version': prompt_packet_utils.SEEDANCE_PROMPT_STYLE_VERSION,
-            'authoring_contract': prompt_packet_utils.SEEDANCE_AUTHORING_CONTRACT,
-        }
+            'prompt_style_version': prompt_packet_utils.KOREAN_PROMPT_STYLE_VERSION,
+            'authoring_contract': prompt_packet_utils.KOREAN_AUTHORING_CONTRACT,
+        }, self.root)
 
     def pack_with_knowledge(self, project: Path, block: str = 'B01') -> dict:
         generation_settings.lock_duration(
@@ -130,7 +131,7 @@ class RuntimeV4Tests(unittest.TestCase):
         receipt = video_knowledge_router.select_knowledge(
             project, block, wiki_root=self.wiki_root, catalog_path=self.catalog_path,
             attributes_path=attributes, budget_chars=4000, max_selections=5)
-        pack = self.valid_pack(block)
+        pack = korean_request(self.valid_pack(block), project)
         pack.update({
             'knowledge_selection_id': receipt['selection_id'],
             'knowledge_context_sha256': receipt['context_sha256'],
@@ -265,7 +266,7 @@ class RuntimeV4Tests(unittest.TestCase):
             with self.assertRaisesRegex(SystemExit, 'V4_REGISTRY_OWNS_ORDER'):
                 sequence_manager.main()
 
-    def test_seedance_prompt_must_be_korean_dominant_and_attested(self) -> None:
+    def test_explicit_korean_prompt_language_and_attestation(self) -> None:
         pack = self.valid_pack()
         self.assertEqual(prompt_packet_utils.validate_seedance(pack), [])
         bad = {**pack, 'prompt': 'A cinematic camera slowly moves through the street and ends on a face.'}

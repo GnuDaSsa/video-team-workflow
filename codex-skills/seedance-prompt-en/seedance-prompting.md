@@ -7,7 +7,7 @@ Defaults: 15s, audio toggle always ON (the soundscape is directed in the prompt)
 ## Prompt language
 
 Follow the single language owner in `seedance-shared-contract.md` → Handoff
-contract, including its explicit, block-scoped English request exception.
+contract, including its default and explicit non-default language contract.
 This governs Seedance video prompts only; image prompt language is separate.
 
 ## What goes in the prompt, and what never does
@@ -64,7 +64,7 @@ the project's locked duration, identity, style, audio, or story requirements.
 
 Record `motion_grammar_profile: toonkit_2d_snappy_v1` in the package and add
 `toonkit_2d_snappy_v1` to `prompt_rules_used`. Keep that metadata out of the
-model-facing Korean prompt. Translate it into the following visible direction
+model-facing production prompt. Translate it into the following visible direction
 instead:
 
 1. **Timed pose beat.** For each planned scene, define a clear start pose, one
@@ -95,7 +95,7 @@ instead:
 For a single scene, this profile produces a strong pose-to-pose accent rather
 than four mini-shots. For a 15-second `PLANNED_MULTI_SHOT_SOURCE`, retain the
 approved 2–4 contiguous scene plan and apply the same one-beat/hold rule to
-each scene. The Korean visual prompt stays concrete and visual; do not paste
+each scene. The production visual prompt stays concrete and visual; do not paste
 the profile name, these numbered rules, package fields, or Toonkit branding
 into Runway.
 
@@ -165,7 +165,7 @@ Do not attach a habitual list of prohibitions.
   approved character sheet carries recurring-character identity.
 - In `no_i2v_reference_native`, do not request or attach a per-cut
   styleframe/start/end/keyframe. Reuse only the minimum approved reusable
-  identity/environment references; the Korean prompt must specify the shot
+  identity/environment references; the production prompt must specify the shot
   composition, blocking, action, camera, atmosphere, and timing that the omitted
   frame would otherwise have supplied.
 - Count follows the request — commonly 3–4, sometimes a character sheet plus a background. There is no minimum, and a file is never attached twice to reach a number.
