@@ -142,7 +142,7 @@ yield design, not a claim about final edit duration.
   Seedance text-rendering scene.
 - Before attestation, record `covered_cuts`, the previous owner if any, the
   duplicate-check verdict, and retry state in the handoff package or ledger.
-- For multi-shot, record a contiguous 0–15s `scene_plan` with 2–4 entries. Each entry has unique covered cuts, relevant reference tokens, one action, one camera setup, and one edit-ready exit. The Korean prompt declares `15초 N숏` and names every `숏 1..N` with hard-cut grammar unless another transition is explicitly motivated.
+- For multi-shot, record a contiguous 0–15s `scene_plan` with 2–4 entries. Each entry has unique covered cuts, relevant reference tokens, one action, one camera setup, and one edit-ready exit. The production prompt declares `15 seconds, N shots` and names every `Shot 1..N` with hard-cut grammar unless another transition is explicitly motivated.
 
 ## Sound
 
@@ -171,7 +171,7 @@ Do not attach a habitual list of prohibitions.
 - Count follows the request — commonly 3–4, sometimes a character sheet plus a background. There is no minimum, and a file is never attached twice to reach a number.
 - `@ImageN` numbering is **not a narrative order**. Each reference is an independent anchor for look, space, props and plausible action, not a sequence to replay.
 - Build the deck from **this shot's own material**. Padding with neighbouring cuts' frames makes adjacent clips look like the same shot.
-- When a recurring character appears, attach the approved `CHAR_<ID>_TRIPTYCH_R<n>` or minimum deterministic `_FACE` / body crop alongside the scene references, and bind its exact role in the Korean prompt.
+- When a recurring character appears, attach the approved `CHAR_<ID>_TRIPTYCH_R<n>` or minimum deterministic `_FACE` / body crop alongside the scene references, and bind its exact role in the production prompt.
 
 ## Length
 

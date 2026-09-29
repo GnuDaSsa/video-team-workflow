@@ -7,7 +7,7 @@ Use this adapter during authoring after `seedance-shared-contract.md` and `seeda
 Maintain two artifacts:
 
 1. **Shot contract package** — complete production logic for humans and validators.
-2. **Korean model-facing prompt** — only the shot-critical subset, compiled to the current target length and visible hard limit.
+2. **Model-facing production prompt** — only the shot-critical subset, compiled to the current target length and visible hard limit.
 
 Do not paste an encyclopedic contract into Runway. Immutable descriptors, spatial maps, reference provenance, revision logs, and omitted background facts remain in the package unless the model must see them for this shot.
 
@@ -113,7 +113,7 @@ Compile the shot-critical subset in this order:
 6. performance, dialogue, and audio;
 7. exit frame and concise positive proof constraints.
 
-Keep the prompt concrete, Korean-first, and within the live skill's current target and hard limit. Remove repeated adjectives before removing spatial, count, contact, timing, or source-role facts.
+Keep the prompt concrete and within the live skill's current target and hard limit; use the shared Handoff language contract. Remove repeated adjectives before removing spatial, count, contact, timing, or source-role facts.
 
 ## User-reference superior compiler — 2026-08-24
 

@@ -17,7 +17,7 @@ Project-specific content (1907 costume research, that project's filenames, sheet
 - Never write the prompt so the numbering becomes a sequence to move through, a match-cut instruction, or an order to replay.
 - One generation = **one coherent shot with one camera flow**, newly composed. The model must not copy several references in turn inside a single clip.
 - Do not force interpolation between reference compositions that were never meant to connect.
-- When a distinction between background, identity, action, or prop materially protects the result, state it in one concise, natural Korean sentence **inside the visual prompt**: e.g. `@Image1은 장소 배경, @Image2는 인물의 얼굴·체형을 고정하는 캐릭터 시트, @Image3은 손·의상·소품 동작을 고정하는 시트다.` This names a visible function, not a file path, scene ID, or operator procedure.
+- When a distinction between background, identity, action, or prop materially protects the result, state it in one concise sentence **inside the visual prompt** under the shared Handoff language contract: e.g. `@Image1 defines the location, @Image2 anchors facial and body identity, and @Image3 anchors hand, costume and prop action.` This names a visible function, not a file path, scene ID, or operator procedure.
 - The sentence must explicitly say that the references are independent anchors, not time order. Do not rely on the thumbnail strip or the handoff package alone for this semantic distinction.
 
 ## Character sheet as identity anchor
@@ -51,8 +51,8 @@ Record in the manifest: `batch_id`, `image_batch_index`, `character_sheet_refres
 
 When the user explicitly prefers their own short, natural-language Runway cards over an expanded template, that preference overrides the normal prompt-length target for the affected package.
 
-- Write one cohesive Korean paragraph, not a label list or compressed schema.
-- For one coherent **15-second locked-duration beat**, about **180–450 Korean characters can be valid** when it still names the visible setup, one action, one camera direction, only the motivated physical reactions, sound, and the final composition. This character-count observation applies only after a 15-second lock; it never selects the duration.
+- Write one cohesive paragraph in the shared Handoff language, not a label list or compressed schema.
+- For one coherent **15-second locked-duration beat**, a **short natural-language paragraph can be valid** when it still names the visible setup, one action, one camera direction, only the motivated physical reactions, sound, and the final composition. This character-count observation applies only after a 15-second lock; it never selects the duration.
 - Do not fake concision by dropping identity, contact physics, sound, or the ending frame. A genuinely complex or explicitly storyboarded sequence may stay longer.
 - Keep model choice, settings, attestation, QC, file paths, and operator gates in the handoff package. The **visible-function `@ImageN` role sentence** is the narrow exception: it belongs in the visual prompt when it disambiguates background versus identity versus action/prop anchors.
 - Treat this as a user-preference route, not a new provider, model, agent, or automation branch. Verify the result in media QC before promoting it as a broadly proven quality rule.
@@ -60,7 +60,7 @@ When the user explicitly prefers their own short, natural-language Runway cards 
 ## Audio ON, explicit per-shot sound route
 
 - Keep Runway Audio **On**. It controls generated SFX and music together, so no-BGM must never be encoded by switching Audio Off.
-- When the project or user requires action-SFX-only audio, the **Korean production prompt itself** must literally state: `오디오는 배경음·음악·노래·나레이션·대사·지속적인 환경음을 생성하지 않는다.` Then name only the short diegetic effects caused by visible on-screen actions (for example a zipper, cup contact, footstep, or cloth friction). Do **not** call for ambience, room tone, wind, rain bed, environmental bed, or any music. Never leave this intent only in a package field.
+- When the project or user requires action-SFX-only audio, the **production prompt itself** must explicitly state the restriction, e.g. `No background sound, music, singing, narration, dialogue or sustained ambience.` Then name only the short diegetic effects caused by visible on-screen actions (for example a zipper, cup contact, footstep, or cloth friction). Do **not** call for ambience, room tone, wind, rain bed, environmental bed, or any music. Never leave this intent only in a package field.
 - **Effects-only QC is a separate gate:** prompt compliance is not audio compliance. For an action-SFX-only job, inspect the actual downloaded clip (audible preview plus waveform/spectrogram when available). Any sustained score, room-tone/ambience bed, narration, dialogue, or continuous environmental layer fails the route even when the prompt was correct. Keep the video as a candidate only; either mute that provider track and rebuild strictly discrete synchronized foley in the edit, or regenerate. Do not promote the generated audio.
 - Do not make no-BGM a universal aesthetic default: score remains available when the current user/shot calls for it. The durable rule is that the prompt, not the UI toggle, carries the sound decision.
 

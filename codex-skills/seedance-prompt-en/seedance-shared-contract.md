@@ -63,7 +63,7 @@ Defaults exist for what the user did *not* specify. They are never a reason to i
 - Do not ask whether to use multi-reference; it is already the default. Asking is different from ignoring a stated one.
 - Whatever the count or modality, the prompt package must contain an ordered
   `@ImageN` / `@VideoN` / `@AudioN` role map naming each attached source's
-  visible or audible function. The Korean model-facing prompt must also bind
+  visible or audible function. The model-facing production prompt must also bind
   every attached token to that narrow function; a package-only role is invisible
   to the provider.
 - **Build each deck from that shot's own material.** Do not pad a deck with the previous or next scene's frames to reach a count. A sliding window like `E19: E18·E19·E20` then `E20: E19·E20·E21` makes consecutive blocks share most of their references, and the model returns two clips that read as the same shot — the exact "why are you making the same video twice" failure.

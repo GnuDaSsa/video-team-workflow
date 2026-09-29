@@ -104,6 +104,24 @@ class SeedanceQueueContinuationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'CURRENT_PACK_INVALID_REAUTHOR_REQUIRED'):
             helper.verify_attested_generation_settings(self.project,'C01',visible_model='Seedance 2.0',duration_sec=15)
 
+    def test_old_korean_attestation_requires_reauthoring_before_generate(self):
+        pack = self.project / 'i2v/seedance/prompts/C01_pack.json'
+        data = json.loads(pack.read_text())
+        data.update(
+            prompt_language='ko-KR',
+            prompt_style_version=packets.KOREAN_PROMPT_STYLE_VERSION,
+            authoring_contract=packets.KOREAN_AUTHORING_CONTRACT,
+            prompt='카메라가 골목을 걷는 인물을 따라간다. 인물이 문을 열자 따뜻한 빛이 바닥에 퍼진다.')
+        pack.write_text(json.dumps(data))
+        receipt = pack.with_name('C01_attestation.json')
+        old_attestation = json.loads(receipt.read_text())
+        old_attestation['pack_sha256'] = hashlib.sha256(pack.read_bytes()).hexdigest()
+        receipt.write_text(json.dumps(old_attestation))
+        with self.assertRaisesRegex(ValueError, 'korean_user_request_required'):
+            helper.verify_attested_generation_settings(
+                self.project, 'C01', visible_model='Seedance 2.0', duration_sec=15)
+        self.assertFalse(helper.settings_preflight_path(self.project, 'C01').exists())
+
     def test_gray_without_active_cards_does_not_trigger_capacity_wait(self):
         result=self.sync([])
         self.assertFalse(result['wake_required'])

@@ -15,9 +15,11 @@ This was not a provider restriction or a inability to write English.
   language mistake. Version routing and other safety/semantic gates are unchanged.
 
 ## Evidence
-- Full working-tree runtime suite: 197 tests passed.
+- Full working-tree runtime suite: 199 tests passed.
+- Isolated staged-tree suite excluding unrelated changes: 198 tests passed.
 - Python compilation, shell syntax and git diff checks passed.
-- 16 reviewed file patches preflighted and applied through
+- 16 initial reviewed file patches plus 5 consumer-cleanup patches (17 unique
+  deployed files) preflighted and applied through
   tools/deploy_reviewed_patch.py. The archive records before bytes and patches.
 - Installed compiler rejects an old Korean pack without explicit Korean intent.
 - A second, previously unsubmitted live block was reauthored in English with a

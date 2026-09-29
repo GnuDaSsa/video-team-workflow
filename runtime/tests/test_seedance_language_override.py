@@ -41,6 +41,25 @@ class LanguageOverrideTests(unittest.TestCase):
         self.pack['block_id'] = 'OTHER'
         self.assertIn('language_request_scope_mismatch', u.validate_language_override(self.pack))
 
+    def test_active_prompt_consumers_do_not_restore_korean_default(self):
+        root = Path(__file__).resolve().parents[2] / 'codex-skills/seedance-prompt-en'
+        stale_phrases = (
+            'The Korean model-facing prompt',
+            '**Korean model-facing prompt**',
+            'Korean-first',
+            'The Korean prompt declares',
+            'role in the Korean prompt',
+            'Write one cohesive Korean paragraph',
+            '**Korean production prompt itself**',
+        )
+        for name in ('seedance-shared-contract.md', 'seedance-prompting.md',
+                     'hell-grind-production-prompting-adapter.md',
+                     'seedance-field-lessons.md'):
+            text = (root / name).read_text()
+            for stale in stale_phrases:
+                with self.subTest(document=name, phrase=stale):
+                    self.assertNotIn(stale, text)
+
     def test_hash_and_project(self):
         self.assertEqual(u.validate_language_override(self.pack,self.root/'other'),['language_override_project_mismatch'])
         self.ev.write_text('{}');self.assertEqual(u.validate_language_override(self.pack),['language_request_evidence_changed'])

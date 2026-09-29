@@ -18,7 +18,7 @@ Commands:
   prepare-upload-alias --project P       make one temporary ASCII symlink for a registry asset
                        --asset-id A --block-id B [--slot N]
   cleanup-upload-alias --path P          remove only a helper-owned temporary upload symlink
-  paste-prompt --file F [--replace]      Korean-validated Lexical paste + exact content/hash check
+  paste-prompt --file F [--replace]      Language-validated Lexical paste + exact content/hash check
   picker-go    --path P                  verified file-picker sheet -> Cmd+Shift+G -> path -> Return
   recovery-checkpoint --project P        persist the same-session transaction before ATTACH
   recovery-record --project P            classify an incident and return the next fixed recovery rung
@@ -54,7 +54,7 @@ from urllib.parse import urlparse
 # Registry-backed commands integrate with the canonical video-team runtime when
 # a v4 project is supplied. Keeping this dependency path explicit lets the
 # Seedance skill own UI/recovery procedure while the runtime continues to own
-# project media validation and Korean prompt attestation.
+# project media validation and production-prompt attestation.
 VIDEO_TEAM_RUNTIME_SCRIPTS = Path(os.environ.get(
     'VIDEO_TEAM_RUNTIME_SCRIPTS',
     '/Users/gnudas/Documents/Codex/video-team-runtime/runtime/scripts',
