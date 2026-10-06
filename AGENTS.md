@@ -49,3 +49,10 @@ Before ending a task, a good prompt is:
 - Keep this harness lightweight; do not turn it into a platform.
 - If validation is not configured yet, say so explicitly instead of claiming full verification.
 <!-- codex-harness-kit:end -->
+
+## Video workflow changes
+
+Before prompt authoring or reusable workflow changes, follow
+[the existing promotion protocol](docs/video-feedback-promotion-protocol.md).
+It owns baseline provenance, project-versus-workflow classification and isolated
+branch publication; it does not replace the production skill contracts.

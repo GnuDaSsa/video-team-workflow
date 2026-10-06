@@ -1,14 +1,16 @@
 {
-  "currentGoal": "Capture and analyze the actual prompt screen and refine the live-action default",
-  "status": "complete",
-  "currentContract": "docs/contracts/2026-09-28-natural-light.md",
-  "blockers": [],
-  "nextStep": "Use current live-action profile for future unsubmitted authoring; inspect actual generated clips separately. Capture/analysis files are delivered locally; medical/device/rights/identity holds and deferred narration stay unchanged.",
-  "lastUpdated": "2026-09-28T23:19:51+09:00",
+  "currentGoal": "Track workflow changes with source provenance and isolated branch publication",
+  "status": "complete_with_validation_warnings",
+  "currentContract": "docs/contracts/2026-10-06-workflow-change-provenance.md",
+  "blockers": [
+    "Existing live-wiki/catalog drift: 82 Node failures; deployed Aside/Codex parity differs from remote base. No deployment authorized."
+  ],
+  "nextStep": "Publish reviewed documentation commit to its separate branch and verify remote SHA; any future merge/deployment or drift reconciliation is separate.",
+  "lastUpdated": "2026-10-06",
   "verification": {
-    "lastCommand": "2 PNG dimension/size/hash checks;14routes;3compiler examples;55targeted tests;wiki preimages/dry-run;official native apply/check46file parity;installed rerun;diff/harness checks",
-    "lastResult": "PASS_SCREEN_GROUNDED_RULE_DEPLOYED",
-    "notes": "Short quote plus labeled paraphrase/new prose, not full transcription. No new generated media/playback experiment or full runtime rerun."
+    "lastCommand": "configured verifyFull; real-path Node rerun; Python compile/unittest; shell syntax; both read-only deployment checks; git diff --check",
+    "lastResult": "SCOPED_DOC_REVIEW_PASS_FULL_VALIDATION_WARNINGS",
+    "notes": "217 Python pass; 407/489 Node pass, 82 source-hash-drift failures; compilation passes with task-local cache. Live parity fails. No runtime/skill changes or live chip/media verification."
   },
   "knownWarnings": [
     "Seongnam Planner R2 remains a historical accepted package but not safe to reuse unchanged: creative city/eating omissions, old candidate IDs and stale brief/override hashes; rebuild R3 before production.",
@@ -85,6 +87,18 @@
         "not_run": "Full bundle deploy/parity; existing unrelated drift preserved. Fresh app-session discovery UI.",
         "native_tests": 451,
         "native_test_environment": "TMPDIR and JEV_QC_TEST_TMP=/private/tmp to avoid macOS /tmp symlink in strict real-path fixtures"
+      }
+    },
+    {
+      "currentGoal": "Capture and analyze the actual prompt screen and refine the live-action default",
+      "status": "complete",
+      "currentContract": "docs/contracts/2026-09-28-natural-light.md",
+      "blockers": [],
+      "nextStep": "Use current live-action profile for future unsubmitted authoring; inspect actual generated clips separately. Capture/analysis files are delivered locally; medical/device/rights/identity holds and deferred narration stay unchanged.",
+      "verification": {
+        "lastCommand": "2 PNG dimension/size/hash checks;14routes;3compiler examples;55targeted tests;wiki preimages/dry-run;official native apply/check46file parity;installed rerun;diff/harness checks",
+        "lastResult": "PASS_SCREEN_GROUNDED_RULE_DEPLOYED",
+        "notes": "Short quote plus labeled paraphrase/new prose, not full transcription. No new generated media/playback experiment or full runtime rerun."
       }
     }
   ]

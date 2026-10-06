@@ -206,3 +206,7 @@ wiki owner; update only its snapshot and existing bounded native derivatives.
 Keep positive image compilation, explicit style/edit intent and real-playback QC.
 Source observation is not an efficacy guarantee. Actual prompt-screen captures and a clearly labeled paraphrase now supply evidence for structure/continuity/support cues; obscured lines are not reconstructed. Contract and release evidence:
 `docs/contracts/2026-09-28-natural-light.md`, `docs/releases/2026-09-28-natural-light/`.
+
+## 2026-10-06 — Workflow change provenance
+
+Extend the existing feedback promotion protocol rather than create a parallel rules system. Separate project authoring from reusable logic changes; preserve source/live drift and distinguish reported platform observations from fresh UI proof.

@@ -131,3 +131,7 @@ repeating the request. Canonical content remains the live-action wiki CURRENT;
 Codex pointers and native reviewed cards supply it. Do not replace natural
 variation with grime/noise or confuse instruction routing with generated QC. When the user asks to inspect a shown prompt, retain actual timestamped screenshots and distinguish visible evidence from narration, paraphrase and missing text.
 Release: `docs/releases/2026-09-28-natural-light/`.
+
+## 2026-10-06 — Workflow change provenance
+
+The user requires future prompting to follow the existing workflow and reusable workflow changes to be reflected on separate GitHub branches. Single owner for this process: `docs/video-feedback-promotion-protocol.md`; this task does not deploy installed skills.
