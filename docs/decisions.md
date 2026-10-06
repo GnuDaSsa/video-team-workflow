@@ -225,3 +225,12 @@ installation. See `docs/contracts/2026-10-06-cloud-cua-profile.md`.
 Use `init --project-root` under the actual authorized task cwd. Preserve the
 legacy default, reject resolved escapes before writes, and keep sandbox authority.
 Do not introduce an arbitrary workspace allowlist or port unrelated dependencies.
+
+## 2026-10-07 — Structural Runway chip readback
+
+Use the observed Lexical decorator attributes and exact chip child structure,
+not global label replacement or whitespace stripping. Separate canonical text
+comparison from approved-file association. Provider IDs on chips are not local
+registry IDs; observed upload slots expose no independent provider IDs. Keep
+nonzero HOLD until association is verified through a separately reviewed process.
+No bypass flag, installed-file edits or private production fixture publication.

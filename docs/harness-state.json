@@ -1,17 +1,17 @@
 {
-  "currentGoal": "Support workspace-contained official project init for the explicit cloud profile",
-  "status": "complete_source_live_unverified",
-  "currentContract": "docs/contracts/2026-10-06-cloud-cua-profile.md",
+  "currentGoal": "Serialize observed Runway chips without claiming asset binding",
+  "status": "source_verified_asset_binding_hold",
+  "currentContract": "docs/contracts/2026-10-07-runway-chip-serialization.md",
   "blockers": [
-    "Cloud live UI, chip equivalence and actual submission/recovery unverified; offline PASS does not authorize execution.",
-    "Existing 82 Node source-hash failures and live parity drift; new source manifest drift intentionally not frozen/deployed."
+    "Canonical text matches saved DOM; independent approved-file/provider asset association remains unverified, so read-prompt returns HOLD.",
+    "Existing 82 Node Knowledge source-hash failures; source/live parity not established."
   ],
-  "nextStep": "Use exact committed source export only after reading execution-profiles; verify actual supported cloud tool/UI before production. No deployment or merge authorized.",
-  "lastUpdated": "2026-10-06",
+  "nextStep": "Single authorized operator reviews ordered upload/hash receipts and current slot/enlargement association; no fabricated provider ID match or Generate authorization from text equality.",
+  "lastUpdated": "2026-10-07",
   "verification": {
-    "lastCommand": "configured verifyFull; 234 Python tests including 6 real-CLI root tests; compile/shell/diff",
-    "lastResult": "234_PYTHON_PASS_CLOUD_LIVE_UNVERIFIED",
-    "notes": "Node407/489,82 existing hash failures. Explicit init root is confined to authorized task cwd, not a permission grant. Default path, author builder and knowledge gates unchanged. Prior parity warnings retained."
+    "lastCommand": "242 Python tests; configured verifyFull with real-path temp; saved DOM replay; Python/shell syntax; diff check",
+    "lastResult": "PASS_CANONICAL_SERIALIZATION_ASSET_BINDING_HOLD",
+    "notes": "8 new tests; Node407/489 with82 existing hash failures. Actual saved DOM canonical hash matches. No browser, deployment, generation or parity success claim."
   },
   "knownWarnings": [
     "Seongnam Planner R2 remains a historical accepted package but not safe to reuse unchanged: creative city/eating omissions, old candidate IDs and stale brief/override hashes; rebuild R3 before production.",

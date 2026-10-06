@@ -146,3 +146,8 @@ denial fallback. Offline receipts never establish tool availability or live UI.
 Official cloud project creation uses `init --project-root` from the authorized
 workspace; no runtime monkeypatch. Preserve actual project/request/authoring
 chronology; the existing request builder neither launches nor identifies models.
+
+Runway chip `data-reference` serializes as `@Image N` while workflow prose uses
+`@ImageN`. Only recognized rendered chip structure may bridge that representation;
+plain text and prompt hashes do not prove reference binding. Source reader now
+reports equivalence separately and retains HOLD for unverified asset association.

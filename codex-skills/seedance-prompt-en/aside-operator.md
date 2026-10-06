@@ -176,3 +176,22 @@ precedence over semantic advice. No second loop, automatic retry or scheduler.
   `required_user_action`. `queue-exit-check` accepts this only without any queue,
   binding, recovery or settings-preflight evidence. Never fabricate a board sync
   or use this state to abandon a started/uncertain transaction.
+
+### Rendered image-chip readback (source-only update)
+
+`read-prompt --file` serializes the observed noneditable Lexical image chip
+structure to canonical `@ImageN`; it retains `raw_display_text`, `canonical_text`,
+both hashes and observed provider IDs in local evidence. CSS line breaks inside
+chips are not authored paragraph breaks. Plaintext tokens do not count as chips.
+Unknown structure, duplicate slots/assets and missing/reordered tokens fail.
+This version is intentionally conservative about repeated chip occurrences.
+
+`content_match=true` only proves canonical text equality. Chip reads still return
+nonzero `HOLD_ASSET_BINDING_UNVERIFIED` because an ID on the chip alone cannot
+prove the approved file association. Do not interpret local registry IDs as
+provider IDs or use the canonical hash as Generate approval. Review the existing
+ordered upload/file-hash receipts, current loaded slots and enlarged images in
+the exact session. The observed slot UI has no independent provider ID; report
+that limit honestly. This source change does not automate association approval,
+change paste, migrate a live transaction, or authorize another browser route.
+See the repository contract `docs/contracts/2026-10-07-runway-chip-serialization.md`.

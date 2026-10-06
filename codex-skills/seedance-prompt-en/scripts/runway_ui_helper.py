@@ -1276,20 +1276,24 @@ def cmd_paste_prompt(args) -> int:
 
 def cmd_read_prompt(args) -> int:
     """Report what is actually in the prompt box."""
+    import hashlib
+    from runway_chip_serializer import PROMPT_CHIP_SERIALIZER_JS
     rc, out, err = browser_js("""(() => {
   if (%s) return JSON.stringify({ok:false, error:'BLOCKING_DIALOG_CLOSE_AND_REOBSERVE'});
   const el = (() => { const a = [...document.querySelectorAll('%s')].filter(e => e.getClientRects().length); return a.length === 1 ? a[0] : null; })();
   if (!el) return JSON.stringify({ok:false, error:'NO_PROMPT_EDITOR'});
-  const t = (%s)(el);
-  return JSON.stringify({ok:true, text:t, len:t.length, over_limit:t.length>3500,
-    hangul_runs:(t.match(/[가-힣]+/g)||[]).length,
-    head:t.slice(0,60), tail:t.slice(-60)});
-})()""" % (PROMPT_BLOCKING_DIALOG_JS, PROMPT_SEL, PROMPT_DOM_TEXT_JS))
+  return JSON.stringify((%s)(el));
+})()""" % (PROMPT_BLOCKING_DIALOG_JS, PROMPT_SEL, PROMPT_CHIP_SERIALIZER_JS))
     if rc != 0:
         evidence(args, 'read-prompt', 'read editor', err[-200:], 'ASIDE_CONTROL_ERROR')
         return 3
     st = json.loads(out)
     actual = str(st.pop('text', ''))
+    st.update(len=len(actual), over_limit=len(actual) > 3500,
+              hangul_runs=len(re.findall(r'[가-힣]+', actual)),
+              head=actual[:60], tail=actual[-60:])
+    st['canonical_text'] = actual
+    st['raw_display_sha256'] = hashlib.sha256(st.get('raw_display_text', actual).encode('utf-8')).hexdigest()
     st['actual_prompt_sha256'] = prompt_sha256(normalize_prompt(actual))
     if getattr(args, 'file', None):
         path = Path(args.file).expanduser().resolve()
@@ -1297,7 +1301,16 @@ def cmd_read_prompt(args) -> int:
         expected = normalize_prompt(path.read_text(encoding='utf-8'))
         st['expected_prompt_sha256'] = prompt_sha256(expected)
         st['content_match'] = bool(st.get('ok')) and normalize_prompt(actual) == expected
-        st['ok'] = st['content_match']
+        expected_tokens = re.findall(r'@Image[1-9][0-9]*', expected)
+        observed_tokens = [c['token'] for c in st.get('chips', [])]
+        st['chip_occurrences_match'] = expected_tokens == observed_tokens
+        st['ok'] = st['content_match'] and st['chip_occurrences_match']
+    if st.get('chips'):
+        # A provider ID on a chip does not prove which approved file it represents.
+        st['asset_binding_verified'] = False
+        st['verdict'] = ('HOLD_ASSET_BINDING_UNVERIFIED' if st.get('ok')
+                         else 'HOLD_CHIP_OR_CONTENT_MISMATCH')
+        st['ok'] = False
     evidence(args, 'read-prompt', 'read editor', json.dumps(st, ensure_ascii=False), 'OK' if st.get('ok') else 'FAIL')
     print(json.dumps(st, ensure_ascii=False))
     return 0 if st.get('ok') else 1
