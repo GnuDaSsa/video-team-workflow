@@ -44,3 +44,32 @@ commands in cloud or silently fall back to personal installed skills/wiki.
 Set `VIDEO_TEAM_RUNTIME_SCRIPTS` to the extracted runtime scripts for cloud checks.
 A project with required external knowledge must carry its legitimately selected
 hash-bound evidence; if absent, report it rather than disabling knowledge gates.
+
+## Official project creation in an authorized workspace
+
+Run with the tool's working-directory argument set to the actual authorized task
+workspace (not `/`, the source installation directory by accident, or a path
+chosen to escape a denial):
+
+```bash
+python3 <extracted-workflow>/runtime/scripts/video_codex_runtime.py init \
+  --project-root ./video-projects --slug example --brief '<approved brief>' \
+  --mode no_i2v_reference_native
+```
+
+The explicit root is resolved under process cwd, including symlinks, and rejected
+if it escapes. An absolute path is allowed only if it resolves inside that same
+workspace. Filesystem/tool permissions still apply. Without `--project-root`,
+the existing local Mac default is unchanged. No monkeypatch/env override is
+needed. A timestamped project is created without replacing an existing one.
+
+This does not port every runtime dependency: the existing required knowledge
+catalog/wiki path and receipts must be resolved through their authorized workflow
+before attestation; do not disable them to make a cloud project pass.
+
+After creating the real project and bounded input files, run the unchanged
+`runtime/scripts/author_handoff.py request` with the already authorized scope.
+Retain its real output and generation time before a new authoring turn. It builds
+JSON and checks file/scope integrity; it neither launches a model nor verifies
+identity. Record actual external author execution separately. Never backdate an
+old authoring turn or label pre-request work as a post-request handoff.

@@ -132,12 +132,29 @@ def expand_lanes(items: list[str]) -> list[str]:
     return expanded
 
 
+def init_project_root(explicit_root: str | None) -> Path:
+    """Contain an explicit parent in the authorized task cwd; never grant access.
+
+    The caller must launch from its actual allowed workspace. The OS/tool sandbox
+    remains authoritative; a cwd or this check is not proof of user permission.
+    """
+    if explicit_root is None:
+        return PROJECT_ROOT
+    workspace = Path.cwd().resolve()
+    if workspace == Path(workspace.anchor):
+        raise SystemExit('INIT_WORKSPACE_ROOT_TOO_BROAD: use the authorized task directory')
+    root = Path(explicit_root).expanduser().resolve()
+    if not root.is_relative_to(workspace):
+        raise SystemExit('INIT_PROJECT_ROOT_OUTSIDE_WORKSPACE: ' + str(root))
+    return root
+
+
 def init_project(args) -> None:
     generation_mode = getattr(args, 'mode', STANDARD_I2V_MODE)
     if generation_mode not in GENERATION_MODES:
         raise SystemExit(f'unknown generation mode {generation_mode}; valid={GENERATION_MODES}')
     slug = slugify(args.slug or args.brief[:40] or 'video-project')
-    project = PROJECT_ROOT / f'{now()}_{slug}'
+    project = init_project_root(getattr(args, 'project_root', None)) / f'{now()}_{slug}'
     project.mkdir(parents=True, exist_ok=False)
     for lane in LANES:
         (project / 'lanes' / lane).mkdir(parents=True, exist_ok=True)
@@ -932,6 +949,7 @@ def main() -> None:
     sub = ap.add_subparsers(dest='cmd', required=True)
     p = sub.add_parser('init')
     p.add_argument('--slug', default='')
+    p.add_argument('--project-root', help='explicit project parent, confined to the authorized task cwd; default preserves the local Mac path')
     p.add_argument('--brief', required=True)
     p.add_argument('--mode', choices=GENERATION_MODES, default=STANDARD_I2V_MODE)
     p.set_defaults(func=init_project)

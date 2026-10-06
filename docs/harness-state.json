@@ -1,5 +1,5 @@
 {
-  "currentGoal": "Separate supported cloud CUA evidence checks from local Aside execution",
+  "currentGoal": "Support workspace-contained official project init for the explicit cloud profile",
   "status": "complete_source_live_unverified",
   "currentContract": "docs/contracts/2026-10-06-cloud-cua-profile.md",
   "blockers": [
@@ -9,9 +9,9 @@
   "nextStep": "Use exact committed source export only after reading execution-profiles; verify actual supported cloud tool/UI before production. No deployment or merge authorized.",
   "lastUpdated": "2026-10-06",
   "verification": {
-    "lastCommand": "configured verifyFull plus independent Python/compile/shell/parity; 11 profile/export fixtures; diff check",
-    "lastResult": "228_PYTHON_PASS_CLOUD_LIVE_UNVERIFIED",
-    "notes": "Node407/489,82 existing source hash failures. Aside parity fails; Codex parity includes intentional new source manifest drift. No browser/provider action."
+    "lastCommand": "configured verifyFull; 234 Python tests including 6 real-CLI root tests; compile/shell/diff",
+    "lastResult": "234_PYTHON_PASS_CLOUD_LIVE_UNVERIFIED",
+    "notes": "Node407/489,82 existing hash failures. Explicit init root is confined to authorized task cwd, not a permission grant. Default path, author builder and knowledge gates unchanged. Prior parity warnings retained."
   },
   "knownWarnings": [
     "Seongnam Planner R2 remains a historical accepted package but not safe to reuse unchanged: creative city/eating omissions, old candidate IDs and stale brief/override hashes; rebuild R3 before production.",

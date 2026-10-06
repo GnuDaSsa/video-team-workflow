@@ -219,3 +219,9 @@ consistency checker, reusing the canonical compiler/lock validation without
 forging an Aside receipt. Live cloud behavior and chip serialization remain
 unverified. Export committed source with harness dependency closure; no global
 installation. See `docs/contracts/2026-10-06-cloud-cua-profile.md`.
+
+### Workspace-contained init follow-up
+
+Use `init --project-root` under the actual authorized task cwd. Preserve the
+legacy default, reject resolved escapes before writes, and keep sandbox authority.
+Do not introduce an arbitrary workspace allowlist or port unrelated dependencies.

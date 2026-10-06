@@ -142,3 +142,7 @@ The user requires future prompting to follow the existing workflow and reusable 
 image-reference production may select the explicit profile in
 `codex-skills/seedance-prompt-en/execution-profiles.md`; it is not an error or
 denial fallback. Offline receipts never establish tool availability or live UI.
+
+Official cloud project creation uses `init --project-root` from the authorized
+workspace; no runtime monkeypatch. Preserve actual project/request/authoring
+chronology; the existing request builder neither launches nor identifies models.

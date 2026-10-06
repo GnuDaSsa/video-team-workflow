@@ -60,3 +60,23 @@ The initial cloud implementation intentionally accepts only image references and
 Seedance 2.0 Multi-reference/Audio On/16:9 or 9:16. No general tool/provider grant.
 If live chip serialization prevents exact attested-prompt equivalence, stop;
 this implementation never blesses a string replacement as binding verification.
+
+## Follow-up: workspace-contained init
+
+Base `4950a0e62cfb67ac9eaa6e3d27e9254ddb284595`. The init parent was fixed to
+one Mac path with no CLI override. Add only `init --project-root`: the resolved
+parent must stay inside the process working directory, which the operator must
+set to the actual authorized task workspace. This is path containment, not an
+OS/sandbox permission grant; no arbitrary workspace allowlist or fallback.
+No flag preserves the existing local default exactly. Reject outside paths and
+symlink escapes before writes; existing project collision remains non-overwrite.
+Use real CLI fixtures, not operator monkeypatches. Keep other runtime/wiki paths,
+knowledge/author gates and author_handoff builder unchanged. No author identity
+or chronology is fabricated; request generation follows project creation.
+
+Follow-up verification: six real-CLI root tests PASS (contained relative/absolute
+path, traversal, symlink escape, existing-file preservation, unchanged default);
+234 total Python tests PASS; compile/shell/diff PASS. Configured verifyFull still
+stops at the unchanged 82/489 Node source-hash failures. No wiki/root monkeypatch,
+model launch, browser/media action or installed-file write performed. Prior live
+parity limitations remain; no repeat deployment or full-parity success claimed.
