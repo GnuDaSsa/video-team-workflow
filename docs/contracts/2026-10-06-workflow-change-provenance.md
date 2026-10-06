@@ -101,3 +101,11 @@ change can be reverted by its dedicated commit. No merge/deployment in this task
   reported in the task result; no self-referential commit hash is embedded here.
 No browser production, media generation, chip-binding test, new prompt
 attestation or generated-output QC is in scope.
+
+## Publication receipt
+
+Source change commit `a001cb137e10db107e1e51d1d218532f3e0fb0d4` was pushed to
+`origin/codex/workflow-change-provenance-20261006`; `git ls-remote` matched the
+local SHA. Remote main remained `d79ecbca97cd4ca37a849f8708d7eedee860a579`.
+This closeout records that observed publication; final branch HEAD is verified
+again in the task result. No PR, merge or deployment performed.
