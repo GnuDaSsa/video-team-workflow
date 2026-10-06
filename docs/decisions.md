@@ -210,3 +210,12 @@ Source observation is not an efficacy guarantee. Actual prompt-screen captures a
 ## 2026-10-06 — Workflow change provenance
 
 Extend the existing feedback promotion protocol rather than create a parallel rules system. Separate project authoring from reusable logic changes; preserve source/live drift and distinguish reported platform observations from fresh UI proof.
+
+## 2026-10-06 — Explicit cloud CUA profile
+
+Keep local Aside binding and all denial/permission guards. The narrow cloud
+profile uses only its actual supported visible UI tool and a separate offline
+consistency checker, reusing the canonical compiler/lock validation without
+forging an Aside receipt. Live cloud behavior and chip serialization remain
+unverified. Export committed source with harness dependency closure; no global
+installation. See `docs/contracts/2026-10-06-cloud-cua-profile.md`.

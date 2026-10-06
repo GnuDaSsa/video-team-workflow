@@ -29,6 +29,15 @@ One Seedance lane performs two sequential phases in the current conversation. Ru
 4. When both are requested, finish and attest the prompting package first, then continue in the same lane to production. Do not rewrite prompts during UI execution; return to the authoring phase if revision is required.
 5. Apply `prompt-review.md` as a same-owner compile/review checklist. It replaces the retired Creative team surface; it does not spawn roles.
 
+## Execution profile
+
+Before production, read `execution-profiles.md`. `local_aside` remains the
+unchanged default. Only an explicitly selected supported cloud environment may
+use `cloud_cua_runway_20` and its distinct evidence checker. It is not a fallback
+for local errors or denials, and does not authorize tools outside their policies.
+All Aside helper commands below are local-profile commands; cloud must use the
+profile's supported visible UI and separate checker, never fake Aside evidence.
+
 ## Non-negotiable gates
 
 - **An explicit user instruction overrides every default here** — mode, count, duration, ratio, audio, provider. In video-team projects, the runtime-owned generation-duration lock is the machine-readable form of that duration decision and starts at the workflow's 15-second default. This skill consumes it and never infers a shorter replacement from shot complexity, final edit trim, or the current UI.
@@ -41,7 +50,7 @@ One Seedance lane performs two sequential phases in the current conversation. Ru
 - Creative Seedance Mode is the default authoring branch unless fragile continuity or the user requests Standard mode.
 - If an approved character/model/identity-sheet character appears, attach the relevant character sheet or identity crop **on every generation**, together with scene references. A previous card or conversational memory does not count.
 - Missing, mismatched, or unverified character-sheet thumbnail means `BLOCKED_CHARACTER_SHEET_ATTACHMENT_NOT_VERIFIED`; never click Generate.
-- Runway visible Aside is the source of truth. Attach `aside repl` to the existing Runway tab by exact `targetId` and use that Aside CLI binding as the primary controller. The helper uses deterministic CLI, not AppleScript DOM control; macOS Accessibility/Computer Use handles only the same-tab native chooser. A disabled Apple Events toggle is not a blocker while Aside CLI can bind. Do not use Chrome, Safari, the Codex in-app browser, connector/API, hidden input, coordinate clicking, a new Aside tab, or a second browser route.
+- In `local_aside`, Runway visible Aside is the source of truth. Attach `aside repl` to the existing Runway tab by exact `targetId` and use that Aside CLI binding as the primary controller. The helper uses deterministic CLI, not AppleScript DOM control; macOS Accessibility/Computer Use handles only the same-tab native chooser. A disabled Apple Events toggle is not a blocker while Aside CLI can bind. Do not use Chrome, Safari, the Codex in-app browser, connector/API, hidden input, coordinate clicking, a new Aside tab, or a second browser route.
 - Before `ATTACH`, create the project-local same-session recovery checkpoint from the exact Runway URL, attested prompt hash, registered reference deck, verified slots, and settings. The helper refuses a missing model or any checkpoint model other than Seedance 2.0, so recovery cannot restore 2.5 as a valid setting. A tool timeout/session disconnect consumes zero semantic attachment attempts; follow `seedance-production.md`'s fixed recovery controller and resume the same slot.
 - A Generate click is exactly one transaction **per scene** after preflight — not one per session. Keep submitting eligible packages while slots are free; stop only when the shelf is empty or every remaining item is blocked.
 - Completion requires a downloaded file and verified duration/codec, not a card or thumbnail.
@@ -53,7 +62,7 @@ One Seedance lane performs two sequential phases in the current conversation. Ru
 
 - Prompt authoring is single-agent and sequential. Do not launch parallel prompt workers, background schedulers, queue observers, browser loops, or external sidecars while the prompt package is being written.
 - The prompting branch is non-GUI: no Aside/Chrome/Safari/Runway activation, Computer Use, `osascript`, AppleScript, `open -a`, native file chooser, or browser automation. Write the local package and hand it to production only after the prompt critic passes.
-- The same lane may use the single visible Aside route after authoring/attestation. No observer process may be started from either phase.
+- In `local_aside`, the same lane may use the single visible Aside route after authoring/attestation. The explicitly selected cloud profile uses only its one supported visible CUA route under `execution-profiles.md`. No observer process may be started from either phase.
 
 ## Live branch documents
 

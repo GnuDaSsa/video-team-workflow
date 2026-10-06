@@ -1,7 +1,13 @@
 # Seedance 2.0 production branch
 
 Execute an already-authored, currently attested package. No prompt improvisation.
-Exact binding and stepwise operation live in `aside-operator.md`; read it first.
+Read `execution-profiles.md` first. This file's Aside commands and recovery
+controller apply to `local_aside`; the explicit cloud profile uses its separate
+visible-UI procedure and offline checker without claiming Aside binding.
+The eight checks below apply to both profiles; check 6 uses the cloud checker
+only in that profile. Cloud support does not change shared queue/QC obligations.
+
+For `local_aside`, exact binding and stepwise operation live in `aside-operator.md`; read it first.
 Aside is the only browser owner surface. One logged-in Aside `app.runwayml.com`
 Generate board per project: bind the existing Generate board in Aside through
 `attachBrowserTab(targetId)`. Apple Events JavaScript is not required.

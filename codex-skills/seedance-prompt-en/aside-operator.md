@@ -1,5 +1,8 @@
 # Aside exact-session operator — shared by 2.0 and 2.5
 
+This is the `local_aside` profile. Supported cloud CUA has a separate narrowly
+scoped contract in `execution-profiles.md`; it must never impersonate this binding.
+
 ## A. One owner, one existing board
 
 Aside CLI `repl` executes deterministic JavaScript. Bare `aside` and `aside exec`

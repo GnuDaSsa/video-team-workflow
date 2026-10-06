@@ -1,16 +1,17 @@
 {
-  "currentGoal": "Track workflow changes with source provenance and isolated branch publication",
-  "status": "complete_with_validation_warnings",
-  "currentContract": "docs/contracts/2026-10-06-workflow-change-provenance.md",
+  "currentGoal": "Separate supported cloud CUA evidence checks from local Aside execution",
+  "status": "complete_source_live_unverified",
+  "currentContract": "docs/contracts/2026-10-06-cloud-cua-profile.md",
   "blockers": [
-    "Existing live-wiki/catalog drift: 82 Node failures; deployed Aside/Codex parity differs from remote base. No deployment authorized."
+    "Cloud live UI, chip equivalence and actual submission/recovery unverified; offline PASS does not authorize execution.",
+    "Existing 82 Node source-hash failures and live parity drift; new source manifest drift intentionally not frozen/deployed."
   ],
-  "nextStep": "Branch published and source commit verified on remote. Keep unmerged/undeployed; reconcile existing source/live drift only as a separate scoped change.",
+  "nextStep": "Use exact committed source export only after reading execution-profiles; verify actual supported cloud tool/UI before production. No deployment or merge authorized.",
   "lastUpdated": "2026-10-06",
   "verification": {
-    "lastCommand": "configured verifyFull; real-path Node rerun; Python compile/unittest; shell syntax; both read-only deployment checks; git diff --check",
-    "lastResult": "SCOPED_DOC_REVIEW_PASS_FULL_VALIDATION_WARNINGS",
-    "notes": "217 Python pass; 407/489 Node pass, 82 source-hash-drift failures; compilation passes with task-local cache. Live parity fails. No runtime/skill changes or live chip/media verification."
+    "lastCommand": "configured verifyFull plus independent Python/compile/shell/parity; 11 profile/export fixtures; diff check",
+    "lastResult": "228_PYTHON_PASS_CLOUD_LIVE_UNVERIFIED",
+    "notes": "Node407/489,82 existing source hash failures. Aside parity fails; Codex parity includes intentional new source manifest drift. No browser/provider action."
   },
   "knownWarnings": [
     "Seongnam Planner R2 remains a historical accepted package but not safe to reuse unchanged: creative city/eating omissions, old candidate IDs and stale brief/override hashes; rebuild R3 before production.",
@@ -101,13 +102,5 @@
         "notes": "Short quote plus labeled paraphrase/new prose, not full transcription. No new generated media/playback experiment or full runtime rerun."
       }
     }
-  ],
-  "publication": {
-    "branch": "codex/workflow-change-provenance-20261006",
-    "sourceCommit": "a001cb137e10db107e1e51d1d218532f3e0fb0d4",
-    "remoteSourceCommitVerified": true,
-    "defaultBranchUnchanged": "d79ecbca97cd4ca37a849f8708d7eedee860a579",
-    "deployment": "not_run",
-    "pullRequest": "not_created"
-  }
+  ]
 }

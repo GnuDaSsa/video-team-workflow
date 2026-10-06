@@ -135,3 +135,10 @@ Release: `docs/releases/2026-09-28-natural-light/`.
 ## 2026-10-06 — Workflow change provenance
 
 The user requires future prompting to follow the existing workflow and reusable workflow changes to be reflected on separate GitHub branches. Single owner for this process: `docs/video-feedback-promotion-protocol.md`; this task does not deploy installed skills.
+
+## Cloud versus local production
+
+`local_aside` remains default. Only supported cloud CUA Runway Seedance 2.0
+image-reference production may select the explicit profile in
+`codex-skills/seedance-prompt-en/execution-profiles.md`; it is not an error or
+denial fallback. Offline receipts never establish tool availability or live UI.

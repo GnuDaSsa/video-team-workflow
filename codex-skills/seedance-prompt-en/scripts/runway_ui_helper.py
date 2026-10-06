@@ -1456,6 +1456,7 @@ def verify_attested_generation_settings(
     duration_sec: float,
     duration_source: str = "visible",
     source_video: Path | None = None,
+    write_receipt: bool = True,
 ) -> dict:
     """Reject a non-2.0 model or duration drift before Generate."""
     project = project.expanduser().resolve()
@@ -1535,7 +1536,8 @@ def verify_attested_generation_settings(
         'visible_model': verified_model,
         'verdict': 'PASS_SETTINGS_MATCH_SEEDANCE_2_0_AND_ATTESTED_DURATION',
     }
-    _write_json_atomic(settings_preflight_path(project, block_id), result)
+    if write_receipt:
+        _write_json_atomic(settings_preflight_path(project, block_id), result)
     return result
 
 
