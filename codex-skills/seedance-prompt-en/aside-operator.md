@@ -195,3 +195,69 @@ the exact session. The observed slot UI has no independent provider ID; report
 that limit honestly. This source change does not automate association approval,
 change paste, migrate a live transaction, or authorize another browser route.
 See the repository contract `docs/contracts/2026-10-07-runway-chip-serialization.md`.
+
+### Compose the existing visual association check with chip readback
+
+The ATTACH row above and production preflight checks 3/4 already define the
+operator's visual approved-reference verification. Independent provider ID equality
+is not a requirement of that visual path. It must not be claimed when slot DOM
+exposes no ID. The conservative reader's raw HOLD is retained; a separate operator
+assessment may satisfy the reference association check, never tool authorization.
+
+For the unchanged exact session and block, the sole authorized operator records
+an append-only entry in `lanes/seedance/local_operator_evidence.jsonl` and links it
+from project `status.json` / `result.md`. Use action
+`reference-association-review`, verdict `PASS_OPERATOR_VISUAL_ASSOCIATION` only
+when all following evidence has actually been inspected (otherwise `HOLD`):
+
+- Operator identity, actual review time, project/block, exact target/session and
+  current pack/prompt/reference-map hashes; no session/account substitution.
+- Each ordered slot: token, approved registry ID, original file hash, actual
+  upload receipt locator and upload order. Confirm that file is still approved
+  and its bytes still match. Alias preparation alone is not completed-upload proof.
+- For each slot: actual enlargement observation time and raw screenshot or tool
+  observation locator, approved original comparison locator, concrete comparison
+  result and reference role. A filename, loaded flag or unsupported recollection
+  alone is insufficient. Do not manufacture missing image observations.
+- Fresh current slot count/order/load state, observed chip order/provider IDs,
+  structural readback's canonical content/occurrence match, plus raw readback
+  path/hash. IDs must equal the IDs recorded at the reviewed deck checkpoint;
+  changed/missing/duplicate IDs, slot changes or uncertain continuity require
+  fresh visual review. Preserve raw display and canonical representations.
+- `verification_method: ordered_upload_and_visual_comparison`,
+  `independent_provider_id_match: false`, and
+  `execution_authorized_by_receipt: false`. Keep the raw helper's
+  `asset_binding_verified:false` and `HOLD_ASSET_BINDING_UNVERIFIED` unchanged.
+
+This is an evidence record, not a software-authenticated visual verdict. Do not
+manufacture a JSON boolean to replace the operator's actual review. Earlier
+same-session enlargement evidence can be reused only with observed unchanged
+composer/deck continuity; resume/refresh/recovery/wake or any uncertainty invalidates
+it as described above. Review again when continuity cannot be established.
+
+Existing checks remain the normal commands below; these are for the sole operator
+to run in its permitted environment, not permission to start another controller:
+
+```bash
+python3 "$SOURCE/codex-skills/seedance-prompt-en/scripts/aside_bridge.py" verify \
+  --binding "$PROJECT/lanes/seedance/aside_binding.json"
+python3 "$SOURCE/codex-skills/seedance-prompt-en/scripts/runway_ui_helper.py" \
+  --binding "$PROJECT/lanes/seedance/aside_binding.json" \
+  --evidence "$PROJECT/lanes/seedance/local_operator_evidence.jsonl" \
+  read-prompt --file "$PROMPT_FILE"
+python3 "$SOURCE/codex-skills/seedance-prompt-en/scripts/runway_ui_helper.py" \
+  --binding "$PROJECT/lanes/seedance/aside_binding.json" \
+  --evidence "$PROJECT/lanes/seedance/local_operator_evidence.jsonl" \
+  settings-verify --project "$PROJECT" --block "$BLOCK" \
+  --visible-model 'Seedance 2.0' --duration-sec "$OBSERVED_DURATION"
+```
+
+`SOURCE` is the reviewed checkout and existing runtime dependencies must resolve;
+these commands do not install it. Preserve each exit status and raw output.
+Do not use `|| true`, change the raw HOLD to PASS, or chain Generate on exit zero.
+Only the exact asset-association HOLD with both content/occurrence matches can be
+paired with the separately evidenced operator association verdict. Any different
+error still blocks. There is no new CLI command that performs visual judgment.
+Do not use `recovery-resolve` merely to record this review or clear unrelated holds.
+Complete all eight fresh production checks and the current continuation scope
+before the existing one-click procedure; this record alone never permits Generate.

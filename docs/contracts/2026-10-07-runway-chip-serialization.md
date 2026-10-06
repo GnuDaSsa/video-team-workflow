@@ -42,3 +42,17 @@ with default TMPDIR also hit existing symlink fixture restrictions. Python ran
 separately; changed Python syntax, shell syntax and diff checks PASS. Downstream
 parity commands did not run after Node failure; prior source/live drift remains.
 No fresh browser read, live installation, cloud validation or generation ran.
+
+## Follow-up: existing operator association path
+
+Base `6e2c9bc2fddec6ad681c958cce9ef2578edeba8a`. Existing production preflight
+3/4 and Aside ATTACH already require visible order and enlarged approved-image
+comparison. These are operator judgments, not provider ID equality checks.
+Clarify how they compose with the conservative reader; no new automated PASS,
+receipt-forging tool, recovery-state mutation or browser route. The raw helper
+HOLD remains immutable. An operator's separate association verdict satisfies only
+the reference association quality check, after actual evidence review. All eight
+fresh preflight checks, user scope, binding and security controls still apply.
+The supplied readiness packet reports prior enlargement review but has no per-slot
+raw screenshot/tool-observation pointers; add genuine existing pointers or perform
+fresh review in the sole operator. This audit does not certify unseen screenshots.

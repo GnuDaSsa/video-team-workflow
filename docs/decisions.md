@@ -234,3 +234,12 @@ comparison from approved-file association. Provider IDs on chips are not local
 registry IDs; observed upload slots expose no independent provider IDs. Keep
 nonzero HOLD until association is verified through a separately reviewed process.
 No bypass flag, installed-file edits or private production fixture publication.
+
+### Existing visual association path clarified
+
+Production checks 3/4 and Aside ATTACH already own operator image comparison.
+Compose their separately evidenced verdict with canonical readback; preserve raw
+HOLD and independent_provider_id_match=false. No automatic bypass or new browser
+controller. A readiness packet without per-slot raw visual evidence pointers is
+not independently auditable; the sole operator supplies real evidence or reviews
+again. This documentation does not assert unseen comparisons were performed.

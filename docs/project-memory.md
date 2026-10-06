@@ -151,3 +151,8 @@ Runway chip `data-reference` serializes as `@Image N` while workflow prose uses
 `@ImageN`. Only recognized rendered chip structure may bridge that representation;
 plain text and prompt hashes do not prove reference binding. Source reader now
 reports equivalence separately and retains HOLD for unverified asset association.
+
+Operator association is distinct from provider ID equality. Existing production
+checks 3/4 allow actual enlarged-image comparison with approved originals, recorded
+with ordered upload/hash evidence and unchanged session/deck continuity. Preserve
+the reader HOLD separately; see aside-operator's composition procedure.

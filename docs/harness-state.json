@@ -1,17 +1,18 @@
 {
-  "currentGoal": "Serialize observed Runway chips without claiming asset binding",
-  "status": "source_verified_asset_binding_hold",
+  "currentGoal": "Clarify existing operator visual association with conservative chip readback",
+  "status": "documented_operator_evidence_pending",
   "currentContract": "docs/contracts/2026-10-07-runway-chip-serialization.md",
   "blockers": [
-    "Canonical text matches saved DOM; independent approved-file/provider asset association remains unverified, so read-prompt returns HOLD.",
-    "Existing 82 Node Knowledge source-hash failures; source/live parity not established."
+    "Actual per-slot visual evidence must be inspected by sole operator; supplied packet lacks per-slot raw screenshot/tool observation pointers.",
+    "Fresh complete preflight and current continuation scope remain required.",
+    "Existing82 Node source-hash failures and source/live drift remain."
   ],
-  "nextStep": "Single authorized operator reviews ordered upload/hash receipts and current slot/enlargement association; no fabricated provider ID match or Generate authorization from text equality.",
+  "nextStep": "Sole operator links genuine visual/upload evidence and records separate association verdict without rewriting raw helper HOLD; no browser action in workflow-maintenance task.",
   "lastUpdated": "2026-10-07",
   "verification": {
-    "lastCommand": "242 Python tests; configured verifyFull with real-path temp; saved DOM replay; Python/shell syntax; diff check",
-    "lastResult": "PASS_CANONICAL_SERIALIZATION_ASSET_BINDING_HOLD",
-    "notes": "8 new tests; Node407/489 with82 existing hash failures. Actual saved DOM canonical hash matches. No browser, deployment, generation or parity success claim."
+    "lastCommand": "Read production checks3/4 and Aside ATTACH; inspect packet; CLI help syntax and diff checks",
+    "lastResult": "PASS_DOCUMENTED_EXISTING_PATH_LIVE_REVIEW_PENDING",
+    "notes": "Docs-only follow-up; no executable logic change. Prior242 Python PASS. No fresh browser/image review, generation, install or full test rerun."
   },
   "knownWarnings": [
     "Seongnam Planner R2 remains a historical accepted package but not safe to reuse unchanged: creative city/eating omissions, old candidate IDs and stale brief/override hashes; rebuild R3 before production.",
