@@ -888,7 +888,7 @@ def run_verified(args, action: str, tail: str, pre: str = '', *, native_picker: 
     # tabs. Re-read both exact identity and focused-window state before input.
     rc, _out, err = aside_bridge.browser_js('true', require_active=True)
     picker_guard = ''
-    if rc and native_picker and 'ASIDE_NATIVE_BOUND_TAB_NOT_ACTIVE' in err:
+    if native_picker and (not rc or 'ASIDE_NATIVE_BOUND_TAB_NOT_ACTIVE' in err):
         try:
             picker_guard = native_picker_guard()
             rc, _out, err = osa(VERIFY_BLOCK + picker_guard)
@@ -929,10 +929,10 @@ def cmd_picker_go(args) -> int:
     tail = f'''
 tell application "System Events"
     tell process "{TARGET_APP}"
-        if not (exists sheet 1 of window 1) then error "ABORT_NO_PICKER_SHEET"
+        if not (exists sheet 1 of nativeMainWindow) then error "ABORT_NO_PICKER_SHEET"
         keystroke "g" using {{command down, shift down}}
         delay 0.5
-        if not (exists sheet 1 of window 1) then error "ABORT_GO_SHEET_LOST"
+        if not (exists sheet 1 of nativeMainWindow) then error "ABORT_GO_SHEET_LOST"
         keystroke "a" using {{command down}}
         delay 0.1
         key code 51
@@ -956,8 +956,8 @@ def cmd_picker_select(args) -> int:
     tail = f'''
 tell application "System Events"
     tell process "{TARGET_APP}"
-        if (value of pop up button 1 of splitter group 1 of sheet 1 of window 1) is not {json.dumps(UPLOAD_ALIAS_ROOT.name)} then error "ABORT_NATIVE_ALIAS_FOLDER"
-        set listView to outline 1 of scroll area 1 of splitter group 1 of splitter group 1 of sheet 1 of window 1
+        if (value of pop up button 1 of splitter group 1 of sheet 1 of nativeMainWindow) is not {json.dumps(UPLOAD_ALIAS_ROOT.name)} then error "ABORT_NATIVE_ALIAS_FOLDER"
+        set listView to outline 1 of scroll area 1 of splitter group 1 of splitter group 1 of sheet 1 of nativeMainWindow
         if (value of attribute "AXIdentifier" of listView) is not "ListView" then error "ABORT_NATIVE_LIST_LAYOUT"
         set candidates to {{}}
         repeat with rr in rows of listView
@@ -971,6 +971,12 @@ tell application "System Events"
         set targetRow to item 1 of candidates
         set value of attribute "AXSelected" of targetRow to true
         if (value of attribute "AXSelected" of targetRow) is not true then error "ABORT_NATIVE_SELECTION_NOT_APPLIED"
+        set openCandidates to {{}}
+        repeat with bb in buttons of sheet 1 of nativeMainWindow
+            if (value of attribute "AXIdentifier" of bb) is "OKButton" then set end of openCandidates to contents of bb
+        end repeat
+        if (count openCandidates) is not 1 then error "ABORT_NATIVE_UNIQUE_OPEN_BUTTON"
+        if enabled of (item 1 of openCandidates) is not true then error "ABORT_NATIVE_OPEN_DISABLED"
     end tell
 end tell
 return "ROW_SELECTED_VERIFY_OPEN_AND_THUMBNAIL"

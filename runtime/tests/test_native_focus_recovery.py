@@ -114,6 +114,26 @@ class NativeFocusRecoveryTests(unittest.TestCase):
             self.assertTrue(all('keystroke' not in value and 'clipboard' not in value
                                 for kind, value in events if kind == 'native'))
 
+    def test_focused_picker_still_proves_modal_and_reuses_guard(self):
+        rc, events = self.invoke([(0, '', ''), (0, '', '')], native_picker=True)
+        self.assertEqual(rc, 0)
+        self.assertEqual(events[3][1], helper.VERIFY_BLOCK + 'NATIVE_MODAL_PROOF')
+        self.assertTrue(events[4][1].startswith(helper.VERIFY_BLOCK + 'NATIVE_MODAL_PROOF'))
+
+    def test_focused_picker_failed_modal_proof_never_sends_input(self):
+        rc, events = self.invoke([(0, '', ''), (0, '', '')], native_picker=True,
+                                 modal_result=(1, '', 'ABORT_NOT_OPEN_PANEL'))
+        self.assertEqual(rc, 2)
+        self.assertTrue(all('keystroke' not in value and 'clipboard' not in value
+                            for kind, value in events if kind == 'native'))
+
+    def test_picker_go_uses_verified_native_window(self):
+        with patch.object(helper, 'run_verified', return_value=0) as run:
+            helper.cmd_picker_go(argparse.Namespace(path='/tmp/approved.png'))
+            self.assertIn('sheet 1 of nativeMainWindow', run.call_args.args[2])
+            self.assertNotIn('of window 1', run.call_args.args[2])
+            self.assertTrue(run.call_args.kwargs['native_picker'])
+
     def test_native_guard_requires_window_id_url_main_window_and_open_panel(self):
         binding = {**BINDING, 'account': None}
         with patch.object(bridge, 'require_project', return_value=binding), \
@@ -145,6 +165,11 @@ class NativeFocusRecoveryTests(unittest.TestCase):
                                'AXSelected', 'ABORT_NATIVE_SELECTION_NOT_APPLIED'):
                     self.assertIn(marker, tail)
                 self.assertNotIn('keystroke', tail); self.assertNotIn('clipboard', tail)
+                self.assertNotIn('of window 1', tail)
+                for marker in ('sheet 1 of nativeMainWindow', 'OKButton',
+                               'ABORT_NATIVE_UNIQUE_OPEN_BUTTON', 'ABORT_NATIVE_OPEN_DISABLED'):
+                    self.assertIn(marker, tail)
+                self.assertNotIn('click ', tail)
                 self.assertEqual(run.call_args.kwargs, {'native_picker': True})
                 run.reset_mock()
                 with self.assertRaises(ValueError):

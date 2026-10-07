@@ -70,14 +70,26 @@ Reference selector to open the native chooser. Computer Use may operate only
 that same Aside chooser; the helper's optional native `picker-go` first requires
 the exact bound tab to be active, activates Aside without input, then rechecks
 the exact active tab in the focused window before macOS frontmost and IME checks.
-When the native picker makes the browser focus flag false, `picker-go` alone may
-instead prove the CLI-bound window ID and exact current URL against native Aside's
-front window/active tab, plus that main window's `open-panel` sheet. That proof is
-repeated immediately before input; an unrelated dialog or changed tab fails closed.
+Both native picker commands always prove the CLI-bound window ID and exact
+current URL against Aside's front window/active tab and the unique AXMain window's
+`open-panel`, even when the browser focus check succeeds. The action uses that
+same `nativeMainWindow`, never `window 1`. Proof repeats immediately before input;
+an unrelated dialog or changed tab fails closed.
 `picker-select --path <helper-alias>` selects one uniquely named visible file row in the
 verified native ListView without keys or clipboard input; it therefore does not depend
 on an English IME. A changed layout, duplicate/missing row or unapplied selection fails
-closed. Re-read the native Open button and actual uploaded thumbnail before proceeding.
+closed. Selection must also expose one enabled `OKButton`; AXSelected alone is
+not upload eligibility. Re-read the native Open button and actual uploaded thumbnail
+before proceeding. If the exact file is highlighted but Open remains disabled,
+classify it as native selection not committed, not a provider rejection or permission
+failure. With the current controller's allowed Computer Use API, re-observe the
+same chooser and focus the actual file list. One bounded keyboard selection
+change may be used only when that controller permits it and IME/focus safety is
+established; then re-read the exact selected filename and enabled Open control.
+Do not repeat Up/Down blindly, use stale indices, or upload an adjacent file.
+If still disabled, preserve the slot and record the observed UI failure; do not
+claim that the user must upload or that file permissions are the cause. The
+existing recovery controller and technology restrictions remain authoritative.
 A short locator timeout after Open is not an upload failure: observe the same
 slot again without replaying Open/upload. Capture enlarged content only after
 image decode **and visible overlay rendering** settle; a blank screenshot is not
