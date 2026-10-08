@@ -10,3 +10,6 @@ A running conversation is not equivalent to RUNNING lane evidence. At observatio
 
 ## Verification
 228 local tests PASS, including a local-timestamp regression; Swift installer compile/sign PASS. Production source assets and status files were read only by the auditor. No live Generate, attachment transaction, future scheduled run, or final media verified. This audit tracks the existing session within the current turn, not via a background monitor.
+
+## Subsequent live failure
+Observed character promotion rejected by image/video-only promote. Owner independently inspected set-state to recover. Preserve the guard; make error and CLI help explain evidence-backed character state updates. No asset approved by auditor. Registry guidance deployed through reviewed patch path; 229 tests PASS including recovery-message regression.
