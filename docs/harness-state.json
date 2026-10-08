@@ -1,14 +1,14 @@
 {
-  "currentGoal": "Capture and analyze the actual prompt screen and refine the live-action default",
+  "currentGoal": "Promote explicit Flow generation to Malfoy-style composite instruction branch and shared motion knowledge",
   "status": "complete",
-  "currentContract": "docs/contracts/2026-09-28-natural-light.md",
+  "currentContract": "docs/contracts/2026-10-08-flow-malfoy-knowledge.md",
   "blockers": [],
-  "nextStep": "Use current live-action profile for future unsubmitted authoring; inspect actual generated clips separately. Capture/analysis files are delivered locally; medical/device/rights/identity holds and deferred narration stay unchanged.",
-  "lastUpdated": "2026-09-28T23:19:51+09:00",
+  "nextStep": "On a real Flow production request, connect and test project-specific Flow execution/state gates before submission; current delivery is instruction routing and knowledge, not an executable Flow adapter.",
+  "lastUpdated": "2026-10-08T19:51:12.265652+09:00",
   "verification": {
-    "lastCommand": "2 PNG dimension/size/hash checks;14routes;3compiler examples;55targeted tests;wiki preimages/dry-run;official native apply/check46file parity;installed rerun;diff/harness checks",
-    "lastResult": "PASS_SCREEN_GROUNDED_RULE_DEPLOYED",
-    "notes": "Short quote plus labeled paraphrase/new prose, not full transcription. No new generated media/playback experiment or full runtime rerun."
+    "lastResult": "PASS_SCOPED_INSTRUCTION_DEPLOYMENT",
+    "lastCommand": "214 unit tests; Python compile; zsh syntax; diff check; scoped deploy preflight/apply/recheck; 4 installed hashes; isolated origin/main: 222 tests",
+    "notes": "Flow UI/generation, matte/render/CapCut playback, executable Flow runtime adapter, full bundle deploy"
   },
   "knownWarnings": [
     "Seongnam Planner R2 remains a historical accepted package but not safe to reuse unchanged: creative city/eating omissions, old candidate IDs and stale brief/override hashes; rebuild R3 before production.",
@@ -85,6 +85,19 @@
         "not_run": "Full bundle deploy/parity; existing unrelated drift preserved. Fresh app-session discovery UI.",
         "native_tests": 451,
         "native_test_environment": "TMPDIR and JEV_QC_TEST_TMP=/private/tmp to avoid macOS /tmp symlink in strict real-path fixtures"
+      }
+    },
+    {
+      "id": "2026-10-08-flow-malfoy-knowledge",
+      "status": "instruction_branch_deployed_live_unverified",
+      "contract": "docs/contracts/2026-10-08-flow-malfoy-knowledge.md",
+      "verification": {
+        "result": "PASS_SCOPED_INSTRUCTION_DEPLOYMENT",
+        "tests": 214,
+        "targeted_tests": 5,
+        "deployed_files": 4,
+        "not_run": "Flow UI/generation, matte/render/CapCut playback, executable Flow runtime adapter, full bundle deploy",
+        "isolated_tests": 222
       }
     }
   ]

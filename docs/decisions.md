@@ -206,3 +206,6 @@ wiki owner; update only its snapshot and existing bounded native derivatives.
 Keep positive image compilation, explicit style/edit intent and real-playback QC.
 Source observation is not an efficacy guarantee. Actual prompt-screen captures and a clearly labeled paraphrase now supply evidence for structure/continuity/support cues; obscured lines are not reconstructed. Contract and release evidence:
 `docs/contracts/2026-09-28-natural-light.md`, `docs/releases/2026-09-28-natural-light/`.
+
+## Flow request selects composite knowledge
+User explicitly corrected the design: a FLOW video-generation request is the entry to Malfoy-style compositing, not a second general/composite choice. Shared motion craft belongs in videodirector/references/flow-malfoy-composite.md and is loaded by matching editor work across providers. Only instruction routing/knowledge is deployed; Seedance CLI/Runway helpers are not a Flow execution adapter. No current project/provider/schedule mutation. See docs/contracts/2026-10-08-flow-malfoy-knowledge.md.

@@ -5,6 +5,18 @@ description: "Use for any video work: planning, MV/music video, promo and public
 
 # Video Director
 
+<!-- flow-malfoy-routing:start -->
+## Flow / 공통 모션그래픽
+
+명시적 FLOW/플로우 영상 생성은 runtime/AGENTS.md §1.4에 따라
+`references/flow-malfoy-composite.md`로 연결한다. 일반/합성형을 다시 묻지 않는다.
+분석 요청은 생성하지 않으며 기본 Seedance·진행 중 프로젝트는 자동 전환하지 않는다.
+
+코드 모션그래픽·키네틱 타이포·쇼케이스 기획/편집/QC에는 provider와 무관하게
+같은 reference §3을 읽는다. 효과 목록 대신 레이어·음악 cue·모듈·수정 단위·재생
+검수를 적용한다. no-text/clean footage 등 실제 요청 범위가 우선한다.
+<!-- flow-malfoy-routing:end -->
+
 Start the response with `[videodirector]` on its own line. This skill owns story, shot purpose, visual intent and delivery taste, **not** runtime execution procedure.
 
 ## Lean entry — classify before loading

@@ -41,7 +41,7 @@ flowchart TD
    - worker는 에이전트가 아니라 수명이 제한된 파일 생성 프로세스이며, fan-in 뒤 종료한다.
    - 4개 이상 요청은 `IMAGE_WORKER_CAP_EXCEEDED`로 거부한다.
 4. 같은 owner가 직렬 실행하되 영상 생성은 QC보다 우선한다. 제출 가능한 승인 패키지를 먼저 생성하고, provider 대기 시간에 완료 후보를 QC한다. QC backlog는 독립된 다음 패키지 생성을 막지 않는다. 생성 배치 후 남은 QC를 컷 순서대로 끝내며 승인 승격·최종 편집/납품에는 QC를 유지한다.
-5. 프로바이더 기본값은 Seedance다. Grok I2V는 사용자가 해당 프로젝트에서 명시했을 때만 같은 직렬 레일 안에서 사용한다. 프로바이더 병렬은 금지한다.
+5. 프로바이더 기본값은 Seedance다. 명시적인 FLOW 영상 생성 요청은 §1.4의 말포이식 합성 분기로 연결한다. Grok I2V는 사용자가 해당 프로젝트에서 명시했을 때만 같은 직렬 레일 안에서 사용한다. 프로바이더 병렬은 금지한다.
 6. 임의 subagent, 전담 프롬프트 agent, 백그라운드 daemon, cron, heartbeat, 두 번째 브라우저 자동화 루프를 만들지 않는다.
 7. 별도 Codex owner를 만드는 lane dispatch는 현재 대화의 해당 spawn 승인을 요구하며, runtime은 `--approved-spawn <lane>:<phase>`가 정확히 일치하지 않으면 거부한다. **같은 owner가 다음 lane/phase의 책임을 이어받는 것은 dispatch/spawn이 아니며 추가 승인을 묻지 않는다.** `next`의 `default_execution`이 기본이고 `next_dispatch`는 승인된 별도 owner 생성에만 쓰는 호환 정보다.
 
@@ -127,6 +127,23 @@ flowchart TD
 - 실행 인수증에는 `block_id`, `status=READY_FOR_EXECUTION`, `prompt`, `settings`, `pack`과 순서 있는 `references`를 기록한다. 각 항목은 project-relative `path`와 `sha256`이다. 기존 handoff/attestation에 이 정보를 통합하고 인수 당시 receipt hash를 유지한다. `author_handoff.py verify --project <p> --block <id> --receipt <file> --receipt-sha256 <accepted-hash>`는 파일 무결성만 검증하며 실제 저작 모델·참조 첨부·창작 품질을 증명하지 않는다.
 - 실행자는 매 재개 시 다음 block ID와 원본 pack/참조/설정을 다시 읽는다. “두 개씩”은 shelf의 다음 두 eligible block이지 임의 변형 두 개가 아니다. 누락·해시 불일치·다른 block·거절 패키지는 제출하지 않는다. 요약/문장 변경/참조 축소는 저작으로 되돌린다. UI 제출 전 검증·queue-doctor·복구·exactly-once 제출은 선택된 Seedance skill만 소유한다.
 - `model_routing.py`의 Astra 저작 경로는 **선택적 새 owner dispatch의 선호값**이다. `next.default_execution`은 모든 lane에서 현재 세션 모델을 상속하며, CLI는 이를 대신 실행할 수 없어 현재 대화로 돌려보낸다. 이미지 lane은 prompting과 production 책임을 구분하되 owner를 강제 분리하지 않는다. 기존 owner 전환 호환 경로는 별도 승인된 경우에만 사용하며 자동으로 Luna를 강제하지 않는다.
+
+### 1.4 명시적 Flow 제작 분기
+
+- 사용자가 FLOW/Flow/플로우로 영상 생성을 요청하면 `flow_malfoy_composite`를
+  기획 분기로 선택하고 `~/.codex/skills/videodirector/references/flow-malfoy-composite.md`를
+  읽는다. 추가 “말포이식” 호출이나 일반/합성형 선택 질문은 필요하지 않다.
+- 기존 기획·오디오·identity·입력 증거·미디어 등록·QC·CapCut·안전/스폰 게이트는
+  유지한다. 코드 BG/FG와 합성 중간 소재는 편집 입력이며 최종 CapCut 납품을 대체하지 않는다.
+- 활성 Seedance 프로젝트/제출 작업/예약을 자동 전환하지 않는다. 명시적 변경 범위만
+  기록하며 기존 HOLD를 보존한다. 영상 생성 요청은 새 owner/병렬/예약 승인이 아니다.
+- 이 분기는 현재 **지침 기반 기획·저작 라우팅**이다. 기존 `video-codex-runtime`
+  `next`/`dispatch`/attest 및 Runway queue helper는 Seedance 전용이며 Flow 실행
+  어댑터가 아니다. Flow를 Seedance로 허위 기록하거나 해당 게이트를 통과했다고
+  가장하지 않는다. 실행 착수 전 현재 프로젝트에 맞는 Flow 입력/상태/검증 연결을
+  확인·구현하고 시험한다. CLI 연동 미구현은 환경 결함이지 사용자 로그인 문제로 돌리지 않는다.
+- 모션그래픽 지식은 위 reference §3을 다른 provider의 관련 편집 단계에서도
+  재사용한다. 지식 로딩 자체는 provider 전환이나 모든 영상에 효과 적용을 뜻하지 않는다.
 
 ## 2. 프롬프트 소유권
 

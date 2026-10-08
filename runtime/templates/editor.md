@@ -12,3 +12,11 @@ Role: serial edit, typography, and verified export owner.
 - Do not upload, publish, submit, or email.
 
 Required outputs: inputs consumed, CapCut evidence, edit/EDL structure, typography QC, export `asset_id` and verification, missing inputs/blockers, `status.json`, and `result.md`.
+
+## Conditional code-motion knowledge
+
+For code motion graphics, kinetic typography, character showcases, or the explicit
+Flow branch, read `/Users/gnudas/.codex/skills/videodirector/references/flow-malfoy-composite.md`
+§3 before designing the edit. Runtime AGENTS §1.4 owns branch selection.
+Record the actual audio cues, BG/subject/FG ownership, hold times and layer-local
+revision path. Do not treat effect counts or a technical alpha test as creative approval.
