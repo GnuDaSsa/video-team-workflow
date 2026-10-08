@@ -27,13 +27,25 @@ class BoardTests(unittest.TestCase):
  def test_corrupt_json_is_visible_and_snapshot_read_only(self):
   self.write('state.json',{'slug':'test'});p=self.write('lanes/music/status.json',{});p.write_text('{broken')
   before={str(f):f.read_bytes() for f in self.root.rglob('*') if f.is_file()}
-  out=b.snapshot(self.root,self.auto);self.assertTrue(out['projects'][0]['errors']);self.assertFalse(out['provider_live_verified']);self.assertEqual(before,{str(f):f.read_bytes() for f in self.root.rglob('*') if f.is_file()})
+  out=b.project_snapshot(self.project,self.auto,1);self.assertTrue(out['errors']);self.assertEqual(before,{str(f):f.read_bytes() for f in self.root.rglob('*') if f.is_file()})
  def test_completion_is_record_not_verified_media(self):
   self.write('state.json',{'slug':'x'});self.write('lanes/package/status.json',{'status':'DONE'})
-  out=b.snapshot(self.root,self.auto);c=next(c for c in out['projects'][0]['cards'] if c['id']=='package');self.assertEqual(c['column'],'done');self.assertFalse(out['provider_live_verified'])
+  out=b.project_snapshot(self.project,self.auto,1);c=next(c for c in out['cards'] if c['id']=='package');self.assertEqual(c['column'],'done');self.assertEqual(b.snapshot(self.root,self.auto)['projects'],[])
  def test_private_prompt_fields_are_not_exported(self):
   self.write('state.json',{'slug':'x','prompt':'secret prompt','token':'secret key'})
   value=json.dumps(b.snapshot(self.root,self.auto));self.assertNotIn('secret',value)
+ def test_current_only_hides_pending_done_and_old_work(self):
+  now=b.timestamp('2026-10-08T20:00:00+09:00')
+  self.write('state.json',{'lanes':{
+   'seedance':{'status':'RUNNING','updated_at':'2026-10-08T19:00:00+09:00'},
+   'music':{'status':'DONE','updated_at':'2026-10-08T19:00:00+09:00'},
+   'editor':{'status':'PENDING','updated_at':'2026-10-08T19:00:00+09:00'},
+   'planner':{'status':'RUNNING','updated_at':'2026-09-08T19:00:00+09:00'},
+   'image_qc':{'status':'BLOCKED','updated_at':'2026-10-08T19:00:00+09:00'}}})
+  out=b.snapshot(self.root,self.auto,now)
+  self.assertEqual({c['id'] for c in out['projects'][0]['cards']},{'seedance','image_qc'})
+  self.write('state.json',{'status':'DONE','lanes':{'seedance':{'status':'RUNNING','updated_at':'2026-10-08T19:00:00+09:00'}}})
+  self.assertEqual(b.snapshot(self.root,self.auto,now)['projects'],[])
  def test_owner_conflict_flag(self):
   self.write('state.json',{'slug':'x'});self.write('lanes/seedance/status.json',{'owner_thread_id':'new','monitoring':{'consumer_task_id':'old'}})
   self.assertIn('불일치',b.project_snapshot(self.project,self.auto,1)['schedule']['label'])

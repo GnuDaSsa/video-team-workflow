@@ -27,3 +27,5 @@ writers. This panel neither fixes nor independently executes production.
 `VIDEO_TEAM_BOARD_DISABLED=1 python3 -m unittest discover -s runtime/tests -v`
 The installer compiles Swift and signs the local app. Native GUI acceptance:
 project selection, automatic refresh, details, collapse/expand, close, and reopen.
+
+Current-only view: show working/attention lanes updated in the last 24 hours, excluding completed projects, pending lanes and old records. This is a recorded-activity filter, not live execution detection.

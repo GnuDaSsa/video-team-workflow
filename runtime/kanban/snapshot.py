@@ -97,7 +97,15 @@ def snapshot(root,automations,now=None):
             if not p.is_dir() or p.is_symlink(): continue
             if not (p/'state.json').is_file() and not (p/'manifest.json').is_file(): continue
             item=project_snapshot(p,automations,now)
-            if item: projects.append(item)
+            if item:
+                state=read(p/'state.json',[])
+                if bucket(state.get('status',''))=='done': continue
+                # Only recently updated, unfinished work; archived RUNNING records
+                # must not masquerade as current production indefinitely.
+                item['cards']=[c for c in item['cards']
+                    if c['column'] in ('working','attention')
+                    and 0 <= now-timestamp(c['updated']) <= 86400]
+                if item['cards']: projects.append(item)
     projects.sort(key=lambda p:p['updated_epoch'],reverse=True)
     return {'schema':1,'observed_at':dt.datetime.now().astimezone().isoformat(),
       'projects':projects,'read_only':True,'provider_live_verified':False}
