@@ -68,6 +68,14 @@ class BoardTests(unittest.TestCase):
   self.assertEqual(b.bucket('WAITING_USER_ACTION'),'attention')
   self.assertEqual(b.bucket('QUEUED'),'waiting')
   self.assertEqual(b.bucket('PENDING'),'ready')
+ def test_week_old_waits_hidden_and_recent_wait_restored(self):
+  now=b.timestamp('2026-10-08T20:00:00+09:00')
+  self.write('state.json',{'slug':'x','updated_at':'2026-10-08T20:00:00+09:00'})
+  for stamp in ['2026-10-01T20:00:00+09:00','2026-09-20T20:00:00+09:00',None,'2099-01-01T00:00:00Z']:
+   self.write('lanes/seedance/status.json',{'status':'WAITING_PROVIDER_QUEUE','updated_at':stamp})
+   self.assertEqual(b.snapshot(self.root,self.auto,now)['projects'],[],stamp)
+  self.write('lanes/seedance/status.json',{'status':'WAITING_PROVIDER_QUEUE','updated_at':'2026-10-01T20:00:01+09:00'})
+  self.assertEqual(len(b.snapshot(self.root,self.auto,now)['projects']),1)
  def test_owner_conflict_flag(self):
   self.write('state.json',{'slug':'x'});self.write('lanes/seedance/status.json',{'owner_thread_id':'new','monitoring':{'consumer_task_id':'old'}})
   self.assertIn('불일치',b.project_snapshot(self.project,self.auto,1)['schedule']['label'])

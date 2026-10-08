@@ -21,6 +21,6 @@ function render(){const p=data.projects.find(p=>p.id===selected)||data.projects[
 window.showError=message=>{$('error').hidden=false;$('error').textContent=message};
 window.updateBoard=(incoming,preferred)=>{data=incoming;if(preferred!==lastPreferred){manual=false;lastPreferred=preferred;lastSignature=''}if(preferred&&!manual&&data.projects.some(p=>p.id===preferred))selected=preferred;if(!data.projects.some(p=>p.id===selected))selected=data.projects[0]?.id||'';
  const signature=JSON.stringify(data.projects);if(signature!==lastSignature){$('projects').replaceChildren(...data.projects.map(p=>{const o=node('option','',p.name);o.value=p.id;return o}));$('projects').value=selected;render();lastSignature=signature}
- $('footer').textContent='파일 확인 '+new Date(data.observed_at).toLocaleTimeString('ko-KR')+' · 미해결 웨이팅 유지 · 기록 기준 / 실시간 검증 아님 · 5초 갱신';
+ $('footer').textContent='파일 확인 '+new Date(data.observed_at).toLocaleTimeString('ko-KR')+' · 7일 이상 미갱신 숨김 · 기록 기준 / 실시간 검증 아님 · 5초 갱신';
 };
 </script></html>

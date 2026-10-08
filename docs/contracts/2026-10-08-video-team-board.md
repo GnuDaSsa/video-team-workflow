@@ -4,4 +4,4 @@ User requests an independently built small window in the desktop upper-left, not
 
 Acceptance complete: 236 isolated tests PASS; Swift build and native GUI verified. See docs/releases/2026-10-08-video-team-board.md.
 
-Waiting tracking: separate WAITING/QUEUED column, explicit wait reason and timestamp provenance. Show elapsed from waiting_since/wait_started_at only when present; otherwise label time since latest record, never invent a start. Preserve unresolved waits beyond 24h with stale warning. Latest non-waiting/terminal record removes wait. Read-only; no new scheduling or provider requests.
+Waiting tracking: separate WAITING/QUEUED column, explicit wait reason and timestamp provenance. Show elapsed from waiting_since/wait_started_at only when present; otherwise label time since latest record, never invent a start. Preserve unresolved waits beyond 24h with stale warning, but hide waits last updated 7 days ago or more (also hide missing/future timestamps). Board refresh never resets activity age. Latest non-waiting/terminal record removes wait. Read-only; no new scheduling or provider requests.

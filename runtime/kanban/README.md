@@ -28,6 +28,6 @@ writers. This panel neither fixes nor independently executes production.
 The installer compiles Swift and signs the local app. Native GUI acceptance:
 project selection, automatic refresh, details, collapse/expand, close, and reopen.
 
-Current-only view: show working/attention lanes updated in the last 24 hours. Unresolved WAITING/AWAITING/QUEUED lanes remain visible beyond that limit with stale warnings. Completed/archived/cancelled projects and pending lanes stay hidden. Latest records move cards out of waiting. This is a recorded-activity filter, not live execution detection.
+Current-only view: show working/attention lanes updated in the last 24 hours. Unresolved WAITING/AWAITING/QUEUED lanes remain visible beyond that limit with stale warnings, but are hidden once their last lane update is 7 days old. Missing or future lane timestamps are excluded. Reading the board does not count as activity. Completed/archived/cancelled projects and pending lanes stay hidden. Latest records move cards out of waiting. This is a recorded-activity filter, not live execution detection.
 
 Waiting cards show reason and elapsed from explicit waiting_since/wait_started_at. Without that evidence, display time since updated_at, not actual wait duration. Missing/future timestamps never invent a duration. Explicit blocking/review status retains attention precedence. No scheduler is created.

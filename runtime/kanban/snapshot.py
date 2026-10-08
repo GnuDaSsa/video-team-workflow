@@ -121,7 +121,9 @@ def snapshot(root,automations,now=None):
                 # Only recently updated, unfinished work; archived RUNNING records
                 # must not masquerade as current production indefinitely.
                 item['cards']=[c for c in item['cards']
-                    if c['column']=='waiting' or (c['column'] in ('working','attention')
+                    if (c['column']=='waiting' and 0 < timestamp(c['updated'])
+                        and 0 <= now-timestamp(c['updated']) < 7*86400)
+                    or (c['column'] in ('working','attention')
                     and 0 <= now-timestamp(c['updated']) <= 86400)]
                 if item['cards']: projects.append(item)
     projects.sort(key=lambda p:p['updated_epoch'],reverse=True)
