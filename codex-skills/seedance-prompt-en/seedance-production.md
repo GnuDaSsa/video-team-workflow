@@ -81,8 +81,10 @@ hash-bound selection survives model/turn changes. A live foreground wait must
 first be stopped and its owning tool result consumed. The next fresh board
 `queue-cycle --from-wake` clears any interrupted wake without sleeping.
 
-In scheduled mode, `queue-cycle` records one board observation and immediately
-returns `SCHEDULED_CHECKPOINT_NO_WAIT`. Direct `queue-wait` is rejected. Do not
+In scheduled mode, `queue-cycle` records one board observation without sleeping.
+It returns `CONTINUATION_NOT_ARMED` (nonzero CLI exit) when pending work lacks a
+fresh compliant native registration snapshot; `SCHEDULED_CHECKPOINT_NO_WAIT`
+requires that gate to pass or the queue to be terminal. Direct `queue-wait` is rejected. Do not
 hand-edit queue flags to escape the foreground branch. A corrupt/changed mode
 receipt fails closed rather than falling back to a 15-minute sleep.
 Existing native `kind: heartbeat/cron, status: ACTIVE` records also express
@@ -100,6 +102,47 @@ Capture registration ID, accepted cadence, destination, active/paused state and
 native tool evidence separately from first-run evidence. Heartbeat model choice
 may inherit task settings; do not claim Luna execution from a routing table.
 A local mode file never proves registration, browser access or successful runs.
+
+### Native registration is an execution step, not a final-answer suggestion
+
+At production entry, before the first Generate/queue handoff, resolve the
+selected continuation mode and existing specific schedule approval. When that
+approval already covers this project's production heartbeat, registration and
+routine repair are the owner's work: do not finish by asking the user to repeat
+"set the schedule". A workflow-default preference alone is not new-surface
+approval; if missing, obtain it once for the named purpose/output. A user pause,
+HOLD or explicit "do not schedule now" is not repair authorization.
+
+Perform this transaction in the current owning conversation:
+
+1. Discover the native `automation_update` tool. Inspect matching existing
+   automation records and use `mode=view` for the resolved ID. Multiple possible
+   matches need resolution, not a duplicate create. Never guess a task ID.
+2. If absent and specifically approved, actually call `mode=create`,
+   `kind=heartbeat`, for the verified production task and approved cadence.
+   If an existing registration has an authorized repairable mismatch, actually
+   call `mode=update` with the same ID and full preserved fields. Never auto-resume
+   a user-paused registration; preserve notification policy, destination and
+   scope. Do not call `suggested_create` then treat the proposal as registered.
+3. Read the actual result/record after the call. A rendered card with no fields,
+   an API error or an uncertain outcome is not ACTIVE proof. Re-read before
+   retrying create to prevent duplicates; no cron/CLI/heartbeat workaround.
+4. In existing lane `status.json`, record `monitoring.automation_id`,
+   `consumer_task_id` (the production owner), `purpose=production_continuation`,
+   and project-relative `registration_evidence`. The evidence is the actual
+   native snapshot described below, not a newly invented self-certification.
+   Run `queue-exit-check`; its scheduled path now consumes that snapshot audit.
+5. Keep registration and execution separate. The first handoff can pass before
+   the first run exists; later runs must show real board/file operations. A
+   delivered instruction, model-capacity error or self-reported progress is not
+   execution. Reconcile accepted/uncertain jobs before any retry.
+
+If native registration cannot be completed because approval/tool access or an
+external service is unavailable, report `CONTINUATION_NOT_ARMED` and the precise
+blocker. The exit refusal forbids claiming autonomous continuation; it does not
+permit endless retries, violating a user stop, or falling back to foreground
+sleep. Preserve existing pending jobs without re-Generate. This repair/audit
+procedure itself never authorizes creating a live test schedule.
 
 ### Cadence and stable resume payload
 
@@ -129,8 +172,10 @@ updates; correct only the authorized mismatch through the native tool.
 
 Keep the automation prompt **stable**: project/state paths, approved scope,
 owner/skill pointer, action priority, safety boundary and terminal condition.
-Do not freeze counts, pending statuses, current composer contents or a long list
-of completed QC intervals into recurring instructions. Those are mutable run
+Do not freeze counts, pending statuses, current composer contents, project
+revision labels such as V4.8, or a long list of completed QC intervals into
+recurring instructions. Read the latest authorized scope and HOLD from state;
+a revision change never expands the human-approved project scope. Those are mutable run
 data in existing state/queue/per-asset QC reports, read afresh at every run.
 Accepted/uncertain transactions are deduplicated from their receipts, not from
 an old sentence saying which block is in the composer.
@@ -235,9 +280,10 @@ A successful Generate is not a safe terminal checkpoint. Before ending a
 scheduled production turn, persist `scheduled_followup` with the exact job/scene,
 acceptance evidence and observation time, `due_at`, existing automation ID,
 consumer task ID, next action, and terminal condition. Verify native registration
-covers that consumer and purpose. If the existing approved schedule is absent or
-paused, repair that same registration through the native tool; never merely
-promise to wait. A missing executable follow-up is `CONTINUATION_NOT_ARMED`, not
+covers that consumer and purpose. If absent, perform native creation only under
+the specific approved scheduling scope. Repair an existing registration in place
+only when that repair is authorized; never override a user PAUSED/HOLD or create
+a duplicate. Never merely promise to wait. A missing executable follow-up is `CONTINUATION_NOT_ARMED`, not
 production running or complete. Do not click Generate again to repair scheduling.
 
 For project-wide continuation already authorized by the user, the next action is

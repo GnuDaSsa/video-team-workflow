@@ -2125,11 +2125,15 @@ def run_queue_cycle(
     mode = read_queue_mode(project)
     runtime = sync_queue_runtime(project, jobs, **sync_kwargs)
     if mode['mode'] == 'scheduled':
+        handoff = scheduled_registration_gate(project)
         return {
-            'ok': True, 'verdict': 'SCHEDULED_CHECKPOINT_NO_WAIT',
+            'ok': handoff['ok'],
+            'verdict': ('SCHEDULED_CHECKPOINT_NO_WAIT' if handoff['ok']
+                        else 'CONTINUATION_NOT_ARMED'),
             'wait_started': False, 'scheduler_created': False,
             'registration_verified': False, 'queue_runtime': runtime,
-            'next_action': 'Inspect native app registration/run evidence; this call only checkpoints one observation. Never start a foreground wait.',
+            'continuation_gate': handoff,
+            'next_action': handoff['next_action'],
         }
     if not runtime.get('wake_required'):
         return {
@@ -2270,6 +2274,85 @@ def audit_schedule_snapshot(project: Path, snapshot: dict, *, automation_id: str
         'scheduler_created': False, 'native_registration_verified_by_this_check': False,
         'actual_run_verified_by_this_check': False,
     }
+
+
+def scheduled_registration_gate(project: Path) -> dict:
+    """Require the existing native audit at handoff, not just scheduled intent.
+
+    This is a local consistency gate, not a scheduler client or authentication
+    of operator evidence. The owning turn must execute the returned native-tool
+    step and capture its actual result. Never invokes tools, sleeps, or writes.
+    """
+    project = project.expanduser().resolve()
+    metadata = Path(_project_seedance_sources(project)['metadata_dir'])
+    runtime = _json_file(queue_runtime_path(project))
+    status = _json_file(metadata / 'status.json')
+    followup = status.get('scheduled_followup') or {}
+    pending_followup = (isinstance(followup, dict)
+                        and followup.get('status') in {'PENDING', 'REQUIRED'})
+    terminal = (runtime.get('contract_version') == QUEUE_RUNTIME_VERSION
+                and runtime.get('may_stop') is True
+                and not runtime.get('active_count')
+                and not runtime.get('settled_backlog_count')
+                and runtime.get('verdict') in {'SHELF_EXHAUSTED', 'ALL_REMAINING_BLOCKED'}
+                and not pending_followup)
+    base = {'read_only': True, 'scheduler_created': False,
+            'native_registration_verified_by_this_check': False,
+            'actual_run_verified_by_this_check': False}
+    if terminal:
+        return {**base, 'ok': True, 'verdict': 'NO_PENDING_QUEUE_HANDOFF',
+                'issues': [], 'next_action': 'Report queue disposition; this is not proof of media/QC completion.'}
+    monitoring = status.get('monitoring') or {}
+    if not isinstance(monitoring, dict):
+        monitoring = {}
+    automation_id = monitoring.get('automation_id')
+    consumer = monitoring.get('consumer_task_id')
+    issues = []
+    if not automation_id:
+        issues.append('SCHEDULE_ID_REQUIRED')
+    if not consumer:
+        issues.append('SCHEDULE_CONSUMER_REQUIRED')
+    if status.get('owner_thread_id') and consumer != status['owner_thread_id']:
+        issues.append('SCHEDULE_NOT_PRODUCTION_OWNER')
+    if monitoring.get('purpose') != 'production_continuation':
+        issues.append('SCHEDULE_PRODUCTION_PURPOSE_REQUIRED')
+    snapshot = None
+    try:
+        evidence = monitoring.get('registration_evidence')
+        if not isinstance(evidence, str) or not evidence.strip():
+            raise ValueError('missing')
+        path = Path(evidence).expanduser()
+        if not path.is_absolute():
+            path = project / path
+        path = path.resolve()
+        if not path.is_relative_to(project):
+            raise ValueError('outside project')
+        snapshot = json.loads(path.read_text(encoding='utf-8'))
+        if not isinstance(snapshot, dict):
+            raise ValueError('not an object')
+    except (OSError, ValueError, TypeError):
+        issues.append('SCHEDULE_NATIVE_SNAPSHOT_REQUIRED')
+    if isinstance(snapshot, dict):
+        audit = audit_schedule_snapshot(project, snapshot,
+                    automation_id=automation_id, consumer_task_id=consumer)
+        issues.extend(audit['issues'])
+    if not issues:
+        return {**base, 'ok': True, 'verdict': 'NATIVE_SNAPSHOT_COMPLIANT',
+                'issues': [], 'automation_id': automation_id, 'consumer_task_id': consumer,
+                'next_action': 'End this bounded check; the existing native heartbeat owns the next wake. Verify actual execution on its next run, not from this snapshot.'}
+    return {**base, 'ok': False, 'verdict': 'CONTINUATION_NOT_ARMED',
+            'issues': issues, 'automation_id': automation_id, 'consumer_task_id': consumer,
+            'native_tool': 'automation_update',
+            'native_read_request': ({'mode': 'view', 'id': automation_id}
+                                    if automation_id else None),
+            'next_action': (
+                'In this owning turn, inspect the matching native automation, then '
+                'CALL automation_update to create or repair it within the specific '
+                'existing approval; preserve user PAUSED/HOLD and do not duplicate it. '
+                'If approval or tool access is missing, report that exact blocker, not '
+                'automatic continuation. Capture fresh native fields in '
+                'monitoring.registration_evidence, rerun queue-exit-check. '
+                'Never substitute queue-mode, a proposal, sleep, or a promise for registration.')}
 
 
 def cmd_queue_schedule_check(args) -> int:
@@ -2435,7 +2518,7 @@ def cmd_queue_cycle(args) -> int:
         print(json.dumps({'ok': False, 'error': str(exc)}, ensure_ascii=False))
         return 1
     print(json.dumps(result, ensure_ascii=False, indent=2))
-    return 0
+    return 0 if result['ok'] else 1
 
 
 def cmd_settings_verify(args) -> int:
@@ -2523,12 +2606,15 @@ def evaluate_queue_exit(project: Path) -> dict:
     live_wait = wake.get('pending') and _pid_running(wake.get('wait_pid'))
     mode = read_queue_mode(project)
     if mode['mode'] == 'scheduled' and not live_wait and not _wait_elapsed_unconsumed(wake):
+        handoff = scheduled_registration_gate(project)
         return {
-            'ok': True, 'verdict': 'QUEUE_EXIT_ALLOWED_SCHEDULED_CHECKPOINT',
+            'ok': handoff['ok'],
+            'verdict': ('QUEUE_EXIT_ALLOWED_SCHEDULED_CHECKPOINT' if handoff['ok']
+                        else 'QUEUE_EXIT_REFUSED_CONTINUATION_NOT_ARMED'),
             'project': str(project), 'active_count': int(runtime.get('active_count') or 0),
             'settled_backlog_count': int(runtime.get('settled_backlog_count') or 0),
             'production_complete': False, 'registration_verified': False,
-            'next_action': 'Verify the native schedule separately; preserve outstanding download/QC work. This exit is not media completion.',
+            'continuation_gate': handoff, 'next_action': handoff['next_action'],
         }
     empty = not runtime.get('active_count') and not runtime.get('settled_backlog_count')
     terminal = empty and runtime.get('verdict') in {'SHELF_EXHAUSTED', 'ALL_REMAINING_BLOCKED'}
@@ -2642,10 +2728,11 @@ def diagnose_queue(project: Path) -> dict:
     mode = read_queue_mode(project)
     if mode['mode'] == 'scheduled' and not (wake.get('pending') and _pid_running(wake.get('wait_pid'))):
         state = ('SCHEDULED_HANDOFF_RECHECK_REQUIRED' if _wait_elapsed_unconsumed(wake)
-                 else 'SCHEDULED_CHECK_SELECTED')
+                 else ('SCHEDULED_CHECK_SELECTED' if exit_gate.get('ok')
+                       else 'SCHEDULED_REGISTRATION_REQUIRED'))
         next_action = ('Read the exact board once and consume the interrupted wake with queue-cycle --from-wake; scheduled mode will not sleep.'
                        if _wait_elapsed_unconsumed(wake) else
-                       'Inspect native app automation registration and last run. Local selection is not registration; do not restart foreground waiting.')
+                       exit_gate.get('next_action', 'Inspect native automation registration; never substitute sleep.'))
         fresh_board = True
     return {
         'ok': True, 'read_only': True, 'project': str(project),

@@ -123,13 +123,105 @@ class ScheduledQueueChecks(unittest.TestCase):
         with mock.patch.object(h, 'run_bounded_queue_wake', side_effect=AssertionError('must not wait')):
             for _ in range(2):
                 result = h.run_queue_cycle(self.project, self.jobs, **self.kw)
-                self.assertEqual(result['verdict'], 'SCHEDULED_CHECKPOINT_NO_WAIT')
+                self.assertEqual(result['verdict'], 'CONTINUATION_NOT_ARMED')
+                self.assertFalse(result['ok'])
                 self.assertFalse(result['wait_started'])
                 self.assertFalse(result['registration_verified'])
                 self.assertEqual(result['queue_runtime']['queue_target'], 2)
                 self.assertEqual(result['queue_runtime']['active_count'], 2)
         self.assertFalse(receipt['scheduler_created'])
         self.assertFalse(h.resume_contract_path(self.project).exists())
+
+    def native_snapshot(self, **changes):
+        data = dict(id='test', kind='heartbeat', status='ACTIVE',
+                    target_thread_id='owner', rrule='FREQ=MINUTELY;INTERVAL=20',
+                    observed_at=dt.datetime.now(dt.timezone.utc).isoformat())
+        data.update(changes)
+        path = self.meta / 'native-registration.json'
+        path.write_text(json.dumps(data))
+        (self.meta / 'status.json').write_text(json.dumps({
+            'owner_thread_id': 'owner', 'monitoring': {
+                'automation_id': 'test', 'consumer_task_id': 'owner',
+                'purpose': 'production_continuation',
+                'registration_evidence': str(path.relative_to(self.project))}}))
+        return path
+
+    def test_scheduled_intent_alone_cannot_exit_active_queue(self):
+        self.select()
+        result = h.run_queue_cycle(self.project, self.jobs, **self.kw)
+        self.assertFalse(result['ok'])
+        self.assertFalse(result['wait_started'])
+        gate = h.evaluate_queue_exit(self.project)
+        self.assertFalse(gate['ok'])
+        self.assertEqual(gate['verdict'], 'QUEUE_EXIT_REFUSED_CONTINUATION_NOT_ARMED')
+        self.assertEqual(gate['continuation_gate']['native_tool'], 'automation_update')
+        self.assertIn('CALL automation_update', gate['next_action'])
+
+    def test_registered_handoff_passes_without_fabricating_first_run(self):
+        self.select(); self.native_snapshot()
+        result = h.run_queue_cycle(self.project, self.jobs, **self.kw)
+        self.assertTrue(result['ok'])
+        self.assertEqual(result['verdict'], 'SCHEDULED_CHECKPOINT_NO_WAIT')
+        gate = h.evaluate_queue_exit(self.project)
+        self.assertTrue(gate['ok'])
+        self.assertEqual(gate['continuation_gate']['verdict'], 'NATIVE_SNAPSHOT_COMPLIANT')
+        self.assertFalse(gate['continuation_gate']['actual_run_verified_by_this_check'])
+        self.assertFalse(gate['registration_verified'])
+
+    def test_invalid_native_registration_cannot_exit_or_claim_continuation(self):
+        self.select(); h.sync_queue_runtime(self.project, self.jobs, **self.kw)
+        cases = [dict(status='PAUSED'), dict(status='PROPOSED'),
+                 dict(target_thread_id='other'), dict(id='other'), dict(kind='cron'),
+                 dict(rrule='FREQ=MINUTELY;INTERVAL=30'),
+                 dict(observed_at='2000-01-01T00:00:00+00:00')]
+        for changes in cases:
+            with self.subTest(changes=changes):
+                self.native_snapshot(**changes)
+                before = {str(p): p.read_bytes() for p in self.project.rglob('*') if p.is_file()}
+                result = h.evaluate_queue_exit(self.project)
+                self.assertFalse(result['ok'])
+                self.assertEqual(result['continuation_gate']['native_read_request'],
+                                 {'mode': 'view', 'id': 'test'})
+                self.assertEqual(before, {str(p): p.read_bytes() for p in self.project.rglob('*') if p.is_file()})
+
+    def test_missing_corrupt_or_foreign_snapshot_fails_closed(self):
+        self.select(); h.sync_queue_runtime(self.project, self.jobs, **self.kw)
+        for value in ('missing.json', str(Path(__file__).resolve())):
+            self.native_snapshot()
+            path = self.meta / 'status.json'; data = json.loads(path.read_text())
+            data['monitoring']['registration_evidence'] = value
+            path.write_text(json.dumps(data))
+            self.assertFalse(h.evaluate_queue_exit(self.project)['ok'])
+        for value in ('invalid json', '[]', 'null'):
+            path = self.native_snapshot(); path.write_text(value)
+            self.assertFalse(h.evaluate_queue_exit(self.project)['ok'])
+
+    def test_observe_only_or_wrong_owner_does_not_arm_production(self):
+        self.select(); h.sync_queue_runtime(self.project, self.jobs, **self.kw)
+        for changes in ({'purpose': 'observe_only'}, {'consumer_task_id': 'manager'}):
+            self.native_snapshot()
+            p = self.meta / 'status.json'; data = json.loads(p.read_text())
+            data['monitoring'].update(changes); p.write_text(json.dumps(data))
+            self.assertFalse(h.evaluate_queue_exit(self.project)['ok'])
+
+    def test_empty_terminal_needs_no_reservation_but_pending_qc_does(self):
+        self.select(); h.sync_queue_runtime(self.project, [], **self.kw)
+        self.assertTrue(h.evaluate_queue_exit(self.project)['ok'])
+        p = self.meta / 'status.json'
+        p.write_text(json.dumps({'scheduled_followup': {'status': 'PENDING',
+                                                       'next_action': 'remaining QC'}}))
+        self.assertFalse(h.evaluate_queue_exit(self.project)['ok'])
+
+    def test_cli_cycle_returns_failure_when_registration_is_missing(self):
+        self.select()
+        import argparse
+        args = argparse.Namespace(project=str(self.project), job=['B01|first|IN_QUEUE'],
+            armed=None, next_eligible=None, shelf_state='EXHAUSTED', generate_state='GRAY',
+            from_wake=False, processed_job=[], capacity_limit=None, capacity_evidence=None)
+        with mock.patch('builtins.print'):
+            self.assertEqual(h.cmd_queue_cycle(args), 1)
+            self.native_snapshot()
+            self.assertEqual(h.cmd_queue_cycle(args), 0)
 
     def test_direct_wait_cannot_bypass_scheduled_selection(self):
         self.select()
@@ -167,7 +259,8 @@ class ScheduledQueueChecks(unittest.TestCase):
         self.assertFalse(h.run_queue_cycle(self.project, self.jobs, **self.kw)['wait_started'])
 
     def test_scheduled_checkpoint_exit_is_not_production_completion(self):
-        self.select(); h.run_queue_cycle(self.project, self.jobs, **self.kw)
+        self.select(); self.native_snapshot()
+        h.run_queue_cycle(self.project, self.jobs, **self.kw)
         result = h.evaluate_queue_exit(self.project)
         self.assertTrue(result['ok'])
         self.assertFalse(result['production_complete'])
@@ -217,7 +310,7 @@ class ScheduledQueueChecks(unittest.TestCase):
             with mock.patch.dict(os.environ, {'CODEX_MODEL': model}):
                 results.append(h.diagnose_queue(self.project))
         self.assertEqual(results[0], results[1]); self.assertEqual(results[1], results[2])
-        self.assertEqual(results[0]['diagnosis'], 'SCHEDULED_CHECK_SELECTED')
+        self.assertEqual(results[0]['diagnosis'], 'SCHEDULED_REGISTRATION_REQUIRED')
         self.assertEqual(results[0]['interval_seconds'], 1200)
         self.assertEqual(before, {str(p): p.read_bytes() for p in self.project.rglob('*') if p.is_file()})
 
