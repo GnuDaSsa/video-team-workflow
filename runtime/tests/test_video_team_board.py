@@ -14,7 +14,7 @@ class BoardTests(unittest.TestCase):
  def write(self,rel,data):
   p=self.project/rel;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(data));return p
  def test_columns_preserve_attention_and_not_started(self):
-  for status,column in [('BLOCKED','attention'),('READY_FOR_USER_REVIEW','attention'),('WAITING_PROVIDER_QUEUE','working'),('DONE','done'),('NOT_STARTED','ready'),('UNKNOWN','ready')]:self.assertEqual(b.bucket(status),column)
+  for status,column in [('BLOCKED','attention'),('READY_FOR_USER_REVIEW','attention'),('WAITING_PROVIDER_QUEUE','waiting'),('DONE','done'),('NOT_STARTED','ready'),('UNKNOWN','ready')]:self.assertEqual(b.bucket(status),column)
  def test_newer_state_wins_but_disagreement_remains_visible(self):
   self.write('state.json',{'lanes':{'seedance':{'status':'RUNNING','updated_at':'2026-10-08T15:00:00+09:00'}}})
   self.write('lanes/seedance/status.json',{'status':'BLOCKED','updated_at':'2026-10-07T15:00:00+09:00'})
@@ -46,6 +46,28 @@ class BoardTests(unittest.TestCase):
   self.assertEqual({c['id'] for c in out['projects'][0]['cards']},{'seedance','image_qc'})
   self.write('state.json',{'status':'DONE','lanes':{'seedance':{'status':'RUNNING','updated_at':'2026-10-08T19:00:00+09:00'}}})
   self.assertEqual(b.snapshot(self.root,self.auto,now)['projects'],[])
+ def test_waiting_retained_after_24h_and_elapsed_is_honest(self):
+  now=b.timestamp('2026-10-08T20:00:00+09:00')
+  self.write('state.json',{'slug':'x'})
+  self.write('lanes/seedance/status.json',{'status':'WAITING_PROVIDER_QUEUE','updated_at':'2026-10-06T20:00:00+09:00'})
+  c=b.snapshot(self.root,self.auto,now)['projects'][0]['cards'][0]
+  self.assertEqual(c['column'],'waiting');self.assertTrue(c['stale'])
+  self.assertEqual(c['waiting']['basis'],'last_record');self.assertEqual(c['waiting']['elapsed_seconds'],172800)
+  self.write('lanes/seedance/status.json',{'status':'RUNNING','updated_at':'2026-10-08T20:00:00+09:00'})
+  c=b.snapshot(self.root,self.auto,now)['projects'][0]['cards'][0]
+  self.assertEqual(c['column'],'working');self.assertIsNone(c['waiting'])
+  self.write('lanes/seedance/status.json',{'status':'DONE','updated_at':'2026-10-08T20:00:00+09:00'})
+  self.assertEqual(b.snapshot(self.root,self.auto,now)['projects'],[])
+ def test_wait_start_unknown_future_and_attention_precedence(self):
+  now=b.timestamp('2026-10-08T20:00:00+09:00')
+  w=b.waiting_record({'waiting_since':'2026-10-08T19:00:00+09:00','wait_reason':'승인 대기'},'WAITING',now)
+  self.assertEqual(w['basis'],'wait_start');self.assertEqual(w['elapsed_seconds'],3600)
+  self.assertEqual(w['reason'],'승인 대기')
+  w=b.waiting_record({'waiting_since':'2099-01-01T00:00:00Z'},'WAITING',now)
+  self.assertIsNone(w['elapsed_seconds'])
+  self.assertEqual(b.bucket('WAITING_USER_ACTION'),'attention')
+  self.assertEqual(b.bucket('QUEUED'),'waiting')
+  self.assertEqual(b.bucket('PENDING'),'ready')
  def test_owner_conflict_flag(self):
   self.write('state.json',{'slug':'x'});self.write('lanes/seedance/status.json',{'owner_thread_id':'new','monitoring':{'consumer_task_id':'old'}})
   self.assertIn('불일치',b.project_snapshot(self.project,self.auto,1)['schedule']['label'])

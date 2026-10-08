@@ -37,8 +37,26 @@ def bucket(status):
     s = str(status).upper()
     if any(x in s for x in ('BLOCK','FAIL','ERROR','REJECT','HOLD','REVIEW','USER_ACTION','REPAIR')): return 'attention'
     if s in ('DONE','COMPLETE','COMPLETED','PASS','WARN_PASS','APPROVED','DELIVERED'): return 'done'
+    if s.startswith(('WAITING','AWAITING','QUEUED')) or s in ('QUEUE','IN_QUEUE'): return 'waiting'
     if any(x in s for x in ('RUNNING','ACTIVE','PROGRESS','WAITING','QUEUE','GENERATING','RECOVERING','STARTED')) and s != 'NOT_STARTED': return 'working'
     return 'ready'
+
+
+def waiting_record(lane, status, now):
+    if bucket(status) != 'waiting': return None
+    start = next((lane.get(k) for k in ('waiting_since','wait_started_at')
+                  if 0 < timestamp(lane.get(k)) <= now), None)
+    basis = 'wait_start' if start else 'last_record'
+    start = start or lane.get('updated_at')
+    stamp = timestamp(start)
+    reasons = {'WAITING_PROVIDER_QUEUE':'생성 서비스 큐 대기',
+               'WAITING_PROVIDER':'생성 서비스 응답 대기',
+               'WAITING_USER':'사용자 응답 대기',
+               'WAITING_APPROVAL':'승인 대기',
+               'QUEUED':'큐 대기', 'IN_QUEUE':'큐 대기'}
+    return {'reason':text(lane.get('wait_reason')) or reasons.get(status.upper(),'대기 상태 · '+status),
+            'since':text(start), 'basis':basis,
+            'elapsed_seconds':int(now-stamp) if 0 < stamp <= now else None}
 
 
 def native_schedule(monitoring, automations):
@@ -75,7 +93,7 @@ def project_snapshot(path, automations, now):
         cards.append({'id':key,'title':label,'column':bucket(status),'status':status,
          'detail':text(lane.get('next_action') or lane.get('current_phase') or lane.get('phase')),
          'updated':text(lane.get('updated_at')),'stale':not stamp or now-stamp>1800,
-         'conflict':conflict,'source':source})
+         'conflict':conflict,'source':source,'waiting':waiting_record(lane,status,now)})
     q=read(path/'lanes/seedance/queue_runtime.json',errors)
     monitoring=seed.get('monitoring') if isinstance(seed.get('monitoring'),dict) else {}
     schedule=native_schedule(monitoring,automations)
@@ -99,12 +117,12 @@ def snapshot(root,automations,now=None):
             item=project_snapshot(p,automations,now)
             if item:
                 state=read(p/'state.json',[])
-                if bucket(state.get('status',''))=='done': continue
+                if bucket(state.get('status',''))=='done' or str(state.get('status','')).upper() in ('CANCELLED','CANCELED','ARCHIVED'): continue
                 # Only recently updated, unfinished work; archived RUNNING records
                 # must not masquerade as current production indefinitely.
                 item['cards']=[c for c in item['cards']
-                    if c['column'] in ('working','attention')
-                    and 0 <= now-timestamp(c['updated']) <= 86400]
+                    if c['column']=='waiting' or (c['column'] in ('working','attention')
+                    and 0 <= now-timestamp(c['updated']) <= 86400)]
                 if item['cards']: projects.append(item)
     projects.sort(key=lambda p:p['updated_epoch'],reverse=True)
     return {'schema':1,'observed_at':dt.datetime.now().astimezone().isoformat(),
