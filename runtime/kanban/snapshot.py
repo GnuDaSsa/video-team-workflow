@@ -29,7 +29,9 @@ def text(value, limit=230):
 def timestamp(value):
     try:
         parsed = dt.datetime.fromisoformat(value.replace('Z','+00:00'))
-        return parsed.timestamp() if parsed.tzinfo else 0
+        # Legacy runtime writers emit local naive ISO timestamps on this host.
+        # Interpret those in the host timezone rather than dropping active work.
+        return parsed.timestamp()
     except (TypeError, ValueError, AttributeError): return 0
 
 
@@ -93,6 +95,7 @@ def project_snapshot(path, automations, now):
         cards.append({'id':key,'title':label,'column':bucket(status),'status':status,
          'detail':text(lane.get('next_action') or lane.get('current_phase') or lane.get('phase')),
          'updated':text(lane.get('updated_at')),'stale':not stamp or now-stamp>1800,
+         'timezone_assumed':bool(stamp and not re.search(r'(Z|[+-]\d{2}:\d{2})$',text(lane.get('updated_at')))),
          'conflict':conflict,'source':source,'waiting':waiting_record(lane,status,now)})
     q=read(path/'lanes/seedance/queue_runtime.json',errors)
     monitoring=seed.get('monitoring') if isinstance(seed.get('monitoring'),dict) else {}

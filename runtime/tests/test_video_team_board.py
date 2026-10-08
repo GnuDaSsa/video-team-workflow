@@ -76,6 +76,16 @@ class BoardTests(unittest.TestCase):
    self.assertEqual(b.snapshot(self.root,self.auto,now)['projects'],[],stamp)
   self.write('lanes/seedance/status.json',{'status':'WAITING_PROVIDER_QUEUE','updated_at':'2026-10-01T20:00:01+09:00'})
   self.assertEqual(len(b.snapshot(self.root,self.auto,now)['projects']),1)
+ def test_legacy_runtime_local_timestamp_is_not_dropped(self):
+  import datetime as dt
+  local=dt.datetime.now().replace(microsecond=0)
+  now=local.timestamp()+60
+  self.write('state.json',{'slug':'x'})
+  self.write('lanes/seedance/status.json',{'status':'RUNNING','updated_at':local.isoformat()})
+  c=b.snapshot(self.root,self.auto,now)['projects'][0]['cards'][0]
+  self.assertTrue(c['timezone_assumed']);self.assertFalse(c['stale'])
+  self.assertEqual(b.timestamp(local.isoformat()),local.timestamp())
+  self.assertEqual(b.timestamp('invalid'),0)
  def test_owner_conflict_flag(self):
   self.write('state.json',{'slug':'x'});self.write('lanes/seedance/status.json',{'owner_thread_id':'new','monitoring':{'consumer_task_id':'old'}})
   self.assertIn('불일치',b.project_snapshot(self.project,self.auto,1)['schedule']['label'])
