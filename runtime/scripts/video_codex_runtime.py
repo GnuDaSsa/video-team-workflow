@@ -73,6 +73,25 @@ QUEUES = [
 ]
 
 
+def show_project_board(project: Path) -> bool:
+    """Open the user's display-only panel at intake, never a production owner."""
+    if os.environ.get('VIDEO_TEAM_BOARD_DISABLED') == '1':
+        return False
+    project = Path(project).expanduser().resolve()
+    launcher = HOME / '.local/bin/video-team-board'
+    if project.parent != PROJECT_ROOT.resolve() or not (project / 'manifest.json').is_file() or not launcher.is_file():
+        return False
+    try:
+        result = subprocess.run([str(launcher), '--project', str(project)],
+                                capture_output=True, text=True, timeout=5)
+        if result.returncode:
+            print('Video board unavailable; production state unchanged.', file=sys.stderr)
+        return result.returncode == 0
+    except (OSError, subprocess.TimeoutExpired):
+        print('Video board unavailable; production state unchanged.', file=sys.stderr)
+        return False
+
+
 def slugify(s: str) -> str:
     out = ''.join(c.lower() if c.isalnum() else '-' for c in s.strip())
     out = '-'.join(x for x in out.split('-') if x)
@@ -243,6 +262,7 @@ def init_project(args) -> None:
         'generation_mode': generation_mode,
     })
     print(str(project))
+    show_project_board(project)
 
 
 def set_mode(args) -> None:
@@ -1019,6 +1039,8 @@ def main() -> None:
 
     args = ap.parse_args()
     args.func(args)
+    if args.cmd == 'next':
+        show_project_board(Path(args.project))
 
 
 if __name__ == '__main__':

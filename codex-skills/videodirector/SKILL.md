@@ -5,6 +5,16 @@ description: "Use for any video work: planning, MV/music video, promo and public
 
 # Video Director
 
+<!-- video-team-board:start -->
+## Project kanban
+
+Production `init`/`next` opens the upper-left Video Team Board. If bypassed, run
+`~/.local/bin/video-team-board --project <absolute-runtime-project>` once.
+Read-only records, not verified media, Hermes, an agent or scheduler.
+No opening for advice/audits. To hide: `VIDEO_TEAM_BOARD_DISABLED=1`.
+Closing stops refresh.
+<!-- video-team-board:end -->
+
 Start the response with `[videodirector]` on its own line. This skill owns story, shot purpose, visual intent and delivery taste, **not** runtime execution procedure.
 
 ## Lean entry — classify before loading
