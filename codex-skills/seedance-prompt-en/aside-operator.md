@@ -51,6 +51,34 @@ Only before any binding, checkpoint, accepted/uncertain Generate or project queu
   then bind/checkpoint normally before attaching anything. A failed or uncertain
   action is observed once before recovery, never blindly repeated.
 
+<!-- bounded-observation:start -->
+### Bounded observation instead of repeated ad hoc reads
+
+Use the existing bridge once before choosing the next UI step:
+
+```bash
+python3 ~/.codex/skills/seedance-prompt-en/scripts/aside_bridge.py observe \
+  --binding "$RUNWAY_ASIDE_BINDING" --record
+```
+
+This single guarded REPL read returns modal surface, reference slot labels,
+editor count/character count and Generate affordance. It saves only
+`lanes/seedance/ui_observation.json`; check its timestamp and binding hash.
+An unchanged phase does not require repeating separate DOM reads for each field.
+After an action, observe again before choosing the next action. Do not replay a
+mutation because a CLI command timed out or printed an error.
+
+`ASSET_SELECTOR` is not a native file chooser. Observe the actual native chooser
+before picker-go/select; `NOT_OBSERVED_BY_DOM` means unknown, never absent.
+`COMPOSER` and enabled Generate do not authorize submission. Existing visual
+identity, prompt hash, model/settings and acceptance gates still apply. No raw
+prompt or private URLs are persisted. Semantic failures return nonzero; no
+marker, malformed result or wrong binding is never success, even if the CLI
+process exited zero. The receipt is not queue-sync, scheduler registration or
+lane progress: the production owner records actual phase transitions separately.
+No background observer or extra browser owner is started.
+<!-- bounded-observation:end -->
+
 ## B. Observe → act once → verify, for each block
 
 | Stage | Evidence required before advancing |
