@@ -1,0 +1,22 @@
+{
+  "ok": true,
+  "scope": "reviewed_patch_only",
+  "full_bundle_parity": false,
+  "applied": false,
+  "files": [
+    {
+      "source": "runtime/scripts/disposable_video_qc.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/disposable_video_qc.py",
+      "before_sha256": "8a5d0e46cf5570493bcc1e16feef42a2d1ae52b1ac45bf0ad942721a145791a6",
+      "after_sha256": "f937435e1c388276036c1dfb2aed93d44ccd7478ea7a6503513f1c516f983fa9",
+      "patch_sha256": "bcbc3f5535f3f2efe7066ebffd73cf1bfd31664bff6a706635518d8f1eab765c"
+    },
+    {
+      "source": "runtime/templates/seedance_qc.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/templates/seedance_qc.md",
+      "before_sha256": "f5f2ca869b3b88fa18b0265eb6dbf0b1d72802b39974c7da079ef4bc898816c3",
+      "after_sha256": "1fc42a2c2d0704a20853ec07e99ac2de196258ecde16c8ef46472523837ce495",
+      "patch_sha256": "c0e950afc244c259248be55293adde3b8b254e0ce336e452a3ad3f03bbdd2adb"
+    }
+  ]
+}

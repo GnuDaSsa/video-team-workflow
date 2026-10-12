@@ -1,0 +1,10 @@
+# Owned QC copy permanent removal
+
+User explicitly requested removal from Trash too and workflow integration, without repeated routine approvals. This does not authorize emptying Trash, arbitrary files, cloud deletion, credit use or additional execution owners.
+
+- Code: `c24f338` adds project-scoped permanent permission, exact registry/Trash journal/source/report checks, single-link file and inode guards, durable delete intent, absence verification and idempotent recovery. `cleanup --permanent-authorization … --apply` runs Trash then purge; standalone `purge` handles the previous owned Trash copy. Missing without intent and changed/reappeared paths fail closed.
+- Actual installed behavior: previous and current QC-only videos (23,912,941 + 24,722,409 = 48,635,350 logical bytes) permanently removed from their exact journal paths. Hash-bound review records retained. Repeat returned ALREADY_DELETED. Candidate folder has no retained video. No physical free-space measurement claimed.
+- Verification: 261 working-tree tests; 18 lifecycle tests from the isolated committed tree; runtime Python compilation, shell syntax, diff and harness checks. Source/script and template live hashes match. Runtime two-clause patch preserves unrelated live Suno/visual-only rules.
+- Scoped deployment: script/template passed canonical reviewed preflight/apply. Full dirty runtime source correctly failed a context conflict; the exact committed two-clause diff was then staged against its prior committed tree and deployed with the same canonical tool. No broad overwrite, full bundle deploy or parity claim.
+- Routine approval is reused only within its recorded scope. The requested same-task 20-minute production continuation was registered separately and checked; registration is not proof of a future run. No additional agent/browser owner.
+- Production/QC: current 2D approach output has improved drawn environment/face in five source-bound native samples. Full-speed playback/audio remains unverified; no whole-video PASS. The paired entry-transition job remains in the normal provider queue.

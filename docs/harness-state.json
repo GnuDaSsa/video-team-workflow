@@ -1,16 +1,16 @@
 {
-  "currentGoal": "Opt-in disposable QC video lifecycle; preserve production and user files",
+  "currentGoal": "Extend opt-in disposable QC to exact journal-owned permanent deletion and retain scoped continuation approval",
   "status": "complete",
   "currentContract": "docs/contracts/2026-10-13-disposable-video-qc.md",
   "blockers": [
     "Live continuation: Aside currently contains another project session; exact intended session restoration required."
   ],
-  "nextStep": "Use installed disposable_video_qc for explicitly opted-in new QC copies. Current video production queue remains separate and pending.",
-  "lastUpdated": "2026-10-13T08:03:32.163281+09:00",
+  "nextStep": "Use scoped permanent cleanup for reviewed QC copies; active production heartbeat continues the pending paired video.",
+  "lastUpdated": "2026-10-13T08:44:55.688611+09:00",
   "verification": {
-    "lastResult": "PASS_SCOPED_DEPLOY_AND_SINGLE_CLIP_LIFECYCLE",
-    "lastCommand": "unit tests, Python compile, shell syntax, diff/harness, scoped deployment/hash and actual register/review/Trash/idempotency",
-    "notes": "Full bundle deploy/parity; full-speed playback/audio quality of new videos"
+    "lastResult": "PASS_SCOPED_DEPLOY_AND_TWO_LIVE_DELETIONS",
+    "lastCommand": "261 tests; 18 isolated tests; Python/shell/diff/harness; scoped 3-file deployment; exact two-file purge and idempotency",
+    "notes": "Full bundle parity/deploy, physical disk free-space measurement, full video/audio perception and next scheduled-run execution"
   },
   "recentCloseouts": [
     {
@@ -152,6 +152,19 @@
         "not_run": "Full bundle deploy/parity; full-speed playback/audio quality of new videos"
       },
       "decision": "Explicit opt-in disposable copies only, source/report-bound reversible Trash, no user file/cloud deletion or automatic perception."
+    },
+    {
+      "id": "2026-10-13-permanent-owned-qc-delete",
+      "status": "complete",
+      "completedAt": "2026-10-13T08:44:55.688611+09:00",
+      "contract": "docs/contracts/2026-10-13-disposable-video-qc.md",
+      "verification": {
+        "tests": 261,
+        "isolated_lifecycle_tests": 18,
+        "result": "PASS_SCOPED_DEPLOY_AND_TWO_LIVE_DELETIONS",
+        "not_run": "Full bundle parity/deploy, physical disk free-space measurement, full video/audio perception and next scheduled-run execution"
+      },
+      "decision": "Recorded explicit permanent-QC approval applies to exact owned reviewed copies without per-file reapproval; never empty Trash or broaden deletion scope."
     }
   ]
 }

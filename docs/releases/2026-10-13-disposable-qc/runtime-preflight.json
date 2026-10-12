@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "scope": "reviewed_patch_only",
+  "full_bundle_parity": false,
+  "applied": false,
+  "files": [
+    {
+      "source": "runtime/AGENTS.md",
+      "target": "Documents/Codex/video-team-runtime/AGENTS.md",
+      "before_sha256": "5d153a8ed55abff0ffe0753d88e411df6d0f3981369a164c60b329f729a40439",
+      "after_sha256": "f5e9e281020307a4f56e54fc9002d0e7f89b7c493100ba31f5160723d013deb9",
+      "patch_sha256": "2359aed42374a08b293103a1e6afd1e9a64dbdb0675a31782d4de2de02f64cf2"
+    }
+  ]
+}
