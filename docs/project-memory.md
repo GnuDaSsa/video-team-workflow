@@ -104,4 +104,4 @@ and docs/releases/2026-09-29-seedance-english-default.md.
 
 ## Disposable QC retention
 
-When explicitly requested, new QC copies can be registered, reviewed and then moved to Trash with source/report hashes. User-selected files, original assets and cloud outputs remain protected. Known frame-level failure can close a bounded review without full-video/audio PASS. Installed lifecycle and verification: docs/releases/2026-10-13-disposable-qc/release.md.
+When explicitly requested, register and review new QC copies, then remove the exact owned copy from Trash as well under recorded permanent-QC permission. Reuse valid scoped approval rather than reasking per file or routine production phase. User-selected files, original assets, other Trash entries and cloud outputs remain protected. Preserve delete intent, source/report hashes and truthful unverified checks; no full-video/audio PASS from frame samples. Installed lifecycle and verification: docs/releases/2026-10-13-disposable-qc/release.md.

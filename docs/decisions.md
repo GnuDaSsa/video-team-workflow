@@ -148,4 +148,4 @@ and docs/releases/2026-09-29-seedance-english-default.md.
 
 ## Opt-in disposable QC copies
 
-Keep temporary download ownership and truthful bounded review separate from media quality approval. The installed disposable_video_qc tool requires exact new-download receipt, one-copy limit, hash-bound authorization/report and candidate state before reversible registry Trash. No broad cleanup, watcher or disk-space claim. See docs/contracts/2026-10-13-disposable-video-qc.md.
+Keep temporary download ownership and truthful bounded review separate from media quality approval. The installed disposable_video_qc tool requires exact new-download receipt, one-copy limit and source/report binding. Explicit project-scoped permanent-QC permission authorizes the exact journal-owned Trash copy to be unlinked after durable delete intent, without repeated per-file approval. No broad Trash cleanup, watcher, user-file deletion or physical free-space claim. See docs/contracts/2026-10-13-disposable-video-qc.md.

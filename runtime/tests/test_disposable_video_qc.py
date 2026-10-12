@@ -117,6 +117,82 @@ class DisposableQCTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'RECEIPT_CHANGED'):
             qc.cleanup(self.project, asset['asset_id'], report, True)
 
+    def permission(self):
+        return self.write('permanent.json', {'mode': 'PERMANENT_QC_COPY_DELETE',
+            'source': 'current_explicit_user_request', 'user_quote': 'delete QC copy from Trash too',
+            'permanent_delete': True, 'scope': 'manifest_owned_qc_copies_only',
+            'project': str(self.project)})
+
+    def trashed(self):
+        asset = self.register(); report = self.report(asset)
+        event = qc.cleanup(self.project, asset['asset_id'], report, True)
+        return asset, report, Path(event['event']['trashed_path'])
+
+    def test_permanent_dry_run_then_exact_delete_idempotent(self):
+        asset, report, target = self.trashed(); permission = self.permission()
+        other = target.parent/'user-saved.mp4'; other.write_bytes(b'keep')
+        self.assertEqual(qc.purge(self.project, asset['asset_id'], report, permission)['state'], 'PURGE_DRY_RUN')
+        self.assertTrue(target.exists())
+        result = qc.purge(self.project, asset['asset_id'], report, permission, True)
+        self.assertEqual(result['state'], 'PERMANENTLY_DELETED'); self.assertFalse(target.exists())
+        self.assertEqual(other.read_bytes(), b'keep')
+        self.assertEqual(qc.purge(self.project, asset['asset_id'], report, permission, True)['state'], 'ALREADY_DELETED')
+
+    def test_cleanup_chains_permanent_only_with_permission(self):
+        asset = self.register(); report = self.report(asset); permission = self.permission()
+        self.assertEqual(qc.cleanup(self.project, asset['asset_id'], report, permanent_authorization=permission)['state'], 'DRY_RUN')
+        result = qc.cleanup(self.project, asset['asset_id'], report, True, permission)
+        self.assertEqual(result['state'], 'PERMANENTLY_DELETED')
+
+    def test_wrong_project_permission_rejected(self):
+        asset, report, target = self.trashed(); permission = self.permission()
+        data = json.loads(permission.read_text()); data['project'] = '/unrelated'
+        permission.write_text(json.dumps(data))
+        with self.assertRaisesRegex(ValueError, 'PERMANENT_QC_PERMISSION'):
+            qc.purge(self.project, asset['asset_id'], report, permission, True)
+        self.assertTrue(target.exists())
+
+    def test_changed_trashed_copy_not_deleted(self):
+        asset, report, target = self.trashed(); target.write_bytes(b'other-file')
+        with self.assertRaisesRegex(ValueError, 'TRASH_COPY_CHANGED'):
+            qc.purge(self.project, asset['asset_id'], report, self.permission(), True)
+        self.assertTrue(target.exists())
+
+    def test_unexplained_missing_not_claimed_deleted(self):
+        asset, report, target = self.trashed(); target.unlink()
+        with self.assertRaisesRegex(ValueError, 'MISSING_WITHOUT'):
+            qc.purge(self.project, asset['asset_id'], report, self.permission(), True)
+
+    def test_same_path_new_file_after_purge_is_never_deleted(self):
+        asset, report, target = self.trashed(); permission = self.permission()
+        qc.purge(self.project, asset['asset_id'], report, permission, True)
+        target.write_bytes(b'new-user-file')
+        with self.assertRaisesRegex(ValueError, 'REAPPEARED'):
+            qc.purge(self.project, asset['asset_id'], report, permission, True)
+        self.assertTrue(target.exists())
+
+    def test_crash_after_unlink_reconciles_saved_intent(self):
+        asset, report, target = self.trashed(); permission = self.permission()
+        unlink = Path.unlink
+        def crash(path, *args, **kwargs):
+            unlink(path, *args, **kwargs)
+            raise OSError('simulated interruption after unlink')
+        with patch.object(Path, 'unlink', crash), self.assertRaises(OSError):
+            qc.purge(self.project, asset['asset_id'], report, permission, True)
+        result = qc.purge(self.project, asset['asset_id'], report, permission, True)
+        self.assertTrue(result['recovered_saved_intent_absence'])
+
+    def test_trashed_symlink_or_hardlink_rejected(self):
+        asset, report, target = self.trashed(); permission = self.permission()
+        other = self.root/'other.mp4'; other.write_bytes(target.read_bytes())
+        target.unlink(); target.symlink_to(other)
+        with self.assertRaisesRegex(ValueError, 'SYMLINK'):
+            qc.purge(self.project, asset['asset_id'], report, permission, True)
+        target.unlink(); os.link(other, target)
+        with self.assertRaisesRegex(ValueError, 'SINGLE_LINK'):
+            qc.purge(self.project, asset['asset_id'], report, permission, True)
+        self.assertTrue(other.exists())
+
 
 if __name__ == '__main__':
     unittest.main()

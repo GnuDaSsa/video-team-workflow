@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-"""Explicitly opted-in QC copies only: register, review, then dry-run/apply Trash.
+"""Owned QC copies: register, review, Trash, and optionally purge that exact copy.
 
-This is not a downloader or a perception tool. Never empties Trash. The operator
-must record an exact UI download mapping and a truthful, source-bound QC report.
+Permanent purge needs recorded project-scoped permission. Never empties Trash.
+This is not a downloader or perception tool; reports must state unverified checks.
 """
 import argparse
 import json
+import os
 from pathlib import Path
 
 import media_registry as registry
 
 MODE = 'TEMP_DOWNLOAD_REVIEW_THEN_TRASH'
+PERMANENT_MODE = 'TEMP_DOWNLOAD_REVIEW_THEN_DELETE'
 VIDEO_EXT = {'.mp4', '.mov', '.mkv', '.webm'}
 
 
@@ -35,7 +37,7 @@ def read_json(project, path):
 
 def authorization(project, path):
     p, data = read_json(project, path)
-    if (data.get('mode') != MODE or not data.get('user_quote')
+    if (data.get('mode') not in {MODE, PERMANENT_MODE} or not data.get('user_quote')
             or data.get('source') != 'current_explicit_user_request'
             or data.get('max_concurrent_local_clips') != 1):
         raise ValueError('EXPLICIT_TEMP_QC_AUTHORIZATION_REQUIRED')
@@ -73,8 +75,10 @@ def register(project, receipt, auth):
             'cloud_preserved': True}})
 
 
-def cleanup(project, asset_id, report, apply=False):
+def cleanup(project, asset_id, report, apply=False, permanent_authorization=None):
     project = Path(project).resolve()
+    if permanent_authorization is not None:
+        permanent_permission(project, permanent_authorization)
     asset = registry.get_asset(project, asset_id)
     owned = json.loads(asset['metadata_json']).get('disposable_qc')
     if not owned or asset['kind'] != 'video' or asset['origin_lane'] != 'seedance_qc':
@@ -100,8 +104,9 @@ def cleanup(project, asset_id, report, apply=False):
                                    (asset_id,)).fetchone()
         if not journal or f'report_sha256={report_hash}' not in journal['reason']:
             raise ValueError('TRASH_REPORT_BINDING_MISMATCH')
-        return {'ok': True, 'state': 'ALREADY_TRASHED', 'asset_id': asset_id,
-                'path': asset['current_path']}
+        if permanent_authorization is not None:
+            return purge(project, asset_id, report, permanent_authorization, apply)
+        return {'ok': True, 'state': 'ALREADY_TRASHED', 'asset_id': asset_id, 'path': asset['current_path']}
     if asset['state'] != 'candidate':
         raise ValueError('PROTECTED_OR_CHANGED_ASSET_STATE')
     source = checked_file(registry.folder(project, 'videos_candidates'), asset['current_path'])
@@ -110,15 +115,123 @@ def cleanup(project, asset_id, report, apply=False):
     item = {'asset_id': asset_id, 'path': str(source), 'sha256': asset['sha256'],
             'reason': f'disposable_qc review={report_path.relative_to(project)} report_sha256={report_hash}'}
     if not apply:
-        return {'ok': True, 'state': 'DRY_RUN', 'candidate': item}
+        return {'ok': True, 'state': 'DRY_RUN', 'candidate': item,
+                'permanent_deletion_requested': permanent_authorization is not None}
     result = registry.move_candidates_to_trash(project, [item])
     if len(result) != 1 or source.exists():
         raise ValueError('TRASH_MOVE_NOT_CONFIRMED')
     target = Path(result[0]['trashed_path'])
     if registry.sha256(target) != asset['sha256']:
         raise ValueError('TRASH_HASH_MISMATCH')
+    if permanent_authorization is not None:
+        return purge(project, asset_id, report, permanent_authorization, True)
     return {'ok': True, 'state': 'TRASHED', 'event': result[0],
             'disk_space_freed': False, 'cloud_preserved': True}
+
+
+def permanent_permission(project, path):
+    p, data = read_json(project, path)
+    if (data.get('mode') != 'PERMANENT_QC_COPY_DELETE'
+            or data.get('source') != 'current_explicit_user_request'
+            or not data.get('user_quote') or data.get('permanent_delete') is not True
+            or data.get('scope') != 'manifest_owned_qc_copies_only'
+            or data.get('project') != str(project)):
+        raise ValueError('EXPLICIT_PERMANENT_QC_PERMISSION_REQUIRED')
+    return {'path': str(p), 'sha256': registry.sha256(p)}
+
+
+def purge(project, asset_id, report, permanent_authorization, apply=False):
+    """Delete only a previously reviewed registry-owned Trash copy, never a tree.
+
+    Persist intent before unlink. Missing-without-intent is not proof of our
+    deletion. Crash recovery verifies absence against the same saved intent.
+    """
+    project = Path(project).resolve()
+    permission = permanent_permission(project, permanent_authorization)
+    checked = cleanup(project, asset_id, report)  # validates immutable source/report ownership
+    if checked['state'] != 'ALREADY_TRASHED':
+        raise ValueError('VERIFIED_TRASH_STEP_REQUIRED')
+    asset = registry.get_asset(project, asset_id)
+    report_path = checked_file(project, report)
+    report_hash = registry.sha256(report_path)
+    with registry.connect(project) as conn:
+        journal = conn.execute('SELECT * FROM cleanup_journal WHERE asset_id=? ORDER BY id DESC LIMIT 1',
+                               (asset_id,)).fetchone()
+        # Creating an empty journal table is metadata-only even in dry run.
+        conn.execute('''CREATE TABLE IF NOT EXISTS disposable_qc_purge_journal (
+            asset_id TEXT PRIMARY KEY, status TEXT NOT NULL, trashed_path TEXT NOT NULL,
+            source_sha256 TEXT NOT NULL, report_sha256 TEXT NOT NULL,
+            authorization_path TEXT NOT NULL, authorization_sha256 TEXT NOT NULL,
+            size_bytes INTEGER NOT NULL, intent_at TEXT NOT NULL, deleted_at TEXT)''')
+        previous = conn.execute('SELECT * FROM disposable_qc_purge_journal WHERE asset_id=?',
+                                (asset_id,)).fetchone()
+    root = Path(os.environ.get('VIDEO_TEAM_TRASH_ROOT', str(Path.home()/'.Trash'))).expanduser()
+    if root.is_symlink():
+        raise ValueError('TRASH_ROOT_SYMLINK_REJECTED')
+    target = Path(asset['current_path'])
+    if (not journal or journal['trashed_path'] != str(target)
+            or journal['sha256'] != asset['sha256']
+            or not journal['reason'].startswith('disposable_qc ')
+            or target.parent != root.resolve()
+            or not target.name.startswith(f'{project.name}__{asset_id}__')):
+        raise ValueError('EXACT_OWNED_TRASH_JOURNAL_REQUIRED')
+    intent = {'asset_id': asset_id, 'trashed_path': str(target), 'source_sha256': asset['sha256'],
+              'report_sha256': report_hash, 'authorization_path': permission['path'],
+              'authorization_sha256': permission['sha256'], 'size_bytes': asset['size_bytes']}
+    if previous and any(previous[k] != v for k, v in intent.items()):
+        raise ValueError('DELETE_INTENT_BINDING_CHANGED')
+    exists = target.exists() or target.is_symlink()
+    if previous and previous['status'] == 'DELETED':
+        if exists:
+            raise ValueError('PURGED_PATH_REAPPEARED')
+        return {'ok': True, 'state': 'ALREADY_DELETED', 'asset_id': asset_id,
+                'logical_bytes_deleted': asset['size_bytes'], 'cloud_preserved': True}
+    if not exists and not previous:
+        raise ValueError('MISSING_WITHOUT_DELETE_INTENT')
+    if exists:
+        checked_file(root, target)
+        if registry.sha256(target) != asset['sha256'] or target.stat().st_size != asset['size_bytes']:
+            raise ValueError('TRASH_COPY_CHANGED')
+    if not apply:
+        return {'ok': True, 'state': 'PURGE_DRY_RUN', 'candidate': intent}
+    if not previous:
+        with registry.connect(project) as conn:
+            conn.execute('''INSERT INTO disposable_qc_purge_journal
+                (asset_id,status,trashed_path,source_sha256,report_sha256,authorization_path,
+                 authorization_sha256,size_bytes,intent_at) VALUES (?,?,?,?,?,?,?,?,?)''',
+                (asset_id, 'INTENT', str(target), asset['sha256'], report_hash,
+                 permission['path'], permission['sha256'], asset['size_bytes'], registry.now_iso()))
+    recovered_absence = not exists
+    if exists:
+        # Recheck exact inode and immutable evidence immediately before unlink.
+        checked_file(root, target)
+        fd = os.open(target, os.O_RDONLY | os.O_NOFOLLOW)
+        try:
+            stat = os.fstat(fd)
+            current = target.lstat()
+            if (stat.st_dev, stat.st_ino, stat.st_nlink) != (current.st_dev, current.st_ino, 1):
+                raise ValueError('TRASH_INODE_CHANGED')
+            if (registry.sha256(target) != asset['sha256']
+                    or registry.sha256(report_path) != report_hash
+                    or permanent_permission(project, permanent_authorization) != permission):
+                raise ValueError('DELETE_EVIDENCE_CHANGED')
+            target.unlink()  # exact verified file; no glob/rmtree/empty-Trash operation
+        finally:
+            os.close(fd)
+    if target.exists() or target.is_symlink():
+        raise ValueError('DELETE_ABSENCE_NOT_VERIFIED')
+    at = registry.now_iso()
+    with registry.connect(project) as conn:
+        conn.execute('UPDATE disposable_qc_purge_journal SET status=?,deleted_at=? WHERE asset_id=?',
+                     ('DELETED', at, asset_id))
+        metadata = json.loads(asset['metadata_json'])
+        metadata['disposable_qc']['permanent_deletion'] = dict(intent, deleted_at=at)
+        conn.execute('UPDATE assets SET metadata_json=?,active=0,updated_at=? WHERE asset_id=?',
+                     (json.dumps(metadata, ensure_ascii=False), at, asset_id))
+    return {'ok': True, 'state': 'PERMANENTLY_DELETED', 'asset_id': asset_id,
+            'path': str(target), 'logical_bytes_deleted': asset['size_bytes'],
+            'recovered_saved_intent_absence': recovered_absence, 'cloud_preserved': True,
+            'physical_free_space_measured': False, 'deleted_at': at}
 
 
 def main():
@@ -130,10 +243,18 @@ def main():
     p = sub.add_parser('cleanup')
     p.add_argument('--asset-id', required=True); p.add_argument('--report', required=True)
     p.add_argument('--apply', action='store_true')
+    p.add_argument('--permanent-authorization', help='recorded project-scoped consent; purge only this owned copy after Trash')
+    p = sub.add_parser('purge')
+    p.add_argument('--asset-id', required=True); p.add_argument('--report', required=True)
+    p.add_argument('--authorization', required=True); p.add_argument('--apply', action='store_true')
     args = parser.parse_args()
     try:
-        result = (register(args.project, args.receipt, args.authorization) if args.cmd == 'register'
-                  else cleanup(args.project, args.asset_id, args.report, args.apply))
+        if args.cmd == 'register':
+            result = register(args.project, args.receipt, args.authorization)
+        elif args.cmd == 'purge':
+            result = purge(args.project, args.asset_id, args.report, args.authorization, args.apply)
+        else:
+            result = cleanup(args.project, args.asset_id, args.report, args.apply, args.permanent_authorization)
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
     except (OSError, ValueError, KeyError) as exc:

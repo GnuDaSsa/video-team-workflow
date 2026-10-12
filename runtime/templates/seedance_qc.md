@@ -75,6 +75,16 @@ QC JSON: asset ID, source SHA, method, findings, unverified checks, cloud preser
 review complete for its declared scope and disposal approved. A known visual
 failure can close that bounded review without claiming playback/audio PASS.
 Run `cleanup` as a dry run, then `cleanup --apply` for the exact asset/report.
-It verifies hashes/ownership, journals a reversible Trash move and preserves the
-cloud original. Never empty Trash, promote an unreviewed clip or claim that a
-Trash move frees disk space. Keep only lightweight findings/evidence afterwards.
+By default this is a reversible registry Trash move. When the user explicitly
+requests deletion from Trash too, record project-scoped
+`PERMANENT_QC_COPY_DELETE` permission once. Reuse that valid narrow authorization
+without per-file confirmation; do not weaken unrelated safety or spawn gates.
+Pass `--permanent-authorization <permission.json>` to the same cleanup command.
+It then purges only the exact reviewed/journal-owned copy, or use `purge` for an
+already-trashed copy. The tool checks source/report/permission hashes, exact
+Trash path and regular single-link file, and persists intent before unlink.
+Never scan/empty Trash or delete user-selected files, original assets or cloud
+outputs. A missing file without a saved delete intent is not verified deletion;
+a changed/reappeared path must be held, not unlinked. Keep lightweight findings,
+source hashes and deletion journal. Logical bytes removed are not a measurement
+of physical free space. Full playback/audio checks remain separately honest.
