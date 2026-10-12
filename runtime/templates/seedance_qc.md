@@ -58,3 +58,23 @@ python3 <runtime>/runtime/scripts/video_qc_coverage.py --project <p> --report <e
   the existing schedule per its authorized scope, not endless duplicate QC.
 - Apply source binding when a legacy report is next used; do not retroactively
   invent reviewed intervals or invalidate previously approved assets wholesale.
+
+### Explicitly opted-in disposable QC downloads
+
+Only when the user requests temporary download/review/removal, use
+`runtime/scripts/disposable_video_qc.py`. This is an exception for newly owned
+QC copies, not permission to change ordinary candidate retention or user files.
+Record a pre-download path baseline and the exact visible-card download mapping;
+isolate the new copy under `media/06_videos_candidates_영상후보/_qc_temp/`.
+`register` requires the authorization/receipt and moves it into the registry's
+canonical candidate directory with disposable ownership metadata. Keep at most
+one pending local copy. Never restore the previously deleted video library.
+
+After a bounded review, persist `disposable_copy_review` in the existing per-asset
+QC JSON: asset ID, source SHA, method, findings, unverified checks, cloud preserved,
+review complete for its declared scope and disposal approved. A known visual
+failure can close that bounded review without claiming playback/audio PASS.
+Run `cleanup` as a dry run, then `cleanup --apply` for the exact asset/report.
+It verifies hashes/ownership, journals a reversible Trash move and preserves the
+cloud original. Never empty Trash, promote an unreviewed clip or claim that a
+Trash move frees disk space. Keep only lightweight findings/evidence afterwards.

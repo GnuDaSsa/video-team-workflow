@@ -145,3 +145,7 @@ The shared Seedance Handoff contract owns the standing English direction
 default; spoken Korean remains literal. Non-default Korean directions require
 scoped explicit intent. See docs/contracts/2026-09-12-seedance-explicit-english.md
 and docs/releases/2026-09-29-seedance-english-default.md.
+
+## Opt-in disposable QC copies
+
+Keep temporary download ownership and truthful bounded review separate from media quality approval. The installed disposable_video_qc tool requires exact new-download receipt, one-copy limit, hash-bound authorization/report and candidate state before reversible registry Trash. No broad cleanup, watcher or disk-space claim. See docs/contracts/2026-10-13-disposable-video-qc.md.

@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "scope": "reviewed_patch_only",
+  "full_bundle_parity": false,
+  "applied": false,
+  "files": [
+    {
+      "source": "runtime/scripts/disposable_video_qc.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/disposable_video_qc.py",
+      "before_sha256": null,
+      "after_sha256": "8a5d0e46cf5570493bcc1e16feef42a2d1ae52b1ac45bf0ad942721a145791a6",
+      "patch_sha256": "b7120e71b07e5ed73787cf9851de74ca78cd9fc62c63f1fa79fd4b4a11d63a90"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "scope": "reviewed_patch_only",
+  "full_bundle_parity": false,
+  "applied": false,
+  "files": [
+    {
+      "source": "runtime/templates/seedance_qc.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/templates/seedance_qc.md",
+      "before_sha256": "f59bf2a1d5f2f930fa85808d97415ae1fc538fbbfdd263f76cba79e848c90605",
+      "after_sha256": "f5f2ca869b3b88fa18b0265eb6dbf0b1d72802b39974c7da079ef4bc898816c3",
+      "patch_sha256": "62068f323ebc26632dc1fbca173379c0ad5ca0152b59d98563409032033a5532"
+    }
+  ]
+}

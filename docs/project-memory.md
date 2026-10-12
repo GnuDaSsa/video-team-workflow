@@ -101,3 +101,7 @@ The shared Seedance Handoff contract owns the standing English direction
 default; spoken Korean remains literal. Non-default Korean directions require
 scoped explicit intent. See docs/contracts/2026-09-12-seedance-explicit-english.md
 and docs/releases/2026-09-29-seedance-english-default.md.
+
+## Disposable QC retention
+
+When explicitly requested, new QC copies can be registered, reviewed and then moved to Trash with source/report hashes. User-selected files, original assets and cloud outputs remain protected. Known frame-level failure can close a bounded review without full-video/audio PASS. Installed lifecycle and verification: docs/releases/2026-10-13-disposable-qc/release.md.

@@ -1,16 +1,16 @@
 {
-  "currentGoal": "Resume existing production owner without fabricating idle; verify direct executor action",
-  "status": "blocked",
-  "currentContract": "docs/contracts/2026-09-08-session-monitor-consistency.md",
+  "currentGoal": "Opt-in disposable QC video lifecycle; preserve production and user files",
+  "status": "complete",
+  "currentContract": "docs/contracts/2026-10-13-disposable-video-qc.md",
   "blockers": [
     "Live continuation: Aside currently contains another project session; exact intended session restoration required."
   ],
-  "nextStep": "Restore exact original Aside session, then resume existing owner and automation-2. S09/S10 completion/QC unverified.",
-  "lastUpdated": "2026-09-22T14:52:03+09:00",
+  "nextStep": "Use installed disposable_video_qc for explicitly opted-in new QC copies. Current video production queue remains separate and pending.",
+  "lastUpdated": "2026-10-13T08:03:32.163281+09:00",
   "verification": {
-    "lastCommand": "152 tests; Python compile; shell syntax; diff check; release freeze/preflight/apply/check",
-    "lastResult": "PASS_EXPLICIT_RESUME_DEPLOYED",
-    "notes": "152 tests and 66-file parity PASS. Native Luna/high context and actual CUA session read verified, no echo-only result. Found other-project session collision; no media mutations. automation-2 reactivated then PAUSED. Owner still sent substantive result message despite final-only instruction."
+    "lastResult": "PASS_SCOPED_DEPLOY_AND_SINGLE_CLIP_LIFECYCLE",
+    "lastCommand": "unit tests, Python compile, shell syntax, diff/harness, scoped deployment/hash and actual register/review/Trash/idempotency",
+    "notes": "Full bundle deploy/parity; full-speed playback/audio quality of new videos"
   },
   "recentCloseouts": [
     {
@@ -139,6 +139,19 @@
         "branch": "codex/seedance-english-default",
         "main": "blocked_by_existing_divergence; no force or conflict resolution"
       }
+    },
+    {
+      "id": "2026-10-13-disposable-video-qc",
+      "status": "complete",
+      "contract": "docs/contracts/2026-10-13-disposable-video-qc.md",
+      "completedAt": "2026-10-13T08:03:32.163281+09:00",
+      "verification": {
+        "result": "PASS_SCOPED_DEPLOY_AND_SINGLE_CLIP_LIFECYCLE",
+        "tests": 253,
+        "commands": "unit tests, Python compile, shell syntax, diff/harness, scoped deployment/hash and actual register/review/Trash/idempotency",
+        "not_run": "Full bundle deploy/parity; full-speed playback/audio quality of new videos"
+      },
+      "decision": "Explicit opt-in disposable copies only, source/report-bound reversible Trash, no user file/cloud deletion or automatic perception."
     }
   ]
 }
