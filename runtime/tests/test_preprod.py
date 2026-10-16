@@ -167,6 +167,12 @@ class PreprodPipelineTests(unittest.TestCase):
         ok, reason = lane_gates.gate_check(self.project, 'music')
         self.assertFalse(ok); self.assertIn('SKIPPED_BY_CONCEPT_LOCK', reason)
         self.assertNotIn('music', lane_gates.next_actions(self.project)['next_lanes'])
+        self.bible(); preprod.lock_stage(self.project, 'bible')
+        self.storyboard(); preprod.lock_stage(self.project, 'storyboard', 'ok')
+        lanes = lane_gates.next_actions(self.project)
+        self.assertEqual(lanes['lanes']['director']['status'], 'DONE')
+        self.assertEqual(lanes['lanes']['planner']['status'], 'DONE')
+        self.assertEqual(lanes['next_lanes'][:1], ['image_creator_01'])
 
     def test_storyboard_lock_derives_planner_files(self) -> None:
         self.lock_all()

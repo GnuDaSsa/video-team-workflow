@@ -718,6 +718,27 @@ PREPROD_LANE_NEEDS = {
 }
 
 
+PREPROD_LANE_OWNS = {
+    'director': ('concept', 'bible'),
+    'planner': ('storyboard',),
+    'image_creator_01': ('images',),
+    'image_creator_02': ('images',),
+    'image_qc': ('images',),
+}
+
+
+def _preprod_done_lanes(project: Path) -> set[str]:
+    """A planning lane is done when the preprod stages it owns are locked."""
+    if not preprod.is_preprod_project(project):
+        return set()
+    locked = {s for s in ('concept', 'bible', 'storyboard', 'images')
+              if preprod.lock_state(project, s)['state'] == 'LOCKED'}
+    done = {lane for lane, stages in PREPROD_LANE_OWNS.items() if set(stages) <= locked}
+    if preprod.concept_without_music(project):
+        done.add('music')
+    return done
+
+
 def _preprod_block(project: Path, lane: str) -> str:
     """In preprod projects a lane opens only after its upstream stages are locked."""
     if not preprod.is_preprod_project(project):
@@ -741,8 +762,11 @@ def next_actions(project: Path) -> dict:
         first['_fresh_for_next'] = True
         db = media_registry.db_path(project)
         _AUDIT_CACHE[str(project.resolve())] = (db.stat().st_mtime if db.exists() else 0.0, first)
+    preprod_done = _preprod_done_lanes(project)
     for lane in LANES:
         info = lane_status(project, lane)
+        if lane in preprod_done and info['status'] not in {'BLOCKED', 'RUNNING'}:
+            info = {**info, 'status': 'DONE', 'raw': info['raw'] + ' (derived: preprod stages locked)'}
         ok, reason = gate_check(project, lane)
         lanes[lane] = {'status': info['status'], 'raw': info['raw'], 'gate_ok': ok, 'gate_reason': reason}
         recovery_restart = lane == 'seedance' and _seedance_recovery_needed(project)
