@@ -150,6 +150,8 @@ def validate_concept(project: Path) -> list[str]:
         _need(e, bool(str(arc.get(beat) or '').strip()), f'concept_arc_missing:{beat}')
     _need(e, isinstance(data.get('must_avoid'), list), 'concept_missing:must_avoid')
     _need(e, data.get('music', 'track') in {'track', 'none'}, f'concept_bad_music:{data.get("music")}')
+    _need(e, data.get('generation_tier', 'Explore Mode') in {'Explore Mode', 'Credits'},
+          f'concept_bad_generation_tier:{data.get("generation_tier")}')
     return e
 
 
@@ -459,6 +461,8 @@ def write_shelf_brief(project: Path, block_id: str) -> Path:
         'resolution': (b.get('resolution') or '720p'), 'audio': 'OFF' if block['audio_route'] == 'silent' else 'ON',
         'mode': 'Multi-reference', 'audio_route': block['audio_route'],
     }
+    if concept.get('generation_tier'):
+        settings['generation_tier'] = concept['generation_tier']
     write_json(out / 'settings.json', settings)
     write_json(out / 'refs.json', {'block_id': block_id, 'references': rows})
     chars = {c['id']: c for c in b.get('characters') or []}
