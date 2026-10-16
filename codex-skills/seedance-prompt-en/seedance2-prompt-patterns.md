@@ -1,313 +1,140 @@
-# Seedance 2.0 multimodal prompting patterns
+# Seedance 2.0 multimodal patterns (review lens)
 
-This is a **prompt-authoring reference** inside the canonical
-`seedance-prompt-en` skill. It does not own Runway UI operation, queue handling,
-downloads, or media completion.
+Load when a block uses video/audio sources, extension, repair, or an unusual
+method. Prompts are still written in the template in `seedance-prompting.md`;
+the fragments below show only what goes **inside** its binding sentences and
+shot sections. No UI operation here.
 
-## Provenance and verification
+## Provenance
 
-- User source: `/Users/gnudas/Downloads/seedance2-prompting.zip`
-- Source SHA-256:
-  `42612531d9c671cdfdbc61df88f8825c4745e48e8a897a2b2f36a7fbcf1b48f3`
-- Integrated: `2026-08-14`
-- First-party cross-checks:
-  - [ByteDance Seedance 2.0 official launch](https://seed.bytedance.com/blog/seedance-2-0-official-launch)
-  - [Runway: Creating with Seedance 2.0](https://help.runwayml.com/hc/en-us/articles/50488490233363-Creating-with-Seedance-2-0)
+User source `/Users/gnudas/Downloads/seedance2-prompting.zip`
+(SHA-256 `42612531d9c671cdfdbc61df88f8825c4745e48e8a897a2b2f36a7fbcf1b48f3`),
+integrated 2026-08-14 and reconciled with
+[ByteDance Seedance 2.0 launch](https://seed.bytedance.com/blog/seedance-2-0-official-launch)
+and [Runway: Creating with Seedance 2.0](https://help.runwayml.com/hc/en-us/articles/50488490233363-Creating-with-Seedance-2-0).
+It is an input, not a second authority.
 
-The ZIP is an input source, not a second authority. Rules below are reconciled
-with `seedance-shared-contract.md`, `seedance-prompting.md`, current first-party
-documentation, and the visible Runway UI.
+Capability snapshot (2026-08-14, Runway): text/image/video/audio inputs;
+`References`, `Start / End frames`, `Text to video`; 5–15 s; up to 9 images,
+3 videos and 3 audio files (each media type's combined duration under 15 s). The
+visible UI and current help page win over this snapshot.
 
-### Current capability snapshot, not a permanent constant
-
-As verified on `2026-08-14`, Runway documents:
-
-- text, image, video, and audio inputs;
-- `References`, `Start / End frames`, and `Text to video` creation modes;
-- 5–15 second generations;
-- up to 9 reference images;
-- up to 3 reference videos, whose combined duration is under 15 seconds;
-- up to 3 reference audio files, whose combined duration is under 15 seconds.
-
-Before production, the visible provider UI and current first-party help page
-win over this snapshot. Do not infer an undocumented combined-file maximum.
-
-### Source claims deliberately not promoted as hard rules
-
-- **Exactly three-second segments:** useful as a planning example, not a
-  universal law. Segment by action complexity, music phrase, and shot purpose.
-- **The phrase “completely reference” as a magic token:** use an explicit scoped
-  role and preservation clause instead; no phrase guarantees literal copying.
-- **All real-person image inputs are forbidden:** Runway describes moderation
-  constraints and suggests Text to Video for realistic humans; it does not state
-  the ZIP's absolute ban. Obey current provider moderation and never retry the
-  same moderated input unchanged.
-- **4-second minimum, 12-file combined limit, and broad image file extensions:**
-  not copied into the live contract because they do not match or are not stated
-  in the current Runway help page.
-- **Backward extension:** use only if the active provider UI visibly exposes it.
+Not promoted as rules: fixed three-second segments; "completely reference" as a
+magic phrase; an absolute ban on real-person images (follow current moderation
+and never retry a moderated input unchanged); a 4 s minimum / 12-file limit;
+backward extension unless the UI exposes it.
 
 ## Method first
 
-Choose the generation method before composing sentences.
-
 | Need | Method | Prompt responsibility |
 |---|---|---|
-| Blend identity, environment, prop, motion, or sound references | `References` | Give every attached source a narrow role and describe the resulting scene |
-| Exact first frame or exact first/last boundary | `Start / End frames` | Describe motion and continuity between the fixed boundaries |
-| No source asset, or realistic human moderation makes image input unsuitable | `Text to video` | Own composition, identity description, blocking, light, action, camera, and sound |
-| Preserve source-video motion but change subject/style/light | reference video / video edit | Name exactly what changes and what remains unchanged |
-| Continue a successful clip | extension | Restate the observed boundary state, preserved invariants, new action, and new end state |
-| Replace only one bad beat | repair/edit | Bound the changed interval or event and preserve everything outside it |
-| Interpret one approved unified board | declared storyboard mode | Use its internal `shot_id`; never treat attachment order as story order |
+| Blend identity, environment, prop, motion or sound refs | `References` | narrow role per source; describe the resulting scene |
+| Exact first frame or first/last boundary | `Start / End frames` | motion and continuity between fixed boundaries |
+| No source asset, or moderation blocks image input | `Text to video` | own composition, identity, blocking, light, action, camera, sound |
+| Keep source-video motion, change subject/style/light | reference video / video edit | name exactly what changes and what stays |
+| Continue a good clip | extension | observed boundary state, invariants, new action, new end state |
+| Replace one bad beat | repair/edit | bound the changed interval, preserve the rest |
+| One approved unified board | declared storyboard mode | use its internal `shot_id`, never attachment order |
 
-The video-team generation mode still applies:
+`standard_i2v` uses the approved per-cut frame plus identity refs;
+`no_i2v_reference_native` makes the prompt own the missing composition.
 
-- `standard_i2v` uses the approved per-cut source frame plus required identity
-  references.
-- `no_i2v_reference_native` omits per-cut frames and makes the production prompt own
-  the missing composition, blocking, action, camera, atmosphere, and timing.
+## Five-question lens
 
-## Five-block compile audit
+Check a finished prompt against these; they map onto template parts and are not
+a separate layout: (1) source binding — every token has one job; (2) subject and
+space — who/what/where and what persists (STYLE/IDENTITY); (3) temporal action —
+feasible order and closing state (shot sections, end frame); (4) camera and
+sound — the declared move per shot and the `Sound:` line; (5) constraints — one
+or two shot-specific risks. Anything that changes nothing on screen moves to the
+pack.
 
-Use these five questions to compile or review a prompt. They are an audit lens,
-not a replacement for the live medium-specific structure. For 2D/stylized
-sequences, `STYLE LOCK -> CONTINUITY -> DIRECTION -> SHOT` remains authoritative.
+## Source binding
 
-1. **Source binding** — What visible or audible job does every attached
-   `@ImageN`, `@VideoN`, and `@AudioN` perform?
-2. **Subject and space** — Who or what is present, where are they, and which
-   identity, costume, prop, geometry, light, and material rules persist?
-3. **Temporal action** — What physically happens, in what feasible order, and
-   what visible state closes the clip?
-4. **Camera and sound** — What is the one dominant camera family or per-beat
-   setup, and what ambience, contact sound, music, or performed speech is heard?
-5. **Style and constraints** — What medium/look is required, and what one or two
-   shot-specific risks need a short positive lock?
-
-If a block does not change what the viewer sees or hears, move it to the package.
-File paths, asset IDs, gate wording, UI settings, retries, and provenance never
-belong in the prompt.
-
-## Multimodal source binding
-
-### Core rule
-
-Every attached source gets a scoped role **inside the model-facing prompt**.
-The package separately records the exact asset ID, path, attachment order, and
-verification evidence.
-
-Good binding says both what to take and what not to overwrite:
+Each binding says what to take and what not to overwrite:
 
 ```text
-@Image1의 인물 얼굴 실루엣과 복식을 주인공의 정체성 기준으로 사용한다.
-공간과 조명은 @Image2를 따르되 @Image1의 얼굴과 체형은 바꾸지 않는다.
-@Video1에서는 카메라 이동 경로만 참고하고 등장인물 외형은 가져오지 않는다.
-@Audio1은 대사의 발음 타이밍, 호흡, 멈춤만 이끌며 배경음악으로 쓰지 않는다.
+@Image1 is the lead's identity: take face silhouette and costume only.
+@Image2 sets the space and light; it never changes the face or build from @Image1.
+@Video1 supplies the camera path only; do not take its people or their look.
+@Audio1 guides the line's pronunciation timing, breath and pauses only; it is not background music.
 ```
 
-Avoid unscoped instructions such as `@Video1을 참고한다`. Avoid assigning one
-source several conflicting jobs. When one source truly contributes two roles,
-state both separately and check that neither conflicts with another source.
+Avoid unscoped lines such as `Use @Video1 as reference.` and one source with
+conflicting jobs; if one source truly has two roles, state both.
 
-### Image roles
-
-- identity: face silhouette, hair mass, age impression, body proportion,
-  costume, signature prop;
-- environment: layout, architecture, terrain, palette, time of day, material;
-- prop/product: exact geometry, surface, logo placement when readable text is
-  safe and required;
-- composition or boundary: starting composition, ending composition, or one
-  declared storyboard `shot_id`;
-- style: medium, line/fill/shading, texture, lighting response.
-
-A recurring-character `TRIPTYCH` or deterministic identity crop is identity/body construction only. It is not a pose, scene,
-camera, or narrative-order cue.
-
-### Video roles
-
-- camera path or mount only;
-- subject action, choreography, timing, or body mechanics only;
-- edit structure or rhythm only;
-- visual effect or transition behavior only;
-- source clip to relight, restyle, replace, repair, or extend;
-- source-video audio, when that audible role is explicitly intended.
-
-When transferring camera motion or choreography, identify the preserved lane:
+- Image roles: identity (face silhouette, hair mass, age impression, build,
+  costume, signature prop); environment (layout, architecture, palette, time of
+  day, material); prop/product (geometry, surface, safe logo placement);
+  boundary (start/end composition or one board `shot_id`); style (medium,
+  line/fill/shading, texture, light response). A triptych or identity crop is
+  identity/body only — never pose, scene, camera or order.
+- Video roles: camera path/mount only; action, choreography or body mechanics
+  only; edit rhythm only; effect/transition behavior only; a source to relight,
+  restyle, repair or extend; its audio only when intended.
+- Audio roles: performed speech guide (timing, cadence, breath, pause, mic
+  distance); score/beat guide; ambience/SFX guide; voice colour only when policy
+  permits. Routes and QC: dialogue table in `seedance-shared-contract.md`.
 
 ```text
-@Video1의 낮은 측면 트래킹 경로와 속도 변화만 적용한다.
-장소는 @Image2, 주인공 정체성은 @Image1을 유지한다.
+@Video1 supplies only its low side-tracking path and speed changes. The location comes from @Image2 and the lead's identity from @Image1.
 ```
 
-### Audio roles
+## Beats inside a shot
 
-- performed Korean speech guide: phoneme timing, cadence, breath, pause,
-  hesitation, mic distance, and emotional curve;
-- score or beat guide: tempo, accents, phrase changes, and energy curve;
-- ambience/SFX guide: material contacts, room tone, weather, machinery, crowd;
-- voice colour only when the provider and policy permit it.
+Within a shot section: `start state → action → contact → physical result → end
+state`. Each beat holds one action or state change and inherits the previous
+state. Convert emotion into evidence — not `she is nervous` but `her eyes flick
+to the exit, her thumb presses the cup rim twice, she inhales and her shoulders
+rise slightly`.
 
-The shared audio contract still wins: Audio stays ON; spoken dialogue requires
-the verified performed `@Audio1` route unless the user explicitly requests the
-candidate-only native voice branch.
-
-## Temporal beat grammar
-
-Use timed beats when the clip is longer than about eight seconds **and** contains
-multiple phases, or whenever order has failed before. Do not split a single
-continuous action merely to satisfy a timer.
-
-Each beat should normally contain:
-
-- one subject action or state change;
-- one camera setup or continuation of the dominant camera move;
-- one motivated environment/material response;
-- one timing or rhythm cue;
-- a state that the next beat can inherit.
-
-The preferred chain is:
-
-```text
-start state -> action -> contact -> physical result -> camera beat -> end state
-```
-
-Convert emotion words into visible performance:
-
-- not `긴장한다`;
-- use `시선이 출구로 짧게 움직이고, 엄지가 컵 가장자리를 두 번 누르며,
-  숨을 들이마신 뒤 어깨가 아주 조금 올라간다`.
-
-Duration budget:
-
-| Duration | Practical budget |
+| Shot length | Practical budget |
 |---|---|
-| 5–6s | one action or one camera discovery |
-| 7–10s | setup -> one interaction -> reveal, usually no more than three major verbs |
-| 11–15s | two or three causal phases with one dominant camera family and an explicit end frame |
+| up to ~6 s | one action or one camera discovery |
+| 7–10 s | setup → one interaction → reveal; about three major verbs |
+| 11–15 s | two or three causal phases, the declared move, explicit end frame |
 
-If the action budget overflows, split the work into separate generations. Do not
-solve overpacking by writing faster transitions.
-
-## Single-shot, multi-shot, and storyboard wording
-
-### Single continuous shot
-
-State it positively and place the continuity instruction near the shot
-description, not as a magic footer:
-
-```text
-15초 단일 연속 숏, 편집 컷 없이 같은 공간과 시간 안에서 이어진다.
-카메라는 인물 앞의 낮은 미디엄 숏에서 시작해 한 번의 부드러운 측면
-트래킹으로 모퉁이까지 따라가고, 인물이 프레임 오른쪽으로 빠져나가는
-구도에서 끝난다.
-```
-
-### Multi-shot sequence
-
-Declare the shot count and cut grammar. Every shot receives its own visible
-action and camera setup. Hard cuts are usually clearer than unspecified morphs.
-
-```text
-15초 3숏 시퀀스, 각 숏은 명확한 하드 컷으로 연결한다.
-0–4초, 숏 1: ...
-4–10초, 숏 2: ...
-10–15초, 숏 3: ...
-```
-
-In `GENERAL_REFERENCE_MODE`, never equate `@Image1 -> @Image2 -> @Image3` with
-shot order. Ordered beats come only from the written shot plan or an approved
-storyboard's internal IDs.
+If the budget overflows, the storyboard needs another shot or block — never
+faster transitions.
 
 ## Extension and repair
 
-### Forward extension
-
-Inspect the actual final frames first. Then compile four parts:
-
-1. observed boundary state;
-2. invariants to preserve;
-3. new action and camera continuation;
-4. new closing state and sound continuation.
+Forward extension — inspect the actual last frames, then write: observed
+boundary state, invariants, new action, new end state.
 
 ```text
-@Video1의 마지막 프레임에서 앞으로 이어진다. 현재 인물은 창가 왼쪽에
-서서 오른손으로 커튼을 잡고 있고, 석양이 얼굴 왼쪽을 비춘다. 같은 인물
-정체성, 의상, 카메라 진행 방향, 방의 구조, 석양 방향, 실내 잔향을 유지한다.
-0–2초에는 커튼을 천천히 놓고 몸을 방 안쪽으로 돌린다. 2–5초에는 같은
-카메라가 반걸음 뒤에서 따라가며 인물이 책상 위 편지를 집어 든다. 마지막은
-편지를 든 손과 망설이는 시선이 함께 보이는 미디엄 클로즈업이다.
+Continue forward from the last frame of @Video1. The woman stands at the left of the window holding the curtain in her right hand; low sunset light falls on the left side of her face. Keep the same identity, costume, camera direction, room layout, sun direction and room reverb. She slowly lets go of the curtain and turns into the room; the camera follows half a step behind as she picks up the letter on the desk. End on a medium close-up of the hand holding the letter and her hesitant gaze.
 ```
 
-Do not extend a clip whose final frames already contain identity, anatomy, or
-geometry drift; extension tends to inherit the defect.
+Do not extend a clip whose last frames already drift in identity, anatomy or
+geometry.
 
-### Local repair or edit
-
-Name the bounded change and the preserved remainder:
+Local repair — name the bounded change and the preserved remainder:
 
 ```text
-@Video1의 첫 6초와 마지막 구도는 유지한다. 6–9초 구간에서만 오른손이
-컵 손잡이를 자연스럽게 잡고 들어 올리도록 수정한다. 얼굴, 왼손, 컵 형태,
-카메라 경로, 조명, 배경 기하, 음향은 바꾸지 않는다.
+Keep the opening and the final composition of @Video1. Only in the middle beat, the right hand takes the cup handle naturally and lifts it. Do not change the face, left hand, cup shape, camera path, lighting, background geometry or sound.
 ```
 
-If the source identity or scene anchor is globally wrong, regenerate from the
-correct reference package instead of stacking repair instructions.
+If the identity or scene anchor is globally wrong, regenerate from the correct
+deck instead of stacking repair lines. (Repair/extension packs still follow the
+template's header and the duration lock.)
 
-## Compact reusable patterns
-
-### Reference composite
+## Reusable binding fragments
 
 ```text
-@Image1의 주인공 정체성과 복식을 유지한다. 장면 구조와 시간대는
-@Image2, 손에 든 제품 형상은 @Image3을 따른다. @Video1의 카메라 경로만
-적용하고 그 영상의 인물과 장소는 가져오지 않는다. [행동과 시간 비트].
-소리는 [앰비언스/접촉음/음악]. 마지막은 [명시적 종료 구도].
+Reference composite: @Image1 keeps the lead's identity and costume; @Image2 sets the scene layout and time of day; @Image3 fixes the shape of the product in her hand. Apply only the camera path of @Video1, not its people or location.
+Choreography transfer: the person from @Image1 performs the move order and weight shifts of @Video1; face, build and costume stay from @Image1, never the dancer in @Video1. Foot contact, cloth inertia, breath and floor response stay natural.
+Product swap: keep the edit rhythm and camera structure of @Video1 and replace only the product with the one in @Image1, keeping its proportions, edges, material, color and logo position; hand-to-product contact is physically exact.
+Storyboard execution: render only internal shot S03 of the approved board in @Image1 as a real film scene; no panels, borders, numbers, captions or UI appear. Identity from @Image2, space and materials from @Image3.
 ```
 
-### Choreography transfer
+## Lens checklist
 
-```text
-@Image1의 인물이 @Video1의 동작 순서와 체중 이동을 수행한다. 얼굴, 체형,
-복식은 @Image1을 유지하고 @Video1의 배우 외형은 가져오지 않는다. 카메라는
-[한 가지 경로]. 발 접촉, 옷감 관성, 호흡, 바닥 반응을 자연스럽게 보인다.
-```
-
-### Product edit
-
-```text
-@Video1의 편집 리듬과 카메라 구조를 유지하되 기존 제품만 @Image1의 제품으로
-교체한다. 제품 비율, 모서리, 재질, 색, 로고 위치를 유지하고 손과 제품의
-접촉을 물리적으로 정확하게 보인다. [시간별 제품 행동]. 마지막은 깨끗한
-히어로 숏이다.
-```
-
-### Storyboard execution
-
-```text
-@Image1의 승인 스토리보드 중 내부 shot_id S03만 실제 영화 장면으로 구현한다.
-보드의 패널, 테두리, 번호, 설명문, UI는 화면에 나타나지 않는다. 인물 정체성은
-@Image2, 공간 재질은 @Image3을 따른다. [S03의 행동·카메라·사운드·종료 구도].
-```
-
-## Prompt critic checklist
-
-- The method matches the intended control: References vs Start/End vs T2V vs
-  edit/extension.
-- Every attached image, video, and audio has a narrow model-facing role.
-- A new reference-based pack declares `model_facing_multimodal_binding_v1` in
-  `prompt_rules_used`; attestation can therefore reject package-only bindings.
-- The same source is not silently responsible for identity, camera, action,
-  background, and style at once.
-- Reference attachment order has not been mistaken for narrative order.
-- Subject, space, action, camera, sound, and end frame are all concrete.
-- Emotion is expressed as visible body, face, breath, or contact behavior.
-- Duration can physically contain the requested actions.
-- Single-shot or multi-shot grammar is explicit when it matters.
-- Extension starts from the observed boundary state and preserves continuity.
-- The prompt contains no paths, asset IDs, UI settings, gates, status, or
-  provenance.
-- Constraints are short and shot-specific; no generic negative wall.
-- The visible provider UI has been checked for current limits and controls before
-  production handoff.
+- Method matches the control needed (References / Start-End / T2V / edit /
+  extension).
+- Every attached image, video and audio has one narrow binding; pack declares
+  `model_facing_multimodal_binding_v1`.
+- Attachment order is not narrative order.
+- The duration can physically contain the actions.
+- Extension starts from the observed boundary state.
+- Constraints are short and shot-specific.

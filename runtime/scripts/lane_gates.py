@@ -13,17 +13,19 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 
 import media_registry
 import lane_inputs
 import generation_settings
+import preprod
 from prompt_packet_utils import prompt_sha256
 
 STATUS_ENUM = {
     'PENDING', 'LAUNCHING', 'RUNNING', 'DONE', 'PARTIAL_DONE', 'PARTIAL_BLOCKED',
     'BLOCKED', 'FAILED', 'KILLED', 'NOT_LOCKED', 'LOCKED', 'PASS', 'FAIL',
-    'REWORK_ONLY', 'READY_FOR_USER_REVIEW',
+    'REWORK_ONLY', 'READY_FOR_USER_REVIEW', 'PENDING_USER_AUDIO',
     'READY_FOR_PRODUCTION',
 }
 DONE_LIKE = {'DONE', 'PASS', 'READY_FOR_USER_REVIEW', 'LOCKED', 'PARTIAL_DONE'}
@@ -31,7 +33,7 @@ DONE_LIKE = {'DONE', 'PASS', 'READY_FOR_USER_REVIEW', 'LOCKED', 'PARTIAL_DONE'}
 LANES = [
     'director', 'music', 'planner',
     'image_creator_01', 'image_creator_02', 'image_qc',
-    'seedance', 'seedance_qc', 'editor', 'package',
+    'seedance', 'seedance_qc', 'package',
 ]
 
 # Canonical block-ready events for the sequential Codex runtime.
@@ -44,7 +46,7 @@ QUEUES = [
     'image_reference_queue', 'image_retry_queue', 'image_review_queue',
     'reference_bundle_queue',
     'seedance_block_queue', 'seedance_review_queue', 'seedance_retry_queue',
-    'edit_queue', 'typography_queue', 'package_qc_queue', 'submission_queue',
+    'package_qc_queue', 'submission_queue',
     'retry_router_queue',
 ]
 
@@ -443,15 +445,29 @@ def lane_status(project: Path, lane: str) -> dict:
     norm = raw.strip().upper()
     if norm in STATUS_ENUM:
         return {'status': norm, 'raw': raw, 'detail': s.get('detail'), 'meta': s}
-    # Heuristic salvage for legacy free-form values.
-    guess = 'UNKNOWN'
-    if 'BLOCK' in norm:
-        guess = 'BLOCKED'
-    elif 'DONE' in norm or 'PASS' in norm or 'READY' in norm or 'LOCKED' in norm:
-        guess = 'PARTIAL_DONE'
-    elif 'PROGRESS' in norm or 'RUNNING' in norm or 'GENERATING' in norm:
-        guess = 'RUNNING'
-    return {'status': guess, 'raw': raw, 'detail': s.get('detail') or raw, 'meta': s}
+    return {'status': _guess_legacy_status(norm), 'raw': raw, 'detail': s.get('detail') or raw, 'meta': s}
+
+
+_NEGATIONS = {'NOT', 'NO', 'UN', 'NON', 'WAIT', 'WAITING', 'PENDING', 'NEEDS', 'REQUIRED'}
+
+
+def _guess_legacy_status(norm: str) -> str:
+    """Salvage legacy free-form values by whole words; never by substring.
+
+    Substring matching classified UNLOCKED/NOT_READY/BYPASS as done-like.
+    Anything unclear is UNKNOWN so it is surfaced, not silently skipped.
+    """
+    words = [w for w in re.split(r'[^A-Z0-9]+', norm) if w]
+    tokens = set(words)
+    if tokens & {'BLOCK', 'BLOCKED', 'HOLD', 'STOPPED'}:
+        return 'BLOCKED'
+    if tokens & _NEGATIONS:
+        return 'UNKNOWN'
+    if tokens & {'DONE', 'PASS', 'PASSED', 'READY', 'LOCKED', 'COMPLETE', 'APPROVED'}:
+        return 'PARTIAL_DONE'
+    if tokens & {'PROGRESS', 'RUNNING', 'GENERATING', 'QUEUED'}:
+        return 'RUNNING'
+    return 'UNKNOWN'
 
 
 def _queue_has_event(project: Path, queue: str, events: tuple[str, ...]) -> bool:
@@ -485,12 +501,25 @@ def lane_process_running(project: Path, lane: str) -> bool:
     return _pid_running(_lane_pid(project, lane))
 
 
+def _has_affirmed_marker(text: str, markers: tuple[str, ...]) -> bool:
+    """'not submitted' / 'nothing generating' must not read as in-flight."""
+    for marker in markers:
+        for match in re.finditer(re.escape(marker), text):
+            before = text[max(0, match.start() - 14):match.start()]
+            if not re.search(r'\b(not|no|never|nothing|without)\b[\s_-]*$', before):
+                return True
+    return False
+
+
 def _seedance_resume_needed(project: Path) -> bool:
     info = lane_status(project, 'seedance')
     if info['status'] != 'RUNNING':
         return False
     if lane_process_running(project, 'seedance'):
         return False
+    queue = _json(project / 'lanes' / 'seedance' / 'queue_runtime.json', {}) or {}
+    if isinstance(queue.get('active_count'), int):
+        return queue['active_count'] > 0 or queue.get('may_stop') is False
     meta = info.get('meta') or {}
     submit_record = str(meta.get('submit_success_record') or '')
     haystack = ' '.join(
@@ -501,14 +530,14 @@ def _seedance_resume_needed(project: Path) -> bool:
         'in queue', 'generating', 'poll runway', 'submit_success',
         'submitted', 'visible in queue',
     )
-    if any(marker in haystack for marker in inflight_markers):
+    if _has_affirmed_marker(haystack, inflight_markers):
         return True
 
     if submit_record:
         record_path = Path(submit_record).expanduser()
         if record_path.exists():
             record_text = _read(record_path).lower()
-            if any(marker in record_text for marker in inflight_markers):
+            if _has_affirmed_marker(record_text, inflight_markers):
                 return True
 
     evidence_tail = _read(project / 'lanes' / 'seedance' / 'ui_evidence.jsonl')[-20000:].lower()
@@ -523,7 +552,26 @@ def _seedance_resume_needed(project: Path) -> bool:
 # match the original runtime behavior). SOFT = newly added ordering checks:
 # warn + record, but NEVER block, so previously-working free dispatch flows
 # keep working exactly as before.
-HARD_GATES = {'seedance', 'seedance_qc', 'editor', 'package'}
+HARD_GATES = {'seedance', 'seedance_qc', 'package'}
+
+
+# Planning lanes (director/music/planner/image prompt authoring) never wait on a
+# stray file; the audit still blocks every lane that consumes registered media.
+MEDIA_CONSUMING_LANES = {'image_qc', 'seedance', 'seedance_qc', 'package'}
+_AUDIT_CACHE: dict[str, tuple[float, dict]] = {}
+
+
+def _audit_cached(project: Path) -> dict:
+    """One audit per `next` call instead of one per lane (the audit hashes every asset)."""
+    key = str(Path(project).resolve())
+    db = media_registry.db_path(Path(project))
+    stamp = db.stat().st_mtime if db.exists() else 0.0
+    cached = _AUDIT_CACHE.get(key)
+    if cached and cached[0] == stamp and cached[1].get('_fresh_for_next'):
+        return cached[1]
+    audit = media_registry.audit_project(Path(project))
+    _AUDIT_CACHE[key] = (stamp, audit)
+    return audit
 
 
 def gate_level(lane: str) -> str:
@@ -543,17 +591,30 @@ def gate_check(project: Path, lane: str) -> tuple[bool, str]:
     project = Path(project)
     st = lambda l: lane_status(project, l)['status']  # noqa: E731
 
-    if media_registry.is_v4_project(project):
-        audit = media_registry.audit_project(project)
+    if lane in MEDIA_CONSUMING_LANES and media_registry.is_v4_project(project):
+        audit = _audit_cached(project)
         if audit['problems']:
             return False, 'MEDIA_HARD_GATE: ' + audit['problems'][0]
 
     if lane == 'director':
         return True, 'OK: director is the entry lane.'
+    blocked = _preprod_block(project, lane)
+    if blocked:
+        return False, blocked
+    if lane == 'music' and preprod.concept_without_music(project):
+        return False, 'SKIPPED_BY_CONCEPT_LOCK: the user-approved concept has music "none"; no music work.'
     if lane == 'music':
+        manifest = _json(project / 'manifest.json', {}) or {}
+        visual_error = lane_inputs.visual_first_error(project, manifest)
+        if visual_error is not None:
+            if visual_error:
+                return False, 'MEDIA_HARD_GATE: visual-first override invalid: ' + visual_error
+            return False, 'USER_SKIPPED_MUSIC_VISUAL_ONLY: no music work is authorized for this project.'
         if st('director') in DONE_LIKE:
             return True, 'OK'
         return False, 'WAIT_DIRECTOR: music starts after director locks direction/safety gates (music_first rail).'
+    if lane == 'planner' and preprod.concept_without_music(project):
+        return True, 'OK: concept lock declares no music; timing comes from the storyboard.'
     if lane == 'planner':
         if media_registry.is_v4_project(project):
             problem = lane_inputs.music_error(project, _json(project / 'manifest.json', {}) or {})
@@ -583,6 +644,18 @@ def gate_check(project: Path, lane: str) -> tuple[bool, str]:
                     'or in No-I2V mode an already approved reusable reference.'
                 )
         return True, 'OK: image_qc watches image_review_queue.'
+    if lane == 'seedance' and preprod.is_preprod_project(project):
+        recovery = _seedance_recovery(project)
+        if recovery.get('valid') and recovery.get('status') == 'USER_ACTION_REQUIRED':
+            return False, ('WAIT_SEEDANCE_USER_ACTION: '
+                           f'{recovery.get("required_user_action") or "exact user action is missing"}')
+        released = preprod.released_blocks(project)
+        if not released:
+            return True, ('OK_SHELF_AUTHORING: write preprod/04_shelf/<BLOCK>/prompt.txt from brief.md, run '
+                          'preprod shelf-lock, then ask the user once to release the shelf. '
+                          'SHELF_NOT_RELEASED: no Runway operation yet.')
+        return True, ('OK_PRODUCTION_COPY_PASTE_ONLY: released shelf blocks ' + ','.join(released)
+                      + '. Run preprod shelf-verify before each block; never edit a released prompt.')
     if lane == 'seedance':
         recovery = _seedance_recovery(project)
         if recovery.get('valid') and recovery.get('status') == 'USER_ACTION_REQUIRED':
@@ -616,28 +689,45 @@ def gate_check(project: Path, lane: str) -> tuple[bool, str]:
         if _read(project / 'queues' / 'seedance_review_queue.jsonl').strip():
             return True, 'OK'
         return False, 'WAIT_SEEDANCE_OUTPUT: no Seedance review/output event.'
-    if lane == 'editor':
-        sqc = _json(project / 'lanes' / 'seedance_qc' / 'status.json', {}) or {}
-        claimed = int(sqc.get('approved_for_edit_count') or 0)
-        if claimed <= 0:
-            return False, 'WAIT_SEEDANCE_QC_PASS: no approved video clips (seedance_qc.approved_for_edit_count == 0).'
-        # The count is a lane's claim about itself. Require real video behind it —
-        # AGENTS.md §1: completion is real files, never a status field.
-        if _project_video_count(project) == 0:
-            return False, ('CLAIM_WITHOUT_MEDIA: seedance_qc claims %d approved clips but no video file '
-                           'exists in the project. Download and verify the clips before editing.' % claimed)
-        return True, 'OK'
     if lane == 'package':
-        if lane_status(project, 'editor')['status'] not in {'DONE', 'READY_FOR_USER_REVIEW', 'PASS'}:
-            return False, 'WAIT_EDITOR_DONE: package starts after editor status DONE/READY_FOR_USER_REVIEW/PASS.'
+        # The editor lane was retired on 2026-10-16. Package delivers the ordered,
+        # QC-approved clips themselves; it no longer waits for an edited master.
+        manifest = _json(project / 'manifest.json', {}) or {}
+        override_error = lane_inputs.visual_first_error(project, manifest)
+        if override_error:
+            return False, 'MEDIA_HARD_GATE: invalid visual-only override: ' + override_error
+        if st('seedance_qc') not in DONE_LIKE:
+            return False, 'WAIT_SEEDANCE_QC_DONE: package starts after seedance_qc is DONE/PASS.'
         if _project_video_count(project) == 0:
-            return False, ('CLAIM_WITHOUT_MEDIA: editor reports done but the project contains no video file. '
+            return False, ('CLAIM_WITHOUT_MEDIA: seedance_qc reports done but the project contains no video file. '
                            'A package cannot be assembled from status fields alone.')
         if media_registry.is_v4_project(project) and media_registry.registry_count(
-                project, kind='final', states={'final', 'approved', 'selected'}) <= 0:
-            return False, 'MEDIA_HARD_GATE: package requires a registered final export in media/09_final_최종본.'
+                project, kind='video', states={'approved', 'selected'}) <= 0:
+            return False, 'MEDIA_HARD_GATE: package requires registered approved clips in media/07_videos_approved_영상승인.'
         return True, 'OK'
     return False, f'unknown lane {lane}'
+
+
+PREPROD_LANE_NEEDS = {
+    'planner': ('concept', 'bible'),
+    'image_creator_01': ('concept', 'bible', 'storyboard'),
+    'image_creator_02': ('concept', 'bible', 'storyboard'),
+    'image_qc': ('concept', 'bible', 'storyboard'),
+    'seedance': ('concept', 'bible', 'storyboard', 'images'),
+    'seedance_qc': ('concept', 'bible', 'storyboard', 'images'),
+}
+
+
+def _preprod_block(project: Path, lane: str) -> str:
+    """In preprod projects a lane opens only after its upstream stages are locked."""
+    if not preprod.is_preprod_project(project):
+        return ''
+    for stage in PREPROD_LANE_NEEDS.get(lane, ()):
+        state = preprod.lock_state(project, stage)
+        if state['state'] != 'LOCKED':
+            detail = '; '.join(state['errors'][:3])
+            return f'WAIT_PREPROD_{stage.upper()}_{state["state"]}: run preprod status/check --stage {stage}. {detail}'.strip()
+    return ''
 
 
 def next_actions(project: Path) -> dict:
@@ -645,6 +735,12 @@ def next_actions(project: Path) -> dict:
     project = Path(project)
     lanes = {}
     next_lanes, user_actions = [], []
+    _AUDIT_CACHE.pop(str(project.resolve()), None)
+    if media_registry.is_v4_project(project):
+        first = media_registry.audit_project(project)
+        first['_fresh_for_next'] = True
+        db = media_registry.db_path(project)
+        _AUDIT_CACHE[str(project.resolve())] = (db.stat().st_mtime if db.exists() else 0.0, first)
     for lane in LANES:
         info = lane_status(project, lane)
         ok, reason = gate_check(project, lane)
@@ -653,7 +749,12 @@ def next_actions(project: Path) -> dict:
         recovery = _seedance_recovery(project) if lane == 'seedance' else {}
         recovery_user_action = bool(
             recovery.get('valid') and recovery.get('status') == 'USER_ACTION_REQUIRED')
-        if recovery_user_action:
+        if lane == 'music' and info['status'] == 'PENDING_USER_AUDIO':
+            user_actions.append({
+                'lane': lane,
+                'detail': 'Suno generation is complete. The user chooses and downloads the song; provide the selected audio in a separate follow-up to resume video work.',
+            })
+        elif recovery_user_action:
             user_actions.append({
                 'lane': lane,
                 'detail': recovery.get('required_user_action') or 'exact user action is missing',
@@ -666,9 +767,21 @@ def next_actions(project: Path) -> dict:
                 'PENDING', 'UNKNOWN', 'NOT_LOCKED', 'PARTIAL_BLOCKED', 'FAILED',
                 'REWORK_ONLY', 'READY_FOR_PRODUCTION'}):
             next_lanes.append(lane)
+    _AUDIT_CACHE.pop(str(project.resolve()), None)
+    if not next_lanes and not user_actions:
+        # Inline execution leaves no pid. A RUNNING lane with an open gate is the
+        # current owner's unfinished work, not a silent dead end.
+        for lane in LANES:
+            if lanes[lane]['status'] == 'RUNNING' and lanes[lane]['gate_ok'] \
+                    and not lane_process_running(project, lane):
+                next_lanes.append(lane)
+                break
     phase = (_json(project / 'manifest.json', {}) or {}).get('project_phase')
-    return {'project': str(project), 'phase': phase, 'lanes': lanes,
-            'next_lanes': next_lanes, 'user_actions_required': user_actions}
+    result = {'project': str(project), 'phase': phase, 'lanes': lanes,
+              'next_lanes': next_lanes, 'user_actions_required': user_actions}
+    if preprod.is_preprod_project(project):
+        result['preprod'] = preprod.status(project)
+    return result
 
 
 def validate_project(project: Path) -> dict:
@@ -702,6 +815,11 @@ def validate_project(project: Path) -> dict:
                         problems.append(f'queues/{q.name}:{i}: invalid JSONL line')
                         break
     manifest = _json(project / 'manifest.json', {}) or {}
+    override_error = lane_inputs.visual_first_error(project, manifest)
+    if override_error:
+        problems.append('visual_first_override_invalid: ' + override_error)
+    elif override_error == '':
+        warnings.append('visual-only delivery: no music/VO; timing remains provisional and package must be labeled visual-assets-only')
     for q in QUEUES:
         if q not in (manifest.get('queues') or {}):
             warnings.append(f'manifest.queues missing registration: {q}')

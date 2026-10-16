@@ -1,69 +1,60 @@
-# Seedance prompting — field lessons
+# Seedance prompting — field lessons (review lens)
 
-Prompt-authoring corrections proven in production, promoted out of a rules copy that had grown inside the independence-activist project because the canonical documents contradicted each other. That file sat in one of 68 session folders, so most runs never saw them.
+Prompt-authoring corrections proven in production. Apply them **inside** the
+template in `seedance-prompting.md`; they add no section. Background stories:
+`incidents.md`. Owners elsewhere: `GENERAL_REFERENCE_MODE`, the character-sheet
+gate and Audio/dialogue live in `seedance-shared-contract.md`; image QC in
+`image-qc-source-frame-standard.md`; Runway board/queue in
+`seedance-production.md`.
 
-**Scope: prompt authoring only.** This file used to also carry image-QC verdicts, video-QC verdicts, and Runway board/queue procedure. Those were moved to their real owners on 2026-07-28 — a prompting document should not be where an image reviewer or a UI operator looks for their rules:
+## References are anchors
 
-- image QC (source frame quality, emotion causality, duplicate protagonists) -> `image-qc-source-frame-standard.md` in this skill folder, owned by the `image_qc` lane
-- Runway board, queue, stall and completion rules -> `seedance-production.md`
+- Never write the prompt so `@Image1 → @ImageN` becomes a sequence, match-cut
+  or replay order; one generation is one newly composed plan.
+- When a background vs identity vs prop distinction protects the result, the
+  binding sentences say it, e.g. `@Image1 defines the location, @Image2 anchors
+  face and body identity, @Image3 anchors the prop; they are independent
+  anchors, not a time order.`
+- Two approved sheets for one character (turnaround/face + action/prop): bind
+  each to its separate job; do not substitute a single portrait or treat them
+  as duplicates.
 
-Project-specific content (1907 costume research, that project's filenames, sheet paths, block cursor) was not promoted at all.
+### Five-image refresh (image batches)
 
-## References are anchors, not a storyboard
-
-`GENERAL_REFERENCE_MODE` — the single most load-bearing correction in that file.
-
-- `@Image1 → @ImageN` are **independent reference images** showing look, palette, space, props, and plausible action. They are not consecutive frames.
-- Never write the prompt so the numbering becomes a sequence to move through, a match-cut instruction, or an order to replay.
-- One generation = **one coherent shot with one camera flow**, newly composed. The model must not copy several references in turn inside a single clip.
-- Do not force interpolation between reference compositions that were never meant to connect.
-- When a distinction between background, identity, action, or prop materially protects the result, state it in one concise sentence **inside the visual prompt** under the shared Handoff language contract: e.g. `@Image1 defines the location, @Image2 anchors facial and body identity, and @Image3 anchors hand, costume and prop action.` This names a visible function, not a file path, scene ID, or operator procedure.
-- The sentence must explicitly say that the references are independent anchors, not time order. Do not rely on the thumbnail strip or the handoff package alone for this semantic distinction.
-
-## Character sheet as identity anchor
-
-- Attach the approved sheet whenever a recurring character appears — always, in addition to the scene references.
-- Order: scene references first, character sheet(s) after.
-- The sheet fixes face silhouette, hair mass, costume, age impression, body proportion, and signature props. Nothing else.
-- When the approved character lock has two sheets, attach and name their separate jobs: the turnaround/face sheet fixes facial structure and body identity; the action/prop sheet fixes clothing, hands, and signature-object handling. Do not silently substitute a provider-safe single portrait or treat the pair as duplicates.
-- The sheet is **not** a scene-order cue, a transition cue, or a pose instruction. A character must never end up in a frontal poster stance merely because a sheet was attached — the shot's action, camera, and mid-motion state are specified separately.
-- Verify by the visible `ImageN` thumbnail on **this** generation. Conversation context and previous decks are not verification.
-- Stale thumbnails from an earlier deck: do not Generate until the strip is fully replaced.
-
-### Five-image refresh
-
-During image batches, index generations from 1 and re-attach the approved sheet as a real file reference every fifth image (5, 10, 15, …), confirming attachment before continuing. This is a drift-prevention habit layered **on top of** the per-generation attach rule, never a replacement for it.
-
-Record in the manifest: `batch_id`, `image_batch_index`, `character_sheet_refresh_at`, `attached_sheet_path`, `attachment_verified`.
+During image batches, re-attach the approved sheet as a real file every fifth
+image (5, 10, 15, …) and record `batch_id`, `image_batch_index`,
+`character_sheet_refresh_at`, `attached_sheet_path`, `attachment_verified`. This
+is on top of the per-generation gate, never a replacement.
 
 ## Creative mode without the light-match crutch
 
-- Creative means inventing **camera, action, viewpoint, and physical discovery** — not decorating with transitions.
-- Fire, torches, lamps, and firelight are usable only when they are a real prop or action **in that shot**. Do not expand them into cross-scene glue, a "light chain", "answering lights", or a repeated warm-edge / through-aperture motif.
-- Light matches between scenes are allowed only on an explicit character-transition beat.
-- Other transitions come from the scene's own causes: steam off food, cloth movement, footfall and dust, a door shadow, a hand on a prop, water, smoke, a change of spatial direction.
-- Distribute camera grammar across scenes — low three-quarter, side track, overhead, intimate macro, rear follow, long-lens observation, POV, static-to-push — one per shot, chosen to fit.
-- Use 2–4 physical layers (steam, smoke, wind, fabric, reflection, foreground occlusion, parallax, focus breathing) and only where the cause actually exists in frame.
-- Do not force `calm → discovery → transformation` or a through-aperture opening onto every scene.
-- If the same light device repeats in adjacent scenes, or a transition effect outweighs the scene's real action, fail it as `CREATIVE_MOTIF_OVERUSE_FAIL`.
+- Creative means inventing camera framing within the declared move, action,
+  viewpoint and physical discovery — not decorating with transitions.
+- Fire, torches, lamps are usable only as a real prop or action in that shot;
+  never a cross-scene "light chain" or repeated warm-edge/through-aperture motif.
+  Light matches between scenes only on an explicit character-transition beat.
+- Transitions come from the scene's own causes: steam, cloth, footfall and
+  dust, a door shadow, a hand on a prop, water, smoke, a change of direction.
+- Vary camera grammar across blocks (low three-quarter, side track, overhead,
+  macro, rear follow, long lens, POV, static-to-push) — in preprod this is
+  chosen in the storyboard, one move per shot.
+- Physical cues: only those the shot needs; no quota. Each needs a cause in
+  frame.
+- Do not force `calm → discovery → transformation` onto every scene. A repeated
+  light device in adjacent scenes, or an effect that outweighs the real action,
+  fails as `CREATIVE_MOTIF_OVERUSE_FAIL`.
 
-## User-directed compact natural-language prompts
+## Compact prompts
 
-When the user explicitly prefers their own short, natural-language Runway cards over an expanded template, that preference overrides the normal prompt-length target for the affected package.
-
-- Write one cohesive paragraph in the shared Handoff language, not a label list or compressed schema.
-- For one coherent **15-second locked-duration beat**, a **short natural-language paragraph can be valid** when it still names the visible setup, one action, one camera direction, only the motivated physical reactions, sound, and the final composition. This character-count observation applies only after a 15-second lock; it never selects the duration.
-- Do not fake concision by dropping identity, contact physics, sound, or the ending frame. A genuinely complex or explicitly storyboarded sequence may stay longer.
-- Keep model choice, settings, attestation, QC, file paths, and operator gates in the handoff package. The **visible-function `@ImageN` role sentence** is the narrow exception: it belongs in the visual prompt when it disambiguates background versus identity versus action/prop anchors.
-- Treat this as a user-preference route, not a new provider, model, agent, or automation branch. Verify the result in media QC before promoting it as a broadly proven quality rule.
-
-## Audio ON, explicit per-shot sound route
-
-- Keep Runway Audio **On**. It controls generated SFX and music together, so no-BGM must never be encoded by switching Audio Off.
-- When the project or user requires action-SFX-only audio, the **production prompt itself** must explicitly state the restriction, e.g. `No background sound, music, singing, narration, dialogue or sustained ambience.` Then name only the short diegetic effects caused by visible on-screen actions (for example a zipper, cup contact, footstep, or cloth friction). Do **not** call for ambience, room tone, wind, rain bed, environmental bed, or any music. Never leave this intent only in a package field.
-- **Effects-only QC is a separate gate:** prompt compliance is not audio compliance. For an action-SFX-only job, inspect the actual downloaded clip (audible preview plus waveform/spectrogram when available). Any sustained score, room-tone/ambience bed, narration, dialogue, or continuous environmental layer fails the route even when the prompt was correct. Keep the video as a candidate only; either mute that provider track and rebuild strictly discrete synchronized foley in the edit, or regenerate. Do not promote the generated audio.
-- Do not make no-BGM a universal aesthetic default: score remains available when the current user/shot calls for it. The durable rule is that the prompt, not the UI toggle, carries the sound decision.
+When the user prefers short natural-language cards, keep the template lines
+(header, verbatim locks, bindings, shot sections with their phrases, end frame)
+and shorten only the action prose: one cohesive English paragraph per shot, no
+label lists. Do not fake concision by dropping identity, contact, sound or the
+end frame. Model, settings, QC and paths stay in the pack. Verify in media QC
+before promoting it as a quality rule.
 
 ## No generic negative wall
 
-Do not auto-append conservative boilerplate such as `no sudden cuts`, `no exaggerated camera movement`, `no camera drift`. Keep only the role-specific essential locks — face, crop, hand/product contact, text/logo. General defects are caught in QC afterwards, not by padding every prompt.
+Do not append boilerplate such as `no sudden cuts`, `no exaggerated camera
+movement`, `no camera drift`. Keep only role-specific locks — face, crop,
+hand/product contact, text/logo. General defects are caught in QC.

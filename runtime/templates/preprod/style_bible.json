@@ -1,0 +1,22 @@
+{
+  "palette_hex": ["#1B2A41", "#F2E9DC", "#E07A5F", "#3D405B"],
+  "lighting": "<one recipe: key direction and quality, time of day, practicals, contrast ratio>",
+  "texture": "<grain, line quality, surface/material treatment, rendering style>",
+  "lens_grammar": "<default focal families, depth of field, how camera moves should feel>",
+  "forbidden_looks": ["<concrete look to reject>", "<another>"],
+  "style_block_en": "<English paragraph, max 600 chars, pasted verbatim into every video prompt: medium, rendering, palette words, light, texture, lens feel. No shot-specific content.>",
+  "resolution": "720p",
+  "characters": [
+    {
+      "id": "HERO",
+      "identity_block_en": "<English, max 350 chars: fixed face, hair, body, wardrobe, age impression. No expression or action.>",
+      "sheet_ref_id": "HERO_SHEET"
+    }
+  ],
+  "locations": [
+    {
+      "id": "ROOFTOP",
+      "description_en": "<English: geometry, materials, light sources, fixed landmarks>"
+    }
+  ]
+}

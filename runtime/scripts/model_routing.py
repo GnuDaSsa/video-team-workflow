@@ -12,7 +12,7 @@ POLICY_VERSION = 'video_team_model_routing_v3_20260915'
 
 ASTRA_MODEL = 'gpt-6-astra'
 ASTRA_EFFORT = 'xhigh'
-LUNA_MODEL = 'gpt-5.6-luna'
+LUNA_MODEL = 'gpt-6-luna'
 LUNA_EFFORT = 'high'
 
 ROUTES = {
@@ -27,7 +27,6 @@ ROUTES = {
     'seedance:prompting': (ASTRA_MODEL, ASTRA_EFFORT, 'video_prompt_authoring'),
     'seedance:production': (None, None, 'aside_cli_and_computer_use'),
     'seedance_qc': (None, None, 'video_qc'),
-    'editor': (None, None, 'capcut_and_edit_flow'),
     'package': (None, None, 'package_and_delivery_flow'),
 }
 

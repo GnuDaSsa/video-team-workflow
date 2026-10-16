@@ -1,205 +1,150 @@
-# Seedance prompting branch
+# Seedance prompting branch — the one template
 
-This branch writes **only what will be visible on screen**. It does not click Runway, watch the queue, or claim completion.
+This branch writes **only what will be visible or audible**. It does not click
+Runway, watch the queue, or claim completion. This file owns the single
+model-facing template. Every other prompting document is a review lens that
+checks a prompt written in this template; none is an alternative structure.
 
-Defaults: 15s, audio toggle always ON (the soundscape is directed in the prompt), naturalism first, medium-aware texture. Reference count follows the request.
+## Where the prompt is written
 
-## Prompt language
+- **Preprod projects** (`preprod/PREPROD_V1` exists — all new projects): the
+  prompt is written once, before production, in
+  `preprod/04_shelf/<BLOCK>/`. Run
+  `preprod.py shelf-brief --project <p> --block <BLOCK>`, write `prompt.txt`
+  from the generated `brief.md`, then `shelf-check` (same flags) until clean and
+  `shelf-lock` (validation + attestation). The user releases shelves once with
+  `shelf-release`. Production only pastes
+  `pack.json`; **no prompt is written or edited at production time.** If the
+  storyboard is wrong, fix and re-lock the storyboard — never patch the prompt
+  around it.
+- **Legacy projects** (no preprod marker): use the same template, write
+  `<BLOCK>_prompt.txt` + package, and attest (see "Pack fields" below).
 
-Follow the single language owner in `seedance-shared-contract.md` → Handoff
-contract, including its default and explicit non-default language contract.
-This governs Seedance video prompts only; image prompt language is separate.
+## Canonical template
 
-## What goes in the prompt, and what never does
-
-The prompt box takes **visible things**. Operational text put there gets rendered — Seedance treats it as something to draw.
-
-Measured on E24 (3,207 chars): `Scene ID`, `REFERENCE ROLES`, gate wording, `EXPECTED`, `EXIT` and a banned-cast list accounted for **1,100 characters — 34% of the prompt** — none of which describes the picture. Only 2,107 characters actually described the shot.
-
-**Never include:**
-
-| Not this | Why |
-|---|---|
-| `Scene ID:` `Mode:` `Look medium:` | internal identifiers; nothing to draw |
-| `REFERENCE ROLES:` role list | that is for whoever attaches the files. `generated styleframe for E23` describes **how a still was produced** — invisible to the camera |
-| `CHARACTER-SHEET GATE`, `Scene-reference gate` | QC gates, not instructions to a model |
-| `EXPECTED: … Audio ON in UI` | UI settings |
-| `EXIT: hands off to next scene` | an edit note |
-| file paths, project names, status values | operational |
-| lists of banned characters | see Negatives below |
-
-**Do include:** the visible scene, what the subject does and shows, one camera move, physical motion, sound, how the workflow-locked duration is spent, and the closing frame.
-
-All the metadata lives in the **handoff package**, a separate file. Keep `*_prompt.txt` prompt-only so pasting the whole file is always safe. Write it as UTF-8 NFC and treat that file—not browser typing—as the production prompt source of truth.
-
-## Structure
-
-```
-STYLE        medium, texture, lighting, colour        ┐
-CONTINUITY   identity, costume, props, spatial rules  ├ shared across the sequence;
-DIRECTION    camera grammar, pacing, sound character  ┘ do not rewrite per shot
-SHOT PLAN    one sustained event, or 2–4 planned scenes with timed edit-outs
-TIMING       how the locked duration is spent
-SOUND        what should be heard
+```text
+15 seconds, N shots:                      <- or: 15 seconds, one continuous shot:
+<STYLE block, verbatim from style_bible.style_block_en>
+<IDENTITY block per cast member, verbatim from identity_block_en>
+@Image1 is <role>: take <attributes> only, never <what must not transfer>.
+@Image2 is <role>: ... (one binding sentence per token; say once that images are independent anchors, not a time order, or "Hard cuts between shots.")
+Shot 1 (0-5s): <shot size>, <angle>, <camera move>[, <lens>]. <composition>. <action beats: start -> contact -> response>. <physics cue only if the shot needs it>.
+Shot 2 (5-10s): ...
+Shot 3 (10-15s): ...
+Sound: <diegetic sounds caused on screen; music only if the block asks>. <dialogue per audio_route>.
+End frame: <storyboard end_frame>.
 ```
 
-A change of medium, character rules or camera grammar starts a new sequence — it is not something to slip into one shot.
+Rules, each mechanically checked by `shelf-check` unless marked (review):
 
-## Writing the SHOT block
+1. **Line 1** is exactly `<duration> seconds, N shots:` (N = storyboard shot
+   count) or `<duration> seconds, one continuous shot:`. The duration is the
+   locked block duration (default 15). No other "N seconds/sec" anywhere; shot
+   times live only in the `Shot k (a-bs):` markers.
+2. **STYLE** and **IDENTITY** are pasted verbatim. Do not paraphrase, shorten,
+   or re-describe the character elsewhere.
+3. **Bindings:** exactly the tokens `@Image1..@ImageN` for the block's refs, in
+   `refs.json` order, each with one sentence naming its role, what to take and
+   (review) what not to take. No `@Video`/`@Audio` unless the block owns one.
+4. **Shots:** for 2–4 shots, each section starts with `Shot k (a-bs):` using
+   the storyboard times, and contains that shot's exact `shot_size`, `angle` and
+   `camera_move` phrases plus every `must_include` phrase **inside its own
+   section**. A single shot carries the same phrases in its one body.
+5. **Action** (review): present tense, visible verbs, start → contact →
+   response. Show emotion through face, breath, hands, posture — never name it.
+6. **Camera** (review): **one dominant camera move per shot, as declared in the
+   storyboard.** Do not add a second move; a compound path means the storyboard
+   needs another shot.
+7. **Physics** (review): **only the physics cues the shot needs; no quota.**
+   Zero is valid for a clean view. Every cue has a cause in frame.
+8. **Sound** (review): one `Sound:` sentence following the block's
+   `audio_route` and the dialogue table in `seedance-shared-contract.md`.
+9. **End frame** last, from the storyboard `end_frame`.
+10. **Length:** target ≤3,200 characters, hard limit 3,500. Over target means
+    adjectives or repetition to cut — never a locked block or MUST phrase.
+11. **English**, UTF-8 NFC. Only a spoken line may stay in its spoken language,
+    in quotes; the prompt must still read as English-dominant.
 
-- **One event.** Cause → contact → response, all visible.
-- Start from the visible composition of `@Image1`.
-- **One camera move.** Do not stack tricks into the locked duration.
-- 2–4 physical layers, and only where the cause is actually present in frame (steam, cloth, reflection, foreground occlusion, dust, vibration, focus breathing).
-- Specify the closing frame — stable enough for the next cut to take over.
-- Do not name emotions; show them. Not "he is sad" but "his gaze drops and his shoulders lower."
+Gold examples that pass `shelf-check` and `shelf-lock`: `examples/` (single
+shot live action, 3-shot 2D, 2-shot product macro, BAD → GOOD).
 
-## Explicit option — Toonkit 2D Snappy Grammar
+## Never in the prompt
 
-Activate `toonkit_2d_snappy_v1` only when the user explicitly asks to apply
-**Toonkit 문법**, **12 laws**, or the equivalent analysed snappy-animation
-grammar. It is an opt-in directing profile for 2D/stylized animation; it is
-not a default for live action, a global negative block, or a reason to replace
-the project's locked duration, identity, style, audio, or story requirements.
+`Scene ID:` · `Mode:` · `Look medium:` · `REFERENCE ROLES:` · gate words ·
+`EXPECTED:` · `Audio ON` / UI settings · `EXIT:` · file paths, asset IDs,
+`CHAR_` IDs, project names, status values · provenance such as "generated
+styleframe for E23" · lists of banned characters. Control the cast by stating
+who is present. Attestation's leak pattern rejects most of these.
 
-Record `motion_grammar_profile: toonkit_2d_snappy_v1` in the package and add
-`toonkit_2d_snappy_v1` to `prompt_rules_used`. Keep that metadata out of the
-model-facing production prompt. Translate it into the following visible direction
-instead:
+## Negatives
 
-1. **Timed pose beat.** For each planned scene, define a clear start pose, one
-   bounded principal motion beat, and a clear final pose. Within the scene,
-   hold still before the beat, execute one short readable beat (normally
-   0.5–0.7 seconds, including preparation and settle), then hold the final pose
-   long enough to read. Scale holds and cuts to the workflow-owned duration;
-   never copy the source experiment's 10-second/four-shot layout unless the
-   current cut map calls for it.
-2. **Animation mechanics.** Write the beat as `anticipation → sudden
-   acceleration → controlled overshoot → sharp settle → delayed
-   follow-through`. Specify the body orientation, planted/contacting limbs and
-   silhouette so the model cannot turn it into walking, sliding, or a second
-   action. Use modest squash-and-stretch, a brief smear/afterimage or speed
-   line only when the action earns it; hair and loose sleeves may settle one
-   beat after the body. Preserve center of gravity, contacts, anatomy and
-   costume continuity.
-3. **Camera separation.** Give each scene one simple, physically stated camera
-   path (for example a constant slow push or rise) that is independent of the
-   character's snap. Do not combine the beat with handheld shake, whip pan,
-   snap zoom, roll, or a second camera move unless the current brief explicitly
-   overrides this profile.
-4. **Rhythmic edit.** When a source has multiple planned scenes, state the
-   exact cut boundaries and use motivated hard cuts by default. Each scene owns
-   one readable action; a new pose, expression, or climax starts the next
-   scene rather than leaking an additional action into the hold.
-
-For a single scene, this profile produces a strong pose-to-pose accent rather
-than four mini-shots. For a 15-second `PLANNED_MULTI_SHOT_SOURCE`, retain the
-approved 2–4 contiguous scene plan and apply the same one-beat/hold rule to
-each scene. The production visual prompt stays concrete and visual; do not paste
-the profile name, these numbered rules, package fields, or Toonkit branding
-into Runway.
-
-## Sequence progression gate
-
-A valid standalone shot is not enough. Before attesting block N, compare it with
-the immediately preceding story block and record a `story_progression` note in
-the handoff package with four items: `incoming_story_state`,
-`narrative_delta`, `causal_bridge`, and `outgoing_story_state`.
-
-- The visible event must reveal new information, change an action or
-  relationship, complicate a prior cause, or resolve it. A repeated location,
-  prop, or mood without one of those changes is a prompt repair, not a new
-  story block.
-- The opening action must be understandable as a consequence of the previous
-  block, and the closing frame must create a concrete handoff to the next one.
-- Queue order, accepted-card count, visual polish, and a new background never
-  substitute for narrative progress.
-- If the causal bridge or narrative delta cannot be stated in one plain
-  sentence, return to the block map and repair the prompt before attestation or
-  Runway submission.
-
-## Scene-density and cut-ownership gate
-
-The workflow prefers a useful 15-second source. When the final video is short or
-cut-dense, the Planner groups 2–4 consecutive, causally related cuts into one
-`PLANNED_MULTI_SHOT_SOURCE` instead of shortening generation. A written scene
-plan may drive final-production multi-shot output in `GENERAL_REFERENCE_MODE`;
-reference attachment order still does not define story order. This is a source
-yield design, not a claim about final edit duration.
-
-- Create a cut-ownership ledger before authoring supplemental blocks.
-- Each cut ID may have only one active owner among queued, accepted, completed,
-  or planned supplemental generation intents.
-- Existing submitted jobs retain ownership. Do not cancel, reinterpret, or
-  recreate them merely to fit a newly declared scene density.
-- Build supplemental blocks only from uncovered cut IDs and stay within the
-  declared scenes-per-clip budget.
-- Editorial speed changes and retiming happen after QC; they are not permission
-  to overpack a provider prompt.
-- A reserved cut may be regenerated only after its current source is explicitly
-  marked `QC_FAILED_RETRY_ALLOWED`.
-- Edit-only typography or final-title beats stay in CapCut and must not become a
-  Seedance text-rendering scene.
-- Before attestation, record `covered_cuts`, the previous owner if any, the
-  duplicate-check verdict, and retry state in the handoff package or ledger.
-- For multi-shot, record a contiguous 0–15s `scene_plan` with 2–4 entries. Each entry has unique covered cuts, relevant reference tokens, one action, one camera setup, and one edit-ready exit. The production prompt declares `15 seconds, N shots` and names every `Shot 1..N` with hard-cut grammar unless another transition is explicitly motivated.
-
-## Sound
-
-Leave the audio toggle ON and **write the sound you want**: room tone, contact sounds, footsteps, cloth, wind. Ask for music when the shot wants music — it is not forbidden.
-
-Write dialogue as verbatim Korean in quotes, with the delivery (breath, pauses, volume) beside it.
-
-## Negatives — keep them short
-
-Do not attach a habitual list of prohibitions.
-
-- One or two risks **specific to this shot**: face identity, hand/product contact, on-screen text.
-- Control the cast **by stating who is present**, not by listing who is banned: "only Minjae and Eunyu are in this room" is shorter and more precise than enumerating every unwanted relative.
-- Everything else is caught by QC afterwards. Filling the prompt with defensive wording crowds out the description.
+One or two risks specific to this shot (face identity, hand/product contact,
+on-screen text), stated positively where possible. No habitual negative wall;
+QC catches general defects.
 
 ## References
 
-- Read `manifest.json.generation_mode` before building the reference package.
-- In `standard_i2v`, the approved per-cut source frame carries the scene and the
-  approved character sheet carries recurring-character identity.
-- In `no_i2v_reference_native`, do not request or attach a per-cut
-  styleframe/start/end/keyframe. Reuse only the minimum approved reusable
-  identity/environment references; the production prompt must specify the shot
-  composition, blocking, action, camera, atmosphere, and timing that the omitted
-  frame would otherwise have supplied.
-- Count follows the request — commonly 3–4, sometimes a character sheet plus a background. There is no minimum, and a file is never attached twice to reach a number.
-- `@ImageN` numbering is **not a narrative order**. Each reference is an independent anchor for look, space, props and plausible action, not a sequence to replay.
-- Build the deck from **this shot's own material**. Padding with neighbouring cuts' frames makes adjacent clips look like the same shot.
-- When a recurring character appears, attach the approved `CHAR_<ID>_TRIPTYCH_R<n>` or minimum deterministic `_FACE` / body crop alongside the scene references, and bind its exact role in the production prompt.
+- `@ImageN` numbering is attachment order, never story order
+  (`GENERAL_REFERENCE_MODE`, owned by the shared contract).
+- In `no_i2v_reference_native`, references give only their named identity /
+  environment / prop role; the prompt itself carries composition, blocking,
+  action, camera and timing. Never copy a reference's composition as an
+  implicit start frame. In `standard_i2v`, the approved per-cut frame may
+  establish the opening composition.
+- Deck, count and character-sheet rules: `seedance-shared-contract.md`.
 
-## Length
+## Story progression and cut ownership
 
-**Target 700–1,500 characters; 3,500 is the hard limit.** Stripping operational text usually lands you inside the target on its own. If you are approaching the ceiling, suspect operational contamination before assuming the description is too detailed. When the user explicitly selects compact natural-language cards, follow the user-directed exception in `seedance-field-lessons.md` rather than padding the visual prompt to this default.
+In preprod projects the locked storyboard already owns order, purpose and
+covered shots (`covered_cuts` are derived from it). For legacy projects, record
+in the package before attesting: `story_progression` (incoming state,
+narrative delta, causal bridge, outgoing state — each one plain sentence) and
+a cut-ownership entry (`covered_cuts`, previous owner, duplicate verdict, retry
+state). A cut may be regenerated only after `QC_FAILED_RETRY_ALLOWED`. Title
+or typography beats are not Seedance text-rendering scenes.
 
-## Authoring isolation
+## Opt-in: Toonkit 2D snappy grammar
 
-Prompt authoring is a single sequential foreground operation owned by the Seedance lane. It may read approved registered files and write/attest the package. It never calls a prompt bridge or a dedicated prompt agent. No browser, Computer Use, `osascript`, file chooser, queue observer or background job belongs in this phase. Use the same-owner `prompt-review.md`; there is no separate Creative team.
+Only when the user explicitly asks for **Toonkit 문법**, **12 laws** or the
+equivalent snappy-animation grammar (2D/stylized only). Record
+`motion_grammar_profile: toonkit_2d_snappy_v1` and add it to
+`prompt_rules_used`; never paste the profile name into the prompt. Inside each
+`Shot k` section write: a clear start pose → one short readable beat
+(anticipation → sudden acceleration → controlled overshoot → sharp settle →
+delayed follow-through of hair/sleeves) → a held final pose; planted limbs and
+silhouette stated so it cannot become walking or a second action; modest
+squash/stretch or one smear only where earned. The camera keeps its one
+declared move, independent of the snap. The profile never changes the locked
+duration, shot count, identity, style or audio.
 
-## Attribute-routed wiki context
+## Wiki knowledge packet
 
-In a v4 project, read `lanes/planner/video_attributes.json`, run the local `knowledge-select` command for the current block, and read only `lanes/seedance/knowledge/<BLOCK>_context.md`. The packet always contains a compact hot core, the preferred Higgsfield community compile core, and camera-composition core; it then selects the current 2D/3D/live-action medium and only matching shot/camera/risk/method/audio sections. Default limits are six selections and 9,000 characters.
+When knowledge routing is enabled, `brief.md` lists the selected context packet
+(`lanes/seedance/knowledge/<BLOCK>_context.md`); read only that, never the
+whole wiki. Apply its craft (Higgsfield community grammar first among creative
+knowledge) **inside this template** — it never adds a section, a second camera
+move, or a physics quota, and it never outranks the user, the storyboard, or
+locked blocks. Do not copy community wording, cameos or motion IDs. The pack
+records selection ID, context SHA-256 and selected IDs automatically.
 
-Within creative knowledge, use the selected `higgsfield-community-*` grammar first: camera family before style adjectives; `start state → action → physical result → camera beat → end frame`; subject/camera/world lanes; one dominant move; 2–4 motivated physical layers; complexity sized *inside the workflow-locked duration*; physical translation instead of preset names. Complexity never selects or shortens the generation duration. This preference never overrides the latest user instruction, project/style/identity/medium locks, approved references, or safety/operational gates. Do not copy community prompt wording, celebrity/IP cameos, or motion IDs literally.
+## Pack fields (legacy attest path)
 
-Do not load the full wiki, raw source collection, or archive during ordinary prompting. Targeted lookup is allowed only when the selected packet reports a conflict or the clip exposes a genuinely new failure class. Record the selection ID, context SHA-256, and selected knowledge IDs in the prompt pack; knowledge content is reasoning context and must not be copied as operational metadata into the visual prompt.
+Packs declare `prompt_language: en-US`,
+`prompt_style_version: creative_seedance_en_v4_20260912`,
+`authoring_contract: seedance_lane_owned_en`, `duration_sec` equal to the
+workflow-owned lock, and `prompt_rules_used` including
+`model_facing_multimodal_binding_v1`. Run
+`prompt_packet_utils.py attest --project <p> --pack <pack>` and require
+`ATTESTED` before UI work. Preprod `shelf-lock` writes these fields itself.
 
 ## Before handing off
 
-- no sentence that describes something invisible
-- `shot_grammar` matches the Planner: one sustained event, or 2–4 explicitly timed scenes
-- one dominant camera setup per planned scene
-- every physical layer has a cause in frame
-- the closing frame is specified
-- spoken lines are verbatim Korean
-- length is inside the target
-- `duration_sec` equals the current workflow-owned project/block duration lock, and any explicit duration wording in every prompt variant names that same value
+- `shelf-check` is clean (or, legacy, attestation is `ATTESTED`).
+- Read the first shot section aloud: the subject's action and the camera are
+  obvious without the rest.
+- No invisible sentence, no second camera move, no uncaused physics cue.
+- Prompt-review lenses (`prompt-review.md`) applied for the risks this block
+  actually has.
 
-Then hand the prompt file and the package to the production branch. UI operation is its job.
-
-For video-team runtime projects, the package must declare `prompt_language=ko-KR`, `prompt_style_version=creative_seedance_ko_v4_20260731`, `authoring_contract=seedance_lane_owned_ko`, and `duration_sec`. Run `prompt_packet_utils.py attest --project <p> --pack <pack>` and require `ATTESTED` before the same lane begins UI operation. Attestation without the project duration lock is not a production handoff.
+Authoring is single-agent, sequential and non-GUI: no browser, Computer Use,
+`osascript`, file chooser, queue observer, background job or prompt agent.

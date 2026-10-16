@@ -10,11 +10,11 @@ is part of the input. No new agent, provider or execution route is authorized.
 Choose the scope from the user's latest intent before writing the prompt:
 - **MOTION_GUIDE**: borrow only named trajectories, timing or camera mechanics;
   the result is a new scene. Use this when the user asks for 동선 참고 / 동선용
-  or a motion reference. Do not promise pixel/frame-exact tracking.
+  (movement reference) or a motion reference. Do not promise pixel/frame-exact tracking.
 - **SOURCE_RESTYLE**: edit the source sequence, preserve its shot boundaries,
   camera, trajectories, occlusion order and contact events; replace appearance.
   Use only when editing/restyling the existing sequence is actually requested.
-  “Blender 위에 입혀라” alone does not settle this distinction; the user's
+  “Blender 위에 입혀라” (“skin it over the Blender”) alone does not settle this distinction; the user's
   explicit clarification that the video is a motion guide takes precedence.
 
 Record this distinction in the existing package's reference-role description.
@@ -57,17 +57,19 @@ do not require a finished render or identical venue mesh merely to use a guide.
 
 ### MOTION_GUIDE — create a new scene from movement cues
 
-Example (adapt tokens, identities and borrowed cues to the actual deck):
+Example binding/opening text, placed inside the template in
+`seedance-prompting.md` (adapt tokens, identities and borrowed cues to the deck):
 
-> 새 2D 액션 애니메이션을 생성한다. @Video1은 두 기체의 동선 참고다.
-> 왼쪽 뒤에서 접근 → 급제동 → 짧은 상승 페인트 → 수비 기체의 상승 반응
-> → 열린 아래 진로로 돌파하는 이동 방향, 속도 변화, 상대 고도와 거리만
-> 참고한다. 기체의 완성 외형과 작화는 @Image1의 흰청 공격 기체 한 대와
-> @Image2의 흑금 수비 기체 한 대를 기준으로 처음부터 끝까지 일관되게
-> 그린다. @Image3은 경기장 구조와 색채 기준이다. 영상의 모형 외형·재질·
-> 조명·배경은 가져오지 않는다. 아래 새 6숏 구성에 따라 장면을 생성한다.
+> Create a new 2D action animation. @Video1 is a movement guide for the two
+> craft: take only the travel direction, speed changes, relative altitude and
+> distance of its approach from rear-left → hard brake → short rising feint →
+> the defender rising in response → breaking through the open lower lane. Draw
+> the finished look of the craft consistently from start to end from @Image1
+> (one white-and-blue attacker) and @Image2 (one black-and-gold defender).
+> @Image3 sets the arena structure and colors. Do not take the video's proxy
+> shapes, materials, lighting or background. Follow the new shot plan below.
 
-Do not add “원본 장면으로 편집”, “매 프레임 재작화”, object-replacement
+Do not add “edit the source scene”, “repaint every frame”, object-replacement
 commands, or an exact source-camera/cut lock to a MOTION_GUIDE prompt. Those
 instructions change the requested task back into source editing. If camera
 motion is needed, name just the useful mechanic (for example side tracking or
@@ -78,13 +80,15 @@ Use unambiguous entity descriptions, not a pilot's name for an airborne craft.
 
 Use a compact source-first edit contract only for this branch:
 
-> @Video1을 원본 장면으로 편집한다. 컷 경계·카메라 경로·각 대상의 위치와
-> 회전·가림 순서·접촉 후 반동은 유지한다. 영상 속 [구별 가능한 형태 A]는
-> @Image1의 [완성 디자인 A] 한 대로 본체와 부속 구조 전체를 교체한다.
-> [형태 B]는 @Image2의 [디자인 B] 한 대로 교체한다. 첫 등장부터 마지막까지
-> 같은 디자인이 이어지며 이미지의 제품 촬영 구도를 새 컷으로 삽입하지 않는다.
-> @Image3은 [환경의 구체적인 구조·재질] 기준이다. 원본의 원근에 맞춰 공간을
-> 재작화한다. 모든 숏을 [선/명암/재질]로 일관되게 표현한다.
+> Edit @Video1 as the source scene. Keep its cut boundaries, camera path, each
+> object's position and rotation, occlusion order and post-contact rebound.
+> Replace the whole body and attachments of [distinct shape A] in the video
+> with one [finished design A] from @Image1, and [shape B] with one
+> [design B] from @Image2. The same designs continue from first appearance to
+> the end; do not insert the images' product-shot framing as new cuts. @Image3
+> sets [the environment's specific structure and materials]; repaint the space
+> to match the source perspective. Render every shot consistently in [line /
+> shading / material].
 
 “Keep everything” conflicts with complete shape/background replacement. Name
 only the invariants. “Ignore gray material” alone does not require full-body
@@ -135,13 +139,6 @@ vision validator. Prompt edits do not guarantee deterministic skinning.
 
 ## Basis
 
-User-approved promotion after a sampled output retained low-poly proxy bodies
-and recolored scenery while inserting isolated finished-object closeups;
-source camera and trajectories were substantially preserved. This observation
-does not establish a universal provider defect or a deterministic root cause.
-The user subsequently clarified that this video's role is movement reference,
-not source editing. Scope-specific examples prevent that request from being
-silently redirected into restyling; prior submitted prompts remain historical
-evidence, not retroactively corrected submissions.
-Official reference-mode scope: [Runway Seedance 2.0 guide](https://help.runwayml.com/hc/en-us/articles/50488490233363-Creating-with-Seedance-2-0)
+History of the proxy-leak observation: `incidents.md`. Official reference-mode
+scope: [Runway Seedance 2.0 guide](https://help.runwayml.com/hc/en-us/articles/50488490233363-Creating-with-Seedance-2-0)
 (supports motion/style transfer and object replacement; no exact-tracking guarantee).

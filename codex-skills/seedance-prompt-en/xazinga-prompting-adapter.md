@@ -1,65 +1,57 @@
-# XAZINGA prompting adapter
+# XAZINGA prompting adapter (review lens)
 
-Source reviewed: `https://www.xazinga.com/apps` (2026-08-21), including its Seedance 2.0, Seedance 2.5, video-prompt-builder, guide, and director skill summaries/downloads.
+Source reviewed: `https://www.xazinga.com/apps` (2026-08-21) — its Seedance
+2.0/2.5, video-prompt-builder, guide and director-skill material. Only
+provider-agnostic checks are kept; the prompt is still the template in
+`seedance-prompting.md`. Do not copy the source's claims about model limits,
+features or preferred languages.
 
-This is an **adapter**, not a competing provider authority. It retains only provider-agnostic authoring patterns that are compatible with the production-language, visible-Runway, project-duration-lock, identity, and audio rules in this skill. Do not copy source claims about model limits, product features, or preferred languages as permanent facts.
+## Every attachment has use / exclude / scope
 
-## Compile additions
+For each `@ImageN`, `@VideoN`, `@AudioN` the binding sentence (and pack map)
+declares:
 
-### 1. Every attachment has a scoped job
+- **use** — exactly which visible attributes are borrowed (identity silhouette,
+  outfit, building geometry, camera motion, action rhythm, sound texture);
+- **exclude** — what must not transfer (a sheet's other panels/background, a
+  building image's occupants, a camera reference's cast/look);
+- **scope** — which shot(s) may use it.
 
-For each `@ImageN`, `@VideoN`, or `@AudioN`, the handoff map and the production prompt must declare:
+A role-less attachment is a preflight failure. Never give an identity sheet to
+a shot without that character or to a different person. Two recurring
+characters: separate crops/sheets, each bound to a screen role; avoid a
+face-forward crowd that could clone an identity.
 
-- **use** — exactly which visible attributes are borrowed (identity silhouette, outfit, building geometry, camera motion, action rhythm, sound texture);
-- **exclude** — which attributes must not transfer (for example, a character sheet's other panels/background; a building image's occupants; a camera reference's cast/look);
-- **scope** — which planned scene(s) may use that anchor.
+## Planning audit (pack only, never pasted)
 
-Attachments are independent anchors in `GENERAL_REFERENCE_MODE`; numbering does not create narrative order. A role-less attachment is a preflight failure. Never attach an identity sheet to a shot in which that character is absent. For two recurring characters, use their separate provider-safe crops/sheets, bind each to a screen role, and avoid a face-forward crowd around them.
+Before locking, keep in the pack/ledger: an effects/motion inventory (repeated
+device check), a density map (quiet vs eventful beats), an energy arc (hook →
+development → release), and a light contract (source, direction, colour
+temperature, contrast, exposure change, final light state). This audit must
+never turn into effect stuffing; every effect needs a visible cause.
 
-### 2. Five visual blocks + package-only planning audit
+## Transition, extension, repair shapes
 
-Model-facing direction remains compact and visual:
+Written inside the template's shot sections:
 
-1. **source binding** — attribute-scoped `@` roles;
-2. **style/continuity** — medium, identity, costume, spatial and light locks;
-3. **timed shot plan** — a visible action/state change per beat;
-4. **camera and sound** — one dominant camera setup per planned scene and only motivated sound;
-5. **constraints/end frame** — shot-specific risk plus an edit-ready closing frame.
+- **Transition:** trigger → camera behavior → visible transformation → arrival.
+- **Extension:** boundary-frame continuity → one new action → final anchor.
+- **Repair:** goal → elements to preserve → exact range → changed action →
+  unchanged constraints.
 
-Before attestation, keep the following **outside the pasted prompt** in the pack/ledger:
+Use concrete physical language, not genre adjectives or preset names. Audio and
+language: `seedance-shared-contract.md` (effects-only wording is in its route
+table).
 
-- effects/motion inventory (repeated device check),
-- density map (quiet vs. eventful beats),
-- energy arc (hook → development → release),
-- a light contract (source, direction, colour temperature, contrast, exposure change, and final light state).
+## Lens checklist
 
-This planning audit must never become indiscriminate effect stuffing. Every effect, transition, and physical layer needs a visible cause and narrative purpose.
+Reject before locking when:
 
-### 3. Time and camera grammar
-
-For a 10s+ source, give each beat an explicit time window; normally use about three-second beats and one core action/state change per beat. A planned multi-shot source may contain 2–4 causal scenes only when the project plan grants those cut IDs. Each scene needs a named camera distance/angle/motion and stable edit-out.
-
-Use concrete physical language rather than genre adjectives or preset names: state the start composition, action, physical response, camera beat, and end frame. Do not combine contradictory camera directions.
-
-### 4. Transition, extension, and repair grammar
-
-- **Transition:** trigger → camera behavior → visible transformation → arrival state.
-- **Extension:** boundary-frame continuity → one new action/state → final anchor frame.
-- **Repair/edit:** target goal → master elements to preserve → exact visible range → changed action/state → unchanged constraints.
-
-These are prompt-authoring structures only. The actual provider mode and capabilities must be verified in the visible Runway UI and must obey the project duration lock.
-
-### 5. Audio and language precedence
-
-The shared Handoff contract owns production and spoken-line language; an external guide does not override it. User/project audio instructions outrank generic defaults. If the project requires effects-only, explicitly state: **no background music, song, narration, dialogue, or continuous ambience; only short effects caused by visible action.**
-
-## Critic checklist additions
-
-Before attestation, reject a package when any is true:
-
-- an attachment has no use/exclude/scope declaration;
-- a person not meant to be Kim has been given Kim's sheet/crop, or a crowd is likely to clone the identity;
-- camera, light, start state, and end frame are not specified per scene;
-- transition is a generic montage rather than a causal bridge;
-- the model-facing text includes internal audit/ledger instructions;
-- the audio clause conflicts with the current project lock.
+- an attachment lacks use/exclude/scope;
+- a person other than the sheet's character receives that sheet/crop, or a
+  crowd is likely to clone an identity;
+- a shot lacks its declared camera, a light cue where light matters, a start
+  state or the end frame;
+- a transition is a generic montage instead of a causal bridge;
+- the prompt contains internal audit/ledger text;
+- the `Sound:` line conflicts with the block's audio route.

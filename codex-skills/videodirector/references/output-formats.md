@@ -11,70 +11,39 @@ Use a table with these columns:
 | scene | timecode | visual | narration |
 |------|----------|--------|-----------|
 
-### Storyboard production blueprint
+### Storyboard (P2) — `preprod/02_storyboard/storyboard.json`
 
-Planner drafts this after the real audio spine and cut map; recurring-character identity fields and any rendered board remain unlocked until the approved character/provider sheets exist. The rendered board may be multi-panel because it is a planning/reference artifact; it is never a production sourceframe. Canonical details: `/Users/gnudas/wiki/concepts/storyboard-production-blueprint-standard.md`.
+The storyboard is now a validated JSON file owned by the planner and locked with the user's approval quote; schema and controlled vocabulary live in `runtime/scripts/preprod.py` (`validate_storyboard`), a skeleton in `runtime/templates/preprod/storyboard.json`. Blocking/geometry thinking: `/Users/gnudas/wiki/concepts/storyboard-production-blueprint-standard.md`. A rendered multi-panel board is optional planning reference only, never a production sourceframe.
 
-```yaml
-project:
-  title: "[title]"
-  premise: "[one sentence]"
-  mode: "MV | public_contest | institution | shortform | trailer"
-  aspect_ratio: "16:9"
-  target_duration: "00:00.000"
-  audio_spine: "[verified file / lock id]"
-  hard_constraints: []
-  palette: []
+Map from the former blueprint YAML:
 
-identity_refs:
-  - character: "[ID]"
-    identity_ref: "CHAR_<ID>_TRIPTYCH_R<n> or deterministic crop"
-    wardrobe_props: []
+| Former YAML field | Now lives in |
+|---|---|
+| `project.title/premise/mode/aspect_ratio/target_duration/hard_constraints` | `concept_lock.json`: `title`, `logline`, `mode`, `aspect_ratio`, `target_runtime_sec`, `must_avoid` |
+| `project.palette`, `look_sound_cinematography.lighting/lens_movement_grammar` | `style_bible.json`: `palette_hex`, `lighting`, `lens_grammar`, `texture`, `style_block_en` |
+| `identity_refs[]` | `style_bible.json` `characters[]` (`identity_block_en`, `sheet_ref_id`) + `image_plan.json` |
+| `environment.set_ref/map` | `style_bible.json` `locations[]` (`description_en`) + block `location_id` / `refs` |
+| `shots[].timecode` | block `order` + shot `start_sec`/`end_sec` inside a 15 s block |
+| `shots[].frame_purpose` | block `purpose` + shot `action` |
+| `shots[].distance_angle`, `camera_motion`, `lens` | shot `shot_size`, `angle`, `camera_move` (controlled lists), `lens` |
+| `shots[].blocking_action` | shot `composition` + `action` + `must_include[]` |
+| `shots[].dialogue_audio` | block `audio_route` |
+| `shots[].transition_in_out` | block `end_frame` (+ optional shot `edit_out`) |
 
-environment:
-  set_ref: "[asset id]"
-  map: "[top-down actor/camera/action-path plan]"
-  screen_direction: "[left-to-right / right-to-left / deliberate reversal]"
-
-shots:
-  - shot_id: "S01"
-    timecode: "00:00.000-00:02.400"
-    frame_purpose: "[new action / information / emotion / rhythm / transition]"
-    distance_angle: "[distance + angle]"
-    lens: "[lens family / focal length]"
-    camera_position: "C1"
-    camera_motion: "[one primary move]"
-    blocking_action: "[start -> contact/action -> visible response]"
-    dialogue_audio: "[dialogue/VO/room tone/SFX/music cue]"
-    transition_in_out: "[motivated entry + stable exit composition]"
-    identity_refs: ["CHAR_<ID>_TRIPTYCH_R<n> or deterministic crop"]
-
-look_sound_cinematography:
-  lighting: "[...]"
-  colour_script: "[...]"
-  acting: "[...]"
-  sound: "[...]"
-  lens_movement_grammar: "[...]"
+```json
+{"blocks": [{"block_id": "B01", "order": 1, "purpose": "...", "duration_sec": 15,
+  "audio_route": "native_diegetic_no_dialogue", "cast": ["HERO"], "location_id": "ROOFTOP",
+  "refs": ["HERO_SHEET", "ROOFTOP_ENV"], "end_frame": "...", "risks": [],
+  "shots": [{"shot_id": "B01_S1", "start_sec": 0, "end_sec": 6, "shot_size": "wide shot",
+    "angle": "eye level", "camera_move": "slow push in", "lens": "35mm",
+    "composition": "...", "action": "...", "must_include": ["..."]}]}]}
 ```
 
-For v4 projects, keep `storyboard_blueprint.md/json` and `storyboard_qc.md` under `lanes/planner/`. A rendered PNG is optional; if produced after identity/source approval, put and register it under `media/01_sources_원본자료/storyboards/`.
+### Storyboard-to-Seedance handoff (P4)
 
-### Storyboard-to-Seedance handoff
+The director/planner no longer hands over free metadata. `preprod.py shelf-brief --block <ID>` generates `preprod/04_shelf/<ID>/brief.md` from the locked concept/bible/storyboard/image plan; the Seedance prompting lane writes the English `prompt.txt` from it, `shelf-check` and `shelf-lock` verify it, and the user releases the shelf once. Production only copy-pastes the released shelf.
 
-The Seedance lane owns the final production prompt. The director/planner supplies metadata only:
-
-```yaml
-storyboard_mode: "STORYBOARD_SHOT_MODE | STORYBOARD_SEQUENCE_PREVIS_MODE"
-storyboard_asset: "STORYBOARD_<PROJECT>_R<n>"
-board_role: "production blueprint; never an on-screen graphic"
-shot_range: ["S01"]
-ordered_beats: []
-character_identity_assets: ["CHAR_<ID>_TRIPTYCH_R<n> or deterministic crop"]
-production_status: "FINAL_CANDIDATE | PREVIS_HOLD"
-```
-
-- `STORYBOARD_SHOT_MODE` is the final-production default: one board shot per generation, with the approved per-cut styleframe and minimum approved triptych/identity crop where required.
-- `STORYBOARD_SEQUENCE_PREVIS_MODE` is an opt-in multi-shot prototype: restate feasible ordered beats and explicitly exclude the board sheet, panels, labels, diagrams and UI from the rendered video. The result remains `PREVIS_HOLD` until QC.
+- One storyboard block = one generation (1–4 shots, 15 s). `STORYBOARD_SEQUENCE_PREVIS_MODE` (whole board in one generation) remains opt-in previs only and is `PREVIS_HOLD` until QC.
 
 ### Character reference JSON
 
@@ -97,7 +66,7 @@ production_status: "FINAL_CANDIDATE | PREVIS_HOLD"
   "attach_instruction": "attach the approved identity/casting source and verify its hash",
   "layout": ["left: headless front full body", "middle: back full body with head", "right: large 3/4 face portrait"],
   "rendering": "text-free neutral mid-gray, neutral studio light, true skin/material color, 16:9",
-  "stress_gate": "10 varied generations, same recognizable identity 10/10",
+  "stress_gate": "three targeted attached-reference checks, recognizable identity 3/3; then clip-level QC",
   "derivatives": ["_FACE", "_FRONT_BODY", "_BACK_BODY"]
 }
 ```
@@ -116,7 +85,7 @@ production_status: "FINAL_CANDIDATE | PREVIS_HOLD"
 
 ### Seedance/I2V motion prompts (default)
 
-Default provider is Seedance. Write one prompt per cut/block; use Grok-style motion tags only if the user named Grok.
+Default provider is Seedance: one English shelf prompt per block via the P4 shelf (above). The bracket motion tags below are Grok-style and are used only if the user named Grok.
 
 Available movement tags:
 
@@ -168,14 +137,13 @@ Embed the relevant style directly inside prompts:
 
 ## Default full-package order
 
-When the user asks for a full package, output in this order:
+When the user asks for a full package, follow the fixed pre-production pipeline in `SKILL.md`:
 
-1. Concept summary in 3 lines or less
-2. Verified audio spine and timeline/cut map
-3. Character JSON
-4. Character sheet JSON
-5. Storyboard production blueprint + QC
-6. Scene start-frame JSON
-7. Seedance/I2V motion prompts (or Grok only if user named Grok)
-8. BGM JSON
-9. Narration/dialogue sheet
+1. P0 `concept_options.md` (3 options) → user choice → `concept_lock.json`
+2. Verified audio spine (music lane) when applicable
+3. P1 `style_bible.json` (palette, lighting, texture, lens grammar, forbidden looks, `style_block_en`, characters/locations)
+4. Character triptych prompts and sheets (P3 refs named by `sheet_ref_id`)
+5. P2 `storyboard.json` → user approval
+6. P3 image prompts + `image_plan.json` with approved assets
+7. P4 shelf prompts (English) → `shelf-lock` → user `shelf-release`
+8. BGM JSON / narration sheet when in scope

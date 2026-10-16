@@ -1,0 +1,41 @@
+{
+  "blocks": [
+    {
+      "block_id": "B01",
+      "order": 1,
+      "purpose": "<what this 15 s block does for the story / music section>",
+      "duration_sec": 15,
+      "audio_route": "native_diegetic_no_dialogue",
+      "cast": ["HERO"],
+      "location_id": "ROOFTOP",
+      "refs": ["HERO_SHEET", "ROOFTOP_ENV"],
+      "end_frame": "<the exact closing image the next block starts from>",
+      "risks": [],
+      "shots": [
+        {
+          "shot_id": "B01_S1",
+          "start_sec": 0,
+          "end_sec": 6,
+          "shot_size": "wide shot",
+          "angle": "eye level",
+          "camera_move": "slow push in",
+          "lens": "35mm",
+          "composition": "<where the subject sits in frame, foreground/background layers>",
+          "action": "<start -> action -> visible response>",
+          "must_include": ["<short phrase that must survive into the prompt>"]
+        },
+        {
+          "shot_id": "B01_S2",
+          "start_sec": 6,
+          "end_sec": 15,
+          "shot_size": "close-up",
+          "angle": "low angle",
+          "camera_move": "static",
+          "composition": "<...>",
+          "action": "<...>",
+          "must_include": []
+        }
+      ]
+    }
+  ]
+}

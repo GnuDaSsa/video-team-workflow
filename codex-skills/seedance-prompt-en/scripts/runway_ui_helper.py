@@ -43,6 +43,7 @@ import datetime as dt
 import json
 import os
 import re
+import shutil
 import sqlite3
 import subprocess
 import sys
@@ -71,8 +72,12 @@ from prompt_packet_utils import (language_stats, normalize_prompt, prompt_sha256
                                  validate_language_override)
 
 
-UPLOAD_ALIAS_ROOT = Path(os.environ.get('RUNWAY_UPLOAD_ALIAS_ROOT', '/tmp/codex-runway-upload'))
-UPLOAD_ALIAS_MAX_AGE_SECONDS = 3600
+# Upload bundles are real APFS clones (not symlinks) in an all-ASCII per-project,
+# per-block folder. Symlinks made NSOpenPanel resolve into the Korean-named
+# media folder and Aside rejects them; the shared /tmp root mixed projects.
+UPLOAD_ALIAS_ROOT = Path(os.environ.get('RUNWAY_UPLOAD_ALIAS_ROOT', str(Path.home() / 'RunwayUpload')))
+UPLOAD_ALIAS_MAX_AGE_SECONDS = 24 * 3600
+UPLOAD_TRANSPORT_SLOT_CAP = 3
 
 RECOVERY_CONTRACT_VERSION = 'seedance_same_session_recovery_v1_20260810'
 RECOVERY_STATE_REL = Path('lanes/seedance/recovery_state.json')
@@ -124,6 +129,14 @@ SAME_SESSION_RECOVERY_LADDER = (
     'REFRESH_EXACT_SAME_SESSION_AND_POLL_5S_X12',
     'SWITCH_OWNER_TOOL_ON_SAME_ASIDE_TAB_ONCE',
 )
+# A chooser that does not open or commit is a path problem, not a session
+# problem: never refresh the session for it (a refresh resets duration to 5s).
+UPLOAD_TRANSPORT_LADDER = (
+    'ESCAPE_CHOOSER_REOPEN_SAME_UPLOAD_TILE_ONCE',
+    'REUSE_RUNWAY_UPLOADS_ENTRY_BY_EXACT_BUNDLE_NAME',
+    'PICKER_GO_TO_BUNDLE_FILE_PATH_THEN_SELECT',
+)
+REFRESH_RUNGS = {'REFRESH_EXACT_SAME_SESSION_AND_POLL_5S_X12'}
 
 
 def normalize_visible_seedance_model(value: str) -> str:
@@ -241,29 +254,46 @@ def _ascii_token(value: str, fallback: str) -> str:
 
 def sweep_stale_upload_aliases(root: Path = UPLOAD_ALIAS_ROOT,
                                max_age_seconds: int = UPLOAD_ALIAS_MAX_AGE_SECONDS) -> list[str]:
-    """Remove only stale helper-owned symlinks; never touch canonical media."""
+    """Remove only stale helper-owned bundle copies; never touch canonical media."""
     if not root.exists():
         return []
     cutoff = time.time() - max_age_seconds
     removed = []
-    for path in root.iterdir():
+    for path in sorted(root.rglob('*'), reverse=True):
         try:
-            if path.is_symlink() and path.lstat().st_mtime <= cutoff:
+            if (path.is_file() or path.is_symlink()) and path.lstat().st_mtime <= cutoff:
                 path.unlink()
                 removed.append(str(path))
-        except FileNotFoundError:
+            elif path.is_dir() and not any(path.iterdir()):
+                path.rmdir()
+        except (FileNotFoundError, OSError):
             continue
     return removed
+
+
+def bundle_dir(project: Path, block_id: str, root: Path = UPLOAD_ALIAS_ROOT) -> Path:
+    project_token = _ascii_token(project.name, 'PROJECT')
+    return root / project_token / _ascii_token(block_id, 'BLOCK')
+
+
+def _clone_copy(source: Path, target: Path) -> None:
+    """APFS clonefile (no extra disk) with a byte-copy fallback; read-only result."""
+    if target.exists() or target.is_symlink():
+        os.chmod(target, 0o600)
+        target.unlink()
+    if subprocess.run(['cp', '-c', str(source), str(target)], capture_output=True).returncode != 0:
+        shutil.copyfile(source, target)
+    os.chmod(target, 0o400)
 
 
 def prepare_upload_alias(project: Path, asset_id: str, block_id: str,
                          slot: int = 1, root: Path = UPLOAD_ALIAS_ROOT,
                          modality: str = 'Image') -> dict:
-    """Create a short-lived ASCII symlink to one approved registry asset.
+    """Clone one approved registry asset into the block's ASCII upload bundle.
 
-    This avoids copied media in Downloads/chat work folders and gives the native
-    chooser a unique ASCII filename. The alias is not a second asset and must be
-    removed immediately after the visible Runway thumbnail is verified.
+    Name `NN_<Modality>N_<asset8>.<ext>` is unique per asset, so the same file
+    can be re-selected from Runway's Uploads library by exact name instead of
+    being uploaded again. The copy is not a second asset; the bundle is swept.
     """
     project = project.expanduser().resolve()
     if not media_registry.is_v4_project(project):
@@ -288,14 +318,17 @@ def prepare_upload_alias(project: Path, asset_id: str, block_id: str,
     root.mkdir(parents=True, exist_ok=True)
     os.chmod(root, 0o700)
     sweep_stale_upload_aliases(root)
-    block = _ascii_token(block_id, 'BLOCK')
+    folder = bundle_dir(project, block_id, root)
+    folder.mkdir(parents=True, exist_ok=True)
     suffix = source.suffix.lower()
     reference_token = f'{modality}{int(slot)}'
-    alias = root / f'{block}__{reference_token.upper()}__{asset_id[-8:]}{suffix}'
-    if alias.exists() or alias.is_symlink():
+    alias = folder / f'{int(slot):02d}_{reference_token}_{_ascii_token(asset_id[-8:], "ASSET")}{suffix}'
+    _clone_copy(source, alias)
+    if media_registry.sha256(alias) != asset['sha256']:
         alias.unlink()
-    alias.symlink_to(source)
+        raise ValueError(f'UPLOAD_BUNDLE_COPY_HASH_MISMATCH: {asset_id}')
     return {
+        'bundle_dir': str(folder),
         'alias_path': str(alias),
         'alias_name': alias.name,
         'canonical_path': str(source),
@@ -309,18 +342,49 @@ def prepare_upload_alias(project: Path, asset_id: str, block_id: str,
     }
 
 
+def _inside_bundle_root(candidate: Path, root: Path) -> bool:
+    try:
+        return candidate.is_relative_to(root) and len(candidate.relative_to(root).parts) == 3
+    except ValueError:
+        return False
+
+
 def cleanup_upload_alias(path: Path, root: Path = UPLOAD_ALIAS_ROOT) -> dict:
     root = Path(os.path.abspath(root.expanduser()))
-    candidate = path.expanduser()
-    if not candidate.is_absolute():
-        candidate = root / candidate
-    candidate = Path(os.path.abspath(candidate))
-    if candidate.parent != root:
+    candidate = Path(os.path.abspath(path.expanduser()))
+    if not _inside_bundle_root(candidate, root):
         raise ValueError(f'UPLOAD_ALIAS_OUTSIDE_HELPER_ROOT: {candidate}')
-    if not candidate.is_symlink():
-        raise ValueError(f'UPLOAD_ALIAS_NOT_SYMLINK: {candidate}')
+    if candidate.is_symlink() or not candidate.is_file():
+        raise ValueError(f'UPLOAD_ALIAS_NOT_BUNDLE_FILE: {candidate}')
+    os.chmod(candidate, 0o600)
     candidate.unlink()
+    if not any(candidate.parent.iterdir()):
+        candidate.parent.rmdir()
     return {'removed': True, 'alias_path': str(candidate)}
+
+
+def prepare_upload_bundle(project: Path, block_id: str, pack_path: Path,
+                          root: Path = UPLOAD_ALIAS_ROOT) -> dict:
+    """Stage every slot of one attested pack, in token order, in one folder."""
+    pack = json.loads(Path(pack_path).read_text(encoding='utf-8'))
+    if pack.get('block_id') != block_id:
+        raise ValueError('UPLOAD_BUNDLE_PACK_BLOCK_MISMATCH')
+    folder = bundle_dir(project.expanduser().resolve(), block_id, root)
+    if folder.exists():
+        for old in folder.iterdir():
+            os.chmod(old, 0o600)
+            old.unlink()
+    rows = []
+    for entry in pack.get('reference_role_map') or []:
+        match = re.fullmatch(r'@(Image|Video|Audio)(\d+)', str(entry.get('token') or ''), re.I)
+        if not match or not entry.get('asset_id'):
+            raise ValueError(f'UPLOAD_BUNDLE_BAD_REFERENCE: {entry.get("token")}')
+        rows.append(prepare_upload_alias(project, entry['asset_id'], block_id,
+                                         int(match.group(2)), root, match.group(1).title()))
+    manifest = {'block_id': block_id, 'bundle_dir': str(folder), 'pack': str(pack_path),
+                'slots': [{k: r[k] for k in ('reference_token', 'alias_name', 'asset_id', 'sha256')} for r in rows]}
+    (folder / 'bundle.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    return manifest
 
 
 # --- same-session recovery controller --------------------------------------
@@ -614,7 +678,26 @@ def record_recovery_incident(
         state['status'] = 'USER_ACTION_REQUIRED'
         state['next_action'] = 'WAIT_FOR_EXACT_USER_ACTION'
         state['required_user_action'] = _human_action_for_incident(incident)
-    elif incident in SESSION_TRANSPORT_INCIDENTS | UPLOAD_TRANSPORT_INCIDENTS:
+    elif incident in UPLOAD_TRANSPORT_INCIDENTS:
+        key = slot or 'UNSPECIFIED_SLOT'
+        per_slot = state.setdefault('upload_transport_failures_by_slot', {})
+        per_slot[key] = int(per_slot.get(key) or 0) + 1
+        state['transport_failures_total'] = int(state.get('transport_failures_total') or 0) + 1
+        event['transport_failure'] = True
+        if per_slot[key] <= min(UPLOAD_TRANSPORT_SLOT_CAP, len(UPLOAD_TRANSPORT_LADDER)):
+            state['status'] = 'RECOVERING'
+            state['next_action'] = UPLOAD_TRANSPORT_LADDER[per_slot[key] - 1]
+            state['after_recovery_action'] = 'VERIFY_ENLARGED_THUMBNAIL_AND_UPDATE_CHECKPOINT'
+            state['required_user_action'] = None
+        else:
+            state['status'] = 'USER_ACTION_REQUIRED'
+            state['next_action'] = 'WAIT_FOR_EXACT_USER_ACTION'
+            state['after_recovery_action'] = None
+            state['required_user_action'] = (
+                f'{key} 업로드 창이 {UPLOAD_TRANSPORT_SLOT_CAP}회 열리지/확정되지 않았다. 같은 Runway 세션에서 '
+                f'업로드 번들 폴더의 해당 파일을 직접 첨부하고 Generate는 누르지 말고 “첨부 완료”라고 알려 달라. '
+                '세션을 새로고침하지 않는다.')
+    elif incident in SESSION_TRANSPORT_INCIDENTS:
         state['transport_failures_total'] = int(state.get('transport_failures_total') or 0) + 1
         consecutive = int(state.get('consecutive_transport_failures') or 0) + 1
         state['consecutive_transport_failures'] = consecutive
@@ -624,6 +707,10 @@ def record_recovery_incident(
         if consecutive <= len(SAME_SESSION_RECOVERY_LADDER):
             state['status'] = 'RECOVERING'
             state['next_action'] = SAME_SESSION_RECOVERY_LADDER[consecutive - 1]
+            if state['next_action'] in REFRESH_RUNGS:
+                # Runway resets duration/model after a reload; Generate stays closed
+                # until settings-verify passes again for this block.
+                state['settings_reverify_required'] = True
             state['after_recovery_action'] = 'RESTORE_CHECKPOINT_AND_RETRY_SAME_SLOT'
             state['required_user_action'] = None
         else:
@@ -692,7 +779,8 @@ def resolve_recovery(
     unsigned = {key: value for key, value in checkpoint.items() if key != 'checkpoint_sha256'}
     checkpoint['checkpoint_sha256'] = _hash_payload(unsigned)
     state['status'] = 'READY'
-    state['next_action'] = 'CONTINUE_FROM_CHECKPOINT'
+    state['next_action'] = ('RUN_SETTINGS_VERIFY_BEFORE_GENERATE' if state.get('settings_reverify_required')
+                            else 'CONTINUE_FROM_CHECKPOINT')
     state['after_recovery_action'] = None
     state['required_user_action'] = None
     state['consecutive_transport_failures'] = 0
@@ -712,7 +800,7 @@ def cmd_prepare_upload_alias(args) -> int:
             Path(args.project), args.asset_id, args.block_id, args.slot,
             modality=args.modality)
     except (OSError, ValueError) as exc:
-        evidence(args, 'prepare-upload-alias', 'validated registry asset -> ASCII symlink',
+        evidence(args, 'prepare-upload-alias', 'validated registry asset -> ASCII bundle clone',
                  str(exc), 'FAIL')
         print(json.dumps({'ok': False, 'error': str(exc)}, ensure_ascii=False))
         return 1
@@ -721,8 +809,18 @@ def cmd_prepare_upload_alias(args) -> int:
     row = {'ts': dt.datetime.now().astimezone().isoformat(timespec='seconds'), **result}
     with receipt.open('a', encoding='utf-8') as handle:
         handle.write(json.dumps(row, ensure_ascii=False) + '\n')
-    evidence(args, 'prepare-upload-alias', 'validated registry asset -> ASCII symlink',
+    evidence(args, 'prepare-upload-alias', 'validated registry asset -> ASCII bundle clone',
              json.dumps(result, ensure_ascii=False), 'READY_FOR_NATIVE_CHOOSER')
+    print(json.dumps({'ok': True, **result}, ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_prepare_upload_bundle(args) -> int:
+    try:
+        result = prepare_upload_bundle(Path(args.project), args.block_id, Path(args.pack))
+    except (OSError, ValueError, KeyError) as exc:
+        print(json.dumps({'ok': False, 'error': str(exc)}, ensure_ascii=False))
+        return 1
     print(json.dumps({'ok': True, **result}, ensure_ascii=False, indent=2))
     return 0
 
@@ -889,7 +987,7 @@ def run_verified(args, action: str, tail: str, pre: str = '', *, native_picker: 
     # tabs. Re-read both exact identity and focused-window state before input.
     rc, _out, err = aside_bridge.browser_js('true', require_active=True)
     picker_guard = ''
-    if rc and native_picker and 'ASIDE_NATIVE_BOUND_TAB_NOT_ACTIVE' in err:
+    if native_picker and (not rc or 'ASIDE_NATIVE_BOUND_TAB_NOT_ACTIVE' in err):
         try:
             picker_guard = native_picker_guard()
             rc, _out, err = osa(VERIFY_BLOCK + picker_guard)
@@ -930,10 +1028,10 @@ def cmd_picker_go(args) -> int:
     tail = f'''
 tell application "System Events"
     tell process "{TARGET_APP}"
-        if not (exists sheet 1 of window 1) then error "ABORT_NO_PICKER_SHEET"
+        if not (exists sheet 1 of nativeMainWindow) then error "ABORT_NO_PICKER_SHEET"
         keystroke "g" using {{command down, shift down}}
         delay 0.5
-        if not (exists sheet 1 of window 1) then error "ABORT_GO_SHEET_LOST"
+        if not (exists sheet 1 of nativeMainWindow) then error "ABORT_GO_SHEET_LOST"
         keystroke "a" using {{command down}}
         delay 0.1
         key code 51
@@ -950,15 +1048,16 @@ end tell
 def cmd_picker_select(args) -> int:
     """Select one visible helper alias via AX, without keyboard/IME events."""
     path = Path(os.path.abspath(Path(args.path).expanduser()))
-    if path.parent.resolve() != UPLOAD_ALIAS_ROOT.resolve() or not path.is_symlink() or not path.is_file():
-        raise ValueError('PICKER_SELECT_REQUIRES_LIVE_HELPER_ALIAS')
+    if (not _inside_bundle_root(path, Path(os.path.abspath(UPLOAD_ALIAS_ROOT)))
+            or path.is_symlink() or not path.is_file()):
+        raise ValueError('PICKER_SELECT_REQUIRES_LIVE_HELPER_BUNDLE_FILE')
     if not re.fullmatch(r'[A-Za-z0-9_]+\.(png|jpg|jpeg|webp|mp4|mov|wav|mp3)', path.name):
         raise ValueError('PICKER_SELECT_ALIAS_NAME_INVALID')
     tail = f'''
 tell application "System Events"
     tell process "{TARGET_APP}"
-        if (value of pop up button 1 of splitter group 1 of sheet 1 of window 1) is not {json.dumps(UPLOAD_ALIAS_ROOT.name)} then error "ABORT_NATIVE_ALIAS_FOLDER"
-        set listView to outline 1 of scroll area 1 of splitter group 1 of splitter group 1 of sheet 1 of window 1
+        if (value of pop up button 1 of splitter group 1 of sheet 1 of nativeMainWindow) is not {json.dumps(path.parent.name)} then error "ABORT_NATIVE_ALIAS_FOLDER"
+        set listView to outline 1 of scroll area 1 of splitter group 1 of splitter group 1 of sheet 1 of nativeMainWindow
         if (value of attribute "AXIdentifier" of listView) is not "ListView" then error "ABORT_NATIVE_LIST_LAYOUT"
         set candidates to {{}}
         repeat with rr in rows of listView
@@ -972,6 +1071,12 @@ tell application "System Events"
         set targetRow to item 1 of candidates
         set value of attribute "AXSelected" of targetRow to true
         if (value of attribute "AXSelected" of targetRow) is not true then error "ABORT_NATIVE_SELECTION_NOT_APPLIED"
+        set openCandidates to {{}}
+        repeat with bb in buttons of sheet 1 of nativeMainWindow
+            if (value of attribute "AXIdentifier" of bb) is "OKButton" then set end of openCandidates to contents of bb
+        end repeat
+        if (count openCandidates) is not 1 then error "ABORT_NATIVE_UNIQUE_OPEN_BUTTON"
+        if enabled of (item 1 of openCandidates) is not true then error "ABORT_NATIVE_OPEN_DISABLED"
     end tell
 end tell
 return "ROW_SELECTED_VERIFY_OPEN_AND_THUMBNAIL"
@@ -1059,6 +1164,12 @@ def read_generate_state() -> dict:
 # Require the unique visible Lexical editor; never a generic contenteditable.
 PROMPT_SEL = '[contenteditable][data-lexical-editor]'
 
+# An editor behind a provider dialog is not eligible for input or acceptance.
+# Check again in the mutating callback, not only in the earlier observation.
+PROMPT_BLOCKING_DIALOG_JS = r"""(() => [...document.querySelectorAll(
+  '[role="dialog"], [role="alertdialog"], dialog[open], [aria-modal="true"]'
+)].some(e => e.getClientRects().length > 0))()"""
+
 
 # innerText of the editor adds CSS paragraph separators; read actual P blocks
 # without collapsing spaces, intentional blank paragraphs, or inline BRs.
@@ -1070,6 +1181,28 @@ PROMPT_DOM_TEXT_JS = r"""(el => {
   }
   return el.innerText || '';
 })"""
+
+
+def _preprod_project_of(path: Path) -> Path | None:
+    for parent in path.parents:
+        if (parent / 'preprod' / 'PREPROD_V1').is_file():
+            return parent
+    return None
+
+
+def shelf_paste_error(prompt_path: Path, pack: str | None) -> str:
+    """In preprod projects production pastes only a released, unchanged shelf prompt."""
+    project = _preprod_project_of(prompt_path)
+    if project is None:
+        return ''
+    import preprod
+    shelf = prompt_path.parent
+    if prompt_path.name != 'prompt.txt' or shelf.parent != project / 'preprod' / '04_shelf':
+        return 'PRODUCTION_PASTES_ONLY_PREPROD_SHELF_PROMPT: preprod/04_shelf/<BLOCK>/prompt.txt'
+    if not pack or Path(pack).expanduser().resolve() != (shelf / 'pack.json').resolve():
+        return 'PRODUCTION_REQUIRES_SHELF_PACK: pass --pack preprod/04_shelf/<BLOCK>/pack.json'
+    errors = preprod.verify_shelf(project, shelf.name)
+    return ('SHELF_NOT_READY: ' + ', '.join(errors)) if errors else ''
 
 
 def cmd_paste_prompt(args) -> int:
@@ -1109,6 +1242,10 @@ def cmd_paste_prompt(args) -> int:
     expected_normalized = normalize_prompt(text)
     expected_stats = language_stats(expected_normalized)
     prompt_language = 'en-US'
+    shelf_error = shelf_paste_error(prompt_path, getattr(args, 'pack', None))
+    if shelf_error:
+        print(json.dumps({'ok': False, 'verdict': 'SHELF_PREFLIGHT_FAILED', 'error': shelf_error}, ensure_ascii=False))
+        return 1
     if getattr(args, 'pack', None):
         try:
             project = aside_bridge.require_project(prompt_file=prompt_path)
@@ -1134,23 +1271,40 @@ def cmd_paste_prompt(args) -> int:
     except (OSError, ValueError) as exc:
         evidence(args, 'paste-prompt', 'prompt belongs to the bound project', str(exc), 'ASIDE_BINDING_ERROR')
         return 3
-    # Lexical's replace selection has been observed to append instead. Refuse to
-    # touch a non-empty editor; the visible operator must clear it and verify an
-    # empty field first. This prevents duplicated prompts after a false replace.
+    # Idempotent ensure: matching accepted text needs no second paste. Preserve
+    # every other non-empty editor; Lexical replace has been seen to append.
     rc, before_out, before_err = browser_js("""(() => {
+  if (%s) return JSON.stringify({ok:false, error:'BLOCKING_DIALOG_CLOSE_AND_REOBSERVE'});
   const el = (() => { const a = [...document.querySelectorAll('%s')].filter(e => e.getClientRects().length); return a.length === 1 ? a[0] : null; })();
   return JSON.stringify(el ? {ok:true, text:(%s)(el)} : {ok:false});
-})()""" % (PROMPT_SEL, PROMPT_DOM_TEXT_JS))
+})()""" % (PROMPT_BLOCKING_DIALOG_JS, PROMPT_SEL, PROMPT_DOM_TEXT_JS))
     if rc != 0:
         evidence(args, 'paste-prompt-preflight', 'read empty Lexical editor',
                  before_err[-200:], 'ASIDE_CONTROL_ERROR')
         return 3
-    before_state = json.loads(before_out)
+    try:
+        before_state = json.loads(before_out)
+        if not isinstance(before_state, dict):
+            raise ValueError('Non-object observation')
+    except (ValueError, TypeError):
+        evidence(args, 'paste-prompt-preflight', 'read current editor',
+                 'invalid observation', 'PARSE_ERROR')
+        return 3
     if not before_state.get('ok'):
         evidence(args, 'paste-prompt-preflight', 'read empty Lexical editor',
-                 before_out, 'NO_PROMPT_EDITOR')
+                 before_out, before_state.get('error', 'NO_PROMPT_EDITOR'))
         return 1
     before_normalized = normalize_prompt(str(before_state.get('text', '')))
+    if before_normalized == expected_normalized:
+        st = {'ok': True, 'verdict': 'PROMPT_ALREADY_MATCHED',
+              'write_dispatched': False, 'content_match': True,
+              'expected': len(expected_normalized),
+              'expected_prompt_sha256': prompt_sha256(expected_normalized),
+              'actual_prompt_sha256': prompt_sha256(before_normalized)}
+        evidence(args, 'paste-prompt', 'accepted prompt already present',
+                 json.dumps(st, ensure_ascii=False), st['verdict'])
+        print(json.dumps(st, ensure_ascii=False))
+        return 0
     if before_normalized:
         verdict = ('REPLACE_UNSAFE_CLEAR_VISIBLE_EDITOR_FIRST' if args.replace
                    else 'PROMPT_NOT_EMPTY_DO_NOT_APPEND')
@@ -1163,6 +1317,7 @@ def cmd_paste_prompt(args) -> int:
     payload = json.dumps({'text': text, 'replace': bool(args.replace), 'sel': PROMPT_SEL})
     js = """(() => {
   const cfg = %s;
+  if (%s) return JSON.stringify({ok:false, error:'BLOCKING_DIALOG_CLOSE_AND_REOBSERVE'});
   const el = (() => { const a = [...document.querySelectorAll(cfg.sel)].filter(e => e.getClientRects().length); return a.length === 1 ? a[0] : null; })();
   if (!el) return JSON.stringify({ok:false, error:'NO_PROMPT_EDITOR'});
   if ((el.innerText || '').trim()) return JSON.stringify({ok:false,error:'PROMPT_CHANGED_BEFORE_PASTE'});
@@ -1175,18 +1330,20 @@ def cmd_paste_prompt(args) -> int:
   dt.setData('text/plain', cfg.text);
   el.dispatchEvent(new ClipboardEvent('paste', {clipboardData: dt, bubbles: true, cancelable: true}));
   return JSON.stringify({ok:true, dispatched:true});
-})()""" % payload
+})()""" % (payload, PROMPT_BLOCKING_DIALOG_JS)
     rc, out, err = browser_js(js)
     if rc != 0:
         evidence(args, 'paste-prompt', 'lexical paste', err[-200:], 'ASIDE_CONTROL_ERROR')
         return 3
     try:
         st = json.loads(out)
-    except Exception:
-        evidence(args, 'paste-prompt', 'lexical paste', out[:200], 'PARSE_ERROR')
+        if not isinstance(st, dict):
+            raise ValueError('Non-object paste result')
+    except (ValueError, TypeError):
+        evidence(args, 'paste-prompt', 'lexical paste', 'invalid result; read before recovery', 'PARSE_ERROR')
         return 3
     if not st.get('ok'):
-        evidence(args, 'paste-prompt', 'lexical paste', out, 'NO_PROMPT_EDITOR')
+        evidence(args, 'paste-prompt', 'lexical paste', out, st.get('error', 'NO_PROMPT_EDITOR'))
         return 1
     # The paste event returns before Lexical commits its React state. Poll the
     # actual editor for up to two seconds instead of emitting a false mismatch.
@@ -1194,14 +1351,27 @@ def cmd_paste_prompt(args) -> int:
     waited_ms = 0
     for attempt in range(11):
         rc, read_out, read_err = browser_js("""(() => {
+  if (%s) return JSON.stringify({ok:false, error:'BLOCKING_DIALOG_CLOSE_AND_REOBSERVE'});
   const el = (() => { const a = [...document.querySelectorAll('%s')].filter(e => e.getClientRects().length); return a.length === 1 ? a[0] : null; })();
   return JSON.stringify(el ? {ok:true, text:(%s)(el)} : {ok:false});
-})()""" % (PROMPT_SEL, PROMPT_DOM_TEXT_JS))
+})()""" % (PROMPT_BLOCKING_DIALOG_JS, PROMPT_SEL, PROMPT_DOM_TEXT_JS))
         if rc != 0:
             evidence(args, 'paste-prompt-verify', 'read committed Lexical text',
                      read_err[-200:], 'ASIDE_CONTROL_ERROR')
             return 3
-        read_state = json.loads(read_out)
+        try:
+            read_state = json.loads(read_out)
+            if not isinstance(read_state, dict):
+                raise ValueError('Non-object observation')
+        except (ValueError, TypeError):
+            evidence(args, 'paste-prompt-verify', 'read committed text',
+                     'invalid observation; re-read, never re-paste', 'PARSE_ERROR')
+            return 3
+        if not read_state.get('ok'):
+            evidence(args, 'paste-prompt-verify', 'read committed text',
+                     're-observe without another paste',
+                     read_state.get('error', 'NO_PROMPT_EDITOR'))
+            return 1
         actual_text = str(read_state.get('text', ''))
         if normalize_prompt(actual_text) == expected_normalized:
             break
@@ -1212,6 +1382,7 @@ def cmd_paste_prompt(args) -> int:
     actual_stats = language_stats(actual_normalized)
     content_match = actual_normalized == expected_normalized
     st.update({
+        'write_dispatched': True,
         'before': 0,
         'after': len(actual_text),
         'expected': len(expected_normalized),
@@ -1229,6 +1400,7 @@ def cmd_paste_prompt(args) -> int:
     st['content_match'] = content_match
     st['language'] = actual_stats
     st['verdict'] = verdict
+    st['ok'] = verdict == 'OK'
     evidence(args, 'paste-prompt', f"expect {st['expected']} chars", json.dumps(st, ensure_ascii=False), verdict)
     print(json.dumps(st, ensure_ascii=False))
     return 0 if verdict == 'OK' else 1
@@ -1237,13 +1409,14 @@ def cmd_paste_prompt(args) -> int:
 def cmd_read_prompt(args) -> int:
     """Report what is actually in the prompt box."""
     rc, out, err = browser_js("""(() => {
+  if (%s) return JSON.stringify({ok:false, error:'BLOCKING_DIALOG_CLOSE_AND_REOBSERVE'});
   const el = (() => { const a = [...document.querySelectorAll('%s')].filter(e => e.getClientRects().length); return a.length === 1 ? a[0] : null; })();
   if (!el) return JSON.stringify({ok:false, error:'NO_PROMPT_EDITOR'});
   const t = (%s)(el);
   return JSON.stringify({ok:true, text:t, len:t.length, over_limit:t.length>3500,
     hangul_runs:(t.match(/[가-힣]+/g)||[]).length,
     head:t.slice(0,60), tail:t.slice(-60)});
-})()""" % (PROMPT_SEL, PROMPT_DOM_TEXT_JS))
+})()""" % (PROMPT_BLOCKING_DIALOG_JS, PROMPT_SEL, PROMPT_DOM_TEXT_JS))
     if rc != 0:
         evidence(args, 'read-prompt', 'read editor', err[-200:], 'ASIDE_CONTROL_ERROR')
         return 3
@@ -2078,11 +2251,15 @@ def run_queue_cycle(
     mode = read_queue_mode(project)
     runtime = sync_queue_runtime(project, jobs, **sync_kwargs)
     if mode['mode'] == 'scheduled':
+        handoff = scheduled_registration_gate(project)
         return {
-            'ok': True, 'verdict': 'SCHEDULED_CHECKPOINT_NO_WAIT',
+            'ok': handoff['ok'],
+            'verdict': ('SCHEDULED_CHECKPOINT_NO_WAIT' if handoff['ok']
+                        else 'CONTINUATION_NOT_ARMED'),
             'wait_started': False, 'scheduler_created': False,
             'registration_verified': False, 'queue_runtime': runtime,
-            'next_action': 'Inspect native app registration/run evidence; this call only checkpoints one observation. Never start a foreground wait.',
+            'continuation_gate': handoff,
+            'next_action': handoff['next_action'],
         }
     if not runtime.get('wake_required'):
         return {
@@ -2223,6 +2400,85 @@ def audit_schedule_snapshot(project: Path, snapshot: dict, *, automation_id: str
         'scheduler_created': False, 'native_registration_verified_by_this_check': False,
         'actual_run_verified_by_this_check': False,
     }
+
+
+def scheduled_registration_gate(project: Path) -> dict:
+    """Require the existing native audit at handoff, not just scheduled intent.
+
+    This is a local consistency gate, not a scheduler client or authentication
+    of operator evidence. The owning turn must execute the returned native-tool
+    step and capture its actual result. Never invokes tools, sleeps, or writes.
+    """
+    project = project.expanduser().resolve()
+    metadata = Path(_project_seedance_sources(project)['metadata_dir'])
+    runtime = _json_file(queue_runtime_path(project))
+    status = _json_file(metadata / 'status.json')
+    followup = status.get('scheduled_followup') or {}
+    pending_followup = (isinstance(followup, dict)
+                        and followup.get('status') in {'PENDING', 'REQUIRED'})
+    terminal = (runtime.get('contract_version') == QUEUE_RUNTIME_VERSION
+                and runtime.get('may_stop') is True
+                and not runtime.get('active_count')
+                and not runtime.get('settled_backlog_count')
+                and runtime.get('verdict') in {'SHELF_EXHAUSTED', 'ALL_REMAINING_BLOCKED'}
+                and not pending_followup)
+    base = {'read_only': True, 'scheduler_created': False,
+            'native_registration_verified_by_this_check': False,
+            'actual_run_verified_by_this_check': False}
+    if terminal:
+        return {**base, 'ok': True, 'verdict': 'NO_PENDING_QUEUE_HANDOFF',
+                'issues': [], 'next_action': 'Report queue disposition; this is not proof of media/QC completion.'}
+    monitoring = status.get('monitoring') or {}
+    if not isinstance(monitoring, dict):
+        monitoring = {}
+    automation_id = monitoring.get('automation_id')
+    consumer = monitoring.get('consumer_task_id')
+    issues = []
+    if not automation_id:
+        issues.append('SCHEDULE_ID_REQUIRED')
+    if not consumer:
+        issues.append('SCHEDULE_CONSUMER_REQUIRED')
+    if status.get('owner_thread_id') and consumer != status['owner_thread_id']:
+        issues.append('SCHEDULE_NOT_PRODUCTION_OWNER')
+    if monitoring.get('purpose') != 'production_continuation':
+        issues.append('SCHEDULE_PRODUCTION_PURPOSE_REQUIRED')
+    snapshot = None
+    try:
+        evidence = monitoring.get('registration_evidence')
+        if not isinstance(evidence, str) or not evidence.strip():
+            raise ValueError('missing')
+        path = Path(evidence).expanduser()
+        if not path.is_absolute():
+            path = project / path
+        path = path.resolve()
+        if not path.is_relative_to(project):
+            raise ValueError('outside project')
+        snapshot = json.loads(path.read_text(encoding='utf-8'))
+        if not isinstance(snapshot, dict):
+            raise ValueError('not an object')
+    except (OSError, ValueError, TypeError):
+        issues.append('SCHEDULE_NATIVE_SNAPSHOT_REQUIRED')
+    if isinstance(snapshot, dict):
+        audit = audit_schedule_snapshot(project, snapshot,
+                    automation_id=automation_id, consumer_task_id=consumer)
+        issues.extend(audit['issues'])
+    if not issues:
+        return {**base, 'ok': True, 'verdict': 'NATIVE_SNAPSHOT_COMPLIANT',
+                'issues': [], 'automation_id': automation_id, 'consumer_task_id': consumer,
+                'next_action': 'End this bounded check; the existing native heartbeat owns the next wake. Verify actual execution on its next run, not from this snapshot.'}
+    return {**base, 'ok': False, 'verdict': 'CONTINUATION_NOT_ARMED',
+            'issues': issues, 'automation_id': automation_id, 'consumer_task_id': consumer,
+            'native_tool': 'automation_update',
+            'native_read_request': ({'mode': 'view', 'id': automation_id}
+                                    if automation_id else None),
+            'next_action': (
+                'In this owning turn, inspect the matching native automation, then '
+                'CALL automation_update to create or repair it within the specific '
+                'existing approval; preserve user PAUSED/HOLD and do not duplicate it. '
+                'If approval or tool access is missing, report that exact blocker, not '
+                'automatic continuation. Capture fresh native fields in '
+                'monitoring.registration_evidence, rerun queue-exit-check. '
+                'Never substitute queue-mode, a proposal, sleep, or a promise for registration.')}
 
 
 def cmd_queue_schedule_check(args) -> int:
@@ -2388,7 +2644,57 @@ def cmd_queue_cycle(args) -> int:
         print(json.dumps({'ok': False, 'error': str(exc)}, ensure_ascii=False))
         return 1
     print(json.dumps(result, ensure_ascii=False, indent=2))
-    return 0
+    return 0 if result['ok'] else 1
+
+
+SETTINGS_OBSERVE_JS = r"""
+(() => {
+  const leaves = [...document.querySelectorAll('button,[role=button],[role=combobox],[role=option][aria-selected=true]')]
+    .filter(e => e.getClientRects().length);
+  const texts = leaves.map(e => (e.innerText || '').trim()).filter(t => t && t.length <= 32);
+  const durations = [...new Set(texts.filter(t => /^\d{1,2}\s*(s|sec|seconds?)$/i.test(t)).map(t => parseInt(t, 10)))];
+  const models = [...new Set(texts.filter(t => /seedance/i.test(t)))];
+  return JSON.stringify({durations, models});
+})()
+"""
+
+
+def observe_visible_settings() -> dict:
+    """Read duration/model from the page itself instead of trusting typed values."""
+    rc, out, err = browser_js(SETTINGS_OBSERVE_JS)
+    if rc:
+        return {'observed': False, 'error': err}
+    try:
+        value = json.loads(out)
+    except (TypeError, ValueError):
+        return {'observed': False, 'error': 'SETTINGS_OBSERVE_UNPARSEABLE'}
+    return {'observed': True, **value}
+
+
+def check_observed_settings(observed: dict, *, expected_duration: int) -> list[str]:
+    """Fail only on unambiguous contradiction; ambiguity is recorded, not guessed."""
+    if not observed.get('observed'):
+        return []
+    errors = []
+    durations = observed.get('durations') or []
+    if len(durations) == 1 and durations[0] != expected_duration:
+        errors.append(f'SETTINGS_DOM_DURATION_MISMATCH: expected={expected_duration},visible={durations[0]}')
+    models = observed.get('models') or []
+    if len(models) == 1 and normalize_visible_seedance_model(models[0]) != REQUIRED_GENERATION_MODEL:
+        errors.append(f'SETTINGS_DOM_MODEL_MISMATCH: visible={models[0]}')
+    return errors
+
+
+def clear_settings_reverify(project: Path, block_id: str, result: dict) -> None:
+    path = _recovery_state_path(project)
+    state = _json_file(path)
+    if state.get('block_id') == block_id and state.get('settings_reverify_required'):
+        state['settings_reverify_required'] = False
+        if state.get('next_action') == 'RUN_SETTINGS_VERIFY_BEFORE_GENERATE':
+            state['next_action'] = 'CONTINUE_FROM_CHECKPOINT'
+        _write_recovery_state(project, state, {
+            'event': 'SETTINGS_REVERIFIED_AFTER_REFRESH', 'verified_at': result.get('verified_at'),
+            'visible_duration_sec': result.get('visible_duration_sec')})
 
 
 def cmd_settings_verify(args) -> int:
@@ -2397,12 +2703,19 @@ def cmd_settings_verify(args) -> int:
         rc, _out, err = browser_js('true')
         if rc:
             raise ValueError(err)
+        observed = observe_visible_settings()
+        dom_errors = check_observed_settings(observed, expected_duration=int(args.duration_sec))
+        if dom_errors:
+            raise ValueError('; '.join(dom_errors))
         result = verify_attested_generation_settings(
             Path(args.project), args.block,
             visible_model=args.visible_model,
             duration_sec=args.duration_sec,
             duration_source=args.duration_source,
             source_video=Path(args.source_video) if args.source_video else None)
+        result['dom_observation'] = observed
+        _write_json_atomic(settings_preflight_path(Path(args.project).expanduser().resolve(), args.block), result)
+        clear_settings_reverify(Path(args.project).expanduser().resolve(), args.block, result)
     except (OSError, ValueError, subprocess.TimeoutExpired) as exc:
         print(json.dumps({'ok': False, 'error': str(exc)}, ensure_ascii=False))
         return 1
@@ -2476,12 +2789,15 @@ def evaluate_queue_exit(project: Path) -> dict:
     live_wait = wake.get('pending') and _pid_running(wake.get('wait_pid'))
     mode = read_queue_mode(project)
     if mode['mode'] == 'scheduled' and not live_wait and not _wait_elapsed_unconsumed(wake):
+        handoff = scheduled_registration_gate(project)
         return {
-            'ok': True, 'verdict': 'QUEUE_EXIT_ALLOWED_SCHEDULED_CHECKPOINT',
+            'ok': handoff['ok'],
+            'verdict': ('QUEUE_EXIT_ALLOWED_SCHEDULED_CHECKPOINT' if handoff['ok']
+                        else 'QUEUE_EXIT_REFUSED_CONTINUATION_NOT_ARMED'),
             'project': str(project), 'active_count': int(runtime.get('active_count') or 0),
             'settled_backlog_count': int(runtime.get('settled_backlog_count') or 0),
             'production_complete': False, 'registration_verified': False,
-            'next_action': 'Verify the native schedule separately; preserve outstanding download/QC work. This exit is not media completion.',
+            'continuation_gate': handoff, 'next_action': handoff['next_action'],
         }
     empty = not runtime.get('active_count') and not runtime.get('settled_backlog_count')
     terminal = empty and runtime.get('verdict') in {'SHELF_EXHAUSTED', 'ALL_REMAINING_BLOCKED'}
@@ -2595,10 +2911,11 @@ def diagnose_queue(project: Path) -> dict:
     mode = read_queue_mode(project)
     if mode['mode'] == 'scheduled' and not (wake.get('pending') and _pid_running(wake.get('wait_pid'))):
         state = ('SCHEDULED_HANDOFF_RECHECK_REQUIRED' if _wait_elapsed_unconsumed(wake)
-                 else 'SCHEDULED_CHECK_SELECTED')
+                 else ('SCHEDULED_CHECK_SELECTED' if exit_gate.get('ok')
+                       else 'SCHEDULED_REGISTRATION_REQUIRED'))
         next_action = ('Read the exact board once and consume the interrupted wake with queue-cycle --from-wake; scheduled mode will not sleep.'
                        if _wait_elapsed_unconsumed(wake) else
-                       'Inspect native app automation registration and last run. Local selection is not registration; do not restart foreground waiting.')
+                       exit_gate.get('next_action', 'Inspect native automation registration; never substitute sleep.'))
         fresh_board = True
     return {
         'ok': True, 'read_only': True, 'project': str(project),
@@ -2659,14 +2976,19 @@ def main() -> int:
     sub = ap.add_subparsers(dest='cmd', required=True)
     sub.add_parser('frontmost').set_defaults(fn=cmd_frontmost)
     sub.add_parser('escape').set_defaults(fn=cmd_escape)
-    p = sub.add_parser('prepare-upload-alias', help='create a temporary ASCII symlink for one approved registry asset')
+    p = sub.add_parser('prepare-upload-bundle', help='clone every slot of one attested pack into its ordered ASCII upload folder')
+    p.add_argument('--project', required=True)
+    p.add_argument('--block-id', required=True)
+    p.add_argument('--pack', required=True)
+    p.set_defaults(fn=cmd_prepare_upload_bundle)
+    p = sub.add_parser('prepare-upload-alias', help='clone one approved registry asset into the block upload bundle')
     p.add_argument('--project', required=True)
     p.add_argument('--asset-id', required=True)
     p.add_argument('--block-id', required=True)
     p.add_argument('--slot', type=int, default=1)
     p.add_argument('--modality', choices=['Image', 'Video', 'Audio'], default='Image')
     p.set_defaults(fn=cmd_prepare_upload_alias)
-    p = sub.add_parser('cleanup-upload-alias', help='remove a helper-owned temporary upload symlink')
+    p = sub.add_parser('cleanup-upload-alias', help='remove one helper-owned upload bundle copy')
     p.add_argument('--path', required=True)
     p.set_defaults(fn=cmd_cleanup_upload_alias)
     p = sub.add_parser('recovery-checkpoint', help='persist the exact same-session Seedance transaction before ATTACH')

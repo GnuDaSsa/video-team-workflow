@@ -1,36 +1,41 @@
-# Seedance — one owner, two sequential phases
+# Seedance — P4 shelf authoring, then P5 copy-paste production
+
+**Authoring mode:** if `manifest.authoring.mode` is `claude`, do not write the creative files yourself — run `video-codex-runtime author run --project <p> --stage shelf --block <B>` (add `--feedback "<user words>"` for changes), then continue with the checks, user approval and lock below. In `codex` mode write them yourself.
 
 Authority: explicit 2.5 → `/Users/gnudas/.codex/skills/seedance25-prompt-en/`;
 2.0 or unversioned → `/Users/gnudas/.codex/skills/seedance-prompt-en/`.
-Load only the selected version branch. Runtime owns rails/media/safety.
+Load only the selected version. Runtime owns rails/media/safety. Prompts are English only.
 
-## Prompting (no browser)
-1. Read the gate, current block map, music cue, generation-duration lock,
-   generation mode, approved reference IDs/hashes and prior failure evidence.
-2. Run `video-codex-runtime knowledge-select --project <p> --block <BLOCK>` when
-   knowledge routing is enabled; read only the selected packet. Community
-   grammar is inspiration below user intent, verified identity and project locks.
-3. Apply the selected skill's prompting branch and shared `prompt-review.md`.
-   Declare `render_scope`; remove irrelevant entities, undecided camera choices,
-   operator prose and filenames. Bind each attached token to its narrow role.
-4. Write a UTF-8 NFC `<BLOCK>_prompt.txt` containing only model-facing visual/audible
-   direction, plus the separate machine-readable package. Include
-   `model_facing_multimodal_binding_v1`, `duration_sec`, `shot_grammar` and, for
-   multi-shot sources, scene IDs/times/cut ownership/reference tokens/action/
-   decided camera/edit-out. Include knowledge receipts when applicable.
-5. Run `prompt_packet_utils.py attest --project <p> --pack <pack>` and require
-   ATTESTED. A stale historical attestation is not current submission authority.
+## P4 — Author the shelf (no browser)
+For every storyboard block, in order:
+1. `video-codex-runtime preprod shelf-brief --project <p> --block <B>` → writes
+   `preprod/04_shelf/<B>/brief.md`, `settings.json`, `refs.json` (and runs the bounded
+   knowledge selection). The brief lists everything the prompt must contain.
+2. Write `preprod/04_shelf/<B>/prompt.txt` following the skill's single canonical template:
+   first line from the brief; STYLE and IDENTITY blocks verbatim; one binding sentence per
+   `@ImageN`; `Shot k (a-bs):` sections with the exact shot size, angle, camera move and
+   MUST phrases; end frame. Target ≤3200 chars, hard limit 3500. No file names, gate words or notes.
+3. `preprod shelf-check` until clean, then `preprod shelf-lock` (also runs attestation).
+When all blocks are locked, show the user every `prompt.txt` (one per block) and ask once;
+then `preprod shelf-release --blocks ALL_LOCKED --approval-quote "<user's words>"`.
 
-## Production (no prompt improvisation)
-Continue in this same conversation by default; this phase change is not a spawn.
-Use only the selected version's production branch and shared
-`aside-operator.md` / executable helper. They own binding, native chooser,
-settings verification, recovery, exactly-once submit and `queue-cycle`.
-If the prompt needs a change, return to prompting and re-attest before Generate.
+## P5 — Production (copy-paste only)
+Continue in this same conversation; the phase change is not a spawn. For each released block:
+1. `preprod shelf-verify --block <B>` must be `ok`. Any failure → stop that block and return to P4.
+2. `runway_ui_helper.py prepare-upload-bundle --project <p> --block-id <B> --pack preprod/04_shelf/<B>/pack.json`
+   → ordered ASCII clones in `~/RunwayUpload/<project>/<B>/` (`01_Image1_…`, `02_Image2_…`). Attach slot N
+   from file `0N_ImageN_*` only; if Runway's Uploads already shows that exact file name, select it instead of re-uploading.
+3. Settings from `settings.json`; `settings-verify` must pass (it also reads the visible duration/model).
+4. `paste-prompt --file preprod/04_shelf/<B>/prompt.txt --pack preprod/04_shelf/<B>/pack.json`, verify, Generate once.
+Never edit, shorten, translate or "improve" a released prompt during production. If it needs
+a change, go back to P4 (or P2 for composition changes), re-lock and get it released again.
+Attachment, recovery, exactly-once submit and queue handling are owned by the selected skill's
+production doc and `aside-operator.md`.
 
-Download the matching output, verify bytes/duration/codec/resolution and ingest
-into `media/06_videos_candidates_영상후보/`; queue the registered asset for QC.
-Submitted cards and historical files are not rewritten to satisfy a new schema.
+Download the matching output, verify bytes/duration/codec/resolution and ingest into
+`media/06_videos_candidates_영상후보/`; queue the registered asset for Seedance QC.
 
-Outputs: pack + prompt + attestation, binding/checkpoint, deck/prompt/settings/
-card evidence, downloaded asset IDs + ffprobe, `status.json`, `result.md`.
+## Legacy projects (no `preprod/`)
+Author a pack under `lanes/seedance/prompts/` and `prompt_packet_utils.py attest --project <p>` before any UI step; the same production rules apply.
+
+Outputs: shelf files + SHELF_LOCK, settings/upload/card evidence, downloaded asset IDs + ffprobe, `status.json`, `result.md`.

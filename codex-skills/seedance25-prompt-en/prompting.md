@@ -35,10 +35,10 @@ For every attached source, write one role in both the package and the visible
 production prompt:
 
 ```text
-@Image1은 주인공 얼굴·머리 실루엣·연령 인상의 유일한 기준이다.
-@Image2는 의상 앞·뒤 구조와 색 배치만 고정한다.
-@Video1은 달리는 속도가 아니라 발 착지와 체중 이동의 리듬만 참고한다.
-@Audio1은 대사의 발화 타이밍과 억양만 따른다.
+@Image1 is the only reference for the lead's face, head silhouette and age impression.
+@Image2 fixes only the front and back construction and color layout of the costume.
+@Video1 supplies only the rhythm of foot strikes and weight shifts, not running speed.
+@Audio1 guides only the timing and intonation of the spoken line.
 ```
 
 - Attachment order is not story order.
@@ -64,7 +64,7 @@ each planned scene in this order:
 4. **Reaction and environment** — cloth, hair, dust, water, foliage, shadow, or
    another layer responds after the cause, not all at once.
 5. **Settle and end state** — overshoot only when motivated, then a readable
-   held state that an editor can cut on.
+   held state the next clip can start from.
 6. **Camera path** — one motivated route with speed and stop behavior; it
    supports the action instead of competing with it.
 
@@ -97,15 +97,12 @@ creative adapter, but keep this 2.5 mode/reference/timestamp contract.
 ## Timeline beats
 
 Timestamps are pacing guidance, not frame-accurate promises. Use contiguous,
-feasible intervals that match the project duration lock. Example structure for
-a 15-second planned source:
+feasible intervals that match the project duration lock. Inside the canonical
+template a beat chain for one shot reads like:
 
 ```text
-0.0–2.5초: 시작 자세와 시선 고정, 호흡만 보인다.
-2.5–5.0초: 오른발에 체중을 싣고 손이 문고리를 잡는다.
-5.0–9.0초: 몸통이 먼저 회전하며 문을 밀고, 소매는 한 박자 늦게 따라온다.
-9.0–12.5초: 문이 벽에 닿기 직전 감속하고 먼지가 뒤늦게 흔들린다.
-12.5–15.0초: 인물과 카메라가 멈춘 최종 구도를 유지한다.
+Shot 1 (0-5s): medium shot, eye level, static. She holds her starting pose, eyes fixed ahead, only her breath moving. Her weight settles onto the right foot and her hand closes on the door handle.
+Shot 2 (5-15s): medium wide shot, eye level, slow push in. Her torso turns first and pushes the door open, the sleeve following a beat late; the door slows just before touching the wall and dust stirs after it. She and the camera come to rest on the final composition.
 ```
 
 Do not overfill a duration merely because 2.5 accepts longer generations.
@@ -115,20 +112,15 @@ already authorize it.
 
 ## Model-facing prompt shape
 
-Follow `../seedance-prompt-en/seedance-shared-contract.md` → Handoff contract
-for production and spoken-line language. Do not paste package keys. Use the smallest set of sections that
-changes the model's behavior:
-
-```text
-[Result and shot intent]
-[Reference roles]
-[Start state and physical action]
-[Timed beats]
-[Camera and spatial response]
-[Style, identity and composition invariants]
-[Sound, dialogue and music roles]
-[Final composition]
-```
+Use the single template in `../seedance-prompt-en/seedance-prompting.md`
+(header → STYLE → IDENTITY → one binding sentence per token → `Shot k (a-bs):`
+sections with size/angle/declared move → `Sound:` → `End frame:`; target ≤3,200,
+hard 3,500 characters, English). Language and dialogue routes:
+`../seedance-prompt-en/seedance-shared-contract.md`. 2.5 adds only: the selected
+provider mode (Reference / Keyframe / Edit / Extend) recorded in the package,
+and the anti-AI motion order above inside each shot section. Preprod shelves
+currently emit Seedance 2.0 settings; a 2.5 block needs an explicit user request
+and its own 2.5 package.
 
 Use positive proof constraints first. Add a short forbidden clause only for a
 known high-risk failure that cannot be stated positively. Never paste workflow
@@ -156,7 +148,7 @@ Before handoff, reject the package if any answer is “no”:
 - Is the primary action physically possible from the starting pose?
 - Are anticipation, contact/causality, reaction, and settle visible where the
   action requires them?
-- Is there one readable camera path and an editor-usable end state?
+- Is there one readable camera path and a usable end state?
 - For 2D/stylized work, are pose timing and line/style stability stated rather
   than replaced with “smooth/high quality” adjectives?
 - Do all timestamp intervals fit the locked duration without overlap or gaps?

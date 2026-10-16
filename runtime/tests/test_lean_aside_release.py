@@ -194,7 +194,7 @@ class ReleaseTests(unittest.TestCase):
 
     def test_lane_templates_are_source_relative_and_lean(self):
         self.assertEqual(runtime.TEMPLATES,ROOT/'runtime/templates')
-        for filename in ('music.md','seedance.md','editor.md','image_creator.md'):
+        for filename in ('music.md','seedance.md','image_creator.md'):
             text=(runtime.TEMPLATES/filename).read_text()
             for obsolete in ('fable_prompt_bridge.py','ANIME_MV_MAHORAGA_MICROCUT','/music-video-production-team/references/'):
                 self.assertNotIn(obsolete,text)

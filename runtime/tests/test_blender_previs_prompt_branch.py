@@ -17,16 +17,16 @@ class BlenderPrevisBranch(unittest.TestCase):
         text=(ROOT/'codex-skills/seedance-prompt-en/blender-previs-prompting.md').read_text()
         section=text.split('### MOTION_GUIDE —',1)[1].split('### SOURCE_RESTYLE —',1)[0]
         example='\n'.join(line for line in section.splitlines() if line.startswith('>'))
-        self.assertIn('새 2D 액션 애니메이션을 생성한다',example)
-        self.assertIn('@Video1은 두 기체의 동선 참고다',example)
+        self.assertIn('Create a new 2D action animation',example)
+        self.assertIn('@Video1 is a movement guide for the two',example)
         for token in ('@Image1','@Image2','@Image3'):
             self.assertIn(token,example)
-        for editing_instruction in ('원본 장면으로 편집','매 프레임 재작화','교체한다'):
-            self.assertNotIn(editing_instruction,example)
+        for editing_instruction in ('edit the source scene','repaint every frame','replace'):
+            self.assertNotIn(editing_instruction,example.lower())
     def test_restyle_remains_explicit_and_reviews_are_scoped(self):
         text=(ROOT/'codex-skills/seedance-prompt-en/blender-previs-prompting.md').read_text()
         restyle=text.split('### SOURCE_RESTYLE —',1)[1].split('## 4.',1)[0]
-        self.assertIn('@Video1을 원본 장면으로 편집한다',restyle)
+        self.assertIn('Edit @Video1 as the source scene',restyle)
         self.assertIn('Use only when editing/restyling the existing sequence is actually requested',text)
         self.assertIn('For MOTION_GUIDE, first check',text)
         self.assertIn('For SOURCE_RESTYLE, first validate',text)

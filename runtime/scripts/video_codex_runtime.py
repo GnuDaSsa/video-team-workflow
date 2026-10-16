@@ -38,7 +38,6 @@ LANES = [
     'image_qc',
     'seedance',
     'seedance_qc',
-    'editor',
     'package',
 ]
 TEMPLATE_BY_LANE = {
@@ -50,7 +49,6 @@ TEMPLATE_BY_LANE = {
     'image_qc': 'image_qc.md',
     'seedance': 'seedance.md',
     'seedance_qc': 'seedance_qc.md',
-    'editor': 'editor.md',
     'package': 'package.md',
 }
 ALIASES: dict[str, list[str]] = {}
@@ -65,12 +63,29 @@ QUEUES = [
     'seedance_block_queue',
     'seedance_review_queue',
     'seedance_retry_queue',
-    'edit_queue',
-    'typography_queue',
     'package_qc_queue',
     'submission_queue',
     'retry_router_queue',
 ]
+
+
+def show_project_board(project: Path) -> bool:
+    """Open the user's display-only panel at intake, never a production owner."""
+    if os.environ.get('VIDEO_TEAM_BOARD_DISABLED') == '1':
+        return False
+    project = Path(project).expanduser().resolve()
+    launcher = HOME / '.local/bin/video-team-board'
+    if project.parent != PROJECT_ROOT.resolve() or not (project / 'manifest.json').is_file() or not launcher.is_file():
+        return False
+    try:
+        result = subprocess.run([str(launcher), '--project', str(project)],
+                                capture_output=True, text=True, timeout=5)
+        if result.returncode:
+            print('Video board unavailable; production state unchanged.', file=sys.stderr)
+        return result.returncode == 0
+    except (OSError, subprocess.TimeoutExpired):
+        print('Video board unavailable; production state unchanged.', file=sys.stderr)
+        return False
 
 
 def slugify(s: str) -> str:
@@ -227,7 +242,6 @@ def init_project(args) -> None:
         'music': {'status': 'NOT_LOCKED', 'music_file': None},
         'cut_list': [],
         'blocks': [],
-        'edit': {'status': 'NOT_STARTED'},
         'package': {'status': 'NOT_STARTED'},
         'safety': state['safety'],
     }
@@ -242,7 +256,14 @@ def init_project(args) -> None:
         'brief': str(project / 'brief.md'),
         'generation_mode': generation_mode,
     })
+    if getattr(args, 'preprod', False):
+        import preprod
+        preprod.init(project)
+        if getattr(args, 'author', ''):
+            import claude_author
+            claude_author.set_mode(project, args.author, 'init --author ' + args.author)
     print(str(project))
+    show_project_board(project)
 
 
 def set_mode(args) -> None:
@@ -375,7 +396,7 @@ def _seedance_phase_contract(project: Path, phase: str, route: dict) -> str:
 
 - This foreground owner is `{route['model'] or 'inherit_session'}` with `{route['reasoning_effort'] or 'session-selected'}` reasoning.
 - Use only current `ATTESTED` prompt packages. Do not rewrite, improve, or silently replace a
-  prompt; return to the Astra prompting phase when a creative revision is required.
+  prompt; return to the same owner's prompting step when a creative revision is required.
 - Aside is the sole visible Runway owner. Bind the exact existing Runway tab with deterministic
   `aside repl` (`listBrowserTabs()` -> exact targetId -> `attachBrowserTab(targetId)`). Never
   open a new Runway tab or use Chrome, Safari, in-app browser, connector, or API.
@@ -850,17 +871,20 @@ def next_cmd(args) -> None:
     for lane in result.get('next_lanes') or []:
         phase = seedance_phase(project, 'auto') if lane == 'seedance' else None
         dispatch.append(model_routing.resolve(lane, phase))
-    result['next_dispatch'] = dispatch
     result['default_execution'] = {
         'action': 'CONTINUE_IN_CURRENT_CONVERSATION',
         'new_owner': False,
         'new_approval_for_role_change': False,
         'automatic_model_switch': False,
+        'authoring_model': 'inherit_session',
+        'same_owner_authoring_allowed': True,
         'next_roles': [{'lane': row['lane'], 'phase': row['phase'],
-                        'author_required': row['model_selection'] == 'astra_author',
+                        'preferred_author_model': row['model'],
+                        'author_model_preference_only': True,
                         'author_protocol': 'AGENTS.md §1.3'} for row in dispatch],
-        'dispatch_note': 'next_dispatch is optional new-owner routing, not an instruction to spawn or ask again for routine steps.',
+        'dispatch_note': 'next_dispatch is optional new-owner routing only. Continue prompting and production here with the actual session model; do not spawn or request routine approval.',
     }
+    result['next_dispatch'] = dispatch
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
@@ -925,13 +949,27 @@ def lock_duration_cmd(args) -> None:
 
 
 def main() -> None:
+    if len(sys.argv) > 1 and sys.argv[1] == 'author':
+        # `video-codex-runtime author set-mode|mode|run ...` → Claude/Codex authoring mode.
+        import claude_author
+        sys.argv = [sys.argv[0] + ' author'] + sys.argv[2:]
+        raise SystemExit(claude_author.main())
+    if len(sys.argv) > 1 and sys.argv[1] == 'preprod':
+        # `video-codex-runtime preprod <cmd> ...` forwards to the preprod stage tool.
+        import preprod
+        sys.argv = [sys.argv[0] + ' preprod'] + sys.argv[2:]
+        raise SystemExit(preprod.main())
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest='cmd', required=True)
     p = sub.add_parser('init')
     p.add_argument('--slug', default='')
     p.add_argument('--brief', required=True)
     p.add_argument('--mode', choices=GENERATION_MODES, default=STANDARD_I2V_MODE)
-    p.set_defaults(func=init_project)
+    p.add_argument('--no-preprod', dest='preprod', action='store_false',
+                   help='legacy rail without the fixed preprod/ stages (new projects use preprod by default)')
+    p.add_argument('--author', choices=('claude', 'codex'), default='',
+                   help='authoring mode chosen by the user; omit to ask at P0')
+    p.set_defaults(func=init_project, preprod=True)
 
     p = sub.add_parser('set-mode', help='switch future unsubmitted blocks between standard I2V and No-I2V')
     p.add_argument('--project', required=True)
@@ -943,7 +981,7 @@ def main() -> None:
     p.add_argument('--lanes', nargs='+', required=True, help='exactly one lane for dispatch; multi-lane aliases are rejected')
     p.add_argument('--force', action='store_true', help='bypass eligible rail gates with a warning; v4 MEDIA_HARD_GATE is never bypassed')
     p.add_argument('--phase', choices=['auto', 'prompting', 'production'], default='auto',
-                   help='seedance only: auto resolves the next sequential Astra/Luna phase')
+                   help='seedance only: auto resolves the next sequential prompting/production phase')
     p.add_argument('--approved-spawn',
                    help='exact current-conversation spawn approval token shown by next/model-route')
     p.set_defaults(func=dispatch)
@@ -1016,6 +1054,8 @@ def main() -> None:
 
     args = ap.parse_args()
     args.func(args)
+    if args.cmd == 'next':
+        show_project_board(Path(args.project))
 
 
 if __name__ == '__main__':

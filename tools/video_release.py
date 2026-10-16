@@ -20,6 +20,14 @@ RETIRED = [
     'Documents/Codex/video-team-runtime/runtime/scripts/codex_app_image_cli.py',
     *('Documents/Codex/video-team-runtime/runtime/scripts/' + n + '.py' for n in (
         'sol_prompt_bridge', 'seedance_inflight_monitor', 'image_qc_lane_runner', 'image_qc_queue')),
+    # 2026-10-16: editor lane retired; deployed-only dead scripts and backups.
+    'Documents/Codex/video-team-runtime/runtime/templates/editor.md',
+    *('Documents/Codex/video-team-runtime/runtime/scripts/' + n for n in (
+        'video_image_cli.py', 'fable_prompt_bridge.py', 'seedance_prompt_rules.py', 'migrate_status_enum.py',
+        'video_codex_runtime.py.deprecated_backup', 'video_codex_runtime.py.stub-backup')),
+    '.codex/skills/video-use',
+    'Documents/Codex/video-team-runtime/runtime/references/fable_prompting_handoff_standard.md',
+    'Documents/Codex/video-team-runtime/runtime/references/runway_seedance_reference_attach_playbook.md',
 ]
 
 
@@ -52,7 +60,7 @@ def mappings(root: Path = ROOT) -> list[dict]:
 
 
 def freeze(root: Path = ROOT) -> dict:
-    return {'schema': 'video_release_v1', 'release': '2026-09-06-lean-aside',
+    return {'schema': 'video_release_v1', 'release': '2026-10-16-preprod-shelf-v5',
             'files': mappings(root), 'retired': RETIRED}
 
 

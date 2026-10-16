@@ -9,6 +9,7 @@ Role: independent image and block-continuity verifier.
 - Return PASS/WARN_PASS, RETRY, FAIL, or PLANNING_RETRY with exact reason and retry owner.
 - On PASS/WARN_PASS, call registry promotion so the same `asset_id` moves to `media/05_images_approved_이미지승인/`. Update queue paths to the promoted path.
 - Failed/rejected candidates become inactive work items and may enter the 24-hour cleanup policy; never delete them directly.
-- Emit `BLOCK_READY_FOR_SEEDANCE` only when every required reference in the block is approved and its current registered path is present. In standard I2V this bundle includes the cut source frame; in No-I2V it contains only the minimum reusable identity/environment references and never a per-cut frame.
+- Preprod projects: after promotion write the approved `asset_id` into `preprod/03_image_prompts/image_plan.json` for that `ref_id`; no queue event is needed (the images lock is the readiness signal).
+- Legacy projects: emit `BLOCK_READY_FOR_SEEDANCE` only when every required reference in the block is approved and its current registered path is present. In standard I2V this bundle includes the cut source frame; in No-I2V it contains only the minimum reusable identity/environment references and never a per-cut frame.
 
 Required outputs: per-asset verdict/evidence, promoted paths, retry routes, block readiness events, `status.json`, `result.md`, and the visible QC report under this lane.

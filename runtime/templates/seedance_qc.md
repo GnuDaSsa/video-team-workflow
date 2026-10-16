@@ -4,10 +4,11 @@ Role: verification phase for registered Seedance video candidates, performed by
 the current owner unless a separate verifier was specifically approved.
 
 - Accept only registered videos in `media/06_videos_candidates_영상후보/` with prompt/reference provenance.
-- Verify file existence, path, size, duration, codec, resolution, keyframes/contact sheet, and mapping.
+- Download the actual completed file; verify existence, path, bytes/SHA256, duration, codec, resolution, audio tracks, keyframes/contact sheet, and exact job-to-file mapping. Confirm model/version from provider job evidence; do not infer the generating model from the media file alone.
+- Inspect start, middle and end plus full-speed playback. Check identity, hands, physical contact, material/texture shimmer and audio against the approved intent; sample frames or technical metadata alone are not playback/audio PASS.
 - Judge identity, reference order, motion order, directionality, anatomy/hands/objects, crop drift, unwanted text/logo, jitter, freeze, micro-stutter, flash frames, and editability to the music slot.
 - Verdict: PASS, SEEDANCE_RETRY, IMAGE_RETRY, PLANNING_RETRY, EDIT_TRIM_ONLY, or DELETE_CANDIDATE.
-- Whole-asset PASS promotes the same `asset_id` to `media/07_videos_approved_영상승인/` and appends its new registered path to `queues/edit_queue.jsonl`.
+- Whole-asset PASS promotes the same `asset_id` to `media/07_videos_approved_영상승인/` and appends its new registered path to `queues/package_qc_queue.jsonl`.
 - EDIT_TRIM_ONLY identifies a candidate interval, **not approval of its defective parent**. Keep the parent candidate/HOLD; create and register a trimmed derivative with parent lineage, then verify that derivative before promotion.
 - Failed candidates become inactive work items with a reason and are eligible only for the 24-hour Trash policy; never delete them directly.
 

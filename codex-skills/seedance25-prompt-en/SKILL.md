@@ -29,7 +29,10 @@ agent, one sequential lane, and one existing visible Aside Runway tab.
 
 Do not copy the 2.0 shared contract wholesale: it includes deliberate 2.0 model
 and queue assumptions. Reuse only the version-neutral creative adapters when
-they apply:
+they apply. The model-facing prompt always uses the single template in
+`../seedance-prompt-en/seedance-prompting.md` (gold examples:
+`../seedance-prompt-en/examples/`); the files below are review lenses, not
+alternative templates:
 
 - `../seedance-prompt-en/seedance-field-lessons.md`
 - `../seedance-prompt-en/hell-grind-production-prompting-adapter.md`

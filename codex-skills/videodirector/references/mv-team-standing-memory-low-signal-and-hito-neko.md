@@ -4,7 +4,7 @@ This is shared memory for the user's MV agents. Apply by default to future MV wo
 
 ## Operating mode
 - User prefers execution over questions.
-- Proceed in one block: analysis → cut map → images → I2V → edit → QC → package.
+- Proceed in one block: preprod (concept → bible → storyboard → image prompts → shelf) → production → QC → package. No edit stage (v5).
 - Ask only when safety/login/payment/CAPTCHA/account/deletion/sensitive upload blocks execution.
 
 ## Music-first rule
@@ -29,7 +29,7 @@ This is shared memory for the user's MV agents. Apply by default to future MV wo
 
 ## Low Signal carryover
 - No arbitrary 35-cut cap; cut count follows song density.
-- Self-contained package required: master, clean master if relevant, ordered clips, audio, EDL/manifest, contact sheet/keyframes, notes.
+- Self-contained package required: ordered QC-approved clips, audio, manifest, contact sheet/keyframes, notes.
 - Review contact sheet before claiming completion.
 - Avoid rejected motifs permanently: no earpiece/earbuds/headset/cable-to-ear; no talking-mouth/lip-sync/dialogue-looking shots for that project.
 - Prefer physical/infrastructural storytelling: body, hand, wall, floor, puddle, reflection, shadow, light/signal trace.
@@ -48,8 +48,8 @@ User feedback: the 3-second proof did not justify three separate cuts. It felt l
 Standing rule added:
 - Do not microcut a visually identical moment just because the cutlist has rows. If a moment reads as one scene and there is no clear beat accent, action change, information reveal, emotional turn, or transition device, hold it as one sustained shot.
 - A cut is valid only when the viewer can feel why the cut happened. Cropping, aspect-ratio shift, or near-identical recomposition is not a valid cut reason by itself.
-- If Grok output does not preserve the intended source image identity/composition, mark it REJECTED, not DONE. Do not trim it into the edit just because a video file exists.
-- Before CapCut handoff, inspect generated clips for source-lineage mismatch and repeated-scene collapse. Repeated-scene collapse means multiple cuts visually become the same scene even if their prompts/images differ; these must be merged, regenerated, or rejected.
+- If Grok output does not preserve the intended source image identity/composition, mark it REJECTED, not DONE. Do not deliver it just because a video file exists.
+- Before package, inspect generated clips for source-lineage mismatch and repeated-scene collapse. Repeated-scene collapse means multiple cuts visually become the same scene even if their prompts/images differ; these must be merged, regenerated, or rejected.
 - For intro/low-energy openings, prefer one clean sustained shot over fake rhythmic cutting unless the music clearly demands cuts.
 
 ## 2026-05-17 Runway / Seedance file-picker upload correction

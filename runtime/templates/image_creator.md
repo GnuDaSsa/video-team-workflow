@@ -1,34 +1,23 @@
-# Image Creator lane prompt
+# Image Creator lane prompt — P3 image prompts and references
 
-Role: image-prompt author and file-backed image production owner.
+**Authoring mode:** if `manifest.authoring.mode` is `claude`, do not write the creative files yourself — run `video-codex-runtime author run --project <p> --stage image-prompts` (add `--feedback "<user words>"` for changes), then continue with the checks, user approval and lock below. In `codex` mode write them yourself.
 
-Start:
+Role: authors and generates every reference image the storyboard needs, and nothing else.
 
-- Read `brief.md`, `manifest.json`, Planner outputs, `queues/image_reference_queue.jsonl`, retry queues, and the canonical AGENTS.md §1–§4.
-- Use `/Users/gnudas/.codex/skills/image-prompt/SKILL.md` to author the final image prompts in this lane. Apply canonical AGENTS §1.3: Astra authors; the original session executes immutable files.
-- For recurring characters, create/QC/register the required model sheets first and attach the approved sheets to every dependent production frame.
-- If `generation_mode=no_i2v_reference_native`, create **no per-cut production frames**. Reuse approved provider-safe identity/environment references and generate only the minimum missing reference assets. If nothing is missing, record `SKIPPED_REFS_REUSED` with the registered asset IDs instead of generating filler images.
+## Preprod projects (all new projects)
+1. Read the locked `style_bible.json` and `storyboard.json`. The needed reference IDs are each block's `refs[]` plus every character's `sheet_ref_id`.
+2. For each reference write `preprod/03_image_prompts/<REF_ID>.prompt.txt` in **English**, using the section structure of `/Users/gnudas/.codex/skills/image-prompt/SKILL.md` (subject, composition, lighting, palette from the bible hex values, material/texture, output constraints). Characters: triptych model sheet per `runtime/references/character_sheet_prompt_standard.md`; sheets come before any image that depends on them.
+3. List them in `preprod/03_image_prompts/image_plan.json` → `references[]`: `ref_id`, `purpose` (`identity|environment|prop|style`), `role_en` (the short English role phrase the video prompt will bind to `@ImageN`, e.g. "Mina identity"), `asset_id` (filled after Image QC promotes it). User-supplied images: `"source": "user_supplied"` + registered `asset_id`, no prompt file.
+4. Generate with the built-in `image_gen` call (up to 3 concurrent calls of already-written prompts; prompts are immutable once generated). Register each candidate into `media/04_images_candidates_이미지후보/` with its prompt hash. Image QC promotes.
+5. When every reference has an approved `asset_id`, run `preprod check --stage images` then `preprod lock --stage images`.
 
-Execution:
+## Rules
+- One reference = one prompt = one standalone image. No grids or contact sheets as production references.
+- Never generate without a required identity reference; never switch to an API fallback.
+- A rejected image gets a new revision of the same `<REF_ID>.prompt.txt` (old one is kept by the registry/revision, not overwritten silently) and goes back through Image QC.
+- `prepare-image-batch` only writes a hash-bound list; it launches no process or agent.
 
-- Save immutable prompt files under `lanes/<lane>/prompts/`.
-- Use the Codex file-backed image route. Do not use ChatGPT web/GUI, Grok still generation, or API-key fallback without explicit user approval.
-- One required reference = one prompt = one standalone image. No-I2V references must be reusable across multiple shots rather than cut-specific compositions.
-- Generate candidates directly into `media/04_images_candidates_이미지후보/` and register them with stable `asset_id`, work item, revision, prompt hash, provider, and provenance.
-- Keep command logs, provenance JSON, mappings, QC evidence, and contact-sheet metadata in the lane. A review contact sheet, if it is an actual image, must also be registered in an appropriate media folder.
-- Do not emit Seedance-ready approval. Only Image QC promotes candidates.
+## Legacy projects (no `preprod/`)
+Follow the queue-based flow in `queues/image_reference_queue.jsonl` with prompts under `lanes/<lane>/prompts/`; the same media/registry and identity rules apply.
 
-Required outputs:
-
-1. Claimed work items and immutable prompt paths.
-2. Candidate `asset_id`, registered media path, dimensions, prompt hash, and provider provenance.
-3. Block/reference/cut mapping and self-rejects.
-4. `queues/image_review_queue.jsonl` event only for real registered candidate images.
-5. Updated `status.json` and `result.md`.
-- `prepare-image-batch` (legacy alias `dispatch-image-shards`) produces a hash-bound
-  handoff only; it launches zero processes/agents. The current owner calls built-in
-  `image_gen` with the immutable one-cut prompt and verified required references.
-  Only bounded image-generation calls may overlap (maximum three), never new Codex
-  tasks or prompt agents. Do not auto-switch reference-conditioned work to an API.
-- A missing or unreadable refs sidecar does not mean “generate without identity”.
-  Resolve required attachments before generation; preserve the identity gate.
+Outputs: prompt paths, candidate `asset_id`s with prompt hashes, `status.json`, `result.md`.

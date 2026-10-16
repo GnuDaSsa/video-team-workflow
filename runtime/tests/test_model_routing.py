@@ -19,6 +19,10 @@ import video_codex_runtime  # noqa: E402
 
 
 class ModelRoutingTests(unittest.TestCase):
+    def test_explicit_legacy_luna_owner_uses_gpt6(self) -> None:
+        self.assertEqual(model_routing.LUNA_MODEL, 'gpt-6-luna')
+        self.assertEqual(model_routing.LUNA_EFFORT, 'high')
+
     def test_creative_generation_routes_to_astra_xhigh(self) -> None:
         for lane, phase in (
                 ('image_creator_01', None), ('image_creator_02', None),
@@ -32,7 +36,7 @@ class ModelRoutingTests(unittest.TestCase):
 
     def test_flow_qc_and_computer_use_route_to_luna_high(self) -> None:
         for lane in ('director', 'music', 'image_qc',
-                     'seedance_qc', 'editor', 'package'):
+                     'seedance_qc', 'package'):
             route = model_routing.resolve(lane)
             self.assertIsNone(route['model'])
             self.assertIsNone(route['reasoning_effort'])

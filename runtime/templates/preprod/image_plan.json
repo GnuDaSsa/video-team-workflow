@@ -1,0 +1,16 @@
+{
+  "references": [
+    {
+      "ref_id": "HERO_SHEET",
+      "purpose": "identity",
+      "role_en": "character identity triptych for HERO",
+      "asset_id": null
+    },
+    {
+      "ref_id": "ROOFTOP_ENV",
+      "purpose": "environment",
+      "role_en": "rooftop environment plate",
+      "asset_id": null
+    }
+  ]
+}

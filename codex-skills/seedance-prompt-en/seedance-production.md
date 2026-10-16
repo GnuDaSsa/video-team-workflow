@@ -29,12 +29,59 @@ A closed 2.5 label is a model mismatch on this branch, not implicit migration.
 Generate is one click per block transaction. Confirm the matching new card
 before advancing. A stale card, thumbnail or click is not submission evidence.
 
+## Submission reconciliation and account cost evidence
+
+This section is the shared operational contract for Codex and the installed
+Aside video entry; their own prompt language, authoring and UI adapters remain
+unchanged. Preserve the project's approved scope, mode, holds and creative locks.
+
+- Before actual use, verify the current account, visible model/mode and cost
+  indicators. The Seongnam observation of Runway GPT Image 2.5 Sunburst with
+  Unlimited, Credits off and a no-credit notice is account-specific historical
+  evidence, not permission or a guarantee for another account. The user's
+  standing preference defers credits: do not perform paid generation or a new
+  purchase under this workflow; if a no-credit route cannot be verified, HOLD
+  that generation. A later explicit scoped user instruction takes precedence.
+- Record one transaction per cut/attempt in the existing receipt: unique prompt
+  marker or exact distinguishing text (not requested on-screen typography), NFC
+  submitted body/hash, reference asset IDs, exact normal session URL, provider
+  job ID when exposed, clicked_at, accepted_at, observed_at and actual status.
+  A local marker/hash is not a provider job ID; unknown remains unknown.
+- A missing immediate card or stale feed is not failure. After a Generate click,
+  preserve other tasks' unsaved composer state and refresh the exact normal
+  project session. Compare the exact prompt, references, timestamps and exposed
+  job/asset IDs with the existing receipt before deciding whether to retry.
+  Similar thumbnails or a shared prompt prefix are insufficient. Uncertain
+  acceptance remains UNKNOWN: no second click, session recreation or resubmit.
+  Retry only after non-acceptance or actual failure is established and the
+  existing retry/cost scope permits it. Never rewrite accepted job provenance.
+- Check actually accepted jobs at the standing 20-minute scheduled interval
+  below unless the user explicitly selects another cadence/mode. A clicked or
+  drafted transaction is not an accepted job. Record last observation and next
+  due time; use the wait for the next cut's direction/assets and independent QA.
+  This rule creates no scheduler and does not reconfigure an existing approved
+  interval or the separately selected bounded foreground wait.
+- Reference mode uses the approved role-separated references; Keyframe is not
+  interchangeable. Per-cut start-frame exceptions require explicit scope.
+  Do not import another project's duration, complexion, ethnicity, product
+  styling, dimension transitions or music rhythm as global instructions.
+
 ## Attachment and recovery
 
 Use `recovery-checkpoint` with project/block, exact session URL, current prompt
 hash, registered reference map/hash, verified slots and actual settings before
-ATTACH. Use `prepare-upload-alias`, visible Reference selector and verified
+ATTACH. Use `prepare-upload-bundle` (ordered ASCII clones in
+`~/RunwayUpload/<project>/<B>/`), the visible Reference selector and the verified
 native chooser as described in `aside-operator.md`; never hidden file inputs.
+In preprod projects run `preprod shelf-verify --block <B>` first and use only the
+shelf's `pack.json`, `settings.json` and `prompt.txt`.
+
+Upload transport failures (`FILE_PICKER_NOT_EXPOSED`, `NATIVE_CHOOSER_*`,
+`UPLOAD_CONTROL_TIMEOUT`) are path problems, never session problems: their
+rungs are `ESCAPE_CHOOSER_REOPEN_SAME_UPLOAD_TILE_ONCE` →
+`REUSE_RUNWAY_UPLOADS_ENTRY_BY_EXACT_BUNDLE_NAME` →
+`PICKER_GO_TO_BUNDLE_FILE_PATH_THEN_SELECT`, capped at 3 per slot, then one exact
+user action. Do not refresh the session for them.
 
 Classify incidents once via `recovery-record` and execute only the returned
 same-session rung; after visible success use `recovery-resolve` and resume the
@@ -81,8 +128,10 @@ hash-bound selection survives model/turn changes. A live foreground wait must
 first be stopped and its owning tool result consumed. The next fresh board
 `queue-cycle --from-wake` clears any interrupted wake without sleeping.
 
-In scheduled mode, `queue-cycle` records one board observation and immediately
-returns `SCHEDULED_CHECKPOINT_NO_WAIT`. Direct `queue-wait` is rejected. Do not
+In scheduled mode, `queue-cycle` records one board observation without sleeping.
+It returns `CONTINUATION_NOT_ARMED` (nonzero CLI exit) when pending work lacks a
+fresh compliant native registration snapshot; `SCHEDULED_CHECKPOINT_NO_WAIT`
+requires that gate to pass or the queue to be terminal. Direct `queue-wait` is rejected. Do not
 hand-edit queue flags to escape the foreground branch. A corrupt/changed mode
 receipt fails closed rather than falling back to a 15-minute sleep.
 Existing native `kind: heartbeat/cron, status: ACTIVE` records also express
@@ -100,6 +149,47 @@ Capture registration ID, accepted cadence, destination, active/paused state and
 native tool evidence separately from first-run evidence. Heartbeat model choice
 may inherit task settings; do not claim Luna execution from a routing table.
 A local mode file never proves registration, browser access or successful runs.
+
+### Native registration is an execution step, not a final-answer suggestion
+
+At production entry, before the first Generate/queue handoff, resolve the
+selected continuation mode and existing specific schedule approval. When that
+approval already covers this project's production heartbeat, registration and
+routine repair are the owner's work: do not finish by asking the user to repeat
+"set the schedule". A workflow-default preference alone is not new-surface
+approval; if missing, obtain it once for the named purpose/output. A user pause,
+HOLD or explicit "do not schedule now" is not repair authorization.
+
+Perform this transaction in the current owning conversation:
+
+1. Discover the native `automation_update` tool. Inspect matching existing
+   automation records and use `mode=view` for the resolved ID. Multiple possible
+   matches need resolution, not a duplicate create. Never guess a task ID.
+2. If absent and specifically approved, actually call `mode=create`,
+   `kind=heartbeat`, for the verified production task and approved cadence.
+   If an existing registration has an authorized repairable mismatch, actually
+   call `mode=update` with the same ID and full preserved fields. Never auto-resume
+   a user-paused registration; preserve notification policy, destination and
+   scope. Do not call `suggested_create` then treat the proposal as registered.
+3. Read the actual result/record after the call. A rendered card with no fields,
+   an API error or an uncertain outcome is not ACTIVE proof. Re-read before
+   retrying create to prevent duplicates; no cron/CLI/heartbeat workaround.
+4. In existing lane `status.json`, record `monitoring.automation_id`,
+   `consumer_task_id` (the production owner), `purpose=production_continuation`,
+   and project-relative `registration_evidence`. The evidence is the actual
+   native snapshot described below, not a newly invented self-certification.
+   Run `queue-exit-check`; its scheduled path now consumes that snapshot audit.
+5. Keep registration and execution separate. The first handoff can pass before
+   the first run exists; later runs must show real board/file operations. A
+   delivered instruction, model-capacity error or self-reported progress is not
+   execution. Reconcile accepted/uncertain jobs before any retry.
+
+If native registration cannot be completed because approval/tool access or an
+external service is unavailable, report `CONTINUATION_NOT_ARMED` and the precise
+blocker. The exit refusal forbids claiming autonomous continuation; it does not
+permit endless retries, violating a user stop, or falling back to foreground
+sleep. Preserve existing pending jobs without re-Generate. This repair/audit
+procedure itself never authorizes creating a live test schedule.
 
 ### Cadence and stable resume payload
 
@@ -129,8 +219,10 @@ updates; correct only the authorized mismatch through the native tool.
 
 Keep the automation prompt **stable**: project/state paths, approved scope,
 owner/skill pointer, action priority, safety boundary and terminal condition.
-Do not freeze counts, pending statuses, current composer contents or a long list
-of completed QC intervals into recurring instructions. Those are mutable run
+Do not freeze counts, pending statuses, current composer contents, project
+revision labels such as V4.8, or a long list of completed QC intervals into
+recurring instructions. Read the latest authorized scope and HOLD from state;
+a revision change never expands the human-approved project scope. Those are mutable run
 data in existing state/queue/per-asset QC reports, read afresh at every run.
 Accepted/uncertain transactions are deduplicated from their receipts, not from
 an old sentence saying which block is in the composer.
@@ -220,7 +312,7 @@ Do not pause a project because an unrelated previous clip is not yet QC-passed.
 A failed clip goes on the repair list without blocking independent approved
 shots. Do not trigger an endless repair loop before completing the initial batch.
 
-Keep QC before approved-media promotion and final edit/delivery, not between
+Keep QC before approved-media promotion and package delivery, not between
 independent Generate submissions. Prompt/identity/reference/settings checks,
 actual source dependencies (a later clip using an earlier video), safety failures,
 and explicit user HOLD still gate the affected submission. This priority does
@@ -235,9 +327,10 @@ A successful Generate is not a safe terminal checkpoint. Before ending a
 scheduled production turn, persist `scheduled_followup` with the exact job/scene,
 acceptance evidence and observation time, `due_at`, existing automation ID,
 consumer task ID, next action, and terminal condition. Verify native registration
-covers that consumer and purpose. If the existing approved schedule is absent or
-paused, repair that same registration through the native tool; never merely
-promise to wait. A missing executable follow-up is `CONTINUATION_NOT_ARMED`, not
+covers that consumer and purpose. If absent, perform native creation only under
+the specific approved scheduling scope. Repair an existing registration in place
+only when that repair is authorized; never override a user PAUSED/HOLD or create
+a duplicate. Never merely promise to wait. A missing executable follow-up is `CONTINUATION_NOT_ARMED`, not
 production running or complete. Do not click Generate again to repair scheduling.
 
 For project-wide continuation already authorized by the user, the next action is

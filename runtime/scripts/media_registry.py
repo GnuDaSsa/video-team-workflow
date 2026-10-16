@@ -342,7 +342,11 @@ def promote(project: Path, asset_id: str) -> dict:
     project = Path(project).expanduser().resolve()
     asset = get_asset(project, asset_id)
     if asset['kind'] not in {'image', 'video'}:
-        raise ValueError('only image/video candidates can be promoted')
+        raise ValueError('only image/video candidates can be promoted; '
+                         'character/audio/source assets keep their canonical folder: '
+                         'after required QC/approval, use set-state --project <project> '
+                         '--asset-id <asset-id> --state <approved-or-locked>. '
+                         'This error does not authorize approval.')
     source = Path(asset['current_path'])
     if not source.is_file() or sha256(source) != asset['sha256']:
         raise ValueError('source missing or hash mismatch; refusing promotion')
@@ -569,8 +573,8 @@ def main() -> int:
     p.add_argument('--origin-lane', default=''); p.add_argument('--provider', default='')
     p.add_argument('--run-id', default=''); p.add_argument('--prompt-hash', default='')
     p.add_argument('--parent-asset-id'); p.add_argument('--copy', action='store_true')
-    p = sub.add_parser('promote'); p.add_argument('--project', required=True); p.add_argument('--asset-id', required=True)
-    p = sub.add_parser('set-state'); p.add_argument('--project', required=True); p.add_argument('--asset-id', required=True); p.add_argument('--state', required=True)
+    p = sub.add_parser('promote', help='Move verified image/video candidates to approved media folders (not character/audio/source)'); p.add_argument('--project', required=True); p.add_argument('--asset-id', required=True)
+    p = sub.add_parser('set-state', help='Update evidence-backed asset state, including character/audio/source, without image/video promotion'); p.add_argument('--project', required=True); p.add_argument('--asset-id', required=True); p.add_argument('--state', required=True)
     p = sub.add_parser('list'); p.add_argument('--project', required=True); p.add_argument('--kind', default=''); p.add_argument('--state', default='')
     p = sub.add_parser('audit'); p.add_argument('--project', required=True)
     p = sub.add_parser('cleanup')

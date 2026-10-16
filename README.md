@@ -9,7 +9,9 @@ this repository. Active rules are latest-only; history belongs to Git/archive.
 새 에이전트 생성이나 자동 모델 변경을 뜻하지 않는다.
 
 `Director → Music Lock → Planner → Image → Image QC → Seedance prompting →
-Seedance production → Seedance QC → Editor/CapCut → Package`
+Seedance production → Seedance QC → Package`
+
+편집(Editor/CapCut) lane은 2026-10-16 퇴역했다. Package는 QC 승인 클립을 순서대로 납품한다.
 
 - `prepare-image-batch`는 내장 imagegen용 hash-bound 목록만 만들며 숨은 Codex 작업/API 전환은 없다.
 - 별도 dispatch는 해당 spawn을 사용자가 명시 승인했을 때만 사용하는 호환 경로.
@@ -29,7 +31,8 @@ Seedance production → Seedance QC → Editor/CapCut → Package`
 | 공통 프롬프트 검토 | `seedance-prompt-en/prompt-review.md` |
 | Aside exact-session 실행 | `seedance-prompt-en/aside-operator.md` + shared helper |
 | 스폰 승인 | `team-policies/subagent_approval_gate_20260721.md` |
-| 이야기·연출·편집 품질 | `codex-skills/videodirector/` |
+| 이야기·연출 품질, P0 컨셉·P1 style bible 작성법 (편집 제외) | `codex-skills/videodirector/` |
+| 프리프로덕션 단계 파일·잠금·선반 | `runtime/scripts/preprod.py` + `runtime/templates/preprod/` |
 
 ## 배포와 검증
 
@@ -61,8 +64,8 @@ python3 tools/shadow_prompt_audit.py --root '<prepared shelf>' > /tmp/shadow-aud
 ## 검증의 한계
 
 코드·해시·프롬프트 검사는 영상 품질 PASS가 아니다. 실제 생성 후 전 구간 재생,
-identity/physics/temporal QC와 실제 CapCut preview/export 검사가 따로 필요하다.
+identity/physics/temporal QC가 따로 필요하다.
 릴리스 범위와 증거: `docs/releases/2026-09-06/`.
 
-포함하지 않는 것: 프로젝트 폴더, 영상/음원, CapCut draft, 세션 URL/계정 상태,
+포함하지 않는 것: 프로젝트 폴더, 영상/음원, 세션 URL/계정 상태,
 비밀정보, 개인 제출 양식. 별도 에이전트/스케줄러/브라우저 루프는 만들지 않는다.

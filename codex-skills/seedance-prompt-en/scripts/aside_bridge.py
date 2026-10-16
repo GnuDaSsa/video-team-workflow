@@ -9,6 +9,8 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import tempfile
+import hashlib
 from urllib.parse import parse_qs, urlparse
 
 MARKER = 'CODEX_ASIDE_RESULT:'
@@ -42,7 +44,10 @@ def repl(code: str, account: str | None = None):
     matches = [line.split(MARKER, 1)[1] for line in p.stdout.splitlines() if line.startswith(MARKER)]
     if len(matches) != 1:
         raise ValueError('ASIDE_CLI_RESULT_MISSING_OR_AMBIGUOUS')
-    value = json.loads(matches[0])
+    try:
+        value = json.loads(matches[0])
+    except (ValueError, TypeError) as exc:
+        raise ValueError('ASIDE_CLI_RESULT_INVALID_JSON') from exc
     if isinstance(value, dict) and '__aside_bridge_error' in value:
         raise ValueError('ASIDE_CLI_CONTROL_FAILED: ' + str(value['__aside_bridge_error']))
     return value
@@ -145,6 +150,85 @@ def browser_js(js: str, binding_path: Path | None = None, *, require_active: boo
         return 3, '', str(exc)
 
 
+# One read-only DOM transaction; no prompt text, media, account URLs or selectors
+# leave the page. Native chooser visibility is outside the DOM's evidence scope.
+OBSERVE_JS = r"""(() => {
+ const visible = e => e.getClientRects().length > 0;
+ const dialogs = [...document.querySelectorAll('[role="dialog"], [role="alertdialog"], dialog[open], [aria-modal="true"]')].filter(visible);
+ const assetSelector = dialogs.some(e => e.getAttribute('aria-label') === 'Asset selector');
+ const editors = [...document.querySelectorAll('[contenteditable][data-lexical-editor]')].filter(visible);
+ const buttons = [...document.querySelectorAll('button')].filter(visible);
+ const slots = buttons.map(e => (e.getAttribute('aria-label') || '').match(/^View (Image|Video|Audio) (\d+) larger$/)).filter(Boolean).map(m => ({modality:m[1], index:Number(m[2])}));
+ const generate = buttons.filter(e => (e.getAttribute('aria-label') || e.innerText || '').trim() === 'Generate');
+ return {schema:1, surface:assetSelector?'ASSET_SELECTOR':dialogs.length?'DIALOG':editors.length===1?'COMPOSER':'UNKNOWN',
+  dialog_count:dialogs.length, editor_count:editors.length,
+  prompt_characters:editors.length===1?(editors[0].textContent || '').length:null,
+  references:slots.slice(0,32), references_truncated:slots.length>32,
+  generate:{count:generate.length, enabled:generate.length===1?!generate[0].disabled && generate[0].getAttribute('aria-disabled')!=='true':null},
+  native_chooser:'NOT_OBSERVED_BY_DOM'};
+})()"""
+
+
+def validate_observation(value):
+    if not isinstance(value, dict) or value.get('schema') != 1:
+        raise ValueError('ASIDE_OBSERVATION_INVALID')
+    if value.get('surface') not in {'ASSET_SELECTOR','DIALOG','COMPOSER','UNKNOWN'}:
+        raise ValueError('ASIDE_OBSERVATION_INVALID_SURFACE')
+    for key in ('dialog_count','editor_count'):
+        if type(value.get(key)) is not int or value[key] < 0:
+            raise ValueError('ASIDE_OBSERVATION_INVALID_COUNT')
+    chars=value.get('prompt_characters')
+    if chars is not None and (type(chars) is not int or chars < 0):
+        raise ValueError('ASIDE_OBSERVATION_INVALID_LENGTH')
+    refs=value.get('references')
+    if not isinstance(refs,list) or len(refs)>32 or type(value.get('references_truncated')) is not bool:
+        raise ValueError('ASIDE_OBSERVATION_INVALID_REFERENCES')
+    clean=[]
+    for ref in refs:
+        if not isinstance(ref,dict) or ref.get('modality') not in ('Image','Video','Audio') or type(ref.get('index')) is not int or ref['index']<1:
+            raise ValueError('ASIDE_OBSERVATION_INVALID_REFERENCE')
+        clean.append({'modality':ref['modality'],'index':ref['index']})
+    generate=value.get('generate')
+    if not isinstance(generate,dict) or type(generate.get('count')) is not int or generate['count']<0 or (generate.get('enabled') is not None and type(generate.get('enabled')) is not bool):
+        raise ValueError('ASIDE_OBSERVATION_INVALID_GENERATE')
+    # Allowlist only; never persist extra fields from a page/tool response.
+    return {k:value[k] for k in ('surface','dialog_count','editor_count','prompt_characters','references_truncated')} | {
+        'references':clean,'generate':{'count':generate['count'],'enabled':generate.get('enabled')},
+        'native_chooser':'NOT_OBSERVED_BY_DOM'}
+
+
+def observe(binding_path: Path, record: bool = False):
+    binding_path=binding_path.expanduser().resolve()
+    binding=json.loads(binding_path.read_text())
+    if not isinstance(binding,dict) or binding.get('version')!=VERSION:
+        raise ValueError('ASIDE_BINDING_VERSION_MISMATCH')
+    project=Path(binding.get('project') or '').expanduser().resolve()
+    if record and (binding_path != project/'lanes/seedance/aside_binding.json' or not (project/'manifest.json').is_file()):
+        raise ValueError('ASIDE_OBSERVATION_RECORD_PROJECT_MISMATCH')
+    # Exactly one existing guarded CLI call, without retries or cached identity.
+    rc,out,err=browser_js(OBSERVE_JS,binding_path)
+    if rc: raise ValueError(err or 'ASIDE_OBSERVATION_FAILED')
+    value=validate_observation(json.loads(out))
+    receipt={'schema':'aside_ui_observation_v1','ok':True,
+        'observed_at':dt.datetime.now().astimezone().isoformat(),
+        'binding_sha256':hashlib.sha256(binding_path.read_bytes()).hexdigest(),
+        'read_only':True,'execution_authorized':False,'provider_acceptance_verified':False,
+        **value}
+    # Do not record against a binding switched while the observation ran.
+    if json.loads(binding_path.read_text()) != binding:
+        raise ValueError('ASIDE_BINDING_CHANGED_DURING_OBSERVATION')
+    if record:
+        destination=project/'lanes/seedance/ui_observation.json'
+        temporary=None
+        try:
+            with tempfile.NamedTemporaryFile(mode='w',encoding='utf-8',dir=destination.parent,prefix='.ui_observation-',delete=False) as f:
+                temporary=Path(f.name);f.write(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n')
+            temporary.replace(destination)
+        finally:
+            if temporary is not None: temporary.unlink(missing_ok=True)
+    return receipt
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     sub = p.add_subparsers(dest='cmd', required=True)
@@ -155,15 +239,21 @@ def main() -> int:
     b.add_argument('--account')
     v = sub.add_parser('verify')
     v.add_argument('--binding', type=Path, required=True)
+    o = sub.add_parser('observe', help='One guarded read of modal, references, editor and Generate; never authorizes execution')
+    o.add_argument('--binding', type=Path, required=True)
+    o.add_argument('--record', action='store_true', help='Save separate observation receipt; never modify lane status')
     args = p.parse_args()
     try:
+        if args.cmd == 'observe':
+            print(json.dumps(observe(args.binding,args.record),ensure_ascii=False))
+            return 0
         if args.cmd == 'bind':
             print(json.dumps(bind(args.project, args.target_id, args.session_url, args.account), ensure_ascii=False))
             return 0
         rc, out, err = browser_js('JSON.stringify({title:document.title,url:location.href})', args.binding)
         print(out if rc == 0 else json.dumps({'ok': False, 'error': err}))
         return rc
-    except ValueError as exc:
+    except (ValueError, OSError, KeyError, TypeError) as exc:
         print(json.dumps({'ok': False, 'error': str(exc)}))
         return 3
 

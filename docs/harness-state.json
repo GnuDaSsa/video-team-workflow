@@ -2,9 +2,7 @@
   "currentGoal": "Extend opt-in disposable QC to exact journal-owned permanent deletion and retain scoped continuation approval",
   "status": "complete",
   "currentContract": "docs/contracts/2026-10-13-disposable-video-qc.md",
-  "blockers": [
-    "Live continuation: Aside currently contains another project session; exact intended session restoration required."
-  ],
+  "blockers": [],
   "nextStep": "Use scoped permanent cleanup for reviewed QC copies; active production heartbeat continues the pending paired video.",
   "lastUpdated": "2026-10-13T08:44:55.688611+09:00",
   "verification": {
@@ -97,6 +95,50 @@
       "contract": "docs/contracts/2026-09-09-seedance20-explicit-six.md"
     },
     {
+      "id": "2026-09-10-blender-previs-prompting",
+      "status": "complete",
+      "scope": "Single-owner conditional Blender source restyle branch for Seedance 2.0 and 2.5",
+      "verification": {
+        "result": "PASS",
+        "tests": 157,
+        "live_managed_files": 67,
+        "changed_live_files": 4,
+        "not_run": "New generated video/full playback quality verification"
+      },
+      "decision": "Separate motion preservation from proxy appearance leakage; silhouette-aligned source repair before repeated restyle; effects after identity pass. Existing unrelated blocked goal preserved."
+    },
+    {
+      "id": "2026-09-11-blender-motion-guide-scope",
+      "status": "complete",
+      "contract": "docs/contracts/2026-09-11-blender-motion-guide-scope.md",
+      "scope": "Correct explicit motion-guide intent without source-edit/repaint instructions; keep SOURCE_RESTYLE separately scoped",
+      "verification": {
+        "result": "PASS",
+        "tests": 159,
+        "new_doc_tests": 2,
+        "draft_packs_validated": 2,
+        "protected_r1_files": 7,
+        "live_managed_files": 67,
+        "changed_live_files": 2,
+        "not_run": "Provider submission, new generated output and full temporal/playback QC"
+      },
+      "decision": "Images own finished identity/venue; Video1 supplies only named movement cues. R2 drafts unsubmitted/unattested. Unrelated blocked main goal and accepted R1 jobs preserved."
+    },
+    {
+      "id": "2026-09-12-seedance-explicit-english",
+      "status": "complete",
+      "contract": "docs/contracts/2026-09-12-seedance-explicit-english.md",
+      "completedAt": "2026-09-12T15:19:02+09:00",
+      "verification": {
+        "result": "PASS",
+        "tests": 167,
+        "live_managed_files": 67,
+        "live": "Two English prompt pastes, settings checks and new provider cards verified",
+        "not_run": "Generated output file and full temporal/creative QC"
+      },
+      "decision": "Korean default retained; hash-bound explicit English block exception. Provider policy root cause unknown; no language-bypass claim. Existing unrelated blocked goal preserved."
+    },
+    {
       "id": "2026-09-14-scheduled-production-and-qc",
       "status": "complete",
       "contract": "docs/contracts/2026-09-14-scheduled-production-and-qc.md",
@@ -108,6 +150,13 @@
         "notes": "68-file parity. Existing native reservation same ID/task/30min/policy verified after stable prompt update; local 20min drift corrected. Actual QC evidence reuse verified, no media promotion. No post-update scheduled run or new generated-quality verification."
       },
       "nextStep": "Existing authorized task continues unresolved QC under deployed workflow; observe the next scheduled run separately. Preserve unrelated blocked main goal."
+    },
+    {
+      "id": "2026-09-15-session-executor-astra-author",
+      "status": "implemented_deployed_live_roundtrip_unverified",
+      "contract": "docs/contracts/2026-09-15-session-executor-astra-author.md",
+      "verification": "188 tests PASS; compile/shell/diff; 69-file deployed parity",
+      "nextStep": "With specific author-spawn approval, verify actual Luna/session -> Astra bounded author -> unchanged session execution; no provider generation needed."
     },
     {
       "id": "2026-09-22-retire-jeongseon-typography",
@@ -141,6 +190,159 @@
       }
     },
     {
+      "id": "2026-09-30-advanced-shot-prompting",
+      "status": "complete_with_existing_wiki_warning",
+      "contract": "docs/contracts/2026-09-30-advanced-shot-prompting.md",
+      "verification": {
+        "result": "PASS_SCOPED_INTEGRATION",
+        "native_tests": 484,
+        "codex_tests": 199,
+        "smoke": "3 native request/author-task fixtures and real-project-attribute Codex route; no real Astra generation claimed",
+        "not_run": "Browser/media generation, paid operations, full release deploy/parity, actual authoring/visual QC",
+        "wiki": "Existing awesome-ai-motion frontmatter error and raw hash warnings preserved; new page checked separately"
+      },
+      "rollback": "/Users/gnudas/Documents/Codex/2026-10-01/task/prompting-integration/apply.py --rollback",
+      "nextStep": "Fresh request/author-task or Codex knowledge-select; read project overrides including duration correction. Do not reuse pre-change receipts for new authorship."
+    },
+    {
+      "id": "2026-10-02-reference-production-transfer",
+      "status": "complete",
+      "contract": "docs/contracts/2026-10-02-reference-production-transfer.md",
+      "completedAt": "2026-10-02T00:05:41.655123+09:00",
+      "verification": {
+        "result": "PASS_SCOPED_LOCAL_DEPLOYMENT",
+        "tests": 199,
+        "checks": {
+          "codex_author_link": "PASS",
+          "aside_author_link": "PASS",
+          "aside_operator_link": "PASS",
+          "installed_production": "PASS",
+          "installed_qc": "PASS",
+          "shared_creative": "PASS"
+        },
+        "commands": "harness validate/check-state; configured verifyQuick (compile, 199 unit tests, shell syntax); git diff --check; reviewed patch preflight/apply and exact deployed hashes",
+        "not_run": "Full bundle deployment, provider/browser generation, native schedule changes, downstream author/actual media QA, push",
+        "cadence": "Existing standing scheduled 20-minute preference retained. Explicit other cadence and separately selected foreground branch preserved; no scheduler/timer changed."
+      },
+      "nextStep": "Fresh entry/reloaded context reads deployed instructions. Existing active contexts must reread changed sections. Real media QA remains project-scoped."
+    },
+    {
+      "id": "2026-10-08-native-picker-target",
+      "status": "deployed_live_picker_unverified_remote_push_failed",
+      "contract": "docs/contracts/2026-10-08-native-picker-target.md",
+      "completedAt": "2026-10-08T00:07:52.468939+09:00",
+      "verification": {
+        "tests": 202,
+        "result": "PASS_SCOPED_PATCH_AND_INSTALLED_HASHES",
+        "not_run": "Live picker mutation, new Generate, generated media QC; active/uncertain card preserved",
+        "isolated_remote_base_tests": 220
+      },
+      "nextStep": "Reconcile existing generating indicator before any retry; native picker smoke only at a safe idle boundary.",
+      "sync": {
+        "branch": "codex/seedance-picker-target-20261008",
+        "commit": "aabfaa874b601c3f0b5cfc666e33c4ec617da2d7",
+        "remote_verified": false,
+        "push_error": "GitHub Internal Server Error twice; no force push",
+        "main_merged": false
+      }
+    },
+    {
+      "id": "2026-10-08-scheduled-registration-gate",
+      "status": "complete_scoped_live_run_unverified",
+      "contract": "docs/contracts/2026-10-08-scheduled-registration-gate.md",
+      "verification": {
+        "lastResult": "PASS_SCOPED_SCHEDULING_GATE_DEPLOYED",
+        "lastCommand": "209 local tests; 227 isolated tests; 34 installed-helper tests; compile/shell/diff/harness; installed hash checks; remote SHA check",
+        "notes": "Native schedule records (9) unchanged. Actual unattended production not tested; user explicitly requested workflow repair, not scheduling now. Native record snapshot consistency is not first-run proof."
+      },
+      "sync": {
+        "branch": "codex/seedance-scheduling-handoff-20261008",
+        "commit": "b2f8692f10fb61b4e2158c9d1d60ac0c2eceb06d",
+        "remote_verified": true,
+        "status": "branch_synced",
+        "main_merged": false
+      }
+    },
+    {
+      "id": "2026-10-08-flow-malfoy-knowledge",
+      "status": "instruction_branch_deployed_live_unverified",
+      "contract": "docs/contracts/2026-10-08-flow-malfoy-knowledge.md",
+      "verification": {
+        "result": "PASS_SCOPED_INSTRUCTION_DEPLOYMENT",
+        "tests": 214,
+        "targeted_tests": 5,
+        "deployed_files": 4,
+        "not_run": "Flow UI/generation, matte/render/CapCut playback, executable Flow runtime adapter, full bundle deploy",
+        "isolated_tests": 222
+      },
+      "sync": {
+        "branch": "codex/flow-malfoy-knowledge-20261008",
+        "commit": "12a21c528c5bf891f7a4e48080ce5c28d7147a0d",
+        "remote_verified": true,
+        "main_merged": false
+      }
+    },
+    {
+      "id": "2026-10-08-video-team-board",
+      "status": "complete",
+      "contract": "docs/contracts/2026-10-08-video-team-board.md",
+      "verification": {
+        "lastResult": "PASS_SCOPED_NATIVE_BOARD",
+        "lastCommand": "236 isolated tests; 223 local tests; Swift compile/sign; JS syntax; native GUI",
+        "notes": "No new schedule or provider action; display reflects recorded state."
+      },
+      "nextStep": "Use panel at next production intake; keep execution verification separate."
+    },
+    {
+      "id": "2026-10-08-board-current-only",
+      "status": "complete",
+      "verification": "10 board tests PASS; native GUI reload; current-only filter (24h recorded activity)",
+      "nextStep": "Production owner must keep lane timestamps current."
+    },
+    {
+      "id": "2026-10-08-board-waiting",
+      "status": "complete",
+      "verification": "226 local tests PASS; 12 board cases; Swift compile/sign; JS syntax and fixture render; native waiting card verified",
+      "nextStep": "Continue reading lane records; no live provider tracking or schedule activation performed."
+    },
+    {
+      "id": "2026-10-08-board-seven-day-filter",
+      "status": "complete",
+      "verification": "227 tests PASS; real snapshot excludes drone-soccer; native board shows Hwaseong waiting only",
+      "nextStep": "No state deletion; lane updated_at changes restore eligible tasks."
+    },
+    {
+      "id": "2026-10-08-active-session-board-audit",
+      "status": "complete",
+      "verification": "229 tests PASS; local timestamp compatibility plus safe registry recovery guidance deployed",
+      "remaining": "Production lane activity reporting requires owner update; no live provider action validated."
+    },
+    {
+      "id": "2026-10-09-workflow-audit",
+      "status": "audit_complete_runtime_unresolved",
+      "verification": "Read-only active-thread/local state/native schedule config/queue-doctor/source-live diff/Git ancestry",
+      "findings": [
+        "stale lane state",
+        "native schedule not linked to local contract",
+        "picker surface sequencing",
+        "source-live drift",
+        "no end-to-end production proof"
+      ],
+      "report": "/Users/gnudas/Documents/영상작업/workflow-audit-20261009/report.md",
+      "nextStep": "Single production owner reconcile actual phase and existing native receipt; preserve live helper fixes; verify two-clip end-to-end."
+    },
+    {
+      "id": "2026-10-09-aside-bounded-observation",
+      "status": "complete_scoped_observation",
+      "contract": "docs/contracts/2026-10-09-aside-bounded-observation.md",
+      "verification": {
+        "lastResult": "PASS",
+        "lastCommand": "237 local tests; 8 new cases/4 DOM fixtures; compile/shell/diff; two-file reviewed deploy; live parity/fail-closed",
+        "notes": "No production browser, real speed, generation or future schedule test. Existing Runway helper unchanged."
+      },
+      "nextStep": "Current production owner uses observe before choosing next UI step; measure real two-clip flow separately."
+    },
+    {
       "id": "2026-10-13-disposable-video-qc",
       "status": "complete",
       "contract": "docs/contracts/2026-10-13-disposable-video-qc.md",
@@ -166,5 +368,19 @@
       },
       "decision": "Recorded explicit permanent-QC approval applies to exact owned reviewed copies without per-file reapproval; never empty Trash or broaden deletion scope."
     }
-  ]
+  ],
+  "priorGoalBeforeSchedulingRepair": {
+    "currentGoal": "Resume existing production owner without fabricating idle; verify direct executor action",
+    "status": "blocked",
+    "currentContract": "docs/contracts/2026-09-08-session-monitor-consistency.md",
+    "blockers": [
+      "Live continuation: Aside currently contains another project session; exact intended session restoration required."
+    ],
+    "nextStep": "Restore exact original Aside session, then resume existing owner and automation-2. S09/S10 completion/QC unverified.",
+    "verification": {
+      "lastCommand": "152 tests; Python compile; shell syntax; diff check; release freeze/preflight/apply/check",
+      "lastResult": "PASS_EXPLICIT_RESUME_DEPLOYED",
+      "notes": "152 tests and 66-file parity PASS. Native Luna/high context and actual CUA session read verified, no echo-only result. Found other-project session collision; no media mutations. automation-2 reactivated then PAUSED. Owner still sent substantive result message despite final-only instruction."
+    }
+  }
 }

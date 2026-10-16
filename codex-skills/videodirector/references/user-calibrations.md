@@ -4,6 +4,9 @@ Learned from accepted/rejected work. These are preferences, not physics — but 
 
 ## Calibrated subtitle taste for this user
 
+> **Post-production (not in this rail).** Runtime v5 (2026-10-16) has no editor/CapCut lane. Keep for a future editor rebuild; do not apply to current production. See `post-production-knowledge.md`.
+
+
 For the user's MV subtitle orders, preserve the learned bilingual caption feel from the ORG79 project:
 
 - Japanese/Korean lyric subtitles should look like one coherent two-line caption block, not a headline plus footnote.
@@ -14,6 +17,9 @@ For the user's MV subtitle orders, preserve the learned bilingual caption feel f
 - For CapCut-style normalized text transforms, a good starting ratio is JP size/scale around 8.4/0.69 and KR around 8.8/0.72, with JP y around -0.69 and KR y around -0.83 for 16:9 lower-third bilingual lyrics; tune from there by screenshot, not by abstract font numbers alone.
 
 ## Calibrated MV title taste for this user
+
+> **Post-production (not in this rail).** Runtime v5 (2026-10-16) has no editor/CapCut lane. Keep for a future editor rebuild; do not apply to current production. See `post-production-knowledge.md`.
+
 
 For this user's MV title orders, prefer title impact that is musically motivated instead of long explanatory title cards. If the user suggests an audible accent, treat it as a serious edit point and verify against audio peaks when available. A strong pattern is a short 3-hit stamp on beat: concept part A / concept part B / full title, then exit before lyric subtitles compete. Keep typography cinematic and restrained: no meme-sized captions, no heavy generic glitch, no long center-card unless explicitly requested. Small motif accents such as a red signal dot, cat-eye/pupil point, ribbon slash, or weak flash are acceptable when tied to the song's visual motifs.
 
@@ -90,6 +96,9 @@ Standing lesson from ORG79: the user values creative packaging and CTR thinking.
 
 ## Editable CJK subtitle delivery rule
 
+> **Post-production (not in this rail).** Runtime v5 (2026-10-16) has no editor/CapCut lane. Keep for a future editor rebuild; do not apply to current production. See `post-production-knowledge.md`.
+
+
 - For Japanese/Korean lyric subtitles, do not rely on a burned-in MP4 as the only deliverable.
 - Always preserve editable subtitle sources: timed CSV/SRT/ASS and, when CapCut is part of the workflow, a CapCut draft/project folder with text clips on separate tracks.
 - Use CJK-capable fonts for Japanese/Korean text, such as Hiragino, Apple SD Gothic Neo, Noto Sans CJK, or another verified Japanese/Korean font; avoid Latin-only default fonts that can produce tofu or broken glyphs.
@@ -97,6 +106,9 @@ Standing lesson from ORG79: the user values creative packaging and CTR thinking.
 - If a subtitle render shows broken Japanese/Korean glyphs, treat it as a font failure, not as an acceptable export; switch to editable CapCut text or a verified CJK font before final delivery.
 
 ## Typography dataset routing rule
+
+> **Post-production (not in this rail).** Runtime v5 (2026-10-16) has no editor/CapCut lane. Keep for a future editor rebuild; do not apply to current production. See `post-production-knowledge.md`.
+
 
 When the task involves typography, subtitles, captions, chapter cards, title cards, lower thirds, keyword cards, final statements, or CapCut text-layer revisions, the editing/typography agent must not design from memory. It must first look for a local typography dataset and selection packet in the active project.
 

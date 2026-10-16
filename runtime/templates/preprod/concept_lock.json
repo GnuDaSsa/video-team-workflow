@@ -1,0 +1,18 @@
+{
+  "title": "<working title>",
+  "logline": "<one-sentence logline of the chosen option>",
+  "audience": "<who this is for / where it is shown>",
+  "selected_option": "A",
+  "mode": "mv",
+  "medium": "2d_animation",
+  "medium_components": [],
+  "aspect_ratio": "16:9",
+  "target_runtime_sec": 60,
+  "emotional_arc": {
+    "hook": "<first 3 seconds>",
+    "build": "<accumulation>",
+    "peak": "<the remembered image>",
+    "out": "<resolution>"
+  },
+  "must_avoid": ["<cliche or rejected look>"]
+}

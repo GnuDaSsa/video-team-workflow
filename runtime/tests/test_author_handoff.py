@@ -8,7 +8,7 @@ import model_routing as m
 
 class AuthorHandoffTests(unittest.TestCase):
     def test_session_model_not_pinned(self):
-        for lane in ('director','music','image_qc','seedance_qc','editor','package'):
+        for lane in ('director','music','image_qc','seedance_qc','package'):
             self.assertIsNone(m.resolve(lane)['model'])
         self.assertEqual(m.resolve('planner')['model'], 'gpt-6-astra')
         for lane in ('image_creator_01','image_creator_02'):

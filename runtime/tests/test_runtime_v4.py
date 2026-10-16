@@ -239,7 +239,9 @@ class RuntimeV4Tests(unittest.TestCase):
         stray.write_bytes(b'not-real-video')
         audit = media_registry.audit_project(project)
         self.assertTrue(any('MEDIA_OUTSIDE_CANONICAL_ROOT' in p for p in audit['problems']))
-        ok, reason = lane_gates.gate_check(project, 'director')
+        # Planning lanes are not frozen by a stray file; media-consuming lanes are.
+        self.assertTrue(lane_gates.gate_check(project, 'director')[0])
+        ok, reason = lane_gates.gate_check(project, 'seedance_qc')
         self.assertFalse(ok)
         self.assertTrue(reason.startswith('MEDIA_HARD_GATE:'))
         self.assertTrue(lane_gates.non_bypassable_reason(project, reason))
@@ -548,7 +550,7 @@ class RuntimeV4Tests(unittest.TestCase):
         self.assertEqual(cycle['verdict'], 'STOPPED_INCOMPLETE')
         self.assertIn('NONTERMINAL_QUEUE_WITHOUT_LIVE_OWNER', cycle['problem'])
 
-    def test_upload_alias_is_ascii_symlink_and_cleanup_is_exact(self) -> None:
+    def test_upload_alias_is_ascii_bundle_clone_and_cleanup_is_exact(self) -> None:
         project = self.init_with_runtime('업로드별칭테스트')
         src = self.root / '승인 이미지.png'; src.write_bytes(b'approved-image')
         candidate = media_registry.ingest(
@@ -556,17 +558,44 @@ class RuntimeV4Tests(unittest.TestCase):
         approved = media_registry.promote(project, candidate['asset_id'])
         alias_root = self.root / 'runway-upload'
         prepared = runway_ui_helper.prepare_upload_alias(
-            project, approved['asset_id'], '장면 01', 1, alias_root)
+            project, approved['asset_id'], '장면 01', 2, alias_root)
         alias = Path(prepared['alias_path'])
-        self.assertTrue(alias.is_symlink())
+        self.assertFalse(alias.is_symlink())
         self.assertEqual(alias.read_bytes(), b'approved-image')
-        self.assertTrue(alias.name.isascii())
+        self.assertTrue(str(alias.relative_to(alias_root)).isascii())
+        self.assertTrue(alias.name.startswith('02_Image2_'))
+        self.assertEqual(alias.parent, runway_ui_helper.bundle_dir(project, '장면 01', alias_root))
         self.assertEqual(prepared['canonical_path'], approved['current_path'])
-        self.assertEqual(Path(approved['current_path']).read_bytes(), b'approved-image')
         removed = runway_ui_helper.cleanup_upload_alias(alias, alias_root)
         self.assertTrue(removed['removed'])
         self.assertFalse(alias.exists())
         self.assertTrue(Path(approved['current_path']).is_file())
+        with self.assertRaises(ValueError):
+            runway_ui_helper.cleanup_upload_alias(Path(approved['current_path']), alias_root)
+
+    def test_upload_transport_never_refreshes_and_refresh_requires_settings(self) -> None:
+        project = self.init_with_runtime('복구사다리')
+        state = {'block_id': 'B01', 'checkpoint': {'references': [], 'phase': 'ATTACH'},
+                 'incident_counts': {}, 'drag_used_by_slot': {}}
+        with mock.patch.object(runway_ui_helper, '_load_recovery_state', return_value=state), \
+             mock.patch.object(runway_ui_helper, '_write_recovery_state', side_effect=lambda p, s, e: s):
+            rungs = [runway_ui_helper.record_recovery_incident(
+                project, 'B01', 'FILE_PICKER_NOT_EXPOSED', slot='Image1')['next_action'] for _ in range(4)]
+            self.assertEqual(rungs[:3], list(runway_ui_helper.UPLOAD_TRANSPORT_LADDER))
+            self.assertEqual(rungs[3], 'WAIT_FOR_EXACT_USER_ACTION')
+            self.assertFalse(any('REFRESH' in r for r in rungs))
+            for _ in range(3):
+                runway_ui_helper.record_recovery_incident(project, 'B01', 'RUNWAY_UI_STALE')
+            self.assertTrue(state['settings_reverify_required'])
+            resolved = runway_ui_helper.resolve_recovery(project, 'B01')
+            self.assertEqual(resolved['next_action'], 'RUN_SETTINGS_VERIFY_BEFORE_GENERATE')
+
+    def test_dom_settings_contradiction_blocks_only_when_unambiguous(self) -> None:
+        check = runway_ui_helper.check_observed_settings
+        self.assertEqual(check({'observed': True, 'durations': [15], 'models': ['Seedance 2.0']}, expected_duration=15), [])
+        self.assertTrue(check({'observed': True, 'durations': [5], 'models': []}, expected_duration=15))
+        self.assertEqual(check({'observed': True, 'durations': [5, 15], 'models': []}, expected_duration=15), [])
+        self.assertEqual(check({'observed': False}, expected_duration=15), [])
 
     def test_inactive_work_moves_to_trash_only_after_24_hours(self) -> None:
         project = self.init_with_runtime('정리테스트')

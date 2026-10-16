@@ -14,7 +14,7 @@
 
 - A multi-panel storyboard is allowed only as a planning/reference artifact under `/Users/gnudas/wiki/concepts/storyboard-production-blueprint-standard.md`. It is not a production sourceframe and its character thumbnails do not replace approved provider-safe identity sheets.
 - Do not use 2x2, contact-sheet, grid, collage, or multi-panel generated images as direct sourceframes for MV production.
-- Prefer one complete 16:9 sourceframe per cut, generated as a single image, so no crop border, panel gutter, or white margin can enter I2V or final edits.
+- Prefer one complete 16:9 sourceframe per cut, generated as a single image, so no crop border, panel gutter, or white margin can enter I2V or delivered clips.
 - Cropped storyboard/contact-sheet panels remain lookdev only. Generate an independent, identity-bound per-cut frame and pass image QC before standard I2V; cropping does not confer production approval.
 - A crop that contains a white border from the original 2x2 sheet is a failed source asset even if the character/scene looks good.
 - Never send a bordered crop to Grok/I2V; regenerate or recrop first.
@@ -32,26 +32,25 @@ When the user says a generated video became `자글자글`, `우글우글`, `비
 
 Default response: use **stability-first videoization**. Lock the approved still's exact composition, face shape, hair silhouette, hands, phone/UI/text, black ad-screen placeholders, room/vehicle geometry, and background perspective. Prefer single-image 3.5–4s stable clips or multi-reference clean cuts; do not ask for morph transitions when stability matters. Allow only breathing, small shoulder/hand motion, hair-tip/curtain/light/ambience movement, short dialogue/SFX if needed. Keep the audio toggle ON and name the soundscape in the prompt as usual — a stability problem is a motion problem, not an audio one. Reject clips with texture crawling, line boiling, face flicker, hand/finger warp, Korean text shimmer, phone deformation, or unstable straight lines.
 
-## CapCut editable-timeline rule
+## Delivery without an edit lane (runtime v5)
 
-For this user's serious MV/public-contest/institution video work, do not deliver a single flattened ffmpeg-assembled MP4 as the main editable result. ffmpeg is allowed for pre-CapCut QC, normalization checks, contact sheets, proxy previews, ffprobe/blackdetect/freezedetect, and temporary timing slates only. The actual edit must be built or mirrored in a CapCut draft so the user can adjust clips, timing, audio, and text inside CapCut. If a flattened reference render is useful, label it clearly as `QC/proxy/reference`, not as the editable final. Final handoff should include a CapCut project/draft with separate media/text/audio tracks where practical, plus manifests and QC artifacts.
-
-Additional hard check: a CapCut draft is not valid merely because JSON inspection or the timeline view shows clip blocks. It must actually preview/play in CapCut's viewer. If a JSON-injected or externally generated draft shows a black viewer, stalled playback, missing media, or nonfunctional preview, mark it HOLD/DO_NOT_USE and rebuild through CapCut's own import/timeline workflow or another route that is verified by actual CapCut playback.
+There is no editor/CapCut stage. Package delivers QC-approved clips in storyboard order with manifests and QC artifacts; it does not flatten them into an "edited master". ffmpeg is used only for probes, QC contact sheets and normalization checks. Design continuity upstream instead: each storyboard block's `end_frame` should hand off cleanly to the next block, and actions should start and settle inside the 15 s so clips can be trimmed later without a rescue edit. Former CapCut rules: `post-production-knowledge.md` (not active).
 
 ## Revision rules
 
+- Any change request goes back to the owning preprod stage (concept / bible / storyboard / image plan / shelf), is edited there and re-locked; downstream locks go STALE. Never improvise at production time.
 - "씬 3 바꿔줘" -> replace only scene 3
 - "BGM 분위기 바꿔줘" -> update only the target track
 - "캐릭터 수정" -> update the character JSON and only the affected scenes
 
 ## Request routing
 
-- "영상 기획" -> ask the 3 start questions if needed, then produce concept + structure
+- "영상 기획" -> ask the 3 start questions if needed, then produce P0 `concept_options.md` (3 options) and wait for the choice
 - "씬 나눠줘" -> produce a cut list
-- "프롬프트 뽑아줘" -> produce character JSON + Codex imagegen start-frame JSON + Grok/Seedance/I2V prompts
+- "프롬프트 뽑아줘" -> P3 image prompts (`<REF>.prompt.txt`) and P4 shelf prompts from `shelf-brief`, all English
 - "BGM 짜줘" -> determine track count and output BGM JSON
 - "대사 정리해줘" -> output narration/dialogue sheet with timecodes
-- "전체 패키지" -> follow the default full-package order exactly
+- "전체 패키지" -> follow the fixed preprod pipeline P0→P5 in SKILL.md
 
 ## Character-sheet-first gate
 

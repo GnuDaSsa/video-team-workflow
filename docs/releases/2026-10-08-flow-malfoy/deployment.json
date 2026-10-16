@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "scope": "flow_instruction_and_knowledge_only",
+  "full_bundle_parity": false,
+  "applied": true,
+  "files": [
+    {
+      "source": "runtime/AGENTS.md",
+      "target": "/Users/gnudas/Documents/Codex/video-team-runtime/AGENTS.md",
+      "before_sha256": "5d153a8ed55abff0ffe0753d88e411df6d0f3981369a164c60b329f729a40439",
+      "after_sha256": "5d153a8ed55abff0ffe0753d88e411df6d0f3981369a164c60b329f729a40439"
+    },
+    {
+      "source": "codex-skills/videodirector/SKILL.md",
+      "target": "/Users/gnudas/.codex/skills/videodirector/SKILL.md",
+      "before_sha256": "6a657ad18a0a03f4483958106f57a20c8474062f660b9b4e36379f468309e351",
+      "after_sha256": "d8279e122c46ceb2610b412ee223e4a84b99387498e28c063ca22b6c7bf4bc4a"
+    },
+    {
+      "source": "runtime/templates/editor.md",
+      "target": "/Users/gnudas/Documents/Codex/video-team-runtime/runtime/templates/editor.md",
+      "before_sha256": "b343b3771914b0fc0005af5bf1b70b17627979c7d184ba3f01d9d470d5ad88ca",
+      "after_sha256": "b343b3771914b0fc0005af5bf1b70b17627979c7d184ba3f01d9d470d5ad88ca"
+    },
+    {
+      "source": "codex-skills/videodirector/references/flow-malfoy-composite.md",
+      "target": "/Users/gnudas/.codex/skills/videodirector/references/flow-malfoy-composite.md",
+      "before_sha256": "e0b097948c481fb1668f1f3afadab06ebc411f0766398dfc7391c73fbeaf82e1",
+      "after_sha256": "e0b097948c481fb1668f1f3afadab06ebc411f0766398dfc7391c73fbeaf82e1"
+    }
+  ],
+  "archive": "/Users/gnudas/.codex/archive/20261008_195229_370152_flow_knowledge"
+}
