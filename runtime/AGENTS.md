@@ -243,6 +243,7 @@ media/
   media/                # 실제 미디어의 유일한 위치 (registry 등록)
   lanes/<lane>/         # status.json, result.md + 해당 lane 메타데이터만
 ~/RunwayUpload/<project>/<BLOCK>/   # 업로드용 ASCII clone 번들 (24시간 sweep, 원본 아님)
+~/RunwayUpload/_runway_library.json # Runway Uploads에 이미 있는 파일(sha256→표시 이름) 장부. 있으면 업로드하지 않고 선택
 ```
 
 - 창작 결정(컨셉·룩·콘티·프롬프트)은 `preprod/` 밖에 만들지 않는다. `lanes/<lane>/`에 제안서·버전 폴더(`v42_*`, `*_R12` 사본)를 늘리지 않는다. 개정은 같은 파일을 고치고 재잠금하면 `_superseded/`가 이력을 보관한다.
@@ -337,6 +338,7 @@ python3 runtime/scripts/media_registry.py audit --project <p>
 python3 runtime/scripts/media_registry.py cleanup --project <p> --older-than-hours 24 --apply
 python3 runtime/scripts/prompt_packet_utils.py attest --project <p> --pack <prompt-pack.json>
 python3 /Users/gnudas/.codex/skills/<selected-seedance-skill>/scripts/runway_ui_helper.py prepare-upload-bundle --project <p> --block-id <B> --pack preprod/04_shelf/<B>/pack.json
+python3 /Users/gnudas/.codex/skills/<selected-seedance-skill>/scripts/runway_ui_helper.py record-runway-attach --path <bundle-file> --name <name-in-Uploads> --how reused|uploaded|missing
 python3 /Users/gnudas/.codex/skills/<selected-seedance-skill>/scripts/runway_ui_helper.py settings-verify --project <p> --block <BLOCK> --visible-model '<visible-model-label>' --duration-sec <visible-seconds>
 python3 /Users/gnudas/.codex/skills/<selected-seedance-skill>/scripts/runway_ui_helper.py resume-contract --project <p>
 python3 /Users/gnudas/.codex/skills/<selected-seedance-skill>/scripts/runway_ui_helper.py recovery-checkpoint --project <p> --block-id <BLOCK> --session-url <exact-runway-session-url> --reference Image1=<AST_...>

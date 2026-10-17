@@ -70,9 +70,13 @@ unchanged. Preserve the project's approved scope, mode, holds and creative locks
 
 Use `recovery-checkpoint` with project/block, exact session URL, current prompt
 hash, registered reference map/hash, verified slots and actual settings before
-ATTACH. Use `prepare-upload-bundle` (ordered ASCII clones in
-`~/RunwayUpload/<project>/<B>/`), the visible Reference selector and the verified
-native chooser as described in `aside-operator.md`; never hidden file inputs.
+ATTACH. Use `prepare-upload-bundle` (content-named `RW_<sha12>` clones in
+`~/RunwayUpload/<project>/<B>/`, with a per-slot `attach` step). Bytes Runway already
+holds are selected from Asset selector > Uploads by the ledger's names and never
+uploaded again; only `UPLOAD_NEW_VIA_NATIVE_CHOOSER` slots go through the visible
+Reference selector and the verified native chooser. Record every attach with
+`record-runway-attach` (`reused`/`uploaded`/`missing`). Details in `aside-operator.md`;
+never hidden file inputs.
 In preprod projects run `preprod shelf-verify --block <B>` first and use only the
 shelf's `pack.json`, `settings.json` and `prompt.txt`.
 

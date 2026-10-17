@@ -244,10 +244,74 @@ class PreprodPipelineTests(unittest.TestCase):
         bundle = runway_ui_helper.prepare_upload_bundle(
             self.project, 'B01', shelf / 'pack.json', self.root / 'RunwayUpload')
         names = [s['alias_name'] for s in bundle['slots']]
-        self.assertEqual([n[:9] for n in names], ['01_Image1', '02_Image2'])
-        for name in names:
+        self.assertEqual([s['reference_token'] for s in bundle['slots']], ['Image1', 'Image2'])
+        for slot, name in zip(bundle['slots'], names):
             path = Path(bundle['bundle_dir']) / name
             self.assertTrue(path.is_file() and not path.is_symlink() and name.isascii())
+            # Content-addressed: same bytes, same name in every block/project.
+            self.assertEqual(name, runway_ui_helper.runway_upload_name(slot['sha256'], path.suffix))
+            self.assertEqual(slot['attach'], 'UPLOAD_NEW_VIA_NATIVE_CHOOSER')
+
+    def test_runway_uploads_ledger_reuses_before_any_upload(self) -> None:
+        self.lock_all()
+        preprod.write_shelf_brief(self.project, 'B01')
+        shelf = self.pre / '04_shelf/B01'
+        (shelf / 'prompt.txt').write_text(self.prompt(), encoding='utf-8')
+        preprod.lock_shelf(self.project, 'B01')
+        root = self.root / 'RunwayUpload'
+        first = runway_ui_helper.prepare_upload_bundle(self.project, 'B01', shelf / 'pack.json', root)
+        slot = first['slots'][0]
+        bundle_file = Path(first['bundle_dir']) / slot['alias_name']
+        with mock.patch.object(runway_ui_helper, 'UPLOAD_ALIAS_ROOT', root), \
+             mock.patch.object(runway_ui_helper, 'run_verified', return_value=0) as run:
+            # Nothing in Runway yet: the native chooser may upload it.
+            self.assertEqual(runway_ui_helper.upload_block_reason(bundle_file), '')
+            runway_ui_helper.record_runway_attach(slot['sha256'], slot['alias_name'], 'uploaded',
+                                                  project='p', asset_id=slot['asset_id'])
+            # Runway holds the bytes now: the chooser refuses and names the entry to select.
+            reason = runway_ui_helper.upload_block_reason(bundle_file)
+            self.assertIn('UPLOAD_BLOCKED_ALREADY_IN_RUNWAY_UPLOADS', reason)
+            self.assertIn(slot['alias_name'], reason)
+            with self.assertRaises(ValueError):
+                runway_ui_helper.cmd_picker_select(SimpleNamespace(path=str(bundle_file)))
+            run.assert_not_called()
+            # The next block (or a project holding a copy) is told to select, not upload.
+            again = runway_ui_helper.prepare_upload_bundle(self.project, 'B01', shelf / 'pack.json', root)
+            self.assertEqual(again['slots'][0]['attach'], 'SELECT_EXISTING_RUNWAY_UPLOAD')
+            self.assertEqual(again['slots'][0]['search_names'], [slot['alias_name']])
+            # A name searched and absent is dropped; then uploading is allowed again.
+            runway_ui_helper.record_runway_attach(slot['sha256'], slot['alias_name'], 'missing')
+            self.assertEqual(runway_ui_helper.upload_block_reason(bundle_file), '')
+
+    def test_bundle_clone_of_old_source_survives_next_slot_sweep(self) -> None:
+        self.lock_all()
+        preprod.write_shelf_brief(self.project, 'B01')
+        shelf = self.pre / '04_shelf/B01'
+        (shelf / 'prompt.txt').write_text(self.prompt(), encoding='utf-8')
+        preprod.lock_shelf(self.project, 'B01')
+        for asset in media_registry.list_assets(self.project):
+            if Path(asset['current_path']).is_file():
+                os.utime(asset['current_path'], (0, 0))
+        bundle = runway_ui_helper.prepare_upload_bundle(
+            self.project, 'B01', shelf / 'pack.json', self.root / 'RunwayUpload')
+        for slot in bundle['slots']:
+            self.assertTrue((Path(bundle['bundle_dir']) / slot['alias_name']).is_file())
+
+    def test_seed_runway_library_from_old_receipts_as_candidates(self) -> None:
+        root = self.root / 'RunwayUpload'
+        receipt = self.root / 'rt/proj1/lanes/seedance/upload_alias_receipts.jsonl'
+        sha = 'a' * 64
+        write(receipt, json.dumps({'ts': '2026-10-01T00:00:00+09:00', 'sha256': sha,
+                                   'alias_name': 'B01__IMAGE1__ABCD.png'}) + '\n')
+        result = runway_ui_helper.seed_runway_library(self.root / 'rt', root)
+        self.assertEqual(result['names_added'], 1)
+        library = runway_ui_helper.load_runway_library(root)
+        self.assertEqual(runway_ui_helper.runway_search_names(library, sha), ['B01__IMAGE1__ABCD.png'])
+        self.assertEqual(library['entries'][sha]['names']['B01__IMAGE1__ABCD.png']['status'], 'candidate')
+        # The ledger at the root is never swept.
+        os.utime(runway_ui_helper.runway_library_path(root), (0, 0))
+        runway_ui_helper.sweep_stale_upload_aliases(root)
+        self.assertTrue(runway_ui_helper.runway_library_path(root).is_file())
 
 
 class ClaudeModeTests(unittest.TestCase):

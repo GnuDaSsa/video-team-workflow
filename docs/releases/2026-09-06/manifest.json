@@ -10,7 +10,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/aside-operator.md",
       "target": ".codex/skills/seedance-prompt-en/aside-operator.md",
-      "sha256": "c2f1a70a659979962203d769806014e9047ff71a0012dd94b3f428eafdd56f55"
+      "sha256": "b0f8ea33d536b69abde879ec304709682934038d4e3efdef7e9286a71ccc5ce0"
     },
     {
       "source": "codex-skills/seedance-prompt-en/blender-previs-prompting.md",
@@ -65,7 +65,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/scripts/runway_ui_helper.py",
       "target": ".codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py",
-      "sha256": "fe08438c479026f1a1f1fbc39545f962c606152f6aab13ce3b7f52447babb5ef"
+      "sha256": "b06ddf419b7b2f6ef04fd4891a745a4d6da9428a6034fe88ff69b301775bb7ae"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-field-lessons.md",
@@ -75,7 +75,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/seedance-production.md",
       "target": ".codex/skills/seedance-prompt-en/seedance-production.md",
-      "sha256": "2dc448a318a7a2924c523e10840f7b99b479e18235ee5293031fcd24502bb9b0"
+      "sha256": "50296acc6900773f8495c9919f6e95b064154ce731d81cacc836f69cf294990a"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-prompting.md",
@@ -355,7 +355,7 @@
     {
       "source": "runtime/templates/seedance.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/seedance.md",
-      "sha256": "89f355a93329fd8d348f58bdcd241002e8fdcab6139226b25580b212b753b127"
+      "sha256": "fbea4b94ad6a92c002df1714b611e600b78eb0b3c8105896a7c46325ddbb0732"
     },
     {
       "source": "runtime/templates/seedance_qc.md",
@@ -380,7 +380,7 @@
     {
       "source": "runtime/AGENTS.md",
       "target": "Documents/Codex/video-team-runtime/AGENTS.md",
-      "sha256": "e9aad585a39ef939d9b0343cd1c4f28c41c33a2bef3c525dfcab982aa5600992"
+      "sha256": "c8935f1557a3ba2e964bbb9c4b2583495c3d1ed167bdc4c34737ccaf0a441b38"
     },
     {
       "source": "references/character_sheet_prompt_standard.md",

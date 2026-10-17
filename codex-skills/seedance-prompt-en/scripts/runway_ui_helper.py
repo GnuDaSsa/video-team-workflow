@@ -15,9 +15,13 @@ Only permitted native picker/key helpers use frontmost-verified AppleScript.
 Commands:
   frontmost                              print frontmost app
   escape                                 send ESC to the Runway browser (verified)
-  prepare-upload-alias --project P       make one temporary ASCII symlink for a registry asset
+  prepare-upload-bundle --project P      clone a pack's refs as RW_<sha12> files + per-slot attach plan
+                       --block-id B --pack K  (SELECT_EXISTING_RUNWAY_UPLOAD before any upload)
+  prepare-upload-alias --project P       clone one registry asset into the block bundle
                        --asset-id A --block-id B [--slot N]
-  cleanup-upload-alias --path P          remove only a helper-owned temporary upload symlink
+  record-runway-attach --name N --how H  ledger: uploaded|reused (thumbnail verified) or missing
+  runway-library [--path F|--seed]       show the names Runway Uploads holds for a file / seed
+  cleanup-upload-alias --path P          remove only a helper-owned bundle copy
   paste-prompt --file F [--replace]      Language-validated Lexical paste + exact content/hash check
   picker-go    --path P                  verified file-picker sheet -> Cmd+Shift+G -> path -> Return
   recovery-checkpoint --project P        persist the same-session transaction before ATTACH
@@ -78,6 +82,11 @@ from prompt_packet_utils import (language_stats, normalize_prompt, prompt_sha256
 UPLOAD_ALIAS_ROOT = Path(os.environ.get('RUNWAY_UPLOAD_ALIAS_ROOT', str(Path.home() / 'RunwayUpload')))
 UPLOAD_ALIAS_MAX_AGE_SECONDS = 24 * 3600
 UPLOAD_TRANSPORT_SLOT_CAP = 3
+# Machine-wide record of which file bytes Runway's Uploads library already
+# holds, under which visible names. Keyed by sha256 so the same image is found
+# again across blocks, slots and projects (project copies get new asset IDs).
+RUNWAY_LIBRARY_NAME = '_runway_library.json'
+RUNWAY_LIBRARY_CANDIDATE_CAP = 6
 
 RECOVERY_CONTRACT_VERSION = 'seedance_same_session_recovery_v1_20260810'
 RECOVERY_STATE_REL = Path('lanes/seedance/recovery_state.json')
@@ -261,6 +270,10 @@ def sweep_stale_upload_aliases(root: Path = UPLOAD_ALIAS_ROOT,
     removed = []
     for path in sorted(root.rglob('*'), reverse=True):
         try:
+            # Only <project>/<block>/<file> copies are disposable; the library
+            # ledger at the root is durable.
+            if len(path.relative_to(root).parts) < 2:
+                continue
             if (path.is_file() or path.is_symlink()) and path.lstat().st_mtime <= cutoff:
                 path.unlink()
                 removed.append(str(path))
@@ -283,16 +296,25 @@ def _clone_copy(source: Path, target: Path) -> None:
         target.unlink()
     if subprocess.run(['cp', '-c', str(source), str(target)], capture_output=True).returncode != 0:
         shutil.copyfile(source, target)
+    # clonefile keeps the source mtime; an old source would otherwise look
+    # stale and be swept by the next prepare call before it is attached.
+    os.utime(target)
     os.chmod(target, 0o400)
+
+
+def runway_upload_name(sha256_hex: str, suffix: str) -> str:
+    """Content-addressed upload name: identical bytes -> identical Runway name,
+    whatever the block, slot, project or asset ID."""
+    return f'RW_{sha256_hex[:12].upper()}{suffix.lower()}'
 
 
 def prepare_upload_alias(project: Path, asset_id: str, block_id: str,
                          slot: int = 1, root: Path = UPLOAD_ALIAS_ROOT,
-                         modality: str = 'Image') -> dict:
+                         modality: str = 'Image', sweep: bool = True) -> dict:
     """Clone one approved registry asset into the block's ASCII upload bundle.
 
-    Name `NN_<Modality>N_<asset8>.<ext>` is unique per asset, so the same file
-    can be re-selected from Runway's Uploads library by exact name instead of
+    The file name is `RW_<sha12>.<ext>` (content-addressed), so a file Runway
+    already holds is found again in Uploads by that exact name instead of
     being uploaded again. The copy is not a second asset; the bundle is swept.
     """
     project = project.expanduser().resolve()
@@ -317,12 +339,13 @@ def prepare_upload_alias(project: Path, asset_id: str, block_id: str,
         raise ValueError(f'UPLOAD_ALIAS_SOURCE_INVALID: {asset_id}')
     root.mkdir(parents=True, exist_ok=True)
     os.chmod(root, 0o700)
-    sweep_stale_upload_aliases(root)
+    if sweep:
+        sweep_stale_upload_aliases(root)
     folder = bundle_dir(project, block_id, root)
     folder.mkdir(parents=True, exist_ok=True)
     suffix = source.suffix.lower()
     reference_token = f'{modality}{int(slot)}'
-    alias = folder / f'{int(slot):02d}_{reference_token}_{_ascii_token(asset_id[-8:], "ASSET")}{suffix}'
+    alias = folder / runway_upload_name(asset['sha256'], suffix)
     _clone_copy(source, alias)
     if media_registry.sha256(alias) != asset['sha256']:
         alias.unlink()
@@ -374,17 +397,162 @@ def prepare_upload_bundle(project: Path, block_id: str, pack_path: Path,
         for old in folder.iterdir():
             os.chmod(old, 0o600)
             old.unlink()
+    root.mkdir(parents=True, exist_ok=True)
+    sweep_stale_upload_aliases(root)
     rows = []
     for entry in pack.get('reference_role_map') or []:
         match = re.fullmatch(r'@(Image|Video|Audio)(\d+)', str(entry.get('token') or ''), re.I)
         if not match or not entry.get('asset_id'):
             raise ValueError(f'UPLOAD_BUNDLE_BAD_REFERENCE: {entry.get("token")}')
         rows.append(prepare_upload_alias(project, entry['asset_id'], block_id,
-                                         int(match.group(2)), root, match.group(1).title()))
+                                         int(match.group(2)), root, match.group(1).title(),
+                                         sweep=False))
+    library = load_runway_library(root)
+    slots = []
+    for r in rows:
+        slot = {k: r[k] for k in ('reference_token', 'alias_name', 'asset_id', 'sha256')}
+        slot.update(_attach_step(library, r['sha256'], r['alias_name']))
+        slots.append(slot)
     manifest = {'block_id': block_id, 'bundle_dir': str(folder), 'pack': str(pack_path),
-                'slots': [{k: r[k] for k in ('reference_token', 'alias_name', 'asset_id', 'sha256')} for r in rows]}
+                'library': str(runway_library_path(root)), 'slots': slots}
     (folder / 'bundle.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     return manifest
+
+
+# --- Runway Uploads library ledger -----------------------------------------
+# Runway keeps every uploaded file in the account's Uploads library. Uploading
+# the same bytes again only adds a duplicate entry and costs an attach round
+# trip through the native chooser (the most failure-prone step). The ledger
+# remembers which names Runway shows for which bytes; ATTACH selects from
+# Uploads first and the native chooser is allowed only for bytes Runway does
+# not hold, or after each remembered name was searched and recorded missing.
+
+def runway_library_path(root: Path | None = None) -> Path:
+    return Path(root or UPLOAD_ALIAS_ROOT) / RUNWAY_LIBRARY_NAME
+
+
+def load_runway_library(root: Path | None = None) -> dict:
+    path = runway_library_path(root)
+    try:
+        data = json.loads(path.read_text(encoding='utf-8'))
+    except (FileNotFoundError, json.JSONDecodeError):
+        data = {}
+    data.setdefault('version', 1)
+    data.setdefault('entries', {})
+    return data
+
+
+def _save_runway_library(data: dict, root: Path | None = None) -> None:
+    path = runway_library_path(root)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix('.tmp')
+    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True) + '\n', encoding='utf-8')
+    os.replace(tmp, path)
+
+
+def runway_search_names(library: dict, sha256_hex: str) -> list[str]:
+    """Names to search in Runway Uploads for these bytes, best first.
+
+    Verified names (seen attached) come before candidates (seeded from old
+    receipts); names recorded missing are skipped."""
+    names = (library.get('entries', {}).get(sha256_hex) or {}).get('names') or {}
+    verified = sorted((n for n, v in names.items() if v.get('status') == 'verified'),
+                      key=lambda n: names[n].get('last_verified', ''), reverse=True)
+    candidates = sorted((n for n, v in names.items() if v.get('status') == 'candidate'),
+                        key=lambda n: names[n].get('first_seen', ''), reverse=True)
+    return verified + candidates
+
+
+def _attach_step(library: dict, sha256_hex: str, bundle_name: str) -> dict:
+    names = runway_search_names(library, sha256_hex)
+    if names:
+        return {'attach': 'SELECT_EXISTING_RUNWAY_UPLOAD', 'search_names': names,
+                'upload_fallback': bundle_name}
+    return {'attach': 'UPLOAD_NEW_VIA_NATIVE_CHOOSER', 'search_names': [],
+            'upload_fallback': bundle_name}
+
+
+def record_runway_attach(sha256_hex: str, name: str, how: str, *, project: str = '',
+                         block_id: str = '', asset_id: str = '',
+                         root: Path | None = None) -> dict:
+    """Record what the Asset selector actually showed for these bytes.
+
+    how=uploaded|reused: the enlarged thumbnail was verified in the slot, so
+    Runway holds the bytes under `name`. how=missing: `name` was searched in
+    Uploads and no row matched, so it is no longer offered."""
+    if not re.fullmatch(r'[0-9a-f]{64}', sha256_hex or ''):
+        raise ValueError('RUNWAY_LIBRARY_SHA256_INVALID')
+    if how not in {'uploaded', 'reused', 'missing'}:
+        raise ValueError(f'RUNWAY_LIBRARY_HOW_INVALID: {how}')
+    if not name or '/' in name:
+        raise ValueError('RUNWAY_LIBRARY_NAME_INVALID')
+    now = dt.datetime.now().astimezone().isoformat(timespec='seconds')
+    data = load_runway_library(root)
+    entry = data['entries'].setdefault(sha256_hex, {'names': {}, 'asset_ids': [], 'projects': []})
+    row = entry['names'].setdefault(name, {'first_seen': now})
+    if how == 'missing':
+        row['status'] = 'missing'
+        row['missing_at'] = now
+    else:
+        row['status'] = 'verified'
+        row['last_verified'] = now
+        row['last_how'] = how
+        if how == 'uploaded':
+            entry.setdefault('first_uploaded_at', now)
+    for key, value in (('asset_ids', asset_id), ('projects', project)):
+        if value and value not in entry[key]:
+            entry[key].append(value)
+    _save_runway_library(data, root)
+    return {'sha256': sha256_hex, 'name': name, 'how': how,
+            'search_names': runway_search_names(data, sha256_hex)}
+
+
+def upload_block_reason(path: Path, root: Path | None = None) -> str:
+    """Why the native chooser must not upload this bundle file, or ''."""
+    names = runway_search_names(load_runway_library(root), media_registry.sha256(path))
+    if not names:
+        return ''
+    return ('UPLOAD_BLOCKED_ALREADY_IN_RUNWAY_UPLOADS: select ' + ' | '.join(names)
+            + ' from Asset selector > Uploads; if a name has no row, record it with '
+              'record-runway-attach --how missing and re-run')
+
+
+def seed_runway_library(runtime_root: Path, root: Path | None = None) -> dict:
+    """Add candidate names from old upload receipts and bundles (never verified)."""
+    root = Path(root or UPLOAD_ALIAS_ROOT)
+    data = load_runway_library(root)
+    found: dict[str, list[tuple[str, str, str]]] = {}
+
+    def add(sha: str, name: str, when: str, source: str) -> None:
+        if re.fullmatch(r'[0-9a-f]{64}', sha or '') and name:
+            found.setdefault(sha, []).append((when or '', name, source))
+
+    for receipt in sorted(Path(runtime_root).glob('*/lanes/seedance/upload_alias_receipts.jsonl')):
+        for line in receipt.read_text(encoding='utf-8', errors='ignore').splitlines():
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            add(row.get('sha256'), row.get('alias_name') or Path(row.get('alias_path') or '').name,
+                row.get('ts'), str(receipt.parent.parent.parent.name))
+    for bundle in sorted(Path(root).glob('*/*/bundle.json')):
+        try:
+            manifest = json.loads(bundle.read_text(encoding='utf-8'))
+        except json.JSONDecodeError:
+            continue
+        when = dt.datetime.fromtimestamp(bundle.stat().st_mtime).astimezone().isoformat(timespec='seconds')
+        for slot in manifest.get('slots') or []:
+            add(slot.get('sha256'), slot.get('alias_name'), when, bundle.parent.parent.name)
+    added = 0
+    for sha, rows in found.items():
+        entry = data['entries'].setdefault(sha, {'names': {}, 'asset_ids': [], 'projects': []})
+        for when, name, source in sorted(rows, reverse=True)[:RUNWAY_LIBRARY_CANDIDATE_CAP]:
+            if name in entry['names']:
+                continue
+            entry['names'][name] = {'status': 'candidate', 'first_seen': when, 'source': source}
+            added += 1
+    _save_runway_library(data, root)
+    return {'library': str(runway_library_path(root)), 'files': len(data['entries']), 'names_added': added}
 
 
 # --- same-session recovery controller --------------------------------------
@@ -825,6 +993,36 @@ def cmd_prepare_upload_bundle(args) -> int:
     return 0
 
 
+def cmd_record_runway_attach(args) -> int:
+    try:
+        sha = args.sha256
+        if args.path:
+            sha = media_registry.sha256(Path(args.path).expanduser())
+        result = record_runway_attach(sha or '', args.name, args.how, project=args.project or '',
+                                      block_id=args.block_id or '', asset_id=args.asset_id or '')
+    except (OSError, ValueError) as exc:
+        print(json.dumps({'ok': False, 'error': str(exc)}, ensure_ascii=False))
+        return 1
+    print(json.dumps({'ok': True, **result}, ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_runway_library(args) -> int:
+    if args.seed:
+        result = seed_runway_library(Path(args.runtime_root).expanduser())
+        print(json.dumps({'ok': True, **result}, ensure_ascii=False, indent=2))
+        return 0
+    library = load_runway_library()
+    if args.sha256 or args.path:
+        sha = args.sha256 or media_registry.sha256(Path(args.path).expanduser())
+        print(json.dumps({'ok': True, 'sha256': sha, 'search_names': runway_search_names(library, sha),
+                          'entry': library['entries'].get(sha)}, ensure_ascii=False, indent=2))
+        return 0
+    print(json.dumps({'ok': True, 'library': str(runway_library_path()),
+                      'files': len(library['entries'])}, ensure_ascii=False, indent=2))
+    return 0
+
+
 def cmd_cleanup_upload_alias(args) -> int:
     try:
         result = cleanup_upload_alias(Path(args.path))
@@ -1053,6 +1251,9 @@ def cmd_picker_select(args) -> int:
         raise ValueError('PICKER_SELECT_REQUIRES_LIVE_HELPER_BUNDLE_FILE')
     if not re.fullmatch(r'[A-Za-z0-9_]+\.(png|jpg|jpeg|webp|mp4|mov|wav|mp3)', path.name):
         raise ValueError('PICKER_SELECT_ALIAS_NAME_INVALID')
+    blocked = upload_block_reason(path)
+    if blocked:
+        raise ValueError(blocked)
     tail = f'''
 tell application "System Events"
     tell process "{TARGET_APP}"
@@ -2988,6 +3189,21 @@ def main() -> int:
     p.add_argument('--slot', type=int, default=1)
     p.add_argument('--modality', choices=['Image', 'Video', 'Audio'], default='Image')
     p.set_defaults(fn=cmd_prepare_upload_alias)
+    p = sub.add_parser('record-runway-attach', help='record that Runway Uploads holds (or lacks) a file under a visible name')
+    p.add_argument('--name', required=True, help='exact file name shown in Asset selector > Uploads')
+    p.add_argument('--how', required=True, choices=['uploaded', 'reused', 'missing'])
+    p.add_argument('--sha256')
+    p.add_argument('--path', help='bundle file; its sha256 is used')
+    p.add_argument('--project')
+    p.add_argument('--block-id')
+    p.add_argument('--asset-id')
+    p.set_defaults(fn=cmd_record_runway_attach)
+    p = sub.add_parser('runway-library', help='show or seed the Runway Uploads ledger')
+    p.add_argument('--sha256')
+    p.add_argument('--path')
+    p.add_argument('--seed', action='store_true', help='add candidate names from old receipts and bundles')
+    p.add_argument('--runtime-root', default=str(Path.home() / 'Documents/Codex/video-team-runtime'))
+    p.set_defaults(fn=cmd_runway_library)
     p = sub.add_parser('cleanup-upload-alias', help='remove one helper-owned upload bundle copy')
     p.add_argument('--path', required=True)
     p.set_defaults(fn=cmd_cleanup_upload_alias)

@@ -94,13 +94,30 @@ No background observer or extra browser owner is started.
 
 Use the selected helper's `recovery-checkpoint` before ATTACH, then
 `prepare-upload-bundle --project <p> --block-id <B> --pack <attested pack>` once per
-block. It writes ordered APFS clones (not symlinks) into the all-ASCII folder
-`~/RunwayUpload/<project>/<B>/` as `NN_<Modality>N_<asset8>.<ext>` plus `bundle.json`;
-slot N is always file `0N_…N_…`. Never attach a file from `media/`, Downloads, /tmp or
-any other folder. Before uploading, look in Runway's Uploads/asset selector for the
-exact bundle file name: an exact match is the same bytes and is selected instead of
-re-uploaded (never pick a same-looking `exec-<uuid>` or Recents item). Use the visible
-Reference selector to open the native chooser. Computer Use may operate only
+block. It writes APFS clones (not symlinks) into the all-ASCII folder
+`~/RunwayUpload/<project>/<B>/` named by content, `RW_<sha12>.<ext>` (same bytes →
+same name in every block, slot and project), plus `bundle.json` whose `slots[]` give
+each token's file and its `attach` step. Never attach a file from `media/`, Downloads,
+/tmp or any other folder.
+
+**Reuse before upload (user rule: never re-upload what Runway already holds).**
+The machine-wide ledger `~/RunwayUpload/_runway_library.json` records which bytes
+Runway's Uploads library holds and under which visible names.
+- `attach: SELECT_EXISTING_RUNWAY_UPLOAD`: open the slot's Reference selector →
+  Asset selector → `Uploads` filter → search each `search_names` entry in order by its
+  exact file name. A row with exactly that name → select it, verify the enlarged
+  thumbnail in the slot, then `record-runway-attach --path <bundle file> --name <name>
+  --how reused`. Several rows with the same `RW_` name are identical bytes; take the
+  newest. For an older name (not `RW_`) with several rows, the enlarged thumbnail must
+  match. No row → `record-runway-attach --path <bundle file> --name <name> --how missing`
+  and try the next name. Never pick a same-looking `exec-<uuid>` or Recents item.
+- `attach: UPLOAD_NEW_VIA_NATIVE_CHOOSER`, or every name recorded missing: upload the
+  bundle file through the native chooser below, verify the enlarged thumbnail, then
+  `record-runway-attach --path <bundle file> --name <RW_ name> --how uploaded`.
+- `picker-select` refuses (`UPLOAD_BLOCKED_ALREADY_IN_RUNWAY_UPLOADS`) a file whose
+  bytes the ledger still lists; that refusal is the instruction to select, not a blocker.
+
+Use the visible Reference selector to open the native chooser. Computer Use may operate only
 that same Aside chooser; the helper's optional native `picker-go` first requires
 the exact bound tab to be active, activates Aside without input, then rechecks
 the exact active tab in the focused window before macOS frontmost and IME checks.

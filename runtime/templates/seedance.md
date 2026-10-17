@@ -23,8 +23,11 @@ then `preprod shelf-release --blocks ALL_LOCKED --approval-quote "<user's words>
 Continue in this same conversation; the phase change is not a spawn. For each released block:
 1. `preprod shelf-verify --block <B>` must be `ok`. Any failure → stop that block and return to P4.
 2. `runway_ui_helper.py prepare-upload-bundle --project <p> --block-id <B> --pack preprod/04_shelf/<B>/pack.json`
-   → ordered ASCII clones in `~/RunwayUpload/<project>/<B>/` (`01_Image1_…`, `02_Image2_…`). Attach slot N
-   from file `0N_ImageN_*` only; if Runway's Uploads already shows that exact file name, select it instead of re-uploading.
+   → `bundle.json` gives each slot its file (`RW_<sha12>.<ext>`, named by content) and an `attach` step.
+   `SELECT_EXISTING_RUNWAY_UPLOAD`: pick it in Asset selector > Uploads by the listed `search_names`
+   (never upload it again). `UPLOAD_NEW_VIA_NATIVE_CHOOSER`: upload that file. After the enlarged
+   thumbnail is verified, `record-runway-attach --path <file> --name <name> --how reused|uploaded`;
+   a searched name with no row → `--how missing`.
 3. Settings from `settings.json`; `settings-verify` must pass (it also reads the visible duration/model).
 4. `paste-prompt --file preprod/04_shelf/<B>/prompt.txt --pack preprod/04_shelf/<B>/pack.json`, verify, Generate once.
 Never edit, shorten, translate or "improve" a released prompt during production. If it needs
