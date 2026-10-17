@@ -346,3 +346,38 @@ def run(project: Path, block: str, *, start: str = 'attach', from_slot: int = 1)
     except OSError:
         pass
     return result
+
+
+def record_generate(project: Path, block: str, state: str, clicked_at: str = '') -> dict:
+    """Bookkeeping only (no browser): the operator clicked Generate once and saw the matching card."""
+    if state not in {'IN_QUEUE', 'GENERATING'}:
+        raise Stop('STATE_INVALID', state)
+    ctx = load_context(project, block)
+    pack = json.loads(ctx['pack_path'].read_text(encoding='utf-8'))
+    binding = json.loads(ctx['binding_path'].read_text(encoding='utf-8'))
+    now = _now()
+    refs = [r.get('asset_id') for r in ctx['refs']]
+    job = {'block_id': block, 'status': state, 'visible_state': state,
+           'prompt_sha256': pack.get('prompt_sha256'), 'reference_asset_ids': refs, 'references': refs,
+           'session_url': binding.get('session_url'), 'click_count': 1, 'clicked_at': clicked_at or now,
+           'accepted_at': now, 'accepted_prompt_exact': True, 'downloaded': False,
+           'quality_verdict': 'NOT_REVIEWED', 'settings': ctx['settings'],
+           'local_output_id': block + '_output1', 'via': 'run-block'}
+    written = []
+    for rel in ('state.json', 'manifest.json', 'lanes/seedance/status.json'):
+        path = ctx['project'] / rel
+        if not path.is_file():
+            continue
+        doc = json.loads(path.read_text(encoding='utf-8'))
+        jobs = doc.setdefault('provider_jobs', [])
+        if any(j.get('block_id') == block for j in jobs):
+            raise Stop('JOB_ALREADY_RECORDED', {'file': rel, 'block': block},
+                       'one Generate per block; reconcile instead of recording twice')
+        jobs.append(job)
+        doc['provider_job_count'] = len(jobs)
+        doc['updated_at'] = now
+        tmp = path.with_suffix('.tmp')
+        tmp.write_text(json.dumps(doc, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        tmp.replace(path)
+        written.append(rel)
+    return {'ok': True, 'block': block, 'state': state, 'written': written}

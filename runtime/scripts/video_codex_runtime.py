@@ -18,6 +18,8 @@ import generation_settings
 import media_registry
 import model_routing
 import video_knowledge_router
+import lane_sessions
+import preprod
 
 HOME = Path('/Users/gnudas')
 RUNTIME = Path('/Users/gnudas/Documents/Codex/video-team-runtime/runtime')
@@ -349,6 +351,11 @@ def seedance_phase(project: Path, requested: str = 'auto') -> str:
     if requested != 'auto':
         raise SystemExit('seedance phase must be auto|prompting|production')
     status = json.loads(read(project / 'lanes' / 'seedance' / 'status.json') or '{}')
+    if preprod.is_preprod_project(project):
+        released = preprod.released_blocks(project)
+        if released and (lane_sessions.production_batch(project, released)[0]
+                         or lane_sessions.undownloaded_jobs(project)):
+            return 'production'
     normalized = str(status.get('status') or '').upper()
     phase = str(status.get('phase') or '').lower()
     if normalized == 'READY_FOR_PRODUCTION' or phase in {
@@ -447,7 +454,7 @@ When updating shared files, keep JSON valid and do not erase other lanes' data.
 All media input/output for this v4 project belongs under `{project / 'media'}` and
 must be registered in `{project / media_registry.REGISTRY_NAME}`. `lanes/` is for
 status, prompts, manifests, QC records and logs only; never store media there.
-"""
+{lane_sessions.result_contract(project, lane)}"""
 
 
 def pid_running(pid: int | None) -> bool:
@@ -490,15 +497,17 @@ def active_lane_owners(project: Path) -> list[dict]:
 
 
 def codex_exec_inner(project: Path, prompt_path: Path, result_path: Path, route: dict) -> str:
-    if not route['model']:
-        raise ValueError('INHERIT_SESSION: continue in the current native session; CLI dispatch cannot inherit its model')
-    effort_config = 'model_reasoning_effort=' + json.dumps(route['reasoning_effort'])
+    """One fresh lane session. No model in the route = the user's own Codex default."""
+    model = ''
+    if route['model']:
+        effort_config = 'model_reasoning_effort=' + json.dumps(route['reasoning_effort'])
+        model = f"-m {shlex.quote(route['model'])} -c {shlex.quote(effort_config)} "
+    sandbox = ' '.join(shlex.quote(a) for a in lane_sessions.sandbox_args(route['route_key']))
     return (
         f"HOME=/Users/gnudas {shlex.quote(str(CODEX))} exec "
-        f"--skip-git-repo-check --full-auto "
+        f"--skip-git-repo-check {sandbox} "
         f"--output-last-message {shlex.quote(str(result_path))} "
-        f"-C {shlex.quote(str(project))} -m {shlex.quote(route['model'] or '')} "
-        f"-c {shlex.quote(effort_config)} < {shlex.quote(str(prompt_path))}"
+        f"-C {shlex.quote(str(project))} {model}< {shlex.quote(str(prompt_path))}"
     )
 
 
@@ -523,13 +532,14 @@ def dispatch(args) -> None:
             raise SystemExit('--phase is valid only for the seedance lane')
         route = model_routing.resolve(lane, phase)
         approval_token = f'{lane}:{phase or "lane"}'
-        if getattr(args, 'approved_spawn', None) != approval_token:
+        standing = lane_sessions.load_policy(PROJECT_ROOT)
+        if lane == 'director':
+            raise SystemExit('DIRECTOR_STAYS_IN_MAIN_THREAD: the director talks to the user; dispatch the next lane instead')
+        if getattr(args, 'approved_spawn', None) != approval_token and not standing:
             raise SystemExit(
-                'SPAWN_APPROVAL_REQUIRED: this dispatch creates one Codex lane owner. '
+                'SPAWN_APPROVAL_REQUIRED: this dispatch creates one Codex lane session. '
                 f'After explicit current-conversation approval, retry with '
-                f'--approved-spawn {approval_token}')
-        if not route['model']:
-            raise SystemExit('INHERIT_SESSION: execution stays in the current conversation; no CLI owner')
+                f'--approved-spawn {approval_token} (or record a standing session-policy)')
         owners = active_lane_owners(project)
         if owners:
             raise SystemExit(
@@ -565,7 +575,16 @@ def dispatch(args) -> None:
             prompt_path = lane_dir / 'prompt.md'
             result_path = lane_dir / 'result.md'
             log_path = lane_dir / 'run.log'
-        if lane == 'seedance' and phase == 'production':
+        batch, remaining, harvest = [], [], []
+        if lane == 'seedance' and phase == 'production' and preprod.is_preprod_project(project):
+            batch, remaining = lane_sessions.production_batch(
+                project, preprod.released_blocks(project), getattr(args, 'blocks', None))
+            if not batch:
+                harvest = lane_sessions.undownloaded_jobs(project)
+                if not harvest:
+                    raise SystemExit('SEEDANCE_NOTHING_LEFT: every released block is generated and downloaded; '
+                                     'dispatch seedance_qc')
+        elif lane == 'seedance' and phase == 'production':
             attested = _attested_seedance_packs(project)
             recovery = json.loads(read(lane_dir / 'recovery_state.json') or '{}')
             resume = lane_gates._seedance_resume_needed(project)
@@ -574,7 +593,13 @@ def dispatch(args) -> None:
                     'SEEDANCE_PRODUCTION_NOT_READY: no current ATTESTED package, recovery '
                     'checkpoint, or in-flight job. Dispatch --phase prompting first.')
         run_due_cleanup(project)  # only after explicit spawn approval and dispatch gates
-        prompt_path.write_text(make_prompt(project, lane, phase), encoding='utf-8')
+        previous = lane_dir / lane_sessions.RESULT_NAME
+        if previous.exists():
+            previous.replace(lane_dir / (lane_sessions.RESULT_NAME + '.prev'))
+        prompt_path.write_text(
+            lane_sessions.production_prompt(project, batch, remaining, route) if batch
+            else lane_sessions.harvest_prompt(project, harvest, route) if harvest
+            else make_prompt(project, lane, phase), encoding='utf-8')
         status = {
             'lane': lane, 'status': 'LAUNCHING',
             'launched_at': dt.datetime.now().isoformat(),
@@ -582,7 +607,9 @@ def dispatch(args) -> None:
             'model': route['model'],
             'reasoning_effort': route['reasoning_effort'],
             'model_policy_version': route['policy_version'],
-            'approved_spawn': approval_token,
+            'approved_spawn': approval_token if getattr(args, 'approved_spawn', None) == approval_token
+                              else 'standing:' + standing.get('recorded_at', ''),
+            'blocks': batch,
         }
         write_json(lane_dir / 'model_route.json', {
             **route,
@@ -618,10 +645,26 @@ def dispatch(args) -> None:
             'monitor': None,
         })
         launched.append({
-            'lane': lane, 'phase': phase or 'lane', 'pid': proc.pid,
+            'lane': lane, 'phase': phase or 'lane', 'pid': proc.pid, 'blocks': batch,
+            'wait': f'video-codex-runtime wait --project {project} --lane {lane}',
             'model': route['model'], 'reasoning_effort': route['reasoning_effort'],
             'log': str(log_path), 'result': str(result_path)})
     print(json.dumps({'project': str(project), 'launched': launched, 'skipped': skipped}, ensure_ascii=False, indent=2))
+
+
+def wait_cmd(args) -> None:
+    project = Path(args.project).expanduser().resolve()
+    print(json.dumps(lane_sessions.wait(project, args.lane, pid_running, args.timeout_min),
+                     ensure_ascii=False, indent=2))
+
+
+def session_policy_cmd(args) -> None:
+    if args.show:
+        print(json.dumps(lane_sessions.load_policy(PROJECT_ROOT) or {'auto_lane_sessions': False},
+                         ensure_ascii=False, indent=2))
+        return
+    print(json.dumps(lane_sessions.set_policy(PROJECT_ROOT, bool(args.enable), args.approval_quote),
+                     ensure_ascii=False, indent=2))
 
 
 def status(args) -> None:
@@ -884,6 +927,20 @@ def next_cmd(args) -> None:
                         'author_protocol': 'AGENTS.md §1.3'} for row in dispatch],
         'dispatch_note': 'next_dispatch is optional new-owner routing only. Continue prompting and production here with the actual session model; do not spawn or request routine approval.',
     }
+    if lane_sessions.load_policy(PROJECT_ROOT):
+        lanes = [row for row in dispatch if row['lane'] != 'director']
+        result['default_execution'] = {
+            'action': 'DISPATCH_LANE_SESSION' if lanes else 'DIRECTOR_IN_MAIN_THREAD',
+            'new_owner': bool(lanes),
+            'new_approval_for_role_change': False,
+            'automatic_model_switch': False,
+            'commands': [f"video-codex-runtime dispatch --project {project} --lanes {row['lane']}"
+                         + (f" --phase {row['phase']}" if row['lane'] == 'seedance' else '')
+                         + f" && video-codex-runtime wait --project {project} --lane {row['lane']}"
+                         for row in lanes[:1]],
+            'dispatch_note': ('Main thread = director. Start the next lane as its own session, wait, read only '
+                              'session_result.json, talk to the user. Do not do lane work in the main thread.'),
+        }
     result['next_dispatch'] = dispatch
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
@@ -983,8 +1040,23 @@ def main() -> None:
     p.add_argument('--phase', choices=['auto', 'prompting', 'production'], default='auto',
                    help='seedance only: auto resolves the next sequential prompting/production phase')
     p.add_argument('--approved-spawn',
-                   help='exact current-conversation spawn approval token shown by next/model-route')
+                   help='exact current-conversation spawn approval token (not needed under a standing session-policy)')
+    p.add_argument('--blocks', nargs='+', help='seedance production: released blocks for this session (default: next 4)')
     p.set_defaults(func=dispatch)
+
+    p = sub.add_parser('wait', help='foreground wait for the running lane session; prints its compact session_result')
+    p.add_argument('--project', required=True)
+    p.add_argument('--lane', required=True, choices=LANES)
+    p.add_argument('--timeout-min', type=float, default=10)
+    p.set_defaults(func=wait_cmd)
+
+    p = sub.add_parser('session-policy', help='record the user standing approval for director-started lane sessions')
+    g = p.add_mutually_exclusive_group(required=True)
+    g.add_argument('--enable', action='store_true')
+    g.add_argument('--disable', action='store_true')
+    g.add_argument('--show', action='store_true')
+    p.add_argument('--approval-quote', default='')
+    p.set_defaults(func=session_policy_cmd)
 
     p = sub.add_parser('status')
     p.add_argument('--project', required=True)

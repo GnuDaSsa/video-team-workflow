@@ -27,7 +27,7 @@ Lane rules:
 - For v4 projects, write lane metadata under `lanes/<lane>/` and write/register all actual media under the project's canonical numbered `media/` tree. Legacy projects keep their existing layout until explicitly migrated.
 - Update `status.json` and `result.md` for the lane.
 - Real media completion requires verified files, paths, sizes, duration/codec where relevant, or verified GUI state. Prompts/plans/placeholders are not completion.
-- Parallel lanes require explicit per-spawn user approval first. The v4 image stage may use up to three bounded non-agent generation processes over immutable prompts; this is not permission to spawn image agents or parallel lanes.
+- Video-team lane sessions: the main thread is the director; each lane runs as one fresh sequential session via `video-codex-runtime dispatch` under the user's standing approval (`session_policy.json`). Parallel lanes still require explicit per-spawn user approval. The v4 image stage may use up to three bounded non-agent generation processes over immutable prompts; this is not permission to spawn image agents or parallel lanes.
 - Public upload, publish, contest/government submission, email send, personal-info form submit, payment, password/2FA, and irreversible deletion require explicit user approval.
 - Login/CAPTCHA/payment/permission/account-limit gates require BLOCKED and the exact user action; ordinary recoverable GUI errors follow the execution-responsibility rule above before escalation.
 
@@ -36,7 +36,7 @@ Lane rules:
 After the video team (or any team workflow) is invoked, work must not fan out into extra agents on its own.
 
 - Spawning any additional agent surface — Codex delegated lane, subagent/worker/explorer, external orchestrator sidecar, background monitor/scheduler/cron/heartbeat, or a second concurrent browser-automation loop — requires **explicit user approval for that specific spawn in the current conversation**. The approval request must name the lane/role, purpose, and expected output.
-- Default execution model is single-agent, sequential, in the main conversation. Parallel lanes are an exception the user grants per project/turn, not the default. Role templates define responsibilities, not standing permission to instantiate agents.
+- Video team exception (user standing approval, 2026-10-17: sessions are fine; what is forbidden is growing new skills/AGENTS files per request): the director starts one sequential lane session at a time via `video-codex-runtime dispatch` and reads its `session_result.json`. Lane sessions start nothing themselves. Otherwise default execution is single-agent, sequential, in the main conversation; role templates are not standing permission. Never create a new skill or enlarge AGENTS/skill files per user request — edit the existing rule in place.
 - Single pre-approved exception: one 15-minute **foreground wait tool session** in the same Codex turn and existing Runway browser while an armed queue is active. It is not a scheduler and cannot create a future model turn; the owning turn must remain attached, consume the result, and re-read the board. It is not a resident observer/agent/process, and only one wait may be pending.
 - Rule files operate latest-only: corrections edit/delete old text in place instead of appending dated layers. History and rollback live in the `GnuDaSsa/video-team-workflow` git repo and `~/.codex/archive/`. Deployed policy: `~/.codex/video-team-policies/subagent_approval_gate_20260721.md`.
 

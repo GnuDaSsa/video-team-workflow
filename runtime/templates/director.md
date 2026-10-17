@@ -23,6 +23,19 @@ Write `preprod/01_bible/style_bible.json`:
 - `locations[]`: `id` (`LOC_*`), `description_en`, `anchor_objects`.
 Run `preprod check --stage bible`, then `preprod lock --stage bible`.
 
+## After P1: direct, do not execute
+The main thread stays the director for the whole project. Every later lane runs in its own
+fresh session so this conversation stays small:
+1. `video-codex-runtime next --project <p>` → run its `default_execution.commands[0]`
+   (`dispatch … && wait …`). One lane session at a time.
+2. Read only the printed `session_result` (`DONE | PARTIAL | STOPPED | NEEDS_USER`). Do not open
+   the lane's logs, prompts or media unless the user asks.
+3. `NEEDS_USER` → ask the user that exact question; record the answer with the stage's lock/approval
+   command (e.g. `preprod lock --stage storyboard --approval-quote …`, `preprod shelf-release …`),
+   then dispatch the lane again. `PARTIAL` (e.g. Seedance blocks left) → dispatch the same lane again.
+   `still running` → `wait` again; never start a second session for it.
+4. Tell the user the result in a few lines, then repeat from 1.
+
 ## Rules
 - Do not generate images, operate Runway, or write production prompts here.
 - Later change requests that alter the concept or look come back to this lane: edit, re-lock (the old version moves to `preprod/_superseded/`), and every downstream stage becomes STALE until re-locked.

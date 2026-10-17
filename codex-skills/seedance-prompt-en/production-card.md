@@ -6,9 +6,9 @@ It replaces reading `SKILL.md`, runtime `AGENTS.md`, `aside-operator.md`,
 Open one of those only when a STOPPED result names it. Every extra read is
 re-sent with every later step; that, not Runway, is what made a block take 40 min.
 
-Run P5 in a **fresh Codex thread** started from the handoff doc, not in a long
-planning/production thread. Write wiki capsules and brief/changelog notes once,
-at the end of the batch, not between blocks.
+P5 runs in its own **lane session** started by the director (`video-codex-runtime
+dispatch --lanes seedance`), at most 4 blocks per session; never in the long
+director thread. Write notes once, at the end of the batch, not between blocks.
 
 `H` = `python3 ~/.codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py`
 
@@ -25,8 +25,8 @@ at the end of the batch, not between blocks.
    sets/checks settings, pastes the shelf prompt, settings-verify, preflight.
 2. `READY` → view the `enlarged_screenshot` of each slot once (identity and
    environment are the approved refs). Then click the single visible Generate
-   **once**, and confirm the matching new card (In queue / Generating). Record
-   the transaction as `seedance-production.md` → "Submission reconciliation" requires.
+   **once**, and confirm the matching new card (In queue / Generating). Then
+   `H record-generate --project <p> --block-id <B> --state IN_QUEUE|GENERATING` (bookkeeping only).
    No card after a short look → `H recovery-record --project <p> --block-id <B> --incident RUNWAY_UI_STALE`; never click twice.
 3. Next block. Do not re-read docs between blocks.
 
@@ -44,7 +44,6 @@ at the end of the batch, not between blocks.
 
 Every run is appended to `lanes/seedance/run_block/runs.jsonl` (with seconds per run).
 
-## After the last block
-Queue wait, download, ffprobe (≈15 s), ingest, Seedance QC and package follow
-`seedance-production.md` from "Post-Generate continuation gate" on. Then one
-wiki capsule for the whole batch.
+## After the last block of this session
+Write the session result and end. Download/harvest, Seedance QC and package are
+each their own later session, started by the director.

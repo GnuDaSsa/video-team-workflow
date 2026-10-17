@@ -90,21 +90,72 @@ class ModelRoutingTests(unittest.TestCase):
         self.assertIn('Astra', data['model_routing']['seedance_phase_handoff'])
 
     def test_codex_command_carries_model_and_effort(self) -> None:
-        route = model_routing.resolve('seedance', 'production')
-        with self.assertRaisesRegex(ValueError, 'INHERIT_SESSION'):
-            video_codex_runtime.codex_exec_inner(
-                Path('/tmp/project'), Path('/tmp/prompt.md'), Path('/tmp/result.md'), route)
+        args = (Path('/tmp/project'), Path('/tmp/prompt.md'), Path('/tmp/result.md'))
+        # No routed model: the session uses the user's own Codex default model.
+        production = video_codex_runtime.codex_exec_inner(*args, model_routing.resolve('seedance', 'production'))
+        self.assertNotIn(' -m ', production)
+        self.assertIn('danger-full-access', production)  # Aside CLI / native chooser lane
+        authoring = video_codex_runtime.codex_exec_inner(*args, model_routing.resolve('seedance', 'prompting'))
+        self.assertIn('-m gpt-6-astra', authoring)
+        self.assertIn('--full-auto', authoring)
+        self.assertNotIn('danger-full-access', authoring)
 
     def test_dispatch_refuses_without_exact_spawn_approval(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             project = Path(td)
             (project / 'state.json').write_text('{}', encoding='utf-8')
             (project / 'lanes' / 'director').mkdir(parents=True)
-            with mock.patch('video_codex_runtime.lane_gates.gate_check', return_value=(True, 'OK')):
-                with self.assertRaisesRegex(SystemExit, 'INHERIT_SESSION|SPAWN_APPROVAL_REQUIRED'):
+            (project / 'lanes' / 'image_qc').mkdir(parents=True)
+            with mock.patch('video_codex_runtime.lane_gates.gate_check', return_value=(True, 'OK')), \
+                    mock.patch.object(video_codex_runtime.lane_sessions, 'load_policy', return_value={}):
+                with self.assertRaisesRegex(SystemExit, 'SPAWN_APPROVAL_REQUIRED'):
+                    video_codex_runtime.dispatch(SimpleNamespace(
+                        project=str(project), lanes=['image_qc'], phase='auto',
+                        approved_spawn=None, force=False))
+                with self.assertRaisesRegex(SystemExit, 'DIRECTOR_STAYS_IN_MAIN_THREAD'):
                     video_codex_runtime.dispatch(SimpleNamespace(
                         project=str(project), lanes=['director'], phase='auto',
                         approved_spawn=None, force=False))
+
+    def test_standing_policy_starts_one_lane_session_and_wait_reads_result(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            project = Path(td)
+            (project / 'state.json').write_text('{}', encoding='utf-8')
+            (project / 'manifest.json').write_text('{}', encoding='utf-8')
+            policy = {'auto_lane_sessions': True, 'approval_quote': 'q', 'recorded_at': 't'}
+            proc = mock.Mock(pid=4242)
+            out = io.StringIO()
+            with mock.patch('video_codex_runtime.lane_gates.gate_check', return_value=(True, 'OK')), \
+                    mock.patch.object(video_codex_runtime.lane_sessions, 'load_policy', return_value=policy), \
+                    mock.patch.object(video_codex_runtime, 'run_due_cleanup'), \
+                    mock.patch.object(video_codex_runtime.subprocess, 'Popen', return_value=proc) as popen, \
+                    mock.patch.object(video_codex_runtime, 'CODEX', Path(sys.executable)), \
+                    contextlib.redirect_stdout(out):
+                video_codex_runtime.dispatch(SimpleNamespace(
+                    project=str(project), lanes=['image_qc'], phase='auto', approved_spawn=None, force=False))
+            popen.assert_called_once()
+            prompt = (project / 'lanes/image_qc/prompt.md').read_text(encoding='utf-8')
+            self.assertIn('SESSION RESULT CONTRACT', prompt)
+            status = json.loads((project / 'lanes/image_qc/status.json').read_text())
+            self.assertTrue(status['approved_spawn'].startswith('standing:'))
+            (project / 'lanes/image_qc/session_result.json').write_text(
+                json.dumps({'status': 'DONE', 'summary': 'ok'}), encoding='utf-8')
+            waited = video_codex_runtime.lane_sessions.wait(project, 'image_qc', lambda pid: False, 0)
+            self.assertEqual(waited['result']['status'], 'DONE')
+            self.assertFalse(waited['running'])
+
+    def test_production_batches_four_released_blocks(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            project = Path(td)
+            (project / 'lanes/seedance').mkdir(parents=True)
+            (project / 'lanes/seedance/status.json').write_text(
+                json.dumps({'provider_jobs': [{'block_id': 'B01'}]}), encoding='utf-8')
+            released = [f'B0{i}' for i in range(1, 8)]
+            batch, rest = video_codex_runtime.lane_sessions.production_batch(project, released)
+            self.assertEqual(batch, ['B02', 'B03', 'B04', 'B05'])
+            self.assertEqual(rest, ['B06', 'B07'])
+            with self.assertRaises(SystemExit):
+                video_codex_runtime.lane_sessions.production_batch(project, released, ['B09'])
 
     def test_next_prefers_same_owner_without_automatic_model_switch(self) -> None:
         with tempfile.TemporaryDirectory() as td:

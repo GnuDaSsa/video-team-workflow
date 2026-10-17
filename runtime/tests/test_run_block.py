@@ -125,6 +125,23 @@ class RunBlockTests(unittest.TestCase):
                     run_block.phase_attach(self._ctx(root), FakePage(dict(GOOD, refs=[]), rows=1), [])
             self.assertEqual(stop.exception.code, 'SLOT_IMAGE_ASPECT_MISMATCH')
 
+    def test_record_generate_writes_job_once(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / 'lanes/seedance').mkdir(parents=True)
+            for rel in ('state.json', 'manifest.json', 'lanes/seedance/status.json'):
+                (root / rel).write_text('{}', encoding='utf-8')
+            (root / 'pack.json').write_text(json.dumps({'prompt_sha256': 'h'}), encoding='utf-8')
+            (root / 'b.json').write_text(json.dumps({'session_url': 'u'}), encoding='utf-8')
+            ctx = dict(self._ctx(root), refs=[{'asset_id': 'AST_1'}])
+            with mock.patch.object(run_block, 'load_context', return_value=ctx):
+                out = run_block.record_generate(root, 'B01', 'IN_QUEUE')
+                self.assertEqual(len(out['written']), 3)
+                job = json.loads((root / 'lanes/seedance/status.json').read_text())['provider_jobs'][0]
+                self.assertEqual((job['block_id'], job['downloaded']), ('B01', False))
+                with self.assertRaises(run_block.Stop):
+                    run_block.record_generate(root, 'B01', 'IN_QUEUE')
+
     def test_run_stops_cleanly_without_shelf(self):
         with tempfile.TemporaryDirectory() as td:
             result = run_block.run(Path(td), 'B01')

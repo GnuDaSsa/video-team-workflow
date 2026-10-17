@@ -1031,6 +1031,16 @@ def cmd_run_block(args) -> int:
     return 0 if result.get('ok') else 1
 
 
+def cmd_record_generate(args) -> int:
+    import run_block
+    try:
+        result = run_block.record_generate(Path(args.project), args.block_id, args.state, args.clicked_at or '')
+    except run_block.Stop as stop:
+        result = {'ok': False, 'stop': stop.code, 'detail': stop.detail, 'next_action': stop.next_action}
+    print(json.dumps(result, ensure_ascii=False, indent=2, default=str))
+    return 0 if result.get('ok') else 1
+
+
 def cmd_cleanup_upload_alias(args) -> int:
     try:
         result = cleanup_upload_alias(Path(args.path))
@@ -3218,6 +3228,12 @@ def main() -> int:
     p.add_argument('--start', choices=['attach', 'settings', 'paste', 'preflight'], default='attach')
     p.add_argument('--from-slot', type=int, default=1)
     p.set_defaults(fn=cmd_run_block)
+    p = sub.add_parser('record-generate', help='after the one Generate click and the matching card: record the provider job (no browser)')
+    p.add_argument('--project', required=True)
+    p.add_argument('--block-id', required=True)
+    p.add_argument('--state', required=True, choices=['IN_QUEUE', 'GENERATING'])
+    p.add_argument('--clicked-at')
+    p.set_defaults(fn=cmd_record_generate)
     p = sub.add_parser('cleanup-upload-alias', help='remove one helper-owned upload bundle copy')
     p.add_argument('--path', required=True)
     p.set_defaults(fn=cmd_cleanup_upload_alias)

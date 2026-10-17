@@ -211,7 +211,8 @@ class AdditionalSafetyTests(unittest.TestCase):
     def test_rejected_dispatch_does_not_cleanup_before_approval(self):
         with tempfile.TemporaryDirectory() as td:
             p=Path(td);(p/'state.json').write_text('{}')
-            with patch.object(sys,'argv',['runtime','dispatch','--project',td,'--lanes','director']), \
+            with patch.object(sys,'argv',['runtime','dispatch','--project',td,'--lanes','image_qc']), \
+                    patch.object(runtime.lane_sessions,'load_policy',return_value={}), \
                     patch.object(runtime,'run_due_cleanup') as cleanup:
                 with self.assertRaisesRegex(SystemExit,'SPAWN_APPROVAL_REQUIRED'):
                     runtime.main()
