@@ -37,7 +37,10 @@ Review lenses — load only when the block has that risk; none is a template:
   compact prompts, no negative wall.
 - `blender-previs-prompting.md` — Blender/3D previs, animatics, source restyle.
 
-**Production phase:** `seedance-production.md` and `aside-operator.md`. The
+**Production phase, preprod shelf project:** `production-card.md` only — one
+`run-block` call per block; open other docs only when a STOPPED result names them.
+
+**Production phase, legacy project:** `seedance-production.md` and `aside-operator.md`. The
 canonical executable is `scripts/runway_ui_helper.py`; runtimes may keep a
 shim but must not fork Runway UI/recovery logic.
 

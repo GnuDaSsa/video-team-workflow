@@ -19,6 +19,7 @@ Commands:
                        --block-id B --pack K  (SELECT_EXISTING_RUNWAY_UPLOAD before any upload)
   prepare-upload-alias --project P       clone one registry asset into the block bundle
                        --asset-id A --block-id B [--slot N]
+  run-block --project P --block-id B    arm one shelf block in one call (attach/settings/paste/preflight)
   record-runway-attach --name N --how H  ledger: uploaded|reused (thumbnail verified) or missing
   runway-library [--path F|--seed]       show the names Runway Uploads holds for a file / seed
   cleanup-upload-alias --path P          remove only a helper-owned bundle copy
@@ -1021,6 +1022,13 @@ def cmd_runway_library(args) -> int:
     print(json.dumps({'ok': True, 'library': str(runway_library_path()),
                       'files': len(library['entries'])}, ensure_ascii=False, indent=2))
     return 0
+
+
+def cmd_run_block(args) -> int:
+    import run_block
+    result = run_block.run(Path(args.project), args.block_id, start=args.start, from_slot=args.from_slot)
+    print(json.dumps(result, ensure_ascii=False, indent=2, default=str))
+    return 0 if result.get('ok') else 1
 
 
 def cmd_cleanup_upload_alias(args) -> int:
@@ -3204,6 +3212,12 @@ def main() -> int:
     p.add_argument('--seed', action='store_true', help='add candidate names from old receipts and bundles')
     p.add_argument('--runtime-root', default=str(Path.home() / 'Documents/Codex/video-team-runtime'))
     p.set_defaults(fn=cmd_runway_library)
+    p = sub.add_parser('run-block', help='arm one released shelf block in one call: attach from Uploads, settings, paste, preflight (never clicks Generate)')
+    p.add_argument('--project', required=True)
+    p.add_argument('--block-id', required=True)
+    p.add_argument('--start', choices=['attach', 'settings', 'paste', 'preflight'], default='attach')
+    p.add_argument('--from-slot', type=int, default=1)
+    p.set_defaults(fn=cmd_run_block)
     p = sub.add_parser('cleanup-upload-alias', help='remove one helper-owned upload bundle copy')
     p.add_argument('--path', required=True)
     p.set_defaults(fn=cmd_cleanup_upload_alias)

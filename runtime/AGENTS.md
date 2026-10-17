@@ -161,6 +161,7 @@ flowchart TD
 | P5 제작 | seedance(production) | 선반만 소비 | `shelf-verify` 통과 |
 
 - 사용자 확인은 P0 컨셉 선택, P2 콘티(이미지 가이드 요약 포함), P4 선반 릴리스 세 번이다. 그 외 단계 전환마다 묻지 않는다.
+- **P5 제작은 빠르게:** 핸드오프 문서로 연 새 Codex 대화에서 `~/.codex/skills/seedance-prompt-en/production-card.md`만 읽고, 블록마다 `runway_ui_helper.py run-block` 한 번 + Generate 클릭 한 번으로 진행한다. 제작 중에는 이 AGENTS·스킬 본문·헬퍼 소스·`--help`·위키를 다시 읽지 않는다(STOPPED 결과가 문서를 지목할 때만). 위키 캡슐·brief·changelog는 배치가 끝난 뒤 한 번 쓴다. 이 예외는 전역 90% 캡슐 규칙보다 우선하지 않는다: 컨텍스트가 실제로 90%에 가까우면 캡슐을 쓴다.
 
 #### 저작 모드 (프로젝트 시작 때 한 번 선택)
 

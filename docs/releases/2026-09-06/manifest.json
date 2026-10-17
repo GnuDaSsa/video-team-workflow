@@ -5,7 +5,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/SKILL.md",
       "target": ".codex/skills/seedance-prompt-en/SKILL.md",
-      "sha256": "714061078ce4ba76ed5c75477ada8e9af32d064bcf048e199e486887c2423dd4"
+      "sha256": "cde9866398696bf10b71255cda8717448f8f62cf0d751629622c810fbf5f2b2a"
     },
     {
       "source": "codex-skills/seedance-prompt-en/aside-operator.md",
@@ -53,6 +53,11 @@
       "sha256": "3fd2d87d8888654822e325ac70315d3c0dc03ccff64ecde16b7edbb1f2a37012"
     },
     {
+      "source": "codex-skills/seedance-prompt-en/production-card.md",
+      "target": ".codex/skills/seedance-prompt-en/production-card.md",
+      "sha256": "01cd8bd6c9d888602cb3afa126e3691d733f2e9bc82bc52b446c1822aa05b386"
+    },
+    {
       "source": "codex-skills/seedance-prompt-en/prompt-review.md",
       "target": ".codex/skills/seedance-prompt-en/prompt-review.md",
       "sha256": "840a6b2a861b7e8cb77f78ec6acc3953e59d1691c423509e9b27974197bb4b09"
@@ -63,9 +68,14 @@
       "sha256": "71b9647a19361a04742db190d293625c783fc2a217d77b5f537502b352047192"
     },
     {
+      "source": "codex-skills/seedance-prompt-en/scripts/run_block.py",
+      "target": ".codex/skills/seedance-prompt-en/scripts/run_block.py",
+      "sha256": "df0387b65f9791f744b1497f68f97af56aab9fe6d50365b2097f200eda19b236"
+    },
+    {
       "source": "codex-skills/seedance-prompt-en/scripts/runway_ui_helper.py",
       "target": ".codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py",
-      "sha256": "b06ddf419b7b2f6ef04fd4891a745a4d6da9428a6034fe88ff69b301775bb7ae"
+      "sha256": "51ea87025a6c1722e57c7eb4a2892fe5f37da360a68eddaa84a73d596be472f8"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-field-lessons.md",
@@ -355,7 +365,7 @@
     {
       "source": "runtime/templates/seedance.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/seedance.md",
-      "sha256": "fbea4b94ad6a92c002df1714b611e600b78eb0b3c8105896a7c46325ddbb0732"
+      "sha256": "e216533349b784d70596954599423ae7a1b2a83c9a35ff890ea28fa1211f8c02"
     },
     {
       "source": "runtime/templates/seedance_qc.md",
@@ -380,7 +390,7 @@
     {
       "source": "runtime/AGENTS.md",
       "target": "Documents/Codex/video-team-runtime/AGENTS.md",
-      "sha256": "c8935f1557a3ba2e964bbb9c4b2583495c3d1ed167bdc4c34737ccaf0a441b38"
+      "sha256": "ceaf093090f6bff5b7863b1b55b376e9cbf4146c6862940ac083c3a9a07020ce"
     },
     {
       "source": "references/character_sheet_prompt_standard.md",
