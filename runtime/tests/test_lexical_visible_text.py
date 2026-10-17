@@ -1,3 +1,5 @@
+import os as _os, tempfile as _tempfile
+_os.environ.setdefault('RUNWAY_UPLOAD_ALIAS_ROOT', _tempfile.mkdtemp(prefix='rwup-test-'))  # never the real ledger
 import argparse
 import contextlib
 import io

@@ -5,16 +5,6 @@ description: "Use for any video work: planning, MV/music video, promo and public
 
 # Video Director
 
-<!-- video-team-board:start -->
-## Project kanban
-
-Production `init`/`next` opens the upper-left Video Team Board. If bypassed, run
-`~/.local/bin/video-team-board --project <absolute-runtime-project>` once.
-Read-only records, not verified media, Hermes, an agent or scheduler.
-No opening for advice/audits. To hide: `VIDEO_TEAM_BOARD_DISABLED=1`.
-Closing stops refresh.
-<!-- video-team-board:end -->
-
 <!-- flow-malfoy-routing:start -->
 ## Flow / 공통 모션그래픽
 

@@ -163,6 +163,7 @@ class ModelRoutingTests(unittest.TestCase):
             with mock.patch.object(video_codex_runtime.lane_gates, 'next_actions',
                                    return_value={'next_lanes': ['seedance']}), \
                     mock.patch.object(video_codex_runtime, 'seedance_phase', return_value='production'), \
+                    mock.patch.object(video_codex_runtime.lane_sessions, 'load_policy', return_value={}), \
                     contextlib.redirect_stdout(out):
                 video_codex_runtime.next_cmd(SimpleNamespace(project=td))
             value = json.loads(out.getvalue())

@@ -428,8 +428,13 @@ def prepare_upload_bundle(project: Path, block_id: str, pack_path: Path,
 # Uploads first and the native chooser is allowed only for bytes Runway does
 # not hold, or after each remembered name was searched and recorded missing.
 
+def _ledger_root(root: Path | None = None) -> Path:
+    # Resolved at call time so tests (RUNWAY_UPLOAD_ALIAS_ROOT) never touch the real ledger.
+    return Path(root or os.environ.get('RUNWAY_UPLOAD_ALIAS_ROOT') or UPLOAD_ALIAS_ROOT)
+
+
 def runway_library_path(root: Path | None = None) -> Path:
-    return Path(root or UPLOAD_ALIAS_ROOT) / RUNWAY_LIBRARY_NAME
+    return _ledger_root(root) / RUNWAY_LIBRARY_NAME
 
 
 def load_runway_library(root: Path | None = None) -> dict:
@@ -520,7 +525,7 @@ def upload_block_reason(path: Path, root: Path | None = None) -> str:
 
 def seed_runway_library(runtime_root: Path, root: Path | None = None) -> dict:
     """Add candidate names from old upload receipts and bundles (never verified)."""
-    root = Path(root or UPLOAD_ALIAS_ROOT)
+    root = _ledger_root(root)
     data = load_runway_library(root)
     found: dict[str, list[tuple[str, str, str]]] = {}
 

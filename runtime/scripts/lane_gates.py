@@ -610,7 +610,7 @@ def gate_check(project: Path, lane: str) -> tuple[bool, str]:
             if visual_error:
                 return False, 'MEDIA_HARD_GATE: visual-first override invalid: ' + visual_error
             return False, 'USER_SKIPPED_MUSIC_VISUAL_ONLY: no music work is authorized for this project.'
-        if st('director') in DONE_LIKE:
+        if st('director') in DONE_LIKE or 'director' in _preprod_done_lanes(project):
             return True, 'OK'
         return False, 'WAIT_DIRECTOR: music starts after director locks direction/safety gates (music_first rail).'
     if lane == 'planner' and preprod.concept_without_music(project):

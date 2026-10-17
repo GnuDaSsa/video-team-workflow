@@ -151,6 +151,35 @@ session (`seedance_qc`), not this one. Write the session result and end.
 {result_contract(project, 'seedance')}"""
 
 
+USER_APPROVAL_STAGES = {'concept', 'storyboard'}
+
+
+def user_gate(project: Path, status: dict) -> dict | None:
+    """A preprod point where the director must ask the user instead of starting a session."""
+    p = str(project)
+    for item in status.get('stages') or []:
+        stage, state = item.get('stage'), item.get('state')
+        if state == 'LOCKED':
+            continue
+        if state == 'DRAFT' and stage in USER_APPROVAL_STAGES:
+            return {'action': 'ASK_USER', 'gate': f'{stage}_approval',
+                    'show': f'preprod/{ {"concept": "00_concept/concept_options.md", "storyboard": "02_storyboard/storyboard.json"}[stage] }',
+                    'commands': [f'video-codex-runtime preprod lock --project {p} --stage {stage} '
+                                 '--approval-quote "<user words>"']}
+        if state == 'DRAFT':
+            return {'action': 'LOCK_STAGE', 'gate': stage,
+                    'commands': [f'video-codex-runtime preprod lock --project {p} --stage {stage}']}
+        return None
+    rows = status.get('shelf') or []
+    if rows and all(r.get('state') in {'LOCKED', 'RELEASED'} for r in rows) \
+            and any(r.get('state') == 'LOCKED' for r in rows):
+        return {'action': 'ASK_USER', 'gate': 'shelf_release',
+                'show': [f"preprod/04_shelf/{r['block_id']}/prompt.txt" for r in rows if r.get('state') == 'LOCKED'],
+                'commands': [f'video-codex-runtime preprod shelf-release --project {p} --blocks ALL_LOCKED '
+                             '--approval-quote "<user words>"']}
+    return None
+
+
 def read_result(project: Path, lane: str) -> dict:
     return _json(project / 'lanes' / lane / RESULT_NAME)
 

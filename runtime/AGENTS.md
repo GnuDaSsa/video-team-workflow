@@ -47,6 +47,18 @@ flowchart TD
    - 사용자 요청마다 새 스킬이나 AGENTS 문서를 만들거나 늘리지 않는다. 규칙 변경은 기존 문서의 해당 위치를 고친다.
 7. 상시 승인이 없으면 `dispatch`는 `--approved-spawn <lane>:<phase>`가 정확히 일치할 때만 실행된다. `next`의 `default_execution.commands`가 다음에 띄울 세션 명령을 알려준다.
 
+### 1.0s 새 프로젝트 시작 (매번 이 순서)
+
+1. 새 영상 요청 = **새 Codex 대화 하나 = 그 프로젝트의 디렉터**. 다른 프로젝트 대화에서 이어 시작하지 않는다.
+2. `video-codex-runtime init --slug <영문-slug> --brief "<사용자 요청 원문>" [--mode no_i2v_reference_native] [--author claude|codex]` → 출력된 프로젝트 경로를 쓴다(preprod가 기본). 사용자가 작성 모드를 말하지 않았으면 첫 질문은 “작성 모드: Claude 프롬프팅 / Codex” 하나뿐이다.
+3. P0·P1은 디렉터가 이 대화에서 한다(`runtime/templates/director.md`): 컨셉 3안 → 사용자 선택 → 잠금, 스타일 바이블 → 잠금.
+4. 그다음은 반복: `video-codex-runtime next --project <p>`의 `default_execution`을 그대로 따른다.
+   - `DISPATCH_LANE_SESSION` → `commands[0]` 실행(새 세션 + wait), `session_result`만 읽는다.
+   - `ASK_USER` → `show`의 파일을 보여 주고 한 번 묻고, 답을 `commands`로 기록한다(콘티 승인, 선반 릴리스).
+   - `LOCK_STAGE` → 그 명령으로 잠근다.
+   - `DIRECTOR_IN_MAIN_THREAD` → 디렉터 단계(P0/P1)를 이 대화에서 진행한다.
+5. 사용자에게 묻는 곳은 작성 모드, P0 컨셉, P2 콘티, P4 선반 릴리스, 그리고 세션이 돌려준 `NEEDS_USER`뿐이다. 레인 작업·로그·프롬프트·미디어를 메인 대화에서 직접 열거나 하지 않는다.
+
 ### 1.0a 불필요한 확인 금지
 
 - 사용자가 요청한 프로젝트 범위의 프롬프트 작성·검수, 승인 참조의 비공개 생성 입력, 설정 확인, Generate, 재시도 규칙 안의 수정, QC, 패키지 정리는 같은 owner가 이어간다. 다음 컷이나 단계마다 “진행할까요?”를 묻지 않는다. **Suno 음악은 예외**: 음악감독은 생성까지만 수행하고 다운로드·생성물 평가/추천/선정은 하지 않는다. 세부 생성 경계는 `music-director/SKILL.md`가 소유한다. Seedance 영상 다운로드 등 다른 매체의 승인된 작업은 이 예외로 바뀌지 않는다.

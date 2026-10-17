@@ -75,7 +75,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/scripts/runway_ui_helper.py",
       "target": ".codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py",
-      "sha256": "636005ae3d6c70ddaf7b5f1133a98df6394a6cd5e9a64411f74b5eacfbb1c482"
+      "sha256": "46de8807c16e6f7487080453ce39ef239522694e300aaa67417a6c7c3c02c4a2"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-field-lessons.md",
@@ -135,7 +135,7 @@
     {
       "source": "codex-skills/videodirector/SKILL.md",
       "target": ".codex/skills/videodirector/SKILL.md",
-      "sha256": "38028a73adf19990bfcb95ac7035de9edaba1f17eaed84f21c633e8a23ae0b12"
+      "sha256": "ffd79eead03bb729081e0117560fd9f62834daa60ae7acd56c0f06a9e6467e2d"
     },
     {
       "source": "codex-skills/videodirector/agents/openai.yaml",
@@ -230,7 +230,7 @@
     {
       "source": "runtime/scripts/lane_gates.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/lane_gates.py",
-      "sha256": "7e9a3fc300f6e39041d1a0491f54d78348dbc5ac578e5530820f07ab9ae9341c"
+      "sha256": "453ea4e832c12c07a7e2924599ff3a1d94dbaaa6c721f82e62416eb3406605c4"
     },
     {
       "source": "runtime/scripts/lane_inputs.py",
@@ -240,7 +240,7 @@
     {
       "source": "runtime/scripts/lane_sessions.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/lane_sessions.py",
-      "sha256": "1bcaa5e7e47a8b226e1c3261343361160957e5332b3f21fc4cbeef6b436297eb"
+      "sha256": "b9cc6258b6f3f32cf90d698f4c28047140196a674894222cf35ecb1efb6a9e4e"
     },
     {
       "source": "runtime/scripts/media_registry.py",
@@ -290,7 +290,7 @@
     {
       "source": "runtime/scripts/video_codex_runtime.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/video_codex_runtime.py",
-      "sha256": "6cf5b2a181c0eea79e92e3096a9f41a581a8a96bdbccf0488237a8f22705db57"
+      "sha256": "f12cf7b6f193c7adc52aecfd30d0e242d7fa474e70d3b4a54761431d9b7b58e1"
     },
     {
       "source": "runtime/scripts/video_knowledge_router.py",
@@ -390,12 +390,12 @@
     {
       "source": "GLOBAL_AGENTS.md",
       "target": ".codex/AGENTS.md",
-      "sha256": "c58b7d324382d6767da1fafe495fbcabdabde7938d939c09d66a82a7ecb1274b"
+      "sha256": "24045fd16b388ff12567d734db44ece01bc8fce8e3bfb0bf7dc3058ecde240b0"
     },
     {
       "source": "runtime/AGENTS.md",
       "target": "Documents/Codex/video-team-runtime/AGENTS.md",
-      "sha256": "26f016d9adc7166cb16f204af46a5689a883fc64bb62a126186803214c4b1c8d"
+      "sha256": "a5c495e953e2e5b5672b8222271b0f078e91f1fefbe62e24c0dffde3b27811a7"
     },
     {
       "source": "references/character_sheet_prompt_standard.md",

@@ -1,4 +1,6 @@
 from __future__ import annotations
+import os as _os, tempfile as _tempfile
+_os.environ.setdefault('RUNWAY_UPLOAD_ALIAS_ROOT', _tempfile.mkdtemp(prefix='rwup-test-'))  # never the real ledger
 
 import contextlib
 import io
@@ -235,6 +237,45 @@ class PreprodPipelineTests(unittest.TestCase):
         self.assertIn('shelf_file_changed:prompt.txt', preprod.verify_shelf(self.project, 'B01'))
         self.assertTrue(runway_ui_helper.shelf_paste_error(shelf / 'prompt.txt', str(shelf / 'pack.json')))
 
+    def _next(self) -> dict:
+        out = io.StringIO()
+        with mock.patch.object(video_codex_runtime.lane_sessions, 'load_policy',
+                               return_value={'auto_lane_sessions': True, 'approval_quote': 'q'}), \
+             contextlib.redirect_stdout(out):
+            video_codex_runtime.next_cmd(SimpleNamespace(project=str(self.project)))
+        return json.loads(out.getvalue())['default_execution']
+
+    def test_new_project_director_flow_asks_user_only_at_the_three_gates(self) -> None:
+        self.assertEqual(self._next()['action'], 'DIRECTOR_IN_MAIN_THREAD')        # P0 in the main thread
+        self.concept()
+        gate = self._next()
+        self.assertEqual((gate['action'], gate['gate']), ('ASK_USER', 'concept_approval'))
+        preprod.lock_stage(self.project, 'concept', 'B안')
+        self.bible(); self.assertEqual(self._next()['action'], 'LOCK_STAGE')
+        preprod.lock_stage(self.project, 'bible')
+        nxt = self._next()                                                         # music session (concept has music)
+        self.assertEqual(nxt['action'], 'DISPATCH_LANE_SESSION')
+        self.assertIn('--lanes music', nxt['commands'][0])
+        no_music = mock.patch.object(lane_gates.preprod, 'concept_without_music', return_value=True)
+        no_music.start(); self.addCleanup(no_music.stop)                           # rest of the flow: no-music concept
+        self.assertIn('--lanes planner', self._next()['commands'][0])
+        self.storyboard()
+        gate = self._next()
+        self.assertEqual((gate['action'], gate['gate']), ('ASK_USER', 'storyboard_approval'))
+        preprod.lock_stage(self.project, 'storyboard', '콘티 확정')
+        self.image_plan(); preprod.lock_stage(self.project, 'images')
+        nxt = self._next()
+        self.assertEqual(nxt['action'], 'DISPATCH_LANE_SESSION')
+        self.assertIn('--phase prompting', nxt['commands'][0])                    # P4 shelf session
+        preprod.write_shelf_brief(self.project, 'B01')
+        (self.pre / '04_shelf/B01/prompt.txt').write_text(self.prompt(), encoding='utf-8')
+        preprod.lock_shelf(self.project, 'B01')
+        gate = self._next()
+        self.assertEqual((gate['action'], gate['gate']), ('ASK_USER', 'shelf_release'))
+        preprod.release_shelf(self.project, ['B01'], '릴리스')
+        nxt = self._next()
+        self.assertIn('--phase production', nxt['commands'][0])                   # P5 production session
+
     def test_upload_bundle_from_shelf_pack_is_ordered_ascii_clones(self) -> None:
         self.lock_all()
         preprod.write_shelf_brief(self.project, 'B01')
@@ -262,8 +303,10 @@ class PreprodPipelineTests(unittest.TestCase):
         first = runway_ui_helper.prepare_upload_bundle(self.project, 'B01', shelf / 'pack.json', root)
         slot = first['slots'][0]
         bundle_file = Path(first['bundle_dir']) / slot['alias_name']
-        with mock.patch.object(runway_ui_helper, 'UPLOAD_ALIAS_ROOT', root), \
-             mock.patch.object(runway_ui_helper, 'run_verified', return_value=0) as run:
+        canonical = getattr(runway_ui_helper, '_canonical', runway_ui_helper)
+        with mock.patch.dict(os.environ, {'RUNWAY_UPLOAD_ALIAS_ROOT': str(root)}), \
+             mock.patch.object(canonical, 'UPLOAD_ALIAS_ROOT', root), \
+             mock.patch.object(canonical, 'run_verified', return_value=0) as run:
             # Nothing in Runway yet: the native chooser may upload it.
             self.assertEqual(runway_ui_helper.upload_block_reason(bundle_file), '')
             runway_ui_helper.record_runway_attach(slot['sha256'], slot['alias_name'], 'uploaded',

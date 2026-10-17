@@ -71,25 +71,6 @@ QUEUES = [
 ]
 
 
-def show_project_board(project: Path) -> bool:
-    """Open the user's display-only panel at intake, never a production owner."""
-    if os.environ.get('VIDEO_TEAM_BOARD_DISABLED') == '1':
-        return False
-    project = Path(project).expanduser().resolve()
-    launcher = HOME / '.local/bin/video-team-board'
-    if project.parent != PROJECT_ROOT.resolve() or not (project / 'manifest.json').is_file() or not launcher.is_file():
-        return False
-    try:
-        result = subprocess.run([str(launcher), '--project', str(project)],
-                                capture_output=True, text=True, timeout=5)
-        if result.returncode:
-            print('Video board unavailable; production state unchanged.', file=sys.stderr)
-        return result.returncode == 0
-    except (OSError, subprocess.TimeoutExpired):
-        print('Video board unavailable; production state unchanged.', file=sys.stderr)
-        return False
-
-
 def slugify(s: str) -> str:
     out = ''.join(c.lower() if c.isalnum() else '-' for c in s.strip())
     out = '-'.join(x for x in out.split('-') if x)
@@ -265,7 +246,6 @@ def init_project(args) -> None:
             import claude_author
             claude_author.set_mode(project, args.author, 'init --author ' + args.author)
     print(str(project))
-    show_project_board(project)
 
 
 def set_mode(args) -> None:
@@ -927,7 +907,15 @@ def next_cmd(args) -> None:
                         'author_protocol': 'AGENTS.md §1.3'} for row in dispatch],
         'dispatch_note': 'next_dispatch is optional new-owner routing only. Continue prompting and production here with the actual session model; do not spawn or request routine approval.',
     }
-    if lane_sessions.load_policy(PROJECT_ROOT):
+    gate = (lane_sessions.user_gate(project, result.get('preprod') or {})
+            if preprod.is_preprod_project(project) else None)
+    if gate:
+        result['default_execution'] = {
+            **gate, 'new_owner': False, 'new_approval_for_role_change': False, 'automatic_model_switch': False,
+            'dispatch_note': ('Director: ' + ('show the user the listed file(s), ask once, then record their words with the command.'
+                                              if gate['action'] == 'ASK_USER' else 'lock this stage, then run next again.')),
+        }
+    elif lane_sessions.load_policy(PROJECT_ROOT):
         lanes = [row for row in dispatch if row['lane'] != 'director']
         result['default_execution'] = {
             'action': 'DISPATCH_LANE_SESSION' if lanes else 'DIRECTOR_IN_MAIN_THREAD',
@@ -1126,8 +1114,6 @@ def main() -> None:
 
     args = ap.parse_args()
     args.func(args)
-    if args.cmd == 'next':
-        show_project_board(Path(args.project))
 
 
 if __name__ == '__main__':
