@@ -477,7 +477,8 @@ def active_lane_owners(project: Path) -> list[dict]:
 
 
 def codex_exec_inner(project: Path, prompt_path: Path, result_path: Path, route: dict) -> str:
-    """One fresh lane session. No model in the route = the user's own Codex default."""
+    """One fresh lane session. No model in the route = the user's own Codex default.
+    `--json` makes run*.log a JSONL event stream the phone console can show live."""
     model = ''
     if route['model']:
         effort_config = 'model_reasoning_effort=' + json.dumps(route['reasoning_effort'])
@@ -485,7 +486,7 @@ def codex_exec_inner(project: Path, prompt_path: Path, result_path: Path, route:
     sandbox = ' '.join(shlex.quote(a) for a in lane_sessions.sandbox_args(route['route_key']))
     return (
         f"HOME=/Users/gnudas {shlex.quote(str(CODEX))} exec "
-        f"--skip-git-repo-check {sandbox} "
+        f"--skip-git-repo-check --json {sandbox} "
         f"--output-last-message {shlex.quote(str(result_path))} "
         f"-C {shlex.quote(str(project))} {model}< {shlex.quote(str(prompt_path))}"
     )
@@ -607,7 +608,8 @@ def dispatch(args) -> None:
         cmd = ['/usr/bin/script', '-q', str(log_path), '/bin/zsh', '-lc', inner]
         out = open(lane_dir / 'supervisor.out', 'ab', buffering=0)
         err = open(lane_dir / 'supervisor.err', 'ab', buffering=0)
-        proc = subprocess.Popen(cmd, cwd=str(project), stdout=out, stderr=err, start_new_session=True)
+        proc = subprocess.Popen(cmd, cwd=str(project), stdin=subprocess.DEVNULL, stdout=out, stderr=err,
+                                start_new_session=True)  # script needs a non-socket stdin
         (lane_dir / 'pid').write_text(str(proc.pid) + '\n', encoding='utf-8')
         status.update({'status': 'RUNNING', 'pid': proc.pid, 'log': str(log_path), 'prompt': str(prompt_path), 'result': str(result_path)})
         write_json(lane_dir / 'status.json', status)

@@ -97,7 +97,9 @@ class ModelRoutingTests(unittest.TestCase):
         self.assertIn('danger-full-access', production)  # Aside CLI / native chooser lane
         authoring = video_codex_runtime.codex_exec_inner(*args, model_routing.resolve('seedance', 'prompting'))
         self.assertIn('-m gpt-6-astra', authoring)
-        self.assertIn('--full-auto', authoring)
+        self.assertIn('-s workspace-write', authoring)
+        self.assertNotIn('--full-auto', authoring)  # removed from codex exec
+        self.assertIn('--json', authoring)
         self.assertNotIn('danger-full-access', authoring)
 
     def test_dispatch_refuses_without_exact_spawn_approval(self) -> None:

@@ -61,7 +61,8 @@ def set_policy(root: Path, enable: bool, approval_quote: str = '') -> dict:
 def sandbox_args(route_key: str) -> list[str]:
     if route_key in GUI_ROUTES:
         return ['-s', 'danger-full-access', '-c', 'approval_policy="never"']
-    return ['--full-auto']
+    # codex 0.16x dropped --full-auto; workspace-write is what it meant for exec.
+    return ['-s', 'workspace-write']
 
 
 def produced_blocks(project: Path) -> set[str]:
