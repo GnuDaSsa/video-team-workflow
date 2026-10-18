@@ -18,7 +18,10 @@ import os
 from pathlib import Path
 import time
 
-PRODUCTION_BATCH = 4
+# Runway runs at most two active generations per account; a third Generate only
+# gets the "wait for your last generation" toast. A production session therefore
+# submits into the free slots and ends; a harvest session empties them.
+RUNWAY_ACTIVE_SLOTS = 2
 # Lanes whose session must reach the Aside CLI / native chooser (outside the
 # workspace sandbox). Everything else runs in the workspace-write sandbox.
 GUI_ROUTES = {'seedance:production', 'music', 'image_creator_01:production', 'image_creator_02:production'}
@@ -71,8 +74,12 @@ def produced_blocks(project: Path) -> set[str]:
 
 
 def production_batch(project: Path, released: list[str], requested: list[str] | None = None,
-                     size: int = PRODUCTION_BATCH) -> tuple[list[str], list[str]]:
-    """Next <=size released blocks without a provider job, and what remains after them."""
+                     slots: int = RUNWAY_ACTIVE_SLOTS) -> tuple[list[str], list[str]]:
+    """Released blocks without a provider job that fit the free Runway slots, and what remains.
+
+    A generated-but-not-downloaded job still counts as holding a slot, so with two
+    such jobs the batch is empty and dispatch runs a harvest session instead.
+    """
     done = produced_blocks(project)
     pending = [b for b in released if b not in done]
     if requested:
@@ -80,7 +87,8 @@ def production_batch(project: Path, released: list[str], requested: list[str] | 
         if unknown:
             raise SystemExit(f'BLOCKS_NOT_RELEASED: {unknown}')
         pending = [b for b in requested if b not in done]
-    return pending[:size], pending[size:]
+    free = max(0, slots - len(undownloaded_jobs(project)))
+    return pending[:free], pending[free:]
 
 
 def latest_handoff(project: Path) -> Path | None:

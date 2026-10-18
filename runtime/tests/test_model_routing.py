@@ -146,16 +146,23 @@ class ModelRoutingTests(unittest.TestCase):
             self.assertEqual(waited['result']['status'], 'DONE')
             self.assertFalse(waited['running'])
 
-    def test_production_batches_four_released_blocks(self) -> None:
+    def test_production_batch_fills_only_free_runway_slots(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             project = Path(td)
             (project / 'lanes/seedance').mkdir(parents=True)
-            (project / 'lanes/seedance/status.json').write_text(
-                json.dumps({'provider_jobs': [{'block_id': 'B01'}]}), encoding='utf-8')
+            status = project / 'lanes/seedance/status.json'
             released = [f'B0{i}' for i in range(1, 8)]
+            status.write_text(json.dumps({'provider_jobs': [{'block_id': 'B01', 'downloaded': True}]}), encoding='utf-8')
             batch, rest = video_codex_runtime.lane_sessions.production_batch(project, released)
-            self.assertEqual(batch, ['B02', 'B03', 'B04', 'B05'])
-            self.assertEqual(rest, ['B06', 'B07'])
+            self.assertEqual(batch, ['B02', 'B03'])  # two active generations per Runway account
+            self.assertEqual(rest, ['B04', 'B05', 'B06', 'B07'])
+            status.write_text(json.dumps({'provider_jobs': [{'block_id': 'B01'}]}), encoding='utf-8')
+            batch, _ = video_codex_runtime.lane_sessions.production_batch(project, released)
+            self.assertEqual(batch, ['B02'])  # B01 still holds a slot
+            status.write_text(json.dumps({'provider_jobs': [{'block_id': 'B01'}, {'block_id': 'B02'}]}), encoding='utf-8')
+            batch, rest = video_codex_runtime.lane_sessions.production_batch(project, released)
+            self.assertEqual(batch, [])  # both slots busy -> dispatch harvests instead
+            self.assertEqual(rest[0], 'B03')
             with self.assertRaises(SystemExit):
                 video_codex_runtime.lane_sessions.production_batch(project, released, ['B09'])
 

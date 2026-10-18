@@ -346,7 +346,7 @@ video-codex-runtime set-mode --project <p> --mode no_i2v_reference_native
 video-codex-runtime lock-duration --project <p> --seconds <5..15> --source <user:...|brief:...|planner_revision:...>
 video-codex-runtime next --project <p>
 video-codex-runtime dispatch --project <p> --lanes <one-lane>          # new lane session (standing session-policy)
-video-codex-runtime dispatch --project <p> --lanes seedance --phase production [--blocks B01 B02]   # ≤4 blocks/session; harvest when all generated
+video-codex-runtime dispatch --project <p> --lanes seedance --phase production [--blocks B01 B02]   # ≤2 blocks/session (Runway: 2 active generations); harvest when both slots are busy or all generated
 video-codex-runtime wait --project <p> --lane <lane> [--timeout-min 10]  # prints session_result; re-run while running
 video-codex-runtime session-policy --show
 python3 /Users/gnudas/.codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py run-block --project <p> --block-id <B>

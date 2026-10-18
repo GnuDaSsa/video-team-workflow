@@ -7,8 +7,8 @@ Open one of those only when a STOPPED result names it. Every extra read is
 re-sent with every later step; that, not Runway, is what made a block take 40 min.
 
 P5 runs in its own **lane session** started by the director (`video-codex-runtime
-dispatch --lanes seedance`), at most 4 blocks per session; never in the long
-director thread. Write notes once, at the end of the batch, not between blocks.
+dispatch --lanes seedance`), at most 2 blocks per session (Runway runs two active generations per
+account; the session gets only the free slots); never in the long director thread. Write notes once, at the end of the batch, not between blocks.
 
 `H` = `python3 ~/.codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py`
 
