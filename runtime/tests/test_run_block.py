@@ -146,7 +146,7 @@ class RunBlockTests(unittest.TestCase):
                     run_block.phase_attach(self._ctx(root), FakePage(dict(GOOD, refs=[]), rows=1), [])
             self.assertEqual(stop.exception.code, 'SLOT_IMAGE_ASPECT_MISMATCH')
 
-    def test_record_generate_writes_job_once(self):
+    def test_record_generate_numbers_retakes(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             (root / 'lanes/seedance').mkdir(parents=True)
@@ -160,8 +160,9 @@ class RunBlockTests(unittest.TestCase):
                 self.assertEqual(len(out['written']), 3)
                 job = json.loads((root / 'lanes/seedance/status.json').read_text())['provider_jobs'][0]
                 self.assertEqual((job['block_id'], job['downloaded']), ('B01', False))
-                with self.assertRaises(run_block.Stop):
-                    run_block.record_generate(root, 'B01', 'IN_QUEUE')
+                run_block.record_generate(root, 'B01', 'IN_QUEUE')
+                jobs = json.loads((root / 'lanes/seedance/status.json').read_text())['provider_jobs']
+                self.assertEqual([j['local_output_id'] for j in jobs], ['B01_output1', 'B01_output2'])
 
     def test_run_stops_cleanly_without_shelf(self):
         with tempfile.TemporaryDirectory() as td:

@@ -379,10 +379,9 @@ def record_generate(project: Path, block: str, state: str, clicked_at: str = '')
             continue
         doc = json.loads(path.read_text(encoding='utf-8'))
         jobs = doc.setdefault('provider_jobs', [])
-        if any(j.get('block_id') == block for j in jobs):
-            raise Stop('JOB_ALREADY_RECORDED', {'file': rel, 'block': block},
-                       'one Generate per block; reconcile instead of recording twice')
-        jobs.append(job)
+        # a director-requested retake is a new job: number it after the block's earlier outputs
+        take = sum(1 for j in jobs if j.get('block_id') == block) + 1
+        jobs.append({**job, 'local_output_id': f'{block}_output{take}'})
         doc['provider_job_count'] = len(jobs)
         doc['updated_at'] = now
         tmp = path.with_suffix('.tmp')
