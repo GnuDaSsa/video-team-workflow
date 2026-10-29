@@ -116,6 +116,25 @@ class RunBlockTests(unittest.TestCase):
             self.assertEqual(stop.exception.code, 'SLOT_NEEDS_NATIVE_UPLOAD')
             self.assertEqual(record.call_args.args[2], 'missing')
 
+    def test_attach_searches_generation_names_under_recents(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            bundle = self._bundle(root, 'SELECT_EXISTING_RUNWAY_UPLOAD')
+            gen = 'Seedream 5_0 Pro - # 1_ SceneX'
+            bundle['slots'][1]['search_names'] = [gen]
+            bundle['slots'][1]['search_pills'] = {gen: 'Recents'}
+            page = FakePage(dict(GOOD, refs=[]), rows=1)
+            log = []
+            with mock.patch.object(runway_ui_helper, 'prepare_upload_bundle', return_value=bundle), \
+                 mock.patch.object(runway_ui_helper, 'record_runway_attach') as record, \
+                 mock.patch.object(run_block, '_image_dims', return_value=(1920, 1080)):
+                run_block.phase_attach(self._ctx(root), page, log)
+            pills = [c[1] for c in page.calls if c[0] == 'js' and 'FILTER_PILL' in c[1]]
+            self.assertIn('==="Uploads"', pills[0])
+            self.assertIn('==="Recents"', pills[1])
+            self.assertEqual([c.args[1:3] for c in record.call_args_list],
+                             [('RW_000000000001.png', 'reused'), (gen, 'reused')])
+
     def test_aspect_mismatch_stops(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

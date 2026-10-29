@@ -27,7 +27,7 @@ Continue in this same conversation; the phase change is not a spawn. For each re
 1. `preprod shelf-verify --block <B>` must be `ok`. Any failure → stop that block and return to P4.
 2. `runway_ui_helper.py prepare-upload-bundle --project <p> --block-id <B> --pack preprod/04_shelf/<B>/pack.json`
    → `bundle.json` gives each slot its file (`RW_<sha12>.<ext>`, named by content) and an `attach` step.
-   `SELECT_EXISTING_RUNWAY_UPLOAD`: pick it in Asset selector > Uploads by the listed `search_names`
+   `SELECT_EXISTING_RUNWAY_UPLOAD`: pick it in Asset selector > Uploads (Recents per `search_pills`) by the listed `search_names`
    (never upload it again). `UPLOAD_NEW_VIA_NATIVE_CHOOSER`: upload that file. After the enlarged
    thumbnail is verified, `record-runway-attach --path <file> --name <name> --how reused|uploaded`;
    a searched name with no row → `--how missing`.

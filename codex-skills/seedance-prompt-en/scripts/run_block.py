@@ -10,8 +10,9 @@ guessing, whenever a step needs the operator: a slot that must be uploaded
 through the native chooser, a setting it cannot set.
 
 Phases (re-runnable with --start):
-  attach    clear composer refs, select every slot from Runway Uploads by the
-            ledger's names (never re-uploading held bytes), verify each slot
+  attach    clear composer refs, select every slot by the ledger's names from
+            Runway Uploads (or Recents, for images generated inside Runway),
+            never re-uploading held bytes; verify each slot
   settings  observe model/mode/duration/ratio/resolution/audio/tier; set 15s
   paste     helper paste-prompt (all shelf/pack gates) + settings-verify
   preflight read-only eight-check preflight -> READY
@@ -162,10 +163,13 @@ def _select_from_uploads(ctx: dict, page: Page, slot: dict, index: int, file_pat
     page.js('(()=>{window.__rbOpen=0;return true})()')
     if opened != 'open':
         raise Stop('ASSET_SELECTOR_NOT_OPENED', {'slot': slot['reference_token']})
-    page.js('(()=>{const d=document.querySelector(\'%s\');const b=[...d.querySelectorAll("button")]'
-            '.filter(e=>e.innerText.trim()==="Uploads");if(b.length!==1)throw Error("UPLOADS_FILTER");'
-            'b[0].click();return true})()' % SELECTOR)
+    pills = slot.get('search_pills') or {}
     for name in slot['search_names']:
+        # Uploads for RW_/uploaded names; Recents for images generated inside Runway.
+        pill = pills.get(name) or 'Uploads'
+        page.js('(()=>{const d=document.querySelector(\'%s\');const b=[...d.querySelectorAll("button")]'
+                '.filter(e=>e.innerText.trim()===%s);if(b.length!==1)throw Error("FILTER_PILL");'
+                'b[0].click();return true})()' % (SELECTOR, json.dumps(pill)))
         page.act('const i=page.locator(%s);await i.fill(%s);await i.press("Enter");return true;'
                  % (json.dumps(SELECTOR + ' input[type=search]'), json.dumps(name)))
         count = page.js(_wait_js(
@@ -175,10 +179,12 @@ def _select_from_uploads(ctx: dict, page: Page, slot: dict, index: int, file_pat
         if not count:
             h.record_runway_attach(slot['sha256'], name, 'missing', project=str(ctx['project']),
                                    block_id=ctx['block'], asset_id=slot['asset_id'])
-            log.append({'step': 'uploads_search', 'slot': slot['reference_token'], 'name': name, 'rows': 0})
+            log.append({'step': 'uploads_search', 'slot': slot['reference_token'], 'name': name, 'pill': pill,
+                        'rows': 0})
             continue
         if count > 1 and not name.startswith('RW_'):
-            raise Stop('LEGACY_NAME_AMBIGUOUS', {'slot': slot['reference_token'], 'name': name, 'rows': count},
+            raise Stop('LEGACY_NAME_AMBIGUOUS', {'slot': slot['reference_token'], 'name': name, 'pill': pill,
+                                                 'rows': count},
                        'select the matching row by enlarged thumbnail, record-runway-attach --how reused, '
                        f'then run-block --start attach --from-slot {index + 1}')
         page.act('const r=page.locator(%s).filter({hasText:%s}).first();await r.dblclick();return true;'
@@ -190,7 +196,8 @@ def _select_from_uploads(ctx: dict, page: Page, slot: dict, index: int, file_pat
         _verify_slot(page, index, file_path, slot, log)
         h.record_runway_attach(slot['sha256'], name, 'reused', project=str(ctx['project']),
                                block_id=ctx['block'], asset_id=slot['asset_id'])
-        log.append({'step': 'attached_from_uploads', 'slot': slot['reference_token'], 'name': name, 'rows': count})
+        log.append({'step': 'attached_from_uploads', 'slot': slot['reference_token'], 'name': name, 'pill': pill,
+                    'rows': count})
         return
     page.js('(()=>{const b=[...document.querySelectorAll(\'%s button[aria-label="Close"]\')];'
             'if(b[0])b[0].click();return true})()' % SELECTOR)

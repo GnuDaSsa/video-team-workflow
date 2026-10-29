@@ -344,6 +344,42 @@ class PreprodPipelineTests(unittest.TestCase):
             runway_ui_helper.record_runway_attach(slot['sha256'], slot['alias_name'], 'missing')
             self.assertEqual(runway_ui_helper.upload_block_reason(bundle_file), '')
 
+    def test_runway_generated_ref_is_selected_from_recents_not_uploaded(self) -> None:
+        self.lock_all()
+        preprod.write_shelf_brief(self.project, 'B01')
+        shelf = self.pre / '04_shelf/B01'
+        (shelf / 'prompt.txt').write_text(self.prompt(), encoding='utf-8')
+        preprod.lock_shelf(self.project, 'B01')
+        door = media_registry.get_asset(self.project, json.loads((shelf / 'pack.json').read_text())
+                                        ['reference_role_map'][1]['asset_id'])
+        # The same bytes as downloaded from a Runway Seedream generation.
+        gen_name = 'Seedream 5_0 Pro - # 1_ SceneReal photograph of a blue door alley at dusk w'
+        src = self.root / f'{gen_name}.png'; src.write_bytes(Path(door['current_path']).read_bytes())
+        media_registry.ingest(self.project, src, kind='image', state='candidate', work_item_id='REF_DOOR_GEN',
+                              provider='runway_seedream_5_0_pro', move=False)
+        root = self.root / 'RunwayUpload'
+        bundle = runway_ui_helper.prepare_upload_bundle(self.project, 'B01', shelf / 'pack.json', root)
+        slot = bundle['slots'][1]
+        self.assertEqual(slot['attach'], 'SELECT_EXISTING_RUNWAY_UPLOAD')
+        self.assertEqual(slot['search_names'], [gen_name])
+        self.assertEqual(slot['search_pills'], {gen_name: 'Recents'})
+        self.assertEqual(bundle['slots'][0]['attach'], 'UPLOAD_NEW_VIA_NATIVE_CHOOSER')
+        bundle_file = Path(bundle['bundle_dir']) / slot['alias_name']
+        self.assertIn('UPLOAD_BLOCKED_ALREADY_IN_RUNWAY_UPLOADS', runway_ui_helper.upload_block_reason(bundle_file, root))
+        # Verified reuse keeps the Recents pill; the next block selects it the same way.
+        runway_ui_helper.record_runway_attach(slot['sha256'], gen_name, 'reused', root=root)
+        again = runway_ui_helper.prepare_upload_bundle(self.project, 'B01', shelf / 'pack.json', root)
+        self.assertEqual(again['slots'][1]['search_pills'], {gen_name: 'Recents'})
+        # Searched under Recents and absent -> recorded missing, never re-added; upload allowed.
+        runway_ui_helper.record_runway_attach(slot['sha256'], gen_name, 'missing', root=root)
+        third = runway_ui_helper.prepare_upload_bundle(self.project, 'B01', shelf / 'pack.json', root)
+        self.assertEqual(third['slots'][1]['attach'], 'UPLOAD_NEW_VIA_NATIVE_CHOOSER')
+        # Seeding from all project registries finds the same generation name (global ledger).
+        seed_root = self.root / 'Seed'
+        runway_ui_helper.seed_runway_library(self.project.parent, seed_root)
+        library = runway_ui_helper.load_runway_library(seed_root)
+        self.assertEqual(runway_ui_helper.runway_search_pills(library, slot['sha256']), {gen_name: 'Recents'})
+
     def test_bundle_clone_of_old_source_survives_next_slot_sweep(self) -> None:
         self.lock_all()
         preprod.write_shelf_brief(self.project, 'B01')

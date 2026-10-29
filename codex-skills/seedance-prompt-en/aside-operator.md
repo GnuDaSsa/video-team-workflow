@@ -102,15 +102,19 @@ each token's file and its `attach` step. Never attach a file from `media/`, Down
 
 **Reuse before upload (user rule: never re-upload what Runway already holds).**
 The machine-wide ledger `~/RunwayUpload/_runway_library.json` records which bytes
-Runway's Uploads library holds and under which visible names.
+Runway's library holds and under which visible names. Images generated inside Runway
+(Seedream etc.) are added automatically under their generation name (the downloaded
+file's name without extension), shown under `Recents`; `bundle.json` gives each name's
+filter in `search_pills`.
 - `attach: SELECT_EXISTING_RUNWAY_UPLOAD`: open the slot's Reference selector →
-  Asset selector → `Uploads` filter → search each `search_names` entry in order by its
-  exact file name. A row with exactly that name → select it, verify the enlarged
+  Asset selector → that name's filter (`Uploads`, or `Recents` for a generation name) →
+  search each `search_names` entry in order by its exact name. A row with exactly that name → select it, verify the enlarged
   thumbnail in the slot, then `record-runway-attach --path <bundle file> --name <name>
   --how reused`. Several rows with the same `RW_` name are identical bytes; take the
   newest. For an older name (not `RW_`) with several rows, the enlarged thumbnail must
   match. No row → `record-runway-attach --path <bundle file> --name <name> --how missing`
-  and try the next name. Never pick a same-looking `exec-<uuid>` or Recents item.
+  and try the next name. Never pick a same-looking `exec-<uuid>` item or a Recents item
+  whose name is not in `search_names`.
 - `attach: UPLOAD_NEW_VIA_NATIVE_CHOOSER`, or every name recorded missing: upload the
   bundle file through the native chooser below, verify the enlarged thumbnail, then
   `record-runway-attach --path <bundle file> --name <RW_ name> --how uploaded`.

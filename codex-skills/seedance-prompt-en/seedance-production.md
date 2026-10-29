@@ -72,7 +72,7 @@ Use `recovery-checkpoint` with project/block, exact session URL, current prompt
 hash, registered reference map/hash, verified slots and actual settings before
 ATTACH. Use `prepare-upload-bundle` (content-named `RW_<sha12>` clones in
 `~/RunwayUpload/<project>/<B>/`, with a per-slot `attach` step). Bytes Runway already
-holds are selected from Asset selector > Uploads by the ledger's names and never
+holds are selected from Asset selector > Uploads (Runway generations: > Recents) by the ledger's names and never
 uploaded again; only `UPLOAD_NEW_VIA_NATIVE_CHOOSER` slots go through the visible
 Reference selector and the verified native chooser. Record every attach with
 `record-runway-attach` (`reused`/`uploaded`/`missing`). Details in `aside-operator.md`;

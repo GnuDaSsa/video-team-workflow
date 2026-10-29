@@ -88,6 +88,13 @@ UPLOAD_TRANSPORT_SLOT_CAP = 3
 # again across blocks, slots and projects (project copies get new asset IDs).
 RUNWAY_LIBRARY_NAME = '_runway_library.json'
 RUNWAY_LIBRARY_CANDIDATE_CAP = 6
+# An image generated inside Runway (Seedream, GPT Image, ...) is already in the
+# account's library: Asset selector > Recents lists it under the same text its
+# download got as file name, "<Model> - # <n>_ <prompt prefix>". Selecting it by
+# that name avoids re-uploading the downloaded bytes as an RW_ copy.
+RUNWAY_GENERATION_NAME_RE = re.compile(r'.+ - # ?\d+_ .+')
+RUNWAY_GENERATION_PILL = 'Recents'
+RUNWAY_UPLOADS_PILL = 'Uploads'
 
 RECOVERY_CONTRACT_VERSION = 'seedance_same_session_recovery_v1_20260810'
 RECOVERY_STATE_REL = Path('lanes/seedance/recovery_state.json')
@@ -408,6 +415,10 @@ def prepare_upload_bundle(project: Path, block_id: str, pack_path: Path,
         rows.append(prepare_upload_alias(project, entry['asset_id'], block_id,
                                          int(match.group(2)), root, match.group(1).title(),
                                          sweep=False))
+    for r in rows:
+        for name in runway_generation_names(project, r['sha256']):
+            remember_runway_generation(r['sha256'], name, project=str(project.expanduser().resolve()),
+                                       asset_id=r['asset_id'], root=root)
     library = load_runway_library(root)
     slots = []
     for r in rows:
@@ -469,10 +480,56 @@ def runway_search_names(library: dict, sha256_hex: str) -> list[str]:
     return verified + candidates
 
 
+def runway_search_pills(library: dict, sha256_hex: str) -> dict:
+    """Asset selector filter pill to search each name under (Uploads unless recorded)."""
+    names = (library.get('entries', {}).get(sha256_hex) or {}).get('names') or {}
+    return {n: names[n].get('pill') or RUNWAY_UPLOADS_PILL for n in runway_search_names(library, sha256_hex)}
+
+
+def runway_generation_names(project: Path, sha256_hex: str) -> list[str]:
+    """Library names of Runway generations with these bytes, from the project registry."""
+    project = Path(project).expanduser().resolve()
+    if not media_registry.db_path(project).is_file():
+        return []
+    try:
+        with media_registry.connect(project) as conn:
+            rows = conn.execute('SELECT provider, original_name FROM assets WHERE sha256=?',
+                                (sha256_hex,)).fetchall()
+    except Exception:  # noqa: BLE001 - no registry means no known generation name
+        return []
+    names = []
+    for row in rows:
+        stem = Path(row['original_name'] or '').stem
+        if ('runway' in str(row['provider'] or '').lower() and RUNWAY_GENERATION_NAME_RE.fullmatch(stem)
+                and stem not in names):
+            names.append(stem)
+    return names
+
+
+def remember_runway_generation(sha256_hex: str, name: str, *, project: str = '', asset_id: str = '',
+                               when: str = '', root: Path | None = None) -> bool:
+    """Add a Runway generation name as a Recents candidate; never overrides a recorded name."""
+    if not re.fullmatch(r'[0-9a-f]{64}', sha256_hex or '') or not name or '/' in name:
+        return False
+    data = load_runway_library(root)
+    entry = data['entries'].setdefault(sha256_hex, {'names': {}, 'asset_ids': [], 'projects': []})
+    if name in entry['names']:
+        return False
+    entry['names'][name] = {'status': 'candidate', 'source': 'runway_generation',
+                            'pill': RUNWAY_GENERATION_PILL,
+                            'first_seen': when or dt.datetime.now().astimezone().isoformat(timespec='seconds')}
+    for key, value in (('asset_ids', asset_id), ('projects', project)):
+        if value and value not in entry.setdefault(key, []):
+            entry[key].append(value)
+    _save_runway_library(data, root)
+    return True
+
+
 def _attach_step(library: dict, sha256_hex: str, bundle_name: str) -> dict:
     names = runway_search_names(library, sha256_hex)
     if names:
         return {'attach': 'SELECT_EXISTING_RUNWAY_UPLOAD', 'search_names': names,
+                'search_pills': runway_search_pills(library, sha256_hex),
                 'upload_fallback': bundle_name}
     return {'attach': 'UPLOAD_NEW_VIA_NATIVE_CHOOSER', 'search_names': [],
             'upload_fallback': bundle_name}
@@ -480,7 +537,7 @@ def _attach_step(library: dict, sha256_hex: str, bundle_name: str) -> dict:
 
 def record_runway_attach(sha256_hex: str, name: str, how: str, *, project: str = '',
                          block_id: str = '', asset_id: str = '',
-                         root: Path | None = None) -> dict:
+                         root: Path | None = None, pill: str = '') -> dict:
     """Record what the Asset selector actually showed for these bytes.
 
     how=uploaded|reused: the enlarged thumbnail was verified in the slot, so
@@ -496,6 +553,8 @@ def record_runway_attach(sha256_hex: str, name: str, how: str, *, project: str =
     data = load_runway_library(root)
     entry = data['entries'].setdefault(sha256_hex, {'names': {}, 'asset_ids': [], 'projects': []})
     row = entry['names'].setdefault(name, {'first_seen': now})
+    if pill:
+        row['pill'] = pill
     if how == 'missing':
         row['status'] = 'missing'
         row['missing_at'] = now
@@ -519,14 +578,13 @@ def upload_block_reason(path: Path, root: Path | None = None) -> str:
     if not names:
         return ''
     return ('UPLOAD_BLOCKED_ALREADY_IN_RUNWAY_UPLOADS: select ' + ' | '.join(names)
-            + ' from Asset selector > Uploads; if a name has no row, record it with '
+            + ' from Asset selector > Uploads (Runway generation names: > Recents); if a name has no row, record it with '
               'record-runway-attach --how missing and re-run')
 
 
 def seed_runway_library(runtime_root: Path, root: Path | None = None) -> dict:
     """Add candidate names from old upload receipts and bundles (never verified)."""
     root = _ledger_root(root)
-    data = load_runway_library(root)
     found: dict[str, list[tuple[str, str, str]]] = {}
 
     def add(sha: str, name: str, when: str, source: str) -> None:
@@ -550,6 +608,21 @@ def seed_runway_library(runtime_root: Path, root: Path | None = None) -> dict:
         for slot in manifest.get('slots') or []:
             add(slot.get('sha256'), slot.get('alias_name'), when, bundle.parent.parent.name)
     added = 0
+    # Images generated inside Runway: the library already holds them under their generation name.
+    for registry in sorted(Path(runtime_root).glob('*/asset_registry.sqlite')):
+        try:
+            with media_registry.connect(registry.parent) as conn:
+                gens = conn.execute("SELECT sha256, provider, original_name, asset_id, created_at FROM assets "
+                                    "WHERE kind IN ('image','character')").fetchall()
+        except Exception:  # noqa: BLE001
+            continue
+        for row in gens:
+            stem = Path(row['original_name'] or '').stem
+            if 'runway' in str(row['provider'] or '').lower() and RUNWAY_GENERATION_NAME_RE.fullmatch(stem):
+                if remember_runway_generation(row['sha256'], stem, project=str(registry.parent),
+                                              asset_id=row['asset_id'], when=row['created_at'] or '', root=root):
+                    added += 1
+    data = load_runway_library(root)
     for sha, rows in found.items():
         entry = data['entries'].setdefault(sha, {'names': {}, 'asset_ids': [], 'projects': []})
         for when, name, source in sorted(rows, reverse=True)[:RUNWAY_LIBRARY_CANDIDATE_CAP]:
@@ -1005,7 +1078,8 @@ def cmd_record_runway_attach(args) -> int:
         if args.path:
             sha = media_registry.sha256(Path(args.path).expanduser())
         result = record_runway_attach(sha or '', args.name, args.how, project=args.project or '',
-                                      block_id=args.block_id or '', asset_id=args.asset_id or '')
+                                      block_id=args.block_id or '', asset_id=args.asset_id or '',
+                                      pill=args.pill or '')
     except (OSError, ValueError) as exc:
         print(json.dumps({'ok': False, 'error': str(exc)}, ensure_ascii=False))
         return 1
@@ -3213,13 +3287,15 @@ def main() -> int:
     p.add_argument('--modality', choices=['Image', 'Video', 'Audio'], default='Image')
     p.set_defaults(fn=cmd_prepare_upload_alias)
     p = sub.add_parser('record-runway-attach', help='record that Runway Uploads holds (or lacks) a file under a visible name')
-    p.add_argument('--name', required=True, help='exact file name shown in Asset selector > Uploads')
+    p.add_argument('--name', required=True, help='exact name shown in Asset selector > Uploads (or > Recents for a Runway generation)')
     p.add_argument('--how', required=True, choices=['uploaded', 'reused', 'missing'])
     p.add_argument('--sha256')
     p.add_argument('--path', help='bundle file; its sha256 is used')
     p.add_argument('--project')
     p.add_argument('--block-id')
     p.add_argument('--asset-id')
+    p.add_argument('--pill', choices=['Uploads', 'Recents'],
+                   help='Asset selector filter the name was found under (Recents: a Runway generation)')
     p.set_defaults(fn=cmd_record_runway_attach)
     p = sub.add_parser('runway-library', help='show or seed the Runway Uploads ledger')
     p.add_argument('--sha256')

@@ -20,8 +20,9 @@ account; the session gets only the free slots); never in the long director threa
 
 ## Per block (B01, B02, … in order)
 1. `H run-block --project <p> --block-id <B>` — one call does shelf-verify,
-   upload bundle, attaches every slot from Runway **Uploads** by the ledger's
-   names (never re-uploads bytes Runway holds), checks each enlarged slot,
+   upload bundle, attaches every slot from Runway **Uploads** (or **Recents** for
+   images generated in Runway) by the ledger's names (never re-uploads bytes
+   Runway holds), checks each enlarged slot,
    sets/checks settings, pastes the shelf prompt, settings-verify, preflight.
 2. `READY` → view the `enlarged_screenshot` of each slot once (identity and
    environment are the approved refs). Then click the single visible Generate
