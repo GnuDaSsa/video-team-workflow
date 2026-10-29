@@ -1,6 +1,6 @@
 # Seedance — P4 shelf authoring, then P5 copy-paste production
 
-**Authoring mode:** if `manifest.authoring.mode` is `claude`, do not write the creative files yourself — run `video-codex-runtime author run --project <p> --stage shelf --block <B>` (add `--feedback "<user words>"` for changes), then continue with the checks, user approval and lock below. In `codex` mode write them yourself.
+**Authoring mode:** if `manifest.authoring.mode` is `claude`, do not write the creative files yourself — run `video-codex-runtime author run --project <p> --stage shelf --block <B>` (add `--feedback "<user words>"` for changes), then continue with the checks, user approval and lock below; inside a dispatched lane session `author run` is unavailable (not logged in), so return `PARTIAL` with the exact `--stage`/`--feedback` for the director instead. In `codex` mode write them yourself.
 
 Authority: explicit 2.5 → `/Users/gnudas/.codex/skills/seedance25-prompt-en/`;
 2.0 or unversioned → `/Users/gnudas/.codex/skills/seedance-prompt-en/`.

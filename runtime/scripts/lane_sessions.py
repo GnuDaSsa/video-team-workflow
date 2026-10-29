@@ -113,9 +113,11 @@ session. Do only this lane's scope, then write `{path}`:
 {{"status": "DONE|PARTIAL|STOPPED|NEEDS_USER", "summary": "<=5 short lines in Korean",
   "outputs": ["paths or asset IDs"], "remaining": ["what is left"],
   "question_for_user": null or "<one exact question>", "next": "<one line>"}}
-Then end. Do not ask the user anything here: anything that needs the user
-(approval, login, CAPTCHA, payment, credits, ambiguity) is `NEEDS_USER` with the
-exact question. Never start another session, agent, scheduler or watcher.
+Then end. Do not ask the user anything here. `NEEDS_USER` (with the exact question)
+is only for payment, login/2FA/CAPTCHA, credit-spending (non-Unlimited) generation,
+public upload/submission, or deletion. Anything else: decide and proceed, or return
+`PARTIAL` saying exactly what the director must do (e.g. an `author run` with feedback).
+Never start another session, agent, scheduler or watcher.
 """
 
 

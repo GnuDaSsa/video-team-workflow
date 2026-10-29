@@ -187,7 +187,7 @@ flowchart TD
 
 - `authoring_mode`가 `UNSET`이면 director의 첫 질문은 정확히 하나다: “작성 모드: Claude 프롬프팅 / Codex”. 답을 `video-codex-runtime author set-mode --project <p> --mode claude|codex --approval-quote "<사용자 답>"`로 기록한다. `init --author claude|codex`로 미리 정할 수도 있다. 모드가 없으면 P0 잠금이 거부된다.
 - `claude` 모드에서 Codex는 창작 파일을 직접 쓰거나 고치지 않는다. 단계마다 `author run --stage concept-options|concept-lock|bible|storyboard|image-prompts|shelf [--block B] [--feedback "<사용자 선택/수정 요청 원문>"]`를 실행하고, 결과 요약과 파일을 사용자에게 보여준 뒤 승인 인용으로 잠근다. 잠금은 파일이 Claude 출력과 바이트 단위로 같을 때만 통과한다(`preprod/authorship.jsonl`).
-- Claude 호출은 해당 단계 파일만 쓸 수 있고(그 밖의 변경은 `CLAUDE_WROTE_OUTSIDE_STAGE`로 거부), 셸·웹·스킬/위키/런타임 쓰기가 막혀 있으며, 검증 오류는 최대 3회 자동 피드백된다. 수정 요청도 `--feedback`으로 다시 Claude에 보낸다.
+- `author run`은 메인(디렉터)에서만 돈다(레인 세션 안에서는 `AUTHOR_RUN_IN_LANE`으로 거부, 레인은 `PARTIAL`로 피드백을 돌려준다). Claude 호출은 해당 단계 파일만 쓸 수 있고(`preprod/`의 그 밖의 변경은 `CLAUDE_WROTE_OUTSIDE_STAGE`로 거부, 레인·docs의 동시 쓰기는 무관), 셸·웹·스킬/위키/런타임 쓰기가 막혀 있으며, 검증 오류는 최대 3회 자동 피드백된다. 수정 요청도 `--feedback`으로 다시 Claude에 보낸다.
 - 모드 전환은 사용자가 요청할 때만 `set-mode`로 한다. 전환해도 기존 잠금은 유지되고, 이후 작성분부터 적용된다.
 - `claude` 모드는 §1.3의 승인형 Astra child 경로를 대체한다(별도 spawn 승인 불필요: 사용자가 모드를 고른 것이 그 승인이다).
 - 상류 파일이 잠금 뒤 바뀌면 그 단계와 하류가 모두 `STALE`이 되고 gate가 닫힌다. 재잠금하면 이전본은 `preprod/_superseded/`로 옮겨지고 현행은 항상 한 벌이다.

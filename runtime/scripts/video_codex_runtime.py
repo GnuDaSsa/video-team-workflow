@@ -351,6 +351,31 @@ def seedance_phase(project: Path, requested: str = 'auto') -> str:
     return 'prompting'
 
 
+def image_phase(project: Path, requested: str = 'auto') -> str | None:
+    """Image lanes: `production` (GUI route, reaches Aside/Runway) once every P3 prompt exists and
+    images are not locked; `None` (authoring route) while prompts are still being written."""
+    if requested == 'production':
+        return 'production'
+    if requested == 'prompting' or not preprod.is_preprod_project(project):
+        return None
+    plan = preprod.image_plan(project)
+    if not plan.get('references') or preprod.lock_state(project, 'images')['state'] == 'LOCKED':
+        return None
+    authoring_left = [e for e in preprod.validate_images(project)
+                      if not ('_not_generated_or_not_approved' in e or '_asset_not_' in e)]
+    return None if authoring_left else 'production'
+
+
+def lane_phase(project: Path, lane: str, requested: str = 'auto') -> str | None:
+    if lane == 'seedance':
+        return seedance_phase(project, requested)
+    if lane.startswith('image_creator_'):
+        return image_phase(project, requested)
+    if requested != 'auto':
+        raise SystemExit('--phase is valid only for seedance and image_creator_* lanes')
+    return None
+
+
 def _attested_seedance_packs(project: Path) -> list[str]:
     rows = []
     for path in sorted((project / 'lanes' / 'seedance' / 'prompts').glob('*_attestation.json')):
@@ -414,7 +439,7 @@ def make_prompt(project: Path, lane: str, phase: str | None = None) -> str:
     lane_prompt = read(TEMPLATES / template_name)
     if not lane_prompt:
         raise SystemExit(f'missing lane template: {lane} -> {template_name}')
-    route = model_routing.resolve(lane, phase if lane == 'seedance' else None)
+    route = model_routing.resolve(lane, phase)
     phase_contract = (
         _seedance_phase_contract(project, phase, route)
         if lane == 'seedance' else
@@ -499,7 +524,7 @@ def codex_exec_inner(project: Path, prompt_path: Path, result_path: Path, route:
         model = f"-m {shlex.quote(route['model'])} -c {shlex.quote(effort_config)} "
     sandbox = ' '.join(shlex.quote(a) for a in lane_sessions.sandbox_args(route['route_key']))
     return (
-        f"HOME=/Users/gnudas {shlex.quote(str(CODEX))} exec "
+        f"VIDEO_TEAM_LANE={shlex.quote(route['lane'])} HOME=/Users/gnudas {shlex.quote(str(CODEX))} exec "
         f"--skip-git-repo-check --json {sandbox} "
         f"--output-last-message {shlex.quote(str(result_path))} "
         f"-C {shlex.quote(str(project))} {model}< {shlex.quote(str(prompt_path))}"
@@ -522,14 +547,9 @@ def dispatch(args) -> None:
     launched = []
     skipped = []
     for lane in lanes:
-        requested_phase = getattr(args, 'phase', 'auto')
-        phase = seedance_phase(project, requested_phase) if lane == 'seedance' else None
-        # Image lanes that drive Aside/Runway need the GUI route (full access); the default
-        # image route is workspace-write and cannot reach the Aside daemon.
-        if lane.startswith('image_creator_') and requested_phase == 'production':
-            phase = 'production'
-        elif lane != 'seedance' and requested_phase != 'auto':
-            raise SystemExit('--phase is valid only for the seedance lane, or production for image lanes')
+        # Image generation needs the GUI route (full access): the workspace-write authoring
+        # route cannot reach the Aside daemon, so `auto` picks production once prompts exist.
+        phase = lane_phase(project, lane, getattr(args, 'phase', 'auto'))
         route = model_routing.resolve(lane, phase)
         approval_token = f'{lane}:{phase or "lane"}'
         standing = lane_sessions.load_policy(PROJECT_ROOT)
@@ -918,7 +938,7 @@ def next_cmd(args) -> None:
     result = lane_gates.next_actions(project)
     dispatch = []
     for lane in result.get('next_lanes') or []:
-        phase = seedance_phase(project, 'auto') if lane == 'seedance' else None
+        phase = lane_phase(project, lane)
         dispatch.append(model_routing.resolve(lane, phase))
     result['default_execution'] = {
         'action': 'CONTINUE_IN_CURRENT_CONVERSATION',
@@ -949,7 +969,7 @@ def next_cmd(args) -> None:
             'new_approval_for_role_change': False,
             'automatic_model_switch': False,
             'commands': [f"video-codex-runtime dispatch --project {project} --lanes {row['lane']}"
-                         + (f" --phase {row['phase']}" if row['lane'] == 'seedance' else '')
+                         + (f" --phase {row['phase']}" if row['phase'] != 'lane' else '')
                          + f" && video-codex-runtime wait --project {project} --lane {row['lane']}"
                          for row in lanes[:1]],
             'dispatch_note': ('Main thread = director. Start the next lane as its own session, wait, read only '
@@ -968,7 +988,7 @@ def model_route_cmd(args) -> None:
                 raise SystemExit('--project is required for seedance --phase auto')
             phase = seedance_phase(project, 'auto')
         elif args.lane.startswith('image_creator_'):
-            phase = 'production' if phase == 'auto' else phase
+            phase = image_phase(project, phase) if project else (None if phase != 'production' else phase)
         elif args.lane != 'seedance':
             phase = None
         print(json.dumps(model_routing.resolve(args.lane, phase), ensure_ascii=False, indent=2))
@@ -1052,7 +1072,7 @@ def main() -> None:
     p.add_argument('--lanes', nargs='+', required=True, help='exactly one lane for dispatch; multi-lane aliases are rejected')
     p.add_argument('--force', action='store_true', help='bypass eligible rail gates with a warning; v4 MEDIA_HARD_GATE is never bypassed')
     p.add_argument('--phase', choices=['auto', 'prompting', 'production'], default='auto',
-                   help='seedance only: auto resolves the next sequential prompting/production phase')
+                   help='seedance and image_creator_*: auto picks production (GUI/Aside route) when prompts are ready')
     p.add_argument('--approved-spawn',
                    help='exact current-conversation spawn approval token (not needed under a standing session-policy)')
     p.add_argument('--blocks', nargs='+', help='seedance production: released blocks for this session (default: next 4)')

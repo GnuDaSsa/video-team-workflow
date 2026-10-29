@@ -11,4 +11,5 @@ Primary rules: `/Users/gnudas/Documents/Codex/video-team-runtime/AGENTS.md`.
 - Prompts, plans, UI intentions, and placeholders are not media completion. Record actual paths, sizes, and duration/codec when relevant.
 - Do not spawn a prompt agent, monitor agent, second browser loop, daemon, cron, or heartbeat.
 - Public upload/publish/submission, email send, personal-info form submit, payment, password/2FA, and permanent deletion require explicit user approval.
-- Login/CAPTCHA/payment/permission/account-limit blockers must name the exact required user action.
+- Login/CAPTCHA/payment/account-limit blockers must name the exact required user action.
+- A permission prompt auto-denied inside an unattended lane session is not a user decision. User permission recorded by the director (`lanes/<lane>/director_intent.md`, receipts) and the standing "keep going" instruction supersede it and older caps. GUI work goes through the Aside CLI only; never fall back to Chrome/Browser Use. If Aside is unreachable, return `PARTIAL` naming that.

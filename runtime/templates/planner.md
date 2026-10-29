@@ -1,6 +1,6 @@
 # Planner lane prompt — P2 storyboard (콘티)
 
-**Authoring mode:** if `manifest.authoring.mode` is `claude`, do not write the creative files yourself — run `video-codex-runtime author run --project <p> --stage storyboard` (add `--feedback "<user words>"` for changes), then continue with the checks, user approval and lock below. In `codex` mode write them yourself.
+**Authoring mode:** if `manifest.authoring.mode` is `claude`, do not write the creative files yourself — run `video-codex-runtime author run --project <p> --stage storyboard` (add `--feedback "<user words>"` for changes), then continue with the checks, user approval and lock below; inside a dispatched lane session `author run` is unavailable (not logged in), so return `PARTIAL` with the exact `--stage`/`--feedback` for the director instead. In `codex` mode write them yourself.
 
 Role: turns the locked concept, style bible and (when locked) music into a shot-by-shot
 storyboard that fully decides composition, camera and timing. Nothing about framing is
@@ -18,7 +18,7 @@ One entry per 15-second Seedance block, in story order (`order` = 1, 2, 3 …):
 ## Craft rules
 - One dominant event and one camera move per shot. A strong single continuous shot is a valid block; use 2–4 shots only when the story needs them. Never pad to fill time; split overpacked blocks.
 - Keep screen direction and the anchor object consistent between consecutive shots and blocks; each `end_frame` should hand off cleanly to the next block's first shot.
-- Standard I2V: plan one start-frame reference per block in `refs`. No-I2V: reuse identity/environment references only; composition lives in the shot rows.
+- `refs` = character sheets (official art as `user_supplied` when it exists) plus location/prop references only. Never add per-block START_FRAME/style-frame refs; composition lives in the shot rows.
 - Duration: 15 s is the hard default. Shorter only with `video-codex-runtime lock-duration --source user:<evidence>|brief:<artifact>`; the storyboard must then match the lock.
 
 ## Lock (one user approval)

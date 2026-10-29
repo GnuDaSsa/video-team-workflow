@@ -63,11 +63,13 @@ TASK = {
     'storyboard': ('Write preprod/02_storyboard/storyboard.json (콘티): every 15-second block in story order with shots '
                    'that fully decide composition, camera and timing, using ONLY the controlled vocabulary in '
                    'runtime/scripts/preprod.py (SHOT_SIZES, ANGLES, CAMERA_MOVES). Contiguous shot times from 0 to '
-                   'duration_sec, one dominant camera move per shot, end_frame that hands off to the next block.'),
+                   'duration_sec, one dominant camera move per shot, end_frame that hands off to the next block. refs[] = '
+                   'character sheets + location/prop refs only; never add <BLOCK>_START_FRAME or style-frame refs.'),
     'image-prompts': ('Write one English prompt file preprod/03_image_prompts/<REF_ID>.prompt.txt for every reference the '
                       'storyboard refs[] and the bible sheet_ref_id values need, and preprod/03_image_prompts/'
                       'image_plan.json references[] with ref_id, purpose, role_en (short English role phrase used to bind '
-                      '@ImageN) and asset_id null. Do not change asset_id values that are already filled.'),
+                      '@ImageN) and asset_id null. Do not change asset_id values that are already filled. No START_FRAME/'
+                      'style-frame refs; official character art stays source user_supplied with no prompt file.'),
     'shelf': ('Write preprod/04_shelf/{block}/prompt.txt, the final English Seedance prompt for block {block}, from '
               'preprod/04_shelf/{block}/brief.md and the single canonical template in seedance-prompting.md. Every '
               'requirement in the brief is mandatory. Target <=3200 characters, hard limit 3500.'),
@@ -129,12 +131,11 @@ def writable(project: Path, stage: str, block: str, path: Path) -> bool:
 
 
 def snapshot(project: Path) -> dict[str, str]:
-    """Hash every non-media file Claude could reach inside the project."""
-    out = {}
-    for path in project.rglob('*'):
-        if path.is_file() and 'media' not in path.relative_to(project).parts[:1] and path.suffix != '.sqlite':
-            out[str(path)] = sha(path)
-    return out
+    """Hash the creative files: preprod/** and top-level *.md (brief). lanes/, docs/, queues and
+    status JSON are written concurrently by running lane sessions and the director."""
+    base = preprod.root(project)
+    paths = [*(base.rglob('*') if base.is_dir() else []), *project.glob('*.md')]
+    return {str(path): sha(path) for path in paths if path.is_file()}
 
 
 def authorship_path(project: Path) -> Path:
@@ -252,6 +253,9 @@ def run_claude(project: Path, prompt: str, model: str, resume: str = '') -> dict
 
 def author(project: Path, stage: str, block: str = '', feedback: str = '') -> dict:
     project = project.expanduser().resolve()
+    if os.environ.get('VIDEO_TEAM_LANE'):
+        raise ValueError('AUTHOR_RUN_IN_LANE: Claude is not logged in inside lane sessions. Do not retry; '
+                         'return PARTIAL with the exact --stage/--feedback the director must run in the main thread')
     if get_mode(project) != 'claude':
         raise ValueError('AUTHOR_MODE_NOT_CLAUDE: in codex mode the current session writes preprod files itself')
     if stage not in STAGES:

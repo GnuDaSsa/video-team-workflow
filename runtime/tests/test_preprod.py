@@ -183,6 +183,24 @@ class PreprodPipelineTests(unittest.TestCase):
         attrs = json.loads((self.project / 'lanes/planner/video_attributes.json').read_text())
         self.assertEqual(attrs['blocks'][0]['cameras'], ['slow_push', 'static'])
 
+    def test_image_lane_auto_phase_is_production_once_prompts_exist(self) -> None:
+        self.concept(); preprod.lock_stage(self.project, 'concept', '좋아 B안으로')
+        self.bible(); preprod.lock_stage(self.project, 'bible')
+        self.storyboard(); preprod.lock_stage(self.project, 'storyboard', '콘티 확정')
+        phase = video_codex_runtime.lane_phase
+        self.assertIsNone(phase(self.project, 'image_creator_02'))  # no prompts yet: authoring route
+        write(self.pre / '03_image_prompts/REF_MINA_SHEET.prompt.txt', 'Photorealistic Mina identity sheet, studio light.')
+        write(self.pre / '03_image_prompts/REF_DOOR.prompt.txt', 'Photorealistic blue door alley, overcast light.')
+        write(self.pre / '03_image_prompts/image_plan.json', {'references': [
+            {'ref_id': 'REF_MINA_SHEET', 'purpose': 'identity', 'role_en': 'Mina identity', 'asset_id': None},
+            {'ref_id': 'REF_DOOR', 'purpose': 'environment', 'role_en': 'blue door alley', 'asset_id': None}]})
+        self.assertEqual(phase(self.project, 'image_creator_02'), 'production')
+        self.assertEqual(video_codex_runtime.model_routing.resolve('image_creator_02', 'production')['route_key'],
+                         'image_creator_02:production')
+        self.assertIsNone(phase(self.project, 'image_creator_02', 'prompting'))
+        with self.assertRaises(SystemExit):
+            phase(self.project, 'planner', 'production')
+
     def test_upstream_edit_makes_lock_stale(self) -> None:
         self.lock_all()
         board = json.loads((self.pre / '02_storyboard/storyboard.json').read_text())
@@ -410,6 +428,20 @@ class ClaudeModeTests(unittest.TestCase):
         def writer(prompt):
             self.options_only(); write(self.project / 'brief.md', 'rewritten by author')
         with self.fake_claude(writer), self.assertRaisesRegex(ValueError, 'CLAUDE_WROTE_OUTSIDE_STAGE'):
+            claude_author.author(self.project, 'concept-options')
+
+    def test_concurrent_lane_and_docs_writes_do_not_fail_author_run(self) -> None:
+        def writer(prompt):
+            self.options_only()
+            write(self.project / 'lanes/seedance/run.production.log', 'lane log')
+            write(self.project / 'lanes/seedance/status.json', {'status': 'RUNNING'})
+            write(self.project / 'docs/codex_handoff_20261029.md', 'director handoff')
+        with self.fake_claude(writer):
+            self.assertTrue(claude_author.author(self.project, 'concept-options')['ok'])
+
+    def test_author_run_inside_lane_session_is_refused(self) -> None:
+        with mock.patch.dict(os.environ, {'VIDEO_TEAM_LANE': 'image_creator_02'}), \
+                self.assertRaisesRegex(ValueError, 'AUTHOR_RUN_IN_LANE'):
             claude_author.author(self.project, 'concept-options')
 
     def test_codex_mode_refuses_author_run(self) -> None:
