@@ -644,6 +644,10 @@ def dispatch(args) -> None:
                 f"[model-route] {route['model']} {route['reasoning_effort']} "
                 f"| {lane}:{phase or 'lane'}"),
         })
+        # provider_jobs is the Runway job ledger (harvest reads it); a new session must not erase it
+        prev_jobs = (json.loads(read(lane_dir / 'status.json') or '{}') or {}).get('provider_jobs')
+        if prev_jobs:
+            status['provider_jobs'] = prev_jobs
         write_json(lane_dir / 'status.json', status)
         update_manifest_lane(project, lane, status)
 
@@ -751,6 +755,9 @@ def kill(args) -> None:
             os.killpg(pid, signal.SIGTERM)
             killed.append({'lane': lane, 'pid': pid})
             status = {'lane': lane, 'status': 'KILLED', 'killed_at': dt.datetime.now().isoformat(), 'pid': pid}
+            prev_jobs = (json.loads(read(lane_dir / 'status.json') or '{}') or {}).get('provider_jobs')
+            if prev_jobs:
+                status['provider_jobs'] = prev_jobs
             write_json(lane_dir / 'status.json', status)
             update_manifest_lane(project, lane, status)
         except Exception as e:
