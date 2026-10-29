@@ -68,9 +68,18 @@ def sandbox_args(route_key: str) -> list[str]:
     return ['-s', 'workspace-write']
 
 
+def _provider_jobs(project: Path) -> list[dict]:
+    # state.json is the durable job ledger (record-generate and harvest write it); the lane's own
+    # status.json is rewritten by every session, so it is only a fallback
+    for rel in ('state.json', 'lanes/seedance/status.json'):
+        jobs = _json(project / rel).get('provider_jobs')
+        if jobs:
+            return jobs
+    return []
+
+
 def produced_blocks(project: Path) -> set[str]:
-    status = _json(project / 'lanes/seedance/status.json')
-    return {str(j.get('block_id')) for j in status.get('provider_jobs') or [] if j.get('block_id')}
+    return {str(j.get('block_id')) for j in _provider_jobs(project) if j.get('block_id')}
 
 
 def production_batch(project: Path, released: list[str], requested: list[str] | None = None,
@@ -144,8 +153,7 @@ DONE if none) and end; harvest/QC runs in its own later session.
 
 
 def undownloaded_jobs(project: Path) -> list[str]:
-    status = _json(project / 'lanes/seedance/status.json')
-    return [str(j.get('block_id')) for j in status.get('provider_jobs') or []
+    return [str(j.get('block_id')) for j in _provider_jobs(project)
             if j.get('block_id') and not j.get('downloaded')]
 
 
