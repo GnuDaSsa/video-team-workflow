@@ -86,7 +86,8 @@ def production_batch(project: Path, released: list[str], requested: list[str] | 
         unknown = [b for b in requested if b not in released]
         if unknown:
             raise SystemExit(f'BLOCKS_NOT_RELEASED: {unknown}')
-        pending = [b for b in requested if b not in done]
+        # an explicit --blocks request is a retake: generate again even if a job exists
+        pending = list(requested)
     free = max(0, slots - len(undownloaded_jobs(project)))
     return pending[:free], pending[free:]
 
