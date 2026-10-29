@@ -203,8 +203,10 @@ def _verify_slot(page: Page, index: int, file_path: Path, slot: dict, log: list)
     """Enlarged overlay must show an image with the bundle file's aspect ratio."""
     seen = page.js(
         '(async()=>{const b=document.querySelector(\'button[aria-label="View Image %d larger"]\');b.click();'
-        'const t0=Date.now();let im=null;while(Date.now()-t0<8000){im=[...document.images].find(i=>i.getClientRects().length'
-        '&&i.clientWidth>300&&i.complete&&i.naturalWidth>0);if(im)break;await new Promise(r=>setTimeout(r,250));}'
+        'const ok=i=>i.getClientRects().length&&i.clientWidth>300&&i.complete&&i.naturalWidth>0;'
+        # the enlarged image lives in the modal; page cards behind it also pass the size test
+        'const t0=Date.now();let im=null;while(Date.now()-t0<8000){im=[...document.querySelectorAll(\'[role="dialog"] img,[aria-modal="true"] img\')].find(ok);'
+        'if(!im&&Date.now()-t0>4000)im=[...document.images].filter(ok).sort((a,b)=>b.clientWidth*b.clientHeight-a.clientWidth*a.clientHeight)[0];if(im)break;await new Promise(r=>setTimeout(r,250));}'
         'return im?{w:im.naturalWidth,h:im.naturalHeight}:null;})()' % index)
     shot = f'rb_{re.sub(r"[^A-Za-z0-9_-]", "_", slot.get("block", ""))}{slot["reference_token"]}_{int(time.time())}.png'
     try:
