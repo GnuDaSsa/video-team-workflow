@@ -386,12 +386,26 @@ def _seedance_phase_contract(project: Path, phase: str, route: dict) -> str:
   prompt; return to the same owner's prompting step when a creative revision is required.
 - Aside is the sole visible Runway owner. Bind the exact existing Runway tab with deterministic
   `aside repl` (`listBrowserTabs()` -> exact targetId -> `attachBrowserTab(targetId)`). Never
-  open a new Runway tab or use Chrome, Safari, in-app browser, connector, or API.
+  open a new Runway tab or use Chrome, Safari, in-app browser, connector, or API.{_new_tab_recovery_exception(project)}
 - Use the same session-selected owner for permitted native Computer Use/file chooser steps. Keep one owner
   tool at a time on the same Aside tab; no second browser loop or nested browser agent.
 - Follow the canonical Seedance production skill for recovery, exactly-once Generate, queue
   continuation, download, ffprobe, registry ingest, and evidence.
 """
+
+
+def _new_tab_recovery_exception(project: Path) -> str:
+    """One-off exception: the user approved opening the same session URL in one new tab."""
+    state = json.loads(read(project / 'lanes/seedance/recovery_state.json') or '{}')
+    answer = state.get('user_answer') or {}
+    if state.get('next_action') != 'OPEN_NEW_VISIBLE_TAB_SAME_SESSION_URL' or not answer.get('quote'):
+        return ''
+    url = (state.get('checkpoint') or {}).get('session_url') or ''
+    return (
+        f"\n- Recovery exception (user: \"{answer['quote']}\", {answer.get('evidence', '')}): the bound tab is"
+        f"\n  unresponsive, so open exactly one visible new Aside tab at the recorded session URL {url}."
+        "\n  It is the same Runway session, not a new one; never re-Generate accepted cards."
+    )
 
 
 def make_prompt(project: Path, lane: str, phase: str | None = None) -> str:
@@ -508,9 +522,14 @@ def dispatch(args) -> None:
     launched = []
     skipped = []
     for lane in lanes:
-        phase = seedance_phase(project, getattr(args, 'phase', 'auto')) if lane == 'seedance' else None
-        if lane != 'seedance' and getattr(args, 'phase', 'auto') != 'auto':
-            raise SystemExit('--phase is valid only for the seedance lane')
+        requested_phase = getattr(args, 'phase', 'auto')
+        phase = seedance_phase(project, requested_phase) if lane == 'seedance' else None
+        # Image lanes that drive Aside/Runway need the GUI route (full access); the default
+        # image route is workspace-write and cannot reach the Aside daemon.
+        if lane.startswith('image_creator_') and requested_phase == 'production':
+            phase = 'production'
+        elif lane != 'seedance' and requested_phase != 'auto':
+            raise SystemExit('--phase is valid only for the seedance lane, or production for image lanes')
         route = model_routing.resolve(lane, phase)
         approval_token = f'{lane}:{phase or "lane"}'
         standing = lane_sessions.load_policy(PROJECT_ROOT)
@@ -521,7 +540,12 @@ def dispatch(args) -> None:
                 'SPAWN_APPROVAL_REQUIRED: this dispatch creates one Codex lane session. '
                 f'After explicit current-conversation approval, retry with '
                 f'--approved-spawn {approval_token} (or record a standing session-policy)')
-        owners = active_lane_owners(project)
+        if getattr(args, 'parallel_browserless', False):
+            raise SystemExit('PARALLEL_DISABLED: 2026-10-24 parallel lane sessions froze the 16GB Mac; '
+                             'wait for the running owner, then dispatch')
+        # One Codex lane owner machine-wide, not per project.
+        owners = [dict(o, project=str(p)) for p in sorted(PROJECT_ROOT.iterdir())
+                  if (p / 'state.json').exists() for o in active_lane_owners(p)]
         if owners:
             raise SystemExit(
                 'SEQUENTIAL_OWNER_EXISTS: another Codex lane owner is still running: '
@@ -1032,6 +1056,8 @@ def main() -> None:
     p.add_argument('--approved-spawn',
                    help='exact current-conversation spawn approval token (not needed under a standing session-policy)')
     p.add_argument('--blocks', nargs='+', help='seedance production: released blocks for this session (default: next 4)')
+    p.add_argument('--parallel-browserless', action='store_true',
+                   help='disabled 2026-10-24: lane sessions run one at a time machine-wide')
     p.set_defaults(func=dispatch)
 
     p = sub.add_parser('wait', help='foreground wait for the running lane session; prints its compact session_result')

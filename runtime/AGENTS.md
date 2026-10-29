@@ -43,7 +43,7 @@ flowchart TD
 5. 프로바이더 기본값은 Seedance다. 명시적인 FLOW 영상 생성 요청은 §1.4의 말포이식 합성 분기로 연결한다. Grok I2V는 사용자가 해당 프로젝트에서 명시했을 때만 같은 직렬 레일 안에서 사용한다. 프로바이더 병렬은 금지한다.
 6. **세션 분리(기본):** 메인 대화는 디렉터다. 사용자와 대화·승인·진행 판단만 하고, 레인 작업은 직접 하지 않는다. 다음 레인은 `video-codex-runtime dispatch --project <p> --lanes <lane>`로 **새 Codex 세션**에서 시작하고 `video-codex-runtime wait --project <p> --lane <lane>`로 기다린 뒤 `lanes/<lane>/session_result.json`만 읽는다. 결과가 `NEEDS_USER`면 그 질문을 사용자에게 하고 답(승인 인용)을 기록한 뒤 같은 레인을 다시 dispatch한다. Seedance 제작은 세션당 released 블록 4개다(`PARTIAL`이면 다음 세션).
    - 상시 승인: `session_policy.json`(runtime 루트)에 기록된 사용자 인용 “내가 말한 에이전드 자동생성 금지는, 애가 내가 뭐말할때마다 스킬을 새로 생성해서 에이전트엠디를 무겁게하더라구 그거아니고 세션생성은 괜찮음” (2026-10-17). 이 승인은 레인 세션에만 해당한다.
-   - 레인 세션은 한 번에 하나만 돈다(Runway 탭·브라우저 owner 하나). 세션 안에서 다른 세션·agent·scheduler·watcher를 만들지 않는다. 백그라운드 daemon, cron, heartbeat, 두 번째 브라우저 자동화 루프는 계속 금지다.
+   - 레인 세션은 한 번에 하나만 돈다(Runway 탭·브라우저 owner 하나). 예외: 브라우저를 쓰지 않는 이미지 레인(`$imagegen`)은 `dispatch --parallel-browserless`로 다른 레인 옆에서 돌 수 있다. 사용자 승인: "런타임 고쳐도 됨" (2026-10-19). 세션 안에서 다른 세션·agent·scheduler·watcher를 만들지 않는다. 백그라운드 daemon, cron, heartbeat, 두 번째 브라우저 자동화 루프는 계속 금지다.
    - 사용자 요청마다 새 스킬이나 AGENTS 문서를 만들거나 늘리지 않는다. 규칙 변경은 기존 문서의 해당 위치를 고친다.
 7. 상시 승인이 없으면 `dispatch`는 `--approved-spawn <lane>:<phase>`가 정확히 일치할 때만 실행된다. `next`의 `default_execution.commands`가 다음에 띄울 세션 명령을 알려준다.
 
