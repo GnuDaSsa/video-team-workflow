@@ -219,7 +219,7 @@ class PreprodPipelineTests(unittest.TestCase):
             'shelf_style_block_not_verbatim': self.prompt(**{'gentle film grain': 'grain'}),
             'shelf_tokens_': self.prompt(**{'@Image2 is': '@Image3 is'}),
             'shelf_first_line_must_be': self.prompt(**{'15 seconds, 2 shots:': '10 seconds, 2 shots:'}),
-            'shelf_prompt_over_3500': self.prompt() + ' x' * 1800,
+            'shelf_prompt_over_10000': self.prompt() + ' x' * 5100,
             'shelf_prompt_not_english': self.prompt() + '\n' + '한국어 설명 문장입니다 ' * 60,
         }
         for code, text in cases.items():

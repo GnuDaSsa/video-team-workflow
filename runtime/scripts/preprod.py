@@ -37,7 +37,6 @@ STAGE_FILES = {
 }
 USER_APPROVED_STAGES = {'concept', 'storyboard', 'shelf'}
 PROMPT_LIMIT = prompt_packet_utils.SEEDANCE_PROMPT_CHAR_LIMIT
-PROMPT_SOFT_LIMIT = 3200
 STYLE_BLOCK_LIMIT = 600
 IDENTITY_BLOCK_LIMIT = 350
 MAX_REFS = 7
@@ -471,7 +470,7 @@ def write_shelf_brief(project: Path, block_id: str) -> Path:
               else f'{block["duration_sec"]} seconds, {len(shots)} shots:')
     lines = [f'# Shelf brief {block_id} (generated; do not edit)', '',
              'Write `prompt.txt` in English. Production will paste it unchanged.', '',
-             f'- Hard limit {PROMPT_LIMIT} chars (target <= {PROMPT_SOFT_LIMIT}). No file names, paths, gate words or notes.',
+             f'- No length target; Runway accepts up to {PROMPT_LIMIT} chars. No file names, paths, gate words or notes.',
              f'- First line exactly: `{header}`',
              '- Include the STYLE block verbatim, and each cast IDENTITY block verbatim.',
              '- Bind every token below to its role once; use no other @ tokens.']

@@ -72,7 +72,7 @@ TASK = {
                       'style-frame refs; official character art stays source user_supplied with no prompt file.'),
     'shelf': ('Write preprod/04_shelf/{block}/prompt.txt, the final English Seedance prompt for block {block}, from '
               'preprod/04_shelf/{block}/brief.md and the single canonical template in seedance-prompting.md. Every '
-              'requirement in the brief is mandatory. Target <=3200 characters, hard limit 3500.'),
+              'requirement in the brief is mandatory. No length target; do not compress for length.'),
 }
 
 

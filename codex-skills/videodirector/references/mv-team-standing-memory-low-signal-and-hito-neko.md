@@ -69,7 +69,7 @@ Standing rule added:
 - Do not repeatedly experiment with Safari Developer Tools, Web Inspector, DOM scripts, or keyboard shortcuts while the user is waiting to generate. If Web Inspector opens accidentally, close it immediately and return to the Runway page.
 - If an accessibility `set_value`/DOM setter truncates at line breaks or only inserts the first line, stop using that method for Runway prompts; use clipboard paste into the focused prompt field instead.
 - Do not open upload/reference pickers when the reference slots are already correct. For an already-prepared Runway generation, the job is simply: prompt in, Generate click, wait.
-- Before clicking Generate, do only the minimum verification needed: correct reference thumbnails/order, prompt under 3500 chars, correct model/settings visible. Avoid extra UI churn.
+- Before clicking Generate, do only the minimum verification needed: correct reference thumbnails/order, prompt under the 10000-char Runway limit, correct model/settings visible. Avoid extra UI churn.
 
 ## Runway asset-search prohibition for not-yet-uploaded local files — 2026-05-17
 - Do **not** search the Runway Asset selector for a local project file that has not already been visibly uploaded and registered in Runway.

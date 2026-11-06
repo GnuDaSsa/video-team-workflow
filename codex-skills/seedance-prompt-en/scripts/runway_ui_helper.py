@@ -156,6 +156,8 @@ UPLOAD_TRANSPORT_LADDER = (
 REFRESH_RUNGS = {'REFRESH_EXACT_SAME_SESSION_AND_POLL_5S_X12'}
 
 
+RUNWAY_PROMPT_CHAR_LIMIT = 10000  # Runway prompt input limit (raised 2026-11-06)
+
 def normalize_visible_seedance_model(value: str) -> str:
     """Return one unambiguous Seedance model from visible Runway text."""
     text = re.sub(r'\s+', ' ', str(value or '')).strip()
@@ -1551,16 +1553,16 @@ def cmd_paste_prompt(args) -> int:
         except (OSError, ValueError) as exc:
             print(json.dumps({'ok': False, 'verdict': 'PROMPT_PACK_PREFLIGHT_FAILED', 'error': str(exc)}))
             return 1
-    if len(expected_normalized) > 3500 or not prompt_language_matches(expected_normalized, prompt_language):
+    if len(expected_normalized) > RUNWAY_PROMPT_CHAR_LIMIT or not prompt_language_matches(expected_normalized, prompt_language):
         st = {
             'ok': False,
             'verdict': 'PROMPT_LANGUAGE_PREFLIGHT_FAILED',
             'language': expected_stats,
-            'over_limit': len(expected_normalized) > 3500,
+            'over_limit': len(expected_normalized) > RUNWAY_PROMPT_CHAR_LIMIT,
             'prompt_sha256': prompt_sha256(expected_normalized),
         }
         evidence(args, 'paste-prompt-preflight',
-                 f'{prompt_language} prompt <=3500 characters',
+                 f'{prompt_language} prompt <={RUNWAY_PROMPT_CHAR_LIMIT} characters',
                  json.dumps(st, ensure_ascii=False), st['verdict'])
         print(json.dumps(st, ensure_ascii=False))
         return 1
@@ -1685,11 +1687,11 @@ def cmd_paste_prompt(args) -> int:
         'after': len(actual_text),
         'expected': len(expected_normalized),
         'hangul_runs': len(re.findall(r'[가-힣]+', actual_text)),
-        'over_limit': len(actual_text) > 3500,
+        'over_limit': len(actual_text) > RUNWAY_PROMPT_CHAR_LIMIT,
         'tail': actual_text[-60:],
         'waited_ms': waited_ms,
     })
-    verdict = ('OVER_3500_LIMIT' if st['over_limit']
+    verdict = ('OVER_PROMPT_LIMIT' if st['over_limit']
                else 'CONTENT_MISMATCH_DO_NOT_GENERATE' if not content_match
                else 'PROMPT_LANGUAGE_VALIDATION_FAILED' if not prompt_language_matches(actual_normalized, prompt_language)
                else 'OK')
@@ -1711,10 +1713,10 @@ def cmd_read_prompt(args) -> int:
   const el = (() => { const a = [...document.querySelectorAll('%s')].filter(e => e.getClientRects().length); return a.length === 1 ? a[0] : null; })();
   if (!el) return JSON.stringify({ok:false, error:'NO_PROMPT_EDITOR'});
   const t = (%s)(el);
-  return JSON.stringify({ok:true, text:t, len:t.length, over_limit:t.length>3500,
+  return JSON.stringify({ok:true, text:t, len:t.length, over_limit:t.length>%d,
     hangul_runs:(t.match(/[가-힣]+/g)||[]).length,
     head:t.slice(0,60), tail:t.slice(-60)});
-})()""" % (PROMPT_BLOCKING_DIALOG_JS, PROMPT_SEL, PROMPT_DOM_TEXT_JS))
+})()""" % (PROMPT_BLOCKING_DIALOG_JS, PROMPT_SEL, PROMPT_DOM_TEXT_JS, RUNWAY_PROMPT_CHAR_LIMIT))
     if rc != 0:
         evidence(args, 'read-prompt', 'read editor', err[-200:], 'ASIDE_CONTROL_ERROR')
         return 3

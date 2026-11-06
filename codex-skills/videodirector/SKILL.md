@@ -54,7 +54,7 @@ Every new project has `preprod/` (marker `preprod/PREPROD_V1`), scaffolded by `p
 Hard rules:
 - **No new creative decisions at production time.** A change request (story, look, shot, prompt wording, ref choice) goes back to the stage that owns it, is edited there and re-locked; every downstream lock goes STALE and is redone. The superseded copy moves to `preprod/_superseded/`; there is always exactly one current version.
 - Model-facing text is **English only**: `style_block_en`, `identity_block_en`, `description_en`, image prompts and shelf prompts. Plan, explain and talk to the user in Korean.
-- Do not write P4 prompts by hand from memory; `shelf-brief` generates the brief (style/identity verbatim, refs, shots, end frame) and `shelf-check` enforces ≤3500 chars (aim ≤3200), the `15 seconds, N shots:` header, `Shot k (a-bs):` markers, verbatim STYLE/IDENTITY, exact `@ImageN` tokens.
+- Do not write P4 prompts by hand from memory; `shelf-brief` generates the brief (style/identity verbatim, refs, shots, end frame) and `shelf-check` enforces the Runway input limit (10000 chars, no length target), the `15 seconds, N shots:` header, `Shot k (a-bs):` markers, verbatim STYLE/IDENTITY, exact `@ImageN` tokens.
 
 Commands: `python3 runtime/scripts/preprod.py init|status|check|lock|shelf-brief|shelf-check|shelf-lock|shelf-release|shelf-verify --project <p> ...` (see `runtime/templates/preprod/README.md`).
 

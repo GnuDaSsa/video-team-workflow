@@ -75,9 +75,9 @@ class LanguageOverrideTests(unittest.TestCase):
         self.assertEqual(result.returncode,0,result.stderr)
         self.assertIn('--pack',result.stdout)
     def test_other_gates_not_relaxed(self):
-        self.pack['prompt'] += ' 12 seconds, 2 shots. '+ 'x'*3501
+        self.pack['prompt'] += ' 12 seconds, 2 shots. '+ 'x'*10001
         errs=u.validate_seedance(self.pack)
-        self.assertIn('prompt_over_3500',errs);self.assertTrue(any('duration_declaration_mismatch' in e for e in errs))
+        self.assertIn('prompt_over_10000',errs);self.assertTrue(any('duration_declaration_mismatch' in e for e in errs))
     def test_paste_attestation_and_hash(self):
         path=self.root/'pack.json';path.write_text(json.dumps(self.pack))
         with self.assertRaisesRegex(ValueError,'ATTESTATION_MISSING'):u.validate_paste_pack(path,self.pack['prompt'],self.root)

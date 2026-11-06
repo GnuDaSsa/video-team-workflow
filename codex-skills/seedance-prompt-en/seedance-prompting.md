@@ -60,8 +60,8 @@ Rules, each mechanically checked by `shelf-check` unless marked (review):
 8. **Sound** (review): one `Sound:` sentence following the block's
    `audio_route` and the dialogue table in `seedance-shared-contract.md`.
 9. **End frame** last, from the storyboard `end_frame`.
-10. **Length:** target ≤3,200 characters, hard limit 3,500. Over target means
-    adjectives or repetition to cut — never a locked block or MUST phrase.
+10. **Length:** no length target; Runway accepts up to 10,000 characters.
+    Do not compress shots or MUST phrases for length; still cut filler adjectives and repetition.
 11. **English**, UTF-8 NFC. Only a spoken line may stay in its spoken language,
     in quotes; the prompt must still read as English-dominant.
 

@@ -21,7 +21,7 @@ import seedance_prompt_case_harness
 import shot_semantics
 
 
-SEEDANCE_PROMPT_CHAR_LIMIT = 3500
+SEEDANCE_PROMPT_CHAR_LIMIT = 10000  # Runway input limit (raised 2026-11-06); not a writing target
 KOREAN_PROMPT_STYLE_VERSION = 'creative_seedance_ko_v4_20260731'
 KOREAN_AUTHORING_CONTRACT = 'seedance_lane_owned_ko'
 PROMPT_LANGUAGE = 'en-US'

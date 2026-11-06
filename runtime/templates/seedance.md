@@ -14,7 +14,7 @@ For every storyboard block, in order:
 2. Write `preprod/04_shelf/<B>/prompt.txt` following the skill's single canonical template:
    first line from the brief; STYLE and IDENTITY blocks verbatim; one binding sentence per
    `@ImageN`; `Shot k (a-bs):` sections with the exact shot size, angle, camera move and
-   MUST phrases; end frame. Target ≤3200 chars, hard limit 3500. No file names, gate words or notes.
+   MUST phrases; end frame. No length target. No file names, gate words or notes.
 3. `preprod shelf-check` until clean, then `preprod shelf-lock` (also runs attestation).
 When all blocks are locked, show the user every `prompt.txt` (one per block) and ask once;
 then `preprod shelf-release --blocks ALL_LOCKED --approval-quote "<user's words>"`.

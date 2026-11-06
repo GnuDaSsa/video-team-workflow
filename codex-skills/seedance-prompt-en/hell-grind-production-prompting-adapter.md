@@ -4,7 +4,7 @@ Load for recurring-character identity, multi-entity blocking, difficult spatial
 continuity, dialogue/lipsync, or exact on-screen text. Distilled from the public
 Hell Grind production package. It adds checks and pack fields; the prompt is
 still the single template in `seedance-prompting.md`. It does not change
-provider rules, UI operation, duration locks or the 3,500-character limit.
+provider rules, UI operation, duration locks or the 10,000-character Runway input limit.
 
 ## Two layers
 

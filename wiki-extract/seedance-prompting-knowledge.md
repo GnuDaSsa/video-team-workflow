@@ -91,7 +91,7 @@ Add block-specific constraints when needed, e.g. `not a real bird`, `do not turn
 
 ## Prompt length and density
 
-Runway UI may enforce a 3500-character prompt counter in the user’s route. Keep block prompts compact: usually 700–1500 characters for 3–5 refs is enough. Dense action lists are useful only if they clarify shot order. If a prompt becomes long, remove generic film adjectives before removing identity/order constraints.
+Runway's prompt input limit is 10,000 characters (raised 2026-11-06); there is no length target. Dense action lists are useful only if they clarify shot order. If a prompt becomes long, remove generic film adjectives before removing identity/order constraints.
 
 Priority order when trimming:
 1. keep reference order / roles;

@@ -205,7 +205,7 @@ flowchart TD
 ### 2.3 Seedance
 
 - 모델 입력 프롬프트는 **영어만** 쓴다. 신규 선반은 다른 언어를 허용하지 않는다(기존 프로젝트의 증거 기반 override 코드는 호환용으로만 남는다).
-- 선반 프롬프트는 `preprod shelf-check`가 기계 검사한다: 영어·NFC, ≤3500자(목표 ≤3200), 첫 줄 `15 seconds, N shots:`/`15 seconds, one continuous shot:`, `Shot k (a-bs):` 표시, 숏별 shot size·angle·camera move·must-include 문구, STYLE·IDENTITY 원문, `@ImageN`이 refs와 정확히 일치, 다른 초 수 언급 금지. 그 뒤 `prompt_packet_utils.attest`를 통과해야 잠긴다.
+- 선반 프롬프트는 `preprod shelf-check`가 기계 검사한다: 영어·NFC, Runway 입력 한도 10000자 이하(분량 목표 없음), 첫 줄 `15 seconds, N shots:`/`15 seconds, one continuous shot:`, `Shot k (a-bs):` 표시, 숏별 shot size·angle·camera move·must-include 문구, STYLE·IDENTITY 원문, `@ImageN`이 refs와 정확히 일치, 다른 초 수 언급 금지. 그 뒤 `prompt_packet_utils.attest`를 통과해야 잠긴다.
 - 제작은 `paste-prompt --file preprod/04_shelf/<B>/prompt.txt --pack preprod/04_shelf/<B>/pack.json`만 허용된다. 릴리스되지 않았거나 잠금 후 바뀐 선반은 helper가 거부한다.
 - 세부 프롬프트 규격(단일 canonical 템플릿)과 Runway UI 절차는 선택된 한 버전 스킬만 따른다. 사용자가 `Seedance 2.5`를 명시하면 `seedance25-prompt-en`, 그 외는 `seedance-prompt-en`. 한 block에서 두 버전을 함께 읽지 않는다.
 - Legacy: `lanes/seedance/prompts/` pack을 `attest --project <p>`로 ATTESTED 받은 뒤에만 UI를 조작한다.
