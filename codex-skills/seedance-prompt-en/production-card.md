@@ -26,7 +26,13 @@ account; the session gets only the free slots); never in the long director threa
    sets/checks settings, pastes the shelf prompt, settings-verify, preflight.
 2. `READY` → view the `enlarged_screenshot` of each slot once (identity and
    environment are the approved refs). Then click the single visible Generate
-   **once**, and confirm the matching new card (In queue / Generating). Then
+   **once**. For successive independent submissions, vary the pointer position
+   within the verified Generate button: first near the G, next near the first e,
+   then continue to a different letter/position and cycle as needed. Keep the
+   point inside the same enabled button and use the authorized visible Aside
+   interaction; if precise positioning is unavailable, do not invent another
+   browser or bypass. This never authorizes an extra click or uncertain retry.
+   Confirm the matching new card (In queue / Generating). Then
    `H record-generate --project <p> --block-id <B> --state IN_QUEUE|GENERATING` (bookkeeping only).
    No card after a short look → `H recovery-record --project <p> --block-id <B> --incident RUNWAY_UI_STALE`; never click twice.
 3. Next block. Do not re-read docs between blocks.
