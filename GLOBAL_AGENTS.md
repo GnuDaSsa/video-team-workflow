@@ -19,7 +19,7 @@
 
 ## Codex App Runtime Video-Team Delegation Mode — 2026-05-16
 
-When the current working directory is under `/Users/gnudas/Documents/Codex/video-team-runtime/`, follow the lane prompt and the local project `brief.md`/`state.json` first.
+When the current working directory is under `/Volumes/gnudas-ssd/video-team/projects/` (project folders since 2026-11-10) or `/Users/gnudas/Documents/Codex/video-team-runtime/`, follow the lane prompt and the local project `brief.md`/`state.json` first.
 
 This is a Codex-native workflow. Codex is the single entrypoint and execution owner; no external orchestrator, sidecar, or relay layer is part of the route.
 

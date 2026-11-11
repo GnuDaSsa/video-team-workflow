@@ -24,7 +24,7 @@ import time
 RUNWAY_ACTIVE_SLOTS = 2
 # Lanes whose session must reach the Aside CLI / native chooser (outside the
 # workspace sandbox). Everything else runs in the workspace-write sandbox.
-GUI_ROUTES = {'seedance:production', 'music', 'image_creator_01:production', 'image_creator_02:production'}
+GUI_ROUTES = {'seedance:production', 'music', 'flow', 'image_creator_01:production', 'image_creator_02:production'}
 RESULT_NAME = 'session_result.json'
 CARD_CANDIDATES = (
     Path.home() / '.codex/skills/seedance-prompt-en/production-card.md',

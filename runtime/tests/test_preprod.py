@@ -42,6 +42,9 @@ class PreprodPipelineTests(unittest.TestCase):
         self.root = Path(self.tmp.name)
         old = video_codex_runtime.PROJECT_ROOT
         video_codex_runtime.PROJECT_ROOT = self.root / 'projects'
+        old_home = video_codex_runtime.PROJECTS_HOME
+        video_codex_runtime.PROJECTS_HOME = self.root / 'projects'
+        video_codex_runtime.PROJECTS_HOME.mkdir(parents=True, exist_ok=True)
         try:
             out = io.StringIO()
             with contextlib.redirect_stdout(out):
@@ -49,6 +52,7 @@ class PreprodPipelineTests(unittest.TestCase):
             self.project = Path(out.getvalue().strip())
         finally:
             video_codex_runtime.PROJECT_ROOT = old
+            video_codex_runtime.PROJECTS_HOME = old_home
         manifest = json.loads((self.project / 'manifest.json').read_text())
         manifest['knowledge_routing']['enabled'] = False
         write(self.project / 'manifest.json', manifest)

@@ -31,6 +31,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import aside_bridge  # noqa: E402
 
 HELPER = Path(__file__).resolve().parent / 'runway_ui_helper.py'
+HELPER_20 = HELPER
+HELPER_25 = Path(__file__).resolve().parents[2] / 'seedance25-prompt-en' / 'scripts' / 'runway_ui_helper.py'
 PHASES = ('attach', 'settings', 'paste', 'preflight')
 # Visible credit label per shelf generation_tier.
 TIER_LABEL = {'Explore Mode': 'Unlimited', 'Unlimited': 'Unlimited'}
@@ -266,7 +268,26 @@ def phase_settings(ctx: dict, page: Page, log: list) -> None:
     log.append({'step': 'settings_match'})
 
 
+def clear_stale_prompt(page: Page, log: list) -> None:
+    """Runway keeps the previous block's prompt after Generate; paste-prompt refuses a
+    non-empty editor, so empty the one visible Lexical editor first and re-observe."""
+    read = ("(()=>{const a=[...document.querySelectorAll('[contenteditable][data-lexical-editor]')]"
+            ".filter(e=>e.getClientRects().length);return a.length===1?(a[0].innerText||'').trim().length:-1})()")
+    before = page.js(read)
+    if not before or before < 0:
+        return
+    page.js("(()=>{const e=[...document.querySelectorAll('[contenteditable][data-lexical-editor]')]"
+            ".filter(x=>x.getClientRects().length)[0];e.focus();const r=document.createRange();"
+            "r.selectNodeContents(e);const s=window.getSelection();s.removeAllRanges();s.addRange(r);return true})()")
+    page.act("await page.keyboard.press('Backspace');return true;")
+    after = page.js(read)
+    if after:
+        raise Stop('PROMPT_CLEAR_FAILED', {'before_chars': before, 'after_chars': after})
+    log.append({'step': 'cleared_stale_prompt', 'before_chars': before})
+
+
 def phase_paste(ctx: dict, page: Page, log: list) -> None:
+    clear_stale_prompt(page, log)
     pasted = _helper(ctx['binding_path'], 'paste-prompt', '--replace', '--file', str(ctx['prompt_path']),
                      '--pack', str(ctx['pack_path']))
     if not pasted.get('ok'):
@@ -319,9 +340,13 @@ def load_context(project: Path, block: str) -> dict:
     if not binding.is_file():
         raise Stop('ASIDE_BINDING_REQUIRED', str(binding), 'bind this project to its own Runway session tab')
     pack = json.loads((shelf / 'pack.json').read_text(encoding='utf-8'))
+    settings = json.loads((shelf / 'settings.json').read_text(encoding='utf-8'))
+    global HELPER
+    # Seedance 2.5 shelves go through the 2.5 model-policy adapter (same UI code, 2.5 model guard).
+    HELPER = HELPER_25 if settings.get('model') == 'Seedance 2.5' else HELPER_20
     return {'project': project, 'block': block, 'binding_path': binding, 'pack_path': shelf / 'pack.json',
             'prompt_path': shelf / 'prompt.txt', 'refs': pack.get('reference_role_map') or [],
-            'settings': json.loads((shelf / 'settings.json').read_text(encoding='utf-8'))}
+            'settings': settings}
 
 
 def run(project: Path, block: str, *, start: str = 'attach', from_slot: int = 1) -> dict:

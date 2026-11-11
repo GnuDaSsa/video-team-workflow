@@ -50,7 +50,7 @@ flowchart TD
 ### 1.0s 새 프로젝트 시작 (매번 이 순서)
 
 1. 새 영상 요청 = **새 Codex 대화 하나 = 그 프로젝트의 디렉터**. 다른 프로젝트 대화에서 이어 시작하지 않는다.
-2. `video-codex-runtime init --slug <영문-slug> --brief "<사용자 요청 원문>" [--mode no_i2v_reference_native] [--author claude|codex]` → 출력된 프로젝트 경로를 쓴다(preprod가 기본). 사용자가 작성 모드를 말하지 않았으면 첫 질문은 “작성 모드: Claude 프롬프팅 / Codex” 하나뿐이다.
+2. `video-codex-runtime init --slug <영문-slug> --brief "<사용자 요청 원문>" [--mode no_i2v_reference_native] [--author claude|codex]` → 출력된 프로젝트 경로를 쓴다(preprod가 기본). 프로젝트 폴더는 외장 SSD `/Volumes/gnudas-ssd/video-team/projects/`에 생기고(2026-11-10~, 기존 프로젝트는 같은 곳으로 옮기고 옛 경로는 심링크), 편집물은 `/Volumes/gnudas-ssd/video-team/edits/<slug>/`에 둔다. `PROJECTS_SSD_NOT_MOUNTED`면 SSD 연결을 요청하고 로컬에 만들지 않는다. 사용자가 작성 모드를 말하지 않았으면 첫 질문은 “작성 모드: Claude 프롬프팅 / Codex” 하나뿐이다.
 3. P0·P1은 디렉터가 이 대화에서 한다(`runtime/templates/director.md`): 컨셉 3안 → 사용자 선택 → 잠금, 스타일 바이블 → 잠금.
 4. 그다음은 반복: `video-codex-runtime next --project <p>`의 `default_execution`을 그대로 따른다.
    - `DISPATCH_LANE_SESSION` → `commands[0]` 실행(새 세션 + wait), `session_result`만 읽는다.

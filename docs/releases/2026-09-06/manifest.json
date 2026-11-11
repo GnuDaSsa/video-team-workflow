@@ -10,7 +10,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/aside-operator.md",
       "target": ".codex/skills/seedance-prompt-en/aside-operator.md",
-      "sha256": "b0f8ea33d536b69abde879ec304709682934038d4e3efdef7e9286a71ccc5ce0"
+      "sha256": "9a074dffea87d13ef9c7f307a5dbd23df9414931ab96ed41b0726e4e36fb0a98"
     },
     {
       "source": "codex-skills/seedance-prompt-en/blender-previs-prompting.md",
@@ -55,7 +55,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/production-card.md",
       "target": ".codex/skills/seedance-prompt-en/production-card.md",
-      "sha256": "6ce5e7add9b3a170d1254e3f598016ae42153efd9a0a1a8536abbc52afdf011e"
+      "sha256": "21cfa7d816992d19504b18faab2af750b77280ff9155956a74f83662bc8ac06d"
     },
     {
       "source": "codex-skills/seedance-prompt-en/prompt-review.md",
@@ -70,12 +70,12 @@
     {
       "source": "codex-skills/seedance-prompt-en/scripts/run_block.py",
       "target": ".codex/skills/seedance-prompt-en/scripts/run_block.py",
-      "sha256": "d1e5d4d071748666474cc360580a33fce756e2dd22ed5778d53f08b8c2241c10"
+      "sha256": "f69e0dc35edadbe2add37dbfbb52ef4549a76f3beea9b05b1feeeb9e22d1211a"
     },
     {
       "source": "codex-skills/seedance-prompt-en/scripts/runway_ui_helper.py",
       "target": ".codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py",
-      "sha256": "46de8807c16e6f7487080453ce39ef239522694e300aaa67417a6c7c3c02c4a2"
+      "sha256": "379a922cd3aebcdc0702ab8296b9c9346b1361fc89455a47543f9395f8e52069"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-field-lessons.md",
@@ -85,7 +85,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/seedance-production.md",
       "target": ".codex/skills/seedance-prompt-en/seedance-production.md",
-      "sha256": "50296acc6900773f8495c9919f6e95b064154ce731d81cacc836f69cf294990a"
+      "sha256": "9910f3e8ca3407fc79a999fae9d2875fd2715ed46b4bb03a7d4c48e73655fe3c"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-prompting.md",
@@ -210,7 +210,7 @@
     {
       "source": "runtime/scripts/claude_author.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/claude_author.py",
-      "sha256": "0b1470b157dfb0b2fda4f3a56177508b93f9a396628067ccf3deeb84d29d5b2c"
+      "sha256": "e6ab7341432e7e71210137bb3a23fd5c3be9d06e12c646c0673a776484a2088a"
     },
     {
       "source": "runtime/scripts/disposable_video_qc.py",
@@ -230,7 +230,7 @@
     {
       "source": "runtime/scripts/lane_gates.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/lane_gates.py",
-      "sha256": "453ea4e832c12c07a7e2924599ff3a1d94dbaaa6c721f82e62416eb3406605c4"
+      "sha256": "eb936a54831cba0d3b4a1f55492afceb477983d356cc0caaaa5269ed3005a0f2"
     },
     {
       "source": "runtime/scripts/lane_inputs.py",
@@ -240,7 +240,7 @@
     {
       "source": "runtime/scripts/lane_sessions.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/lane_sessions.py",
-      "sha256": "b9cc6258b6f3f32cf90d698f4c28047140196a674894222cf35ecb1efb6a9e4e"
+      "sha256": "bc329ccd0d7612d293d9d6ed495f95816245e64c9209f34da9e18befe2014c4e"
     },
     {
       "source": "runtime/scripts/media_registry.py",
@@ -250,7 +250,7 @@
     {
       "source": "runtime/scripts/model_routing.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/model_routing.py",
-      "sha256": "22d0dddf514a774794956cba3c0292408db6229c6617caab51049de82d0dc248"
+      "sha256": "6df3217e2f504d0ac8d6e652c6c88e42e8d68f4caa9630181e63169f5392c208"
     },
     {
       "source": "runtime/scripts/preprod.py",
@@ -290,7 +290,7 @@
     {
       "source": "runtime/scripts/video_codex_runtime.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/video_codex_runtime.py",
-      "sha256": "f12cf7b6f193c7adc52aecfd30d0e242d7fa474e70d3b4a54761431d9b7b58e1"
+      "sha256": "ee875f5a2b609f0bc6cae6e06ca9a1419e146eeaacaf393b6050f0ce4f1864a9"
     },
     {
       "source": "runtime/scripts/video_knowledge_router.py",
@@ -308,9 +308,14 @@
       "sha256": "2fb32aa16a7f9b52de95c0d74029e51020e669eb718e61d3bdf53a8da3801b53"
     },
     {
+      "source": "runtime/templates/flow.md",
+      "target": "Documents/Codex/video-team-runtime/runtime/templates/flow.md",
+      "sha256": "fa3bd02315f876272ae16b379275a99ccc3456e0c5a3bbc18a52b643a0977ad8"
+    },
+    {
       "source": "runtime/templates/image_creator.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/image_creator.md",
-      "sha256": "eb0c3d406c27cc22215c08dab0a69f75cbf819aef34f6858c3f554e122fd45bf"
+      "sha256": "13f2fc4d2dff0484ef65ae61835f507f26d0a1035c209055295d5ce568a4e015"
     },
     {
       "source": "runtime/templates/image_qc.md",
@@ -330,7 +335,7 @@
     {
       "source": "runtime/templates/planner.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/planner.md",
-      "sha256": "4945d3d0ff7e1433a84f4dea1013f56b1a3804fa7beb6f41a38d9648585dedf4"
+      "sha256": "d3d425834454d9ac3071dc051225f8d6b6de1da2a5f4055d594d2309d1559460"
     },
     {
       "source": "runtime/templates/preprod/README.md",
@@ -370,7 +375,7 @@
     {
       "source": "runtime/templates/seedance.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/seedance.md",
-      "sha256": "e216533349b784d70596954599423ae7a1b2a83c9a35ff890ea28fa1211f8c02"
+      "sha256": "dea4dd443543d604af74ff67f8cc409dde296ec40c691904a00d028ca9b802cb"
     },
     {
       "source": "runtime/templates/seedance_qc.md",
@@ -380,7 +385,7 @@
     {
       "source": "runtime/templates/shared_lane_contract.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/shared_lane_contract.md",
-      "sha256": "5e14b6d740ffd990d29a6b39b0571d46c299756d2f60158090450b747d25df94"
+      "sha256": "53ad11088d5c6cad74522f46c1971948c98fad670f1955fc90d4cef194ce820c"
     },
     {
       "source": "runtime/templates/visual.md",
@@ -395,7 +400,7 @@
     {
       "source": "runtime/AGENTS.md",
       "target": "Documents/Codex/video-team-runtime/AGENTS.md",
-      "sha256": "a5c495e953e2e5b5672b8222271b0f078e91f1fefbe62e24c0dffde3b27811a7"
+      "sha256": "563338abf6e82ebb3a365901fa8b0b06a24ade728ed4dc7c2ba0af938732c0bb"
     },
     {
       "source": "references/character_sheet_prompt_standard.md",

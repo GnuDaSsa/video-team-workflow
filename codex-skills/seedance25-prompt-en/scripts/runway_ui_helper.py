@@ -50,6 +50,7 @@ def _require_seedance_25(value: str, *, error_prefix: str = 'SETTINGS') -> str:
 # The shared helper resolves these globals at call time. Patching only this
 # policy preserves one implementation for every UI/recovery/queue operation.
 _shared.REQUIRED_GENERATION_MODEL = EXPECTED_MODEL
+_shared.QUEUE_TARGET_DEFAULT = 1  # Runway Unlimited runs one Seedance 2.5 job at a time (observed 2026-11-07)
 _shared.require_seedance_20 = _require_seedance_25
 _original_verify = _shared.verify_attested_generation_settings
 

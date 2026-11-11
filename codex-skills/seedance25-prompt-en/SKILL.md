@@ -29,9 +29,13 @@ agent, one sequential lane, and one existing visible Aside Runway tab.
 
 Do not copy the 2.0 shared contract wholesale: it includes deliberate 2.0 model
 and queue assumptions. Reuse only the version-neutral creative adapters when
-they apply. The model-facing prompt always uses the single template in
-`../seedance-prompt-en/seedance-prompting.md` (gold examples:
-`../seedance-prompt-en/examples/`); the files below are review lenses, not
+they apply. The model-facing prompt uses the **2.5 structured layout in
+`prompting.md`** (References → Summary → timed shots with SFX → Sound →
+Consistency → End frame, per Runway's Seedance 2.5 guide). The 2.0 template in
+`../seedance-prompt-en/seedance-prompting.md` supplies only the version-neutral
+parts (verbatim STYLE/IDENTITY blocks, shot vocabulary); its flowing-prose
+shape and one-move-per-shot rule do not apply to 2.5. No length target
+(Runway accepts 10,000 characters). The files below are review lenses, not
 alternative templates:
 
 - `../seedance-prompt-en/seedance-field-lessons.md`
@@ -70,5 +74,6 @@ and provider-visible capabilities outrank those adapters.
 
 - [ByteDance Seed: Introducing Seedance 2.5](https://seed.bytedance.com/en/blog/one-take-creation-flexible-referencing-introducing-seedance-2-5)
 - [Runway: Creating with Seedance 2.5](https://help.runwayml.com/hc/en-us/articles/53542207042323-Creating-with-Seedance-2-5)
+- [Runway: Seedance 2.5 prompt guide](https://runway.com/resources/seedance-2-5-prompt-guide)
 
 Shared compiler review and exact-session operations: `../seedance-prompt-en/prompt-review.md` and `../seedance-prompt-en/aside-operator.md`. These are version-neutral, not a second version branch.

@@ -60,7 +60,9 @@ TASK = {
               'texture, lens_grammar, forbidden_looks, style_block_en (<=600 chars English, pasted verbatim into every '
               'video prompt, generic to the whole film), characters[] (id CHAR_*, identity_block_en <=350 chars, '
               'sheet_ref_id), locations[] (id LOC_*, description_en, anchor_objects).'),
-    'storyboard': ('Write preprod/02_storyboard/storyboard.json (콘티): every 15-second block in story order with shots '
+    'storyboard': ('Write preprod/02_storyboard/storyboard.json (콘티): every block in story order (15 s each for the '
+                   'default Seedance 2.0; when the user asks for Seedance 2.5 set top-level generation {{model: '
+                   '"Seedance 2.5", resolution}} and use 5-30 s blocks with up to 8 shots) with shots '
                    'that fully decide composition, camera and timing, using ONLY the controlled vocabulary in '
                    'runtime/scripts/preprod.py (SHOT_SIZES, ANGLES, CAMERA_MOVES). Contiguous shot times from 0 to '
                    'duration_sec, one dominant camera move per shot, end_frame that hands off to the next block. refs[] = '
@@ -71,7 +73,8 @@ TASK = {
                       '@ImageN) and asset_id null. Do not change asset_id values that are already filled. No START_FRAME/'
                       'style-frame refs; official character art stays source user_supplied with no prompt file.'),
     'shelf': ('Write preprod/04_shelf/{block}/prompt.txt, the final English Seedance prompt for block {block}, from '
-              'preprod/04_shelf/{block}/brief.md and the single canonical template in seedance-prompting.md. Every '
+              'preprod/04_shelf/{block}/brief.md and the single canonical template in seedance-prompting.md '
+              '(for a Seedance 2.5 shelf, the 2.5 layout in seedance25-prompt-en/prompting.md). Every '
               'requirement in the brief is mandatory. No length target; do not compress for length.'),
 }
 
@@ -196,8 +199,18 @@ def stage_errors(project: Path, stage: str, block: str) -> list[str]:
     return preprod.VALIDATORS[LOCK_STAGE[stage]](project)
 
 
+def _model(project: Path) -> str:
+    try:
+        return preprod.generation(project)['model']
+    except ValueError:
+        return ''
+
+
 def build_prompt(project: Path, stage: str, block: str, feedback: str, errors: list[str]) -> str:
-    reads = [str(p) for p in READ_FIRST[stage] if p.exists()]
+    read_list = list(READ_FIRST[stage])
+    if stage in ('storyboard', 'shelf') and _model(project) == 'Seedance 2.5':
+        read_list += [SKILLS / 'seedance25-prompt-en/SKILL.md', SKILLS / 'seedance25-prompt-en/prompting.md']
+    reads = [str(p) for p in read_list if p.exists()]
     files = [str(p.relative_to(project)) for p in target_files(project, stage, block)] or ['(see task)']
     lines = [
         'You are the creative author for one stage of a video pre-production pipeline. '

@@ -26,6 +26,7 @@ ROUTES = {
     'image_qc': (None, None, 'image_qc'),
     'seedance:prompting': (ASTRA_MODEL, ASTRA_EFFORT, 'video_prompt_authoring'),
     'seedance:production': (None, None, 'aside_cli_and_computer_use'),
+    'flow': (None, None, 'google_flow_gui_production'),
     'seedance_qc': (None, None, 'video_qc'),
     'package': (None, None, 'package_and_delivery_flow'),
 }

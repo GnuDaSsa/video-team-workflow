@@ -181,8 +181,23 @@ def _canonical_reference_token(value: object) -> str:
     return token if token.startswith('@') else '@' + token
 
 
+def pack_model(pack: dict) -> str:
+    return str(pack.get('provider_model') or (pack.get('settings') or {}).get('model') or 'Seedance 2.0')
+
+
+def validate_model_duration(pack: dict) -> list[str]:
+    model = pack_model(pack)
+    cap = generation_settings.MODEL_MAX_DURATION_SEC.get(model)
+    if cap is None:
+        return [f'unknown_provider_model:{model}']
+    duration = pack.get('duration_sec')
+    if isinstance(duration, int) and duration > cap:
+        return [f'duration_over_model_cap:{model}={cap},actual={duration}']
+    return []
+
+
 def validate_shot_grammar(pack: dict, binding_entries: list[tuple[str, str]]) -> list[str]:
-    """Validate 15-second single-source yield design independently of UI settings."""
+    """Validate single-source yield design (2.0: 15s/2-4 shots; 2.5: 5-30s/2-8 shots)."""
     errors: list[str] = []
     grammar = pack.get('shot_grammar')
     if not grammar:
@@ -196,14 +211,20 @@ def validate_shot_grammar(pack: dict, binding_entries: list[tuple[str, str]]) ->
         return errors
 
     duration = pack.get('duration_sec')
-    if duration != 15:
+    is_25 = pack_model(pack) == 'Seedance 2.5'
+    if is_25:
+        # 2.5: 5-30s takes, timeline beats of ~4-8s; up to 8 labelled shots per source.
+        if not isinstance(duration, int) or not 5 <= duration <= 30:
+            errors.append(f'multi_shot_25_duration_out_of_range:{duration}')
+    elif duration != 15:
         errors.append(f'multi_shot_source_requires_15s:{duration}')
     count = pack.get('planned_scene_count')
     explicit_six = (pack.get('provider_model') in ('Seedance 2.0', 'Seedance 2.5')
                     and pack.get('user_requested_scene_count') == 6
                     and count == 6)
-    if not isinstance(count, int) or not (2 <= count <= 4 or explicit_six):
-        errors.append(f'multi_shot_scene_count_must_be_2_to_4:{count}')
+    max_count = 8 if is_25 else 4
+    if not isinstance(count, int) or not (2 <= count <= max_count or explicit_six):
+        errors.append(f'multi_shot_scene_count_must_be_2_to_{max_count}:{count}')
         return errors
     scenes = pack.get('scene_plan')
     if not isinstance(scenes, list) or len(scenes) != count:
@@ -285,6 +306,7 @@ def validate_seedance(pack: dict) -> list[str]:
 
     binding_required = MULTIMODAL_BINDING_RULE.lower() in rules.lower()
     binding_entries = _reference_role_entries(pack.get('reference_role_map'))
+    errors.extend(validate_model_duration(pack))
     errors.extend(validate_shot_grammar(pack, binding_entries))
     if binding_required:
         if not binding_entries:

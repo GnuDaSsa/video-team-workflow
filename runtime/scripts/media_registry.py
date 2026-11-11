@@ -288,6 +288,13 @@ def asset_for_path(project: Path, path: Path) -> dict | None:
             'SELECT * FROM assets WHERE current_path=? AND state<>? ORDER BY updated_at DESC LIMIT 1',
             (resolved, 'trashed'),
         ).fetchone()
+        if row is None:
+            # Projects moved to the SSD (2026-11-10) keep pre-move paths that now resolve via symlink.
+            for candidate in conn.execute('SELECT * FROM assets WHERE state<>? ORDER BY updated_at DESC',
+                                          ('trashed',)):
+                if str(Path(candidate['current_path']).resolve()) == resolved:
+                    row = candidate
+                    break
     return dict(row) if row is not None else None
 
 

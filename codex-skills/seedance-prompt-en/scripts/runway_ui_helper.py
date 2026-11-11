@@ -1739,7 +1739,7 @@ def cmd_read_prompt(args) -> int:
 RESUME_CONTRACT_VERSION = 'seedance_foreground_wait_v4_20260819'
 QUEUE_RUNTIME_VERSION = 'seedance_queue_runtime_v2_20260819'
 QUEUE_TARGET_DEFAULT = 2
-WAKE_DELAY_SECONDS = 900
+WAKE_DELAY_SECONDS = 180  # 3 min board re-read (DOM read only); was 900
 WAIT_RETURN_INSTRUCTION_KO = '현재 Seedance 보드를 다시 읽고 queue-cycle --from-wake로 소비해.'
 INFLIGHT_STATES = {'IN_QUEUE', 'GENERATING', 'PROCESSING', 'LOADING'}
 SETTLED_STATES = {'COMPLETED', 'FAILED', 'CANCELLED', 'INVALID_INPUT'}
@@ -3268,6 +3268,27 @@ def cmd_recover(args) -> int:
     return rc1
 
 
+def _adopt_project_generation_model(args) -> None:
+    """A preprod project whose storyboard declares Seedance 2.5 runs every helper call under the
+    2.5 model guard (same as the seedance25 adapter), so a 2.0-path call cannot fight the visible 2.5 UI."""
+    global REQUIRED_GENERATION_MODEL, QUEUE_TARGET_DEFAULT
+    project = getattr(args, 'project', None)
+    if not project and getattr(args, 'binding', None):
+        try:
+            project = json.loads(Path(args.binding).read_text(encoding='utf-8')).get('project')
+        except (OSError, ValueError):
+            project = None
+    if not project:
+        return
+    try:
+        sb = json.loads((Path(project) / 'preprod/02_storyboard/storyboard.json').read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return
+    if ((sb.get('generation') or {}).get('model')) == 'Seedance 2.5':
+        REQUIRED_GENERATION_MODEL = 'Seedance 2.5'
+        QUEUE_TARGET_DEFAULT = 1
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument('--evidence', default=None)
@@ -3440,6 +3461,7 @@ def main() -> int:
     sub.add_parser('check-generate').set_defaults(fn=cmd_check_generate)
     sub.add_parser('recover').set_defaults(fn=cmd_recover)
     args = ap.parse_args()
+    _adopt_project_generation_model(args)
     if args.binding:
         os.environ['RUNWAY_ASIDE_BINDING'] = str(Path(args.binding).expanduser().resolve())
     return args.fn(args)

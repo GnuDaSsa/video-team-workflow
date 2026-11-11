@@ -15,7 +15,8 @@ from pathlib import Path
 
 DURATION_LOCK_VERSION = 'seedance_generation_duration_lock_v1_20260819'
 MIN_DURATION_SEC = 5
-MAX_DURATION_SEC = 15
+MAX_DURATION_SEC = 30  # Seedance 2.5 ceiling; per-model caps in MODEL_MAX_DURATION_SEC
+MODEL_MAX_DURATION_SEC = {'Seedance 2.0': 15, 'Seedance 2.5': 30}
 SOURCE_PREFIXES = ('user:', 'brief:', 'planner_revision:', 'workflow_default:')
 SHORTER_OVERRIDE_PREFIXES = ('user:', 'brief:')
 DEFAULT_DURATION_SEC = 15

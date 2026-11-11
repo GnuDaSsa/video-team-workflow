@@ -24,11 +24,28 @@ class SeedancePromptCaseHarnessTests(unittest.TestCase):
         self.assertEqual(prompt_packet_utils.validate_shot_grammar(pack, [('@Image1', 'drone')]), [])
         for model in ('Seedance 2.0', 'Seedance 2.5'):
             self.assertEqual(prompt_packet_utils.validate_shot_grammar({**pack, 'provider_model': model}, [('@Image1', 'drone')]), [])
-        for key,value in [('provider_model', 'Unknown'), ('user_requested_scene_count', None)]:
+        for key,value in [('provider_model', 'Unknown')]:
             invalid = {**pack, key: value}
             self.assertTrue(prompt_packet_utils.validate_shot_grammar(invalid, [('@Image1', 'drone')]))
+        # 2.0 needs the explicit six-shot request; 2.5 allows up to 8 labelled shots (Runway 2.5 guide).
+        self.assertTrue(prompt_packet_utils.validate_shot_grammar(
+            {**pack, 'provider_model': 'Seedance 2.0', 'user_requested_scene_count': None}, [('@Image1', 'drone')]))
+        self.assertEqual(prompt_packet_utils.validate_shot_grammar(
+            {**pack, 'user_requested_scene_count': None}, [('@Image1', 'drone')]), [])
         pack['scene_plan'][2]['start_sec'] = 5.5
         self.assertTrue(prompt_packet_utils.validate_shot_grammar(pack, [('@Image1', 'drone')]))
+
+    def test_seedance25_thirty_second_multi_shot(self):
+        scenes = [{'start_sec': a, 'end_sec': b, 'covered_cuts': [c], 'scene_id': c, 'reference_tokens': ['@Image1'],
+                   'action': 'walk', 'camera': 'static', 'edit_out': 'hold'}
+                  for (a, b), c in zip([(0, 7), (7, 15), (15, 23), (23, 30)], 'abcd')]
+        pack = {'duration_sec': 30, 'shot_grammar': 'PLANNED_MULTI_SHOT_SOURCE', 'provider_model': 'Seedance 2.5',
+                'planned_scene_count': 4, 'covered_cuts': list('abcd'), 'scene_plan': scenes}
+        self.assertEqual(prompt_packet_utils.validate_shot_grammar(pack, [('@Image1', 'lead')]), [])
+        self.assertEqual(prompt_packet_utils.validate_model_duration(pack), [])
+        as20 = {**pack, 'provider_model': 'Seedance 2.0'}
+        self.assertTrue(prompt_packet_utils.validate_shot_grammar(as20, [('@Image1', 'lead')]))
+        self.assertTrue(prompt_packet_utils.validate_model_duration(as20))
 
     def base_pack(self) -> dict:
         return {

@@ -33,7 +33,7 @@ DONE_LIKE = {'DONE', 'PASS', 'READY_FOR_USER_REVIEW', 'LOCKED', 'PARTIAL_DONE'}
 LANES = [
     'director', 'music', 'planner',
     'image_creator_01', 'image_creator_02', 'image_qc',
-    'seedance', 'seedance_qc', 'package',
+    'seedance', 'flow', 'seedance_qc', 'package',
 ]
 
 # Canonical block-ready events for the sequential Codex runtime.
@@ -557,7 +557,7 @@ HARD_GATES = {'seedance', 'seedance_qc', 'package'}
 
 # Planning lanes (director/music/planner/image prompt authoring) never wait on a
 # stray file; the audit still blocks every lane that consumes registered media.
-MEDIA_CONSUMING_LANES = {'image_qc', 'seedance', 'seedance_qc', 'package'}
+MEDIA_CONSUMING_LANES = {'image_qc', 'seedance', 'flow', 'seedance_qc', 'package'}
 _AUDIT_CACHE: dict[str, tuple[float, dict]] = {}
 
 
@@ -682,6 +682,16 @@ def gate_check(project: Path, lane: str) -> tuple[bool, str]:
             return True, 'OK'
         return False, ('WAIT_BLOCK_READY: no %s event in seedance_block_queue (Image QC has not approved a full '
                        'reference bundle for any block).' % BLOCK_READY_EVENT)
+    if lane == 'flow':
+        # Explicit Google Flow branch (AGENTS §1.4). Off unless the director wrote a
+        # Flow intent for this project, so other projects never see it as a next lane.
+        intent = project / 'lanes' / 'flow' / 'director_intent.md'
+        if not intent.exists():
+            return False, 'NOT_REQUESTED: no lanes/flow/director_intent.md (Flow is used only on explicit user request).'
+        if media_registry.is_v4_project(project) and media_registry.registry_count(
+                project, kind='image', states={'approved', 'selected'}) <= 0:
+            return False, 'MEDIA_HARD_GATE: Flow requires registered approved images.'
+        return True, 'OK_FLOW_COPY_PASTE: run the blocks listed in lanes/flow/director_intent.md exactly as written.'
     if lane == 'seedance_qc':
         if media_registry.is_v4_project(project) and media_registry.registry_count(
                 project, kind='video', states={'candidate'}) <= 0:

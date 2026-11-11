@@ -93,6 +93,9 @@ class RuntimeV4Tests(unittest.TestCase):
     ) -> Path:
         old_root = video_codex_runtime.PROJECT_ROOT
         video_codex_runtime.PROJECT_ROOT = self.root / 'projects'
+        old_home = video_codex_runtime.PROJECTS_HOME
+        video_codex_runtime.PROJECTS_HOME = self.root / 'projects'
+        video_codex_runtime.PROJECTS_HOME.mkdir(parents=True, exist_ok=True)
         try:
             output = io.StringIO()
             with contextlib.redirect_stdout(output):
@@ -101,6 +104,7 @@ class RuntimeV4Tests(unittest.TestCase):
             return Path(output.getvalue().strip())
         finally:
             video_codex_runtime.PROJECT_ROOT = old_root
+            video_codex_runtime.PROJECTS_HOME = old_home
 
     def valid_pack(self, block: str = 'B01') -> dict:
         return korean_request({

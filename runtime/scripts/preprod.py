@@ -41,6 +41,9 @@ STYLE_BLOCK_LIMIT = 600
 IDENTITY_BLOCK_LIMIT = 350
 MAX_REFS = 7
 MAX_SHOTS = 4
+# Seedance 2.5 (Runway: up to 30 image refs, 4-30s takes): wider per-block envelope.
+MAX_REFS_25 = 12
+MAX_SHOTS_25 = 8
 MODES = {'mv', 'contest', 'tourism', 'institution', 'shortform', 'other'}
 MEDIUMS = {'2d_animation', '3d_animation', 'live_action', 'mixed'}
 ASPECTS = {'16:9', '9:16', '1:1', '4:3', '3:4', '21:9'}
@@ -211,6 +214,10 @@ def validate_storyboard(project: Path) -> list[str]:
     known = {str(i.get('id')) for k in ('characters', 'locations') for i in b.get(k) or []}
     blocks = data.get('blocks') or []
     _need(e, bool(blocks), 'storyboard_no_blocks')
+    gen_model = (data.get('generation') or {}).get('model') or 'Seedance 2.0'
+    _need(e, gen_model in generation_settings.MODEL_MAX_DURATION_SEC, f'storyboard_unknown_generation_model:{gen_model}')
+    max_refs, max_shots = (MAX_REFS_25, MAX_SHOTS_25) if gen_model == 'Seedance 2.5' else (MAX_REFS, MAX_SHOTS)
+    model_cap = generation_settings.MODEL_MAX_DURATION_SEC.get(gen_model, 15)
     seen_blocks, seen_shots = set(), set()
     for index, block in enumerate(blocks, 1):
         bid = str(block.get('block_id') or '')
@@ -224,6 +231,8 @@ def validate_storyboard(project: Path) -> list[str]:
         expected = generation_settings.expected_duration(project, bid)[1].get('expected_duration_sec')
         _need(e, duration == expected,
               f'storyboard_{tag}_duration_{duration}_must_match_lock_{expected}')
+        _need(e, isinstance(duration, int) and duration <= model_cap,
+              f'storyboard_{tag}_duration_{duration}_over_{gen_model}_cap_{model_cap}')
         sheets = {str(c.get('id')): str(c.get('sheet_ref_id')) for c in b.get('characters') or []}
         for ref in block.get('cast') or []:
             _need(e, ref in known, f'storyboard_{tag}_unknown_cast:{ref}')
@@ -233,11 +242,11 @@ def validate_storyboard(project: Path) -> list[str]:
                       f'storyboard_{tag}_refs_missing_sheet_of_{ref}:{sheets[ref]}')
         _need(e, block.get('location_id') in known, f'storyboard_{tag}_unknown_location:{block.get("location_id")}')
         refs = block.get('refs') or []
-        _need(e, 1 <= len(refs) <= MAX_REFS and len(set(refs)) == len(refs),
-              f'storyboard_{tag}_refs_must_be_1_to_{MAX_REFS}_unique')
+        _need(e, 1 <= len(refs) <= max_refs and len(set(refs)) == len(refs),
+              f'storyboard_{tag}_refs_must_be_1_to_{max_refs}_unique')
         _need(e, bool(str(block.get('end_frame') or '').strip()), f'storyboard_{tag}_missing_end_frame')
         shots = block.get('shots') or []
-        _need(e, 1 <= len(shots) <= MAX_SHOTS, f'storyboard_{tag}_shots_must_be_1_to_{MAX_SHOTS}')
+        _need(e, 1 <= len(shots) <= max_shots, f'storyboard_{tag}_shots_must_be_1_to_{max_shots}')
         cursor = 0.0
         for s_index, shot in enumerate(shots, 1):
             sid = str(shot.get('shot_id') or '')
@@ -444,6 +453,16 @@ def ref_rows(project: Path, block: dict) -> list[dict]:
     return rows
 
 
+def generation(project: Path) -> dict:
+    """Provider model for the whole storyboard: `generation: {model, resolution}` in storyboard.json.
+    Absent → Seedance 2.0 (the workflow default; 2.5 only on explicit user request)."""
+    gen = (read_json(stage_file(project, 'storyboard')) or {}).get('generation') or {}
+    model = gen.get('model') or 'Seedance 2.0'
+    if model not in generation_settings.MODEL_MAX_DURATION_SEC:
+        raise ValueError(f'UNKNOWN_PROVIDER_MODEL: {model}')
+    return {'model': model, 'resolution': gen.get('resolution')}
+
+
 def write_shelf_brief(project: Path, block_id: str) -> Path:
     """Deterministic authoring brief: everything the prompt must contain, nothing else."""
     for stage in ('concept', 'bible', 'storyboard', 'images'):
@@ -455,9 +474,10 @@ def write_shelf_brief(project: Path, block_id: str) -> Path:
     rows = ref_rows(project, block)
     out = shelf_dir(project, block_id)
     out.mkdir(parents=True, exist_ok=True)
+    gen = generation(project)
     settings = {
-        'model': 'Seedance 2.0', 'duration_sec': block['duration_sec'], 'aspect_ratio': concept['aspect_ratio'],
-        'resolution': (b.get('resolution') or '720p'), 'audio': 'OFF' if block['audio_route'] == 'silent' else 'ON',
+        'model': gen['model'], 'duration_sec': block['duration_sec'], 'aspect_ratio': concept['aspect_ratio'],
+        'resolution': gen['resolution'] or (b.get('resolution') or '720p'), 'audio': 'OFF' if block['audio_route'] == 'silent' else 'ON',
         'mode': 'Multi-reference', 'audio_route': block['audio_route'],
     }
     if concept.get('generation_tier'):
@@ -476,6 +496,14 @@ def write_shelf_brief(project: Path, block_id: str) -> Path:
              '- Bind every token below to its role once; use no other @ tokens.']
     if len(shots) > 1:
         lines.append('- Start each shot with `Shot N (a-bs):` using the times below.')
+    if gen['model'] == 'Seedance 2.5':
+        lines += ['- Seedance 2.5 layout (Runway guide): after the header and STYLE/IDENTITY blocks, a REFERENCES list '
+                  '(one line per token, one exclusive role each), then a one-sentence SUMMARY of subject, place, event, '
+                  'style and camera feel, then the timed shots, then Sound, then a CONSISTENCY note restating the 2-3 '
+                  'fixed traits per character and the paper/line look, then the End frame.',
+                  '- Shot times are contiguous whole seconds. A shot longer than ~4s may chain two camera moves; '
+                  'restate the lead\'s fixed traits at each major beat. Describe visuals positively; negatives only '
+                  'for subtitles, music and text.']
     lines += ['- Inside each shot use the exact shot size, angle and camera move phrases, plus every MUST phrase.',
               '- End with the END FRAME.', '', '## STYLE (verbatim)', b['style_block_en'], '', '## IDENTITY (verbatim)']
     lines += [chars[c]['identity_block_en'] for c in block.get('cast') or []] or ['(no cast)']
@@ -575,6 +603,7 @@ def build_pack(project: Path, block_id: str) -> Path:
         'authoring_contract': prompt_packet_utils.ENGLISH_AUTHORING_CONTRACT,
         'prompt': prompt, 'prompt_file': str(out / 'prompt.txt'), 'prompt_sha256': prompt_packet_utils.prompt_sha256(prompt),
         'settings': read_json(out / 'settings.json'),
+        'provider_model': (read_json(out / 'settings.json') or {}).get('model') or 'Seedance 2.0',
         'reference_role_map': [{'token': r['token'], 'role': r['role'], 'asset_id': r['asset_id'],
                                 'path': r['path'], 'sha256': r['sha256']} for r in refs],
         'shot_grammar': prompt_packet_utils.SINGLE_SHOT_GRAMMAR if len(shots) == 1 else prompt_packet_utils.MULTI_SHOT_GRAMMAR,

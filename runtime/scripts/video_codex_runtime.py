@@ -11,6 +11,7 @@ import shlex
 import signal
 import subprocess
 import sys
+import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import lane_gates  # shared gate/status-enum/validation logic (P1/P2/P3)
@@ -24,7 +25,24 @@ import preprod
 HOME = Path('/Users/gnudas')
 RUNTIME = Path('/Users/gnudas/Documents/Codex/video-team-runtime/runtime')
 TEMPLATES = Path(__file__).resolve().parents[1] / 'templates'
+# Rules (AGENTS.md), session_policy.json and pre-2026-11-10 project symlinks stay on the local disk.
 PROJECT_ROOT = HOME / 'Documents' / 'Codex' / 'video-team-runtime'
+# 2026-11-10: the local disk was 93% full, so project folders (all media) live on the external
+# SSD volume `gnudas-ssd` (a separate APFS volume next to the Time Machine volume).
+PROJECTS_HOME = Path(os.environ.get('VIDEO_TEAM_PROJECTS_ROOT', '/Volumes/gnudas-ssd/video-team/projects'))
+
+
+def project_dirs() -> list[Path]:
+    """Every real project folder: SSD first, then any project not yet moved off the local root."""
+    found: dict[str, Path] = {}
+    for root in (PROJECTS_HOME, PROJECT_ROOT):
+        if not root.is_dir():
+            continue
+        for p in sorted(root.iterdir()):
+            # legacy local entries are symlinks to the SSD copy; count each project once
+            if p.is_dir() and not p.is_symlink() and (p / 'state.json').exists():
+                found.setdefault(p.name, p)
+    return [found[k] for k in sorted(found)]
 CODEX = Path('/opt/homebrew/bin/codex')
 IMAGE_MAX_PARALLEL = 3
 STANDARD_I2V_MODE = 'standard_i2v'
@@ -39,10 +57,12 @@ LANES = [
     'image_creator_02',
     'image_qc',
     'seedance',
+    'flow',
     'seedance_qc',
     'package',
 ]
 TEMPLATE_BY_LANE = {
+    'flow': 'flow.md',
     'director': 'director.md',
     'music': 'music.md',
     'planner': 'planner.md',
@@ -135,8 +155,11 @@ def init_project(args) -> None:
     if generation_mode not in GENERATION_MODES:
         raise SystemExit(f'unknown generation mode {generation_mode}; valid={GENERATION_MODES}')
     slug = slugify(args.slug or args.brief[:40] or 'video-project')
-    project = PROJECT_ROOT / f'{now()}_{slug}'
-    project.mkdir(parents=True, exist_ok=False)
+    if not PROJECTS_HOME.is_dir():
+        raise SystemExit(f'PROJECTS_SSD_NOT_MOUNTED: {PROJECTS_HOME} is missing. Connect the external SSD '
+                         '(volume gnudas-ssd) and retry; do not create the project on the local disk.')
+    project = PROJECTS_HOME / f'{now()}_{slug}'
+    project.mkdir(exist_ok=False)
     for lane in LANES:
         (project / 'lanes' / lane).mkdir(parents=True, exist_ok=True)
     for q in QUEUES:
@@ -488,6 +511,19 @@ def pid_running(pid: int | None) -> bool:
         return True
 
 
+def pid_reused(pid: int, pid_path: Path) -> bool:
+    """A finished lane's pid file can outlive its process; the OS later hands that pid to an
+    unrelated process (seen: cfprefsd, 2026-11-07/08) and every dispatch then reports
+    SEQUENTIAL_OWNER_EXISTS forever. The real owner started before its pid file was written."""
+    try:
+        out = subprocess.run(['ps', '-o', 'lstart=', '-p', str(pid)], capture_output=True, text=True,
+                             env={**os.environ, 'LC_ALL': 'C'}, timeout=5).stdout.strip()
+        started = time.mktime(time.strptime(out, '%a %b %d %H:%M:%S %Y'))
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return False  # cannot tell: keep the conservative "still running" answer
+    return started > pid_path.stat().st_mtime + 5
+
+
 def update_manifest_lane(project: Path, lane: str, data: dict) -> None:
     manifest_path = project / 'manifest.json'
     manifest = json.loads(read(manifest_path) or '{}')
@@ -505,7 +541,7 @@ def active_lane_owners(project: Path) -> list[dict]:
             pid = int(read(pid_path).strip())
         except (TypeError, ValueError):
             continue
-        if pid_running(pid):
+        if pid_running(pid) and not pid_reused(pid, pid_path):
             status = json.loads(read(project / 'lanes' / lane / 'status.json') or '{}')
             owners.append({
                 'lane': lane, 'pid': pid,
@@ -564,8 +600,7 @@ def dispatch(args) -> None:
             raise SystemExit('PARALLEL_DISABLED: 2026-10-24 parallel lane sessions froze the 16GB Mac; '
                              'wait for the running owner, then dispatch')
         # One Codex lane owner machine-wide, not per project.
-        owners = [dict(o, project=str(p)) for p in sorted(PROJECT_ROOT.iterdir())
-                  if (p / 'state.json').exists() for o in active_lane_owners(p)]
+        owners = [dict(o, project=str(p)) for p in project_dirs() for o in active_lane_owners(p)]
         if owners:
             raise SystemExit(
                 'SEQUENTIAL_OWNER_EXISTS: another Codex lane owner is still running: '

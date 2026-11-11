@@ -94,38 +94,79 @@ If the user explicitly enables `toonkit_2d_snappy_v1`, apply its pose-to-pose
 hold/anticipation/action/overshoot/settle/follow-through grammar from the 2.0
 creative adapter, but keep this 2.5 mode/reference/timestamp contract.
 
-## Timeline beats
+## Model-facing prompt layout (Runway Seedance 2.5 guide, 2026-11)
 
-Timestamps are pacing guidance, not frame-accurate promises. Use contiguous,
-feasible intervals that match the project duration lock. Inside the canonical
-template a beat chain for one shot reads like:
+2.5 reads **structured labelled blocks**, not 2.0 flowing prose. Keep the
+runtime header and the verbatim STYLE / IDENTITY blocks the shelf brief
+requires, then compile in this order:
 
 ```text
-Shot 1 (0-5s): medium shot, eye level, static. She holds her starting pose, eyes fixed ahead, only her breath moving. Her weight settles onto the right foot and her hand closes on the door handle.
-Shot 2 (5-15s): medium wide shot, eye level, slow push in. Her torso turns first and pushes the door open, the sleeve following a beat late; the door slows just before touching the wall and dust stirs after it. She and the camera come to rest on the final composition.
+<N> seconds, <k> shots:
+<STYLE block verbatim>
+<IDENTITY block(s) verbatim>
+References: @Image1 is <one exclusive role>. @Image2 is <one exclusive role>. ...
+Summary: <one sentence: who, where, what happens, genre/look, overall camera feel>.
+Shot 1 (0-6s): <size>, <angle>, <declared move>. <opening state → anticipation → action → reaction → settle>. SFX: <diegetic sounds of this beat>.
+Shot 2 (6-13s): ...
+Sound: <whole-take bed>. No music. No subtitles.
+Consistency: <2-3 fixed traits per lead restated>, <line/paper/palette invariants>, <prop states that carry across shots>.
+End frame: <held, readable final composition>.
 ```
 
-Do not overfill a duration merely because 2.5 accepts longer generations.
-Unrelated scenes stay separate. A planned multi-shot source may contain 2–4
-causally connected cuts only when the project cut-ownership and duration locks
-already authorize it.
+- **References first.** Every token gets one exclusive role (identity, wardrobe,
+  location, object). A loose role such as "for style" leaks unintended traits.
+  Do not re-describe a referenced object at length in prose; the model may read
+  it as a second object.
+- **Summary sentence** anchors all shots into one scene; write it before the
+  timeline, never skip it.
+- **Timeline.** Contiguous whole-second intervals, no gaps (gaps are ungoverned).
+  Default beat 4–8 s; a closing hold 3–4 s. Timestamps are pacing, not frame-exact
+  cuts. Say cuts explicitly ("Cut to …") when the shot changes.
+- **Compound camera is allowed** inside a beat longer than ~4 s (e.g. locked-off
+  hold, then a slow push in). The 2.0 one-move-per-shot rule is not a 2.5 rule,
+  but every move still needs a motive and a stop.
+- **Restate the primary traits** of each lead (2–3 visible features) at every
+  major beat and again in Consistency; 2.5 drifts on long takes otherwise.
+- **Positive visuals.** Describe the wanted result. Negatives only for audio,
+  subtitles and on-screen text ("No subtitles. No background music,
+  environmental sounds only.").
+- **Per-beat SFX** lines plus one Sound bed. State whether music is present.
+- **Detail density follows resolution.** At 1080p give texture/line facts
+  (paper grain, brush-edge, wash bleed) once in STYLE and once in Consistency;
+  do not repeat them in every shot.
+- **Length.** No length target and no compression; Runway accepts 10,000
+  characters. Spend words on staging, timing and causality, not adjectives.
 
-## Model-facing prompt shape
+### Runway Unlimited cap
 
-Use the single template in `../seedance-prompt-en/seedance-prompting.md`
-(header → STYLE → IDENTITY → one binding sentence per token → `Shot k (a-bs):`
-sections with size/angle/declared move → `Sound:` → `End frame:`; target ≤3,200,
-hard 3,500 characters, English). Language and dialogue routes:
-`../seedance-prompt-en/seedance-shared-contract.md`. 2.5 adds only: the selected
-provider mode (Reference / Keyframe / Edit / Extend) recorded in the package,
-and the anti-AI motion order above inside each shot section. Preprod shelves
-currently emit Seedance 2.0 settings; a 2.5 block needs an explicit user request
-and its own 2.5 package.
+On the Runway **Unlimited** (relaxed) tier, Seedance 2.5 generates at most
+**15 s** (user-confirmed 2026-11-07) and **720p** (1080p is credit-mode only on the visible Runway control, 2026-11-07). Unless the user says the job runs on paid
+credits, plan 2.5 blocks at 15 s and spend 2.5's strengths on structure,
+reference depth and staging, not on length.
 
-Use positive proof constraints first. Add a short forbidden clause only for a
-known high-risk failure that cannot be stated positively. Never paste workflow
-terms, file paths, hashes, package keys, safety notes, or critic commentary into
-the model-facing prompt.
+### Long-take planning (why 2.5)
+
+Use the 30 s ceiling to keep one emotional scene in one source instead of
+stitching 15 s fragments: one location, one light state, 3–5 beats with a
+quiet hold between them. Do not fill 30 s just because it is allowed; unrelated
+places stay in separate sources. A good 2.5 block reads as a short scene:
+establish (often a no-person environment or object insert) → approach →
+the one decisive gesture → reaction → held end frame.
+
+### Hand-drawn / restrained-acting lessons (user feedback 2026-11-06)
+
+- Prefer small acting: a head turn, a hand pause, a slow walk. No running,
+  leaping, grabbing or chase energy unless the brief demands it.
+- Every block carries at least one **no-person shot**: environment, weather,
+  an object holding the story (a card, a flower, a leaf), or a reflection.
+  These breathe and make the background part of the story.
+- Avoid stock symbols the user rejected: closing elevator doors, ribbon
+  "votes", hand-over-and-run beats. Show choices through objects placed or
+  withheld.
+- Korean places read Korean: utility poles and wires, shop awnings, apartment
+  blocks, bus shelters; never a European street.
+- No legible text anywhere: signs, buses, packaging and screens stay blank
+  shapes or face away.
 
 ## Package and critic gate
 
@@ -152,6 +193,8 @@ Before handoff, reject the package if any answer is “no”:
 - For 2D/stylized work, are pose timing and line/style stability stated rather
   than replaced with “smooth/high quality” adjectives?
 - Do all timestamp intervals fit the locked duration without overlap or gaps?
+- Are References, Summary, timed shots with SFX, Sound, Consistency and End frame all present, in that order?
+- Does the block contain at least one no-person or object shot, and is the acting restrained?
 - Does the package explicitly name Seedance 2.5 and the selected mode?
 
 On a failed generated clip, diagnose the failure class and change one primary
