@@ -3,23 +3,20 @@
 Canonical source for the user's video workflow. Project/media data stays outside
 this repository. Active rules are latest-only; history belongs to Git/archive.
 
-## 실행 모델
+## 실행 모델 (v5)
 
-기본은 **현재 대화의 한 작업자**가 아래 역할을 순차 수행한다. 역할 변경은
-새 에이전트 생성이나 자동 모델 변경을 뜻하지 않는다.
+디렉터는 **메인 스레드**(Claude Code 또는 Codex 대화)다. 사용자 확인과 진행 판단만
+하고, 각 레인은 `video-codex-runtime dispatch`로 새 Codex 세션에서 돌려
+`session_result.json`만 읽는다. Seedance 제작은 `video-codex-runtime produce`
+(백그라운드 실행, 종료코드로 보고)가 표준이다. 머신 전체 동시 실행은 브라우저 레인 1 +
+로컬 레인 1. 자세한 규칙은 `runtime/AGENTS.md`.
 
 `Director → Music Lock → Planner → Image → Image QC → Seedance prompting →
 Seedance production → Seedance QC → Package`
 
-편집(Editor/CapCut) lane은 2026-10-16 퇴역했다. Package는 QC 승인 클립을 순서대로 납품한다.
-
-- `prepare-image-batch`는 내장 imagegen용 hash-bound 목록만 만들며 숨은 Codex 작업/API 전환은 없다.
-- 별도 dispatch는 해당 spawn을 사용자가 명시 승인했을 때만 사용하는 호환 경로.
-- 이미지 실행만 불변 1-cut prompt당 최대 3개의 bounded non-agent process 허용.
-- No-I2V는 새 팀이 아니라 승인된 재사용 reference를 최소로 쓰는 생성 모드.
-- 프로젝트별 media/registry와 승인/제출 안전은 runtime AGENTS.md가 소유한다.
-- v4 조회 명령은 자동 정리를 실행하지 않는다. 승인 게이트를 통과한 lane dispatch 경로의 기존
-  24시간 정리와 명시적 정리 명령만 해당 정책을 따른다. 미디어 이관은 별도 요청.
+- 편집(Editor/CapCut) lane은 퇴역했다. Package는 QC 승인 클립을 순서대로 납품한다.
+- No-I2V(기본)는 새 팀이 아니라 컷별 시작프레임 없이 재사용 reference만 쓰는 생성 모드.
+- 프로젝트별 media/registry와 승인/제출 안전은 `runtime/AGENTS.md`가 소유한다.
 
 ## 권위
 

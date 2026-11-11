@@ -20,6 +20,7 @@ When all blocks are locked, show the user every `prompt.txt` (one per block) and
 then `preprod shelf-release --blocks ALL_LOCKED --approval-quote "<user's words>"`.
 
 ## P5 — Production (copy-paste only)
+The director normally launches this through `video-codex-runtime produce`; you are one of its sessions and handle the blocks it names.
 Read `~/.codex/skills/seedance-prompt-en/production-card.md` and nothing else first: per block one
 `runway_ui_helper.py run-block --project <p> --block-id <B>` (attach from Uploads, settings, paste,
 preflight), then one Generate click. The numbered steps below are what run-block does.

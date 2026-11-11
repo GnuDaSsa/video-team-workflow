@@ -88,7 +88,7 @@ No background observer or extra browser owner is started.
 | ATTACH | each expected modality/token mapped to approved asset; enlarged visible thumbnail verified |
 | PROMPT | unique visible Lexical editor; matching text is a no-write success, otherwise empty before one paste; no visible dialog; NFC content/hash equality |
 | SETTINGS | fresh closed model/mode/time/ratio/audio/resolution where exposed, matched to current pack |
-| GENERATE | eight-check preflight; exactly one visible Generate control; one click; apply the successive-click position rule in `production-card.md` § Per block |
+| GENERATE | eight-check preflight; exactly one visible Generate control; one click |
 | ACCEPT | matching newly accepted provider card/output; evidence distinguishes old cards |
 | HARVEST | matching file, bytes/hash/ffprobe/registry before processed acknowledgement |
 

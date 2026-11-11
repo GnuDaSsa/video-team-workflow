@@ -235,9 +235,8 @@ class AdditionalSafetyTests(unittest.TestCase):
             self.assertFalse(result['batches'][0][0]['attachment_verified_by_generator'])
 
     def test_retired_image_runner_cannot_hide_api_fallback(self):
-        s=(ROOT/'runtime/scripts/image_creator_lane_runner.py').read_text()
-        self.assertNotIn('subprocess',s);self.assertNotIn('thread/start',s)
-        self.assertIn('USE_CURRENT_OWNER_BUILTIN_IMAGEGEN',s)
+        # 2026-11-11: the retired compatibility stub itself is gone (listed in video_release.RETIRED)
+        self.assertFalse((ROOT/'runtime/scripts/image_creator_lane_runner.py').exists())
 
     def test_release_retires_dangling_legacy_image_symlink(self):
         with tempfile.TemporaryDirectory() as td:

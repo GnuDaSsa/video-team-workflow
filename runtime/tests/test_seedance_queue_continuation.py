@@ -131,7 +131,7 @@ class SeedanceQueueContinuationTests(unittest.TestCase):
         contract = helper.build_resume_contract(self.project)
 
         self.assertEqual(contract['snapshot']['layout'], 'legacy')
-        self.assertEqual(contract['delay_seconds'], 900)
+        self.assertEqual(contract['delay_seconds'], 180)
         self.assertEqual(contract['snapshot']['attested_prompt_count'], 1)
         self.assertEqual(
             helper.resume_contract_path(self.project),
@@ -296,7 +296,7 @@ class SeedanceQueueContinuationTests(unittest.TestCase):
         result = helper.run_bounded_queue_wake(
             self.project, sleeper=observed_delays.append)
 
-        self.assertEqual(observed_delays, [900])
+        self.assertEqual(observed_delays, [180])
         self.assertEqual(result['verdict'], 'WAIT_ELAPSED_RECHECK_BOARD_NOW')
         runtime = json.loads(helper.queue_runtime_path(self.project).read_text())
         self.assertFalse(runtime['wake']['pending'])
@@ -407,7 +407,7 @@ class SeedanceQueueContinuationTests(unittest.TestCase):
             sleeper=observed_delays.append,
         )
         self.assertTrue(result['wait_started'])
-        self.assertEqual(observed_delays, [900])
+        self.assertEqual(observed_delays, [180])
         self.assertEqual(result['verdict'], 'WAIT_ELAPSED_RECHECK_BOARD_NOW')
 
         observed_delays.clear()
@@ -423,7 +423,7 @@ class SeedanceQueueContinuationTests(unittest.TestCase):
             sleeper=observed_delays.append,
         )
         self.assertTrue(result['wait_started'])
-        self.assertEqual(observed_delays, [900])
+        self.assertEqual(observed_delays, [180])
 
     def test_status_attested_blocks_cannot_be_hidden_as_all_blocked(self) -> None:
         status_path = self.project / 'i2v' / 'seedance' / 'status.json'

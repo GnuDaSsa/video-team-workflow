@@ -58,3 +58,13 @@ before promoting it as a quality rule.
 Do not append boilerplate such as `no sudden cuts`, `no exaggerated camera
 movement`, `no camera drift`. Keep only role-specific locks — face, crop,
 hand/product contact, text/logo. General defects are caught in QC.
+
+## User-rejected patterns (both versions; enforced by `prompt_lint.py`, warnings)
+
+- Real skin and camera texture (pores, 35mm, grain); never "smooth/flawless skin".
+- Text-bearing props (lab coat, beaker, labels, signage, cards, panels, logos) draw fake text even under "no text": leave them out or write them bare and blank. Do not describe screen content or mention screens; frame so no screen shows. No unrequested titles, captions or place labels.
+- A nasal feeding tube needs "not an oxygen cannula", one fixed side, and a sheet that shows it.
+- Korean sites read Korean (Korean staff, poles, awnings, apartments); no foreign-office stock scenes.
+- No START_FRAME or style-frame refs. Location refs: no story props, no paper margin, full-bleed.
+- Small acting (head turn, hand pause, slow walk); every block has a no-person shot; no elevator-door or ribbon-vote cliches.
+- Scenes follow the approved line literally (`copy_line`); no nature x AI metaphors.

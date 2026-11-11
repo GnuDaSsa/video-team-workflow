@@ -131,9 +131,9 @@ exclude gray background, panel seams and (for the headless default) the missing
 head. No QC-passed triptych or derivative → `BLOCKED_NO_PROVIDER_SAFE_SHEET`.
 Spec: `runtime/references/character_sheet_prompt_standard.md`.
 
-- `standard_i2v`: attach styleframe(s) + the minimum identity asset; the
-  styleframe carries the scene.
-- `no_i2v_reference_native`: no per-cut frame; minimum reusable
+- `standard_i2v` (only when the user explicitly requests it): attach
+  styleframe(s) + the minimum identity asset; the styleframe carries the scene.
+- `no_i2v_reference_native` (default): no per-cut frame; minimum reusable
   identity/environment refs; the prompt carries composition, blocking, action,
   camera, atmosphere and timing.
 

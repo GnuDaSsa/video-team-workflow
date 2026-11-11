@@ -130,6 +130,7 @@ HUMAN_ACTION_INCIDENTS = {
     'CAPTCHA_REQUIRED',
     'PAYMENT_REQUIRED',
     'ACCOUNT_LIMIT',
+    'ACCOUNT_WARNING',
     'ASIDE_FILE_UPLOAD_ACCESS_REQUIRED',
     'OS_PERMISSION_REQUIRED',
 }
@@ -205,6 +206,177 @@ TARGET_APP = resolve_target_app()
 def browser_js(js: str) -> tuple[int, str, str]:
     """CLI/repl only; rejects missing binding or session drift before DOM access."""
     return aside_bridge.browser_js(js)
+
+
+# --- account-warning hold ----------------------------------------------------
+# Runway has twice shown an automation / account-suspension warning ("Are you
+# using an autoclicker?"). The rule: stop everything, never click, attach or
+# retry, and resume only after the user confirms. This is detection + stop only;
+# it never dismisses, hides or works around the warning.
+
+DEFAULT_PROVIDER_HOLD = '/Users/gnudas/Documents/Codex/video-team-runtime/PROVIDER_HOLD.json'
+ACCOUNT_WARNING_EXIT = 5
+PROVIDER_HOLD_EXIT = 6
+
+_WARN_STRONG = re.compile(
+    r"auto[\s\-]?click(?:er|ers|ing|s)?"
+    r"|자동\s*클릭"
+    r"|unusual\s+(?:activity|traffic)|suspicious\s+(?:activity|behaviou?r)"
+    r"|비정상(?:적)?(?:인)?\s*(?:활동|접근|트래픽)|의심스러운\s*(?:활동|접근)"
+    r"|captcha|verify\s+(?:that\s+)?you(?:'re|\s+are)\s+(?:a\s+)?human|로봇이\s*아닙니다|사람임을\s*확인",
+    re.I)
+_WARN_AUTOMATION = re.compile(r"\bautomated\b|\bautomation\b|자동화", re.I)
+_WARN_PENALTY = re.compile(
+    r"suspen(?:d|ded|sion)|\bban(?:ned)?\b|violat\w+|terms\s+of\s+(?:service|use)"
+    r"|계정\s*정지|이용\s*정지|이용\s*제한|차단|위반|약관", re.I)
+_WARN_ACCOUNT = re.compile(r"\baccount\b|계정", re.I)
+_WARN_ACCOUNT_PENALTY = re.compile(
+    r"suspen(?:d|ded|sion)|\bban(?:ned)?\b|정지|차단|이용\s*제한", re.I)
+
+
+def _warning_snippet(text: str, start: int, end: int) -> str:
+    return text[max(0, start - 80):min(len(text), end + 80)].strip()[:200]
+
+
+def detect_account_warning(page_text: str | None, dialog_text: str | None = None) -> str | None:
+    """Return a short evidence snippet for an automation / account warning, else None.
+
+    Strong phrases (autoclicker, unusual activity, captcha ...) match anywhere in the page text.
+    Weak combinations (automation word + sanction word, account + suspend) are only trusted
+    inside dialog/alert/toast text, never in page body text such as old job-card prompts."""
+    page_text = unicodedata.normalize('NFC', str(page_text or ''))
+    dialog_text = unicodedata.normalize('NFC', str(dialog_text or ''))
+    for text in (dialog_text, page_text):
+        m = _WARN_STRONG.search(text)
+        if m:
+            return _warning_snippet(text, m.start(), m.end())
+    for first, second, span in ((_WARN_AUTOMATION, _WARN_PENALTY, 90), (_WARN_ACCOUNT, _WARN_ACCOUNT_PENALTY, 60)):
+        for m in first.finditer(dialog_text):
+            window = dialog_text[max(0, m.start() - span):m.end() + span]
+            if second.search(window):
+                return _warning_snippet(dialog_text, m.start(), m.end())
+    return None
+
+
+def provider_hold_path() -> Path:
+    return Path(os.environ.get('VIDEO_TEAM_PROVIDER_HOLD') or DEFAULT_PROVIDER_HOLD).expanduser()
+
+
+def read_provider_hold() -> dict | None:
+    path = provider_hold_path()
+    if not path.exists():
+        return None
+    try:
+        value = json.loads(path.read_text(encoding='utf-8'))
+        return value if isinstance(value, dict) else {'reason': 'UNREADABLE_HOLD_FILE'}
+    except (OSError, ValueError):
+        return {'reason': 'UNREADABLE_HOLD_FILE'}
+
+
+def write_provider_hold(evidence_text: str, project=None, block=None, reason: str = 'ACCOUNT_WARNING') -> dict:
+    """Atomic tmp+os.replace. An existing hold is kept untouched (first evidence wins)."""
+    existing = read_provider_hold()
+    if existing is not None:
+        return existing
+    path = provider_hold_path()
+    doc = {'held_at': dt.datetime.now().astimezone().isoformat(timespec='seconds'),
+           'reason': reason,
+           'project': str(project) if project else None,
+           'block': str(block) if block else None,
+           'evidence': (evidence_text or '')[:200]}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(path.name + f'.tmp{os.getpid()}')
+    tmp.write_text(json.dumps(doc, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    os.replace(tmp, path)
+    return doc
+
+
+# Visible text only: skips hidden nodes and the prompt editor (our own prompt is not a warning).
+WARNING_TEXT_JS = r"""(() => {
+  const vis = el => el && el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden' && getComputedStyle(el).display !== 'none';
+  const dsel = '[role=dialog],[role=alertdialog],[role=alert],[aria-live],[aria-modal=true],dialog[open],[data-sonner-toast],[class*=toast i],[class*=Toast],[class*=modal i],[class*=banner i]';
+  const dialog = [...document.querySelectorAll(dsel)].filter(vis).map(e => (e.innerText || '').slice(0, 3000)).join('\n');
+  const out = [];
+  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let n, size = 0;
+  while ((n = w.nextNode()) && size < 60000) {
+    const t = (n.nodeValue || '').trim();
+    if (!t) continue;
+    const el = n.parentElement;
+    if (!el || el.closest('[contenteditable],script,style,noscript,textarea') || !vis(el)) continue;
+    out.push(t); size += t.length + 1;
+  }
+  return JSON.stringify({dialog_text: dialog, page_text: out.join('\n')});
+})()"""
+
+
+def parse_warning_payload(raw) -> tuple[str, str]:
+    """(page_text, dialog_text) from WARNING_TEXT_JS output; a plain string counts as page text."""
+    if isinstance(raw, dict):
+        return str(raw.get('page_text') or ''), str(raw.get('dialog_text') or '')
+    try:
+        value = json.loads(raw) if isinstance(raw, str) else None
+    except ValueError:
+        value = None
+    if isinstance(value, dict) and ('page_text' in value or 'dialog_text' in value):
+        return str(value.get('page_text') or ''), str(value.get('dialog_text') or '')
+    return str(raw or ''), ''
+
+
+def account_warning_result(evidence_text: str, project=None, block=None, where: str = '') -> dict:
+    hold = write_provider_hold(evidence_text, project, block)
+    incident = None
+    if project and block:
+        try:
+            state = record_recovery_incident(Path(project), str(block), 'ACCOUNT_WARNING', detail=(evidence_text or '')[:200])
+            incident = {'status': state.get('status'), 'next_action': state.get('next_action')}
+        except (OSError, ValueError, KeyError):
+            incident = {'status': 'NOT_RECORDED'}
+    return {'ok': False, 'reason_code': 'ACCOUNT_WARNING', 'incident': 'ACCOUNT_WARNING',
+            'where': where, 'evidence': (evidence_text or '')[:200], 'hold_file': str(provider_hold_path()),
+            'held_at': hold.get('held_at'), 'recovery': incident,
+            'next_action': 'STOP: no click, attach or retry. Tell the user; resume only after their confirmation.'}
+
+
+def scan_page_for_warning(project=None, block=None, where: str = '') -> dict | None:
+    """Read the bound tab's visible text and stop on a warning. None = nothing found
+    (also when the page cannot be read: the caller's own step fails on that)."""
+    rc, out, _err = browser_js(WARNING_TEXT_JS)
+    if rc != 0:
+        return None
+    found = detect_account_warning(*parse_warning_payload(out))
+    if not found:
+        return None
+    return account_warning_result(found, project, block, where)
+
+
+def provider_hold_result(hold: dict) -> dict:
+    return {'ok': False, 'reason_code': 'PROVIDER_HOLD', 'hold_file': str(provider_hold_path()),
+            'hold': hold, 'next_action': 'Do nothing in the browser. Ask the user; the hold is cleared only by '
+                                         '`video-codex-runtime hold --clear` after their confirmation.'}
+
+
+def guard_page(args, where: str) -> int | None:
+    """CLI guard: return an exit code (after printing JSON) when held or a warning is visible."""
+    hold = read_provider_hold()
+    if hold is not None:
+        print(json.dumps(provider_hold_result(hold), ensure_ascii=False, indent=2))
+        return PROVIDER_HOLD_EXIT
+    project = getattr(args, 'project', None)
+    block = getattr(args, 'block_id', None) or getattr(args, 'block', None)
+    result = scan_page_for_warning(project, block, where)
+    if result:
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return ACCOUNT_WARNING_EXIT
+    return None
+
+
+def cmd_warning_scan(args) -> int:
+    rc = guard_page(args, 'warning-scan')
+    if rc is not None:
+        return rc
+    print(json.dumps({'ok': True, 'warning': None}))
+    return 0
 
 
 # --- input-method guard ----------------------------------------------------
@@ -891,6 +1063,7 @@ def _human_action_for_incident(incident: str) -> str:
         'CAPTCHA_REQUIRED': '같은 Aside Runway 탭의 CAPTCHA를 직접 완료한 뒤 “완료”라고 알려 달라.',
         'PAYMENT_REQUIRED': '결제 또는 크레딧 변경은 자동 수행하지 않는다. 원하는 처리 방향을 명시해 달라.',
         'ACCOUNT_LIMIT': 'Runway 계정 제한 화면을 확인·해제한 뒤 같은 세션을 유지하고 “제한 해제”라고 알려 달라.',
+        'ACCOUNT_WARNING': 'Runway 자동화/계정 정지 경고가 떴다. 모든 디스패치는 PROVIDER_HOLD로 중단됐다. 경고를 직접 확인·닫고 재개 여부를 알려 달라(video-codex-runtime hold --clear는 사용자 확인 후에만).',
         'ASIDE_FILE_UPLOAD_ACCESS_REQUIRED': 'Aside에서 Runway 파일 업로드 권한을 허용한 뒤 “파일 접근 켬”이라고 알려 달라.',
         'OS_PERMISSION_REQUIRED': 'macOS가 요청한 Aside/Computer Use 파일·접근성 권한을 허용한 뒤 “권한 허용”이라고 알려 달라.',
     }
@@ -1106,18 +1279,31 @@ def cmd_runway_library(args) -> int:
 
 
 def cmd_run_block(args) -> int:
+    _g = guard_page(args, 'run-block (start)')
+    if _g is not None:
+        return _g
     import run_block
     result = run_block.run(Path(args.project), args.block_id, start=args.start, from_slot=args.from_slot)
     print(json.dumps(result, ensure_ascii=False, indent=2, default=str))
+    if result.get('reason_code') == 'ACCOUNT_WARNING':
+        return ACCOUNT_WARNING_EXIT
+    if result.get('reason_code') == 'PROVIDER_HOLD':
+        return PROVIDER_HOLD_EXIT
     return 0 if result.get('ok') else 1
 
 
 def cmd_record_generate(args) -> int:
     import run_block
+    # Post-Generate confirmation read: a warning right after the click must stop everything.
+    # Bookkeeping of the already-clicked job still happens; then the run stops with ACCOUNT_WARNING.
+    warning = scan_page_for_warning(args.project, args.block_id, 'record-generate (after Generate)')
     try:
         result = run_block.record_generate(Path(args.project), args.block_id, args.state, args.clicked_at or '')
     except run_block.Stop as stop:
         result = {'ok': False, 'stop': stop.code, 'detail': stop.detail, 'next_action': stop.next_action}
+    if warning:
+        print(json.dumps({**warning, 'recorded': result}, ensure_ascii=False, indent=2, default=str))
+        return ACCOUNT_WARNING_EXIT
     print(json.dumps(result, ensure_ascii=False, indent=2, default=str))
     return 0 if result.get('ok') else 1
 
@@ -1316,10 +1502,16 @@ def cmd_frontmost(args) -> int:
 
 
 def cmd_escape(args) -> int:
+    _g = guard_page(args, 'escape')
+    if _g is not None:
+        return _g
     return run_verified(args, 'ESC', 'tell application "System Events" to key code 53')
 
 
 def cmd_picker_go(args) -> int:
+    _g = guard_page(args, 'picker-go (before attach)')
+    if _g is not None:
+        return _g
     path = str(Path(args.path).expanduser())
     pre = f'set the clipboard to {json.dumps(path)}\n'
     tail = f'''
@@ -1343,6 +1535,9 @@ end tell
 
 
 def cmd_picker_select(args) -> int:
+    _g = guard_page(args, 'picker-select (before attach)')
+    if _g is not None:
+        return _g
     """Select one visible helper alias via AX, without keyboard/IME events."""
     path = Path(os.path.abspath(Path(args.path).expanduser()))
     if (not _inside_bundle_root(path, Path(os.path.abspath(UPLOAD_ALIAS_ROOT)))
@@ -1506,6 +1701,9 @@ def shelf_paste_error(prompt_path: Path, pack: str | None) -> str:
 
 
 def cmd_paste_prompt(args) -> int:
+    _g = guard_page(args, 'paste-prompt (before attach/prompt)')
+    if _g is not None:
+        return _g
     """Insert prompt text without any keystroke.
 
     The prompt box is a Lexical editor: execCommand and DOM writes are ignored,
@@ -2926,6 +3124,9 @@ def cmd_queue_mode(args) -> int:
 
 
 def cmd_queue_cycle(args) -> int:
+    _g = guard_page(args, 'queue-cycle (board re-read)')
+    if _g is not None:
+        return _g
     try:
         jobs = [parse_queue_job(value) for value in (args.job or [])]
         result = run_queue_cycle(
@@ -2998,6 +3199,9 @@ def clear_settings_reverify(project: Path, block_id: str, result: dict) -> None:
 
 
 def cmd_settings_verify(args) -> int:
+    _g = guard_page(args, 'settings-verify (before Generate)')
+    if _g is not None:
+        return _g
     try:
         aside_bridge.require_project(Path(args.project))
         rc, _out, err = browser_js('true')
@@ -3024,11 +3228,17 @@ def cmd_settings_verify(args) -> int:
 
 
 def cmd_queue_wait(args) -> int:
+    _g = guard_page(args, 'queue-wait (board re-read)')
+    if _g is not None:
+        return _g
     try:
         result = run_bounded_queue_wake(Path(args.project))
     except ValueError as exc:
         print(json.dumps({'ok': False, 'error': str(exc)}, ensure_ascii=False))
         return 1
+    _g = guard_page(args, 'queue-wait (after wake)')
+    if _g is not None:
+        return _g
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 
@@ -3255,12 +3465,18 @@ def cmd_queue_doctor(args) -> int:
 
 
 def cmd_check_generate(args) -> int:
+    _g = guard_page(args, 'check-generate (before Generate)')
+    if _g is not None:
+        return _g
     st = read_generate_state()
     evidence(args, 'check-generate', 'read visible button color via CSS', json.dumps(st, ensure_ascii=False), st['verdict'])
     return 0 if st['verdict'] == 'BLUE_ENABLED' else 1
 
 
 def cmd_recover(args) -> int:
+    _g = guard_page(args, 'recover')
+    if _g is not None:
+        return _g
     rc1 = cmd_escape(args)
     rc, out, _ = osa('tell application "System Events" to name of first application process whose frontmost is true')
     evidence(args, 'recover', 'ESC sent, frontmost reported', f'frontmost={out}', 'RECOVERY_STEP_DONE')
@@ -3459,6 +3675,9 @@ def main() -> int:
     p.add_argument('--write')
     p.set_defaults(fn=cmd_resume_contract)
     sub.add_parser('check-generate').set_defaults(fn=cmd_check_generate)
+    p = sub.add_parser('warning-scan', help='read visible page text; stop with ACCOUNT_WARNING (exit 5) or PROVIDER_HOLD (exit 6)')
+    p.add_argument('--project'); p.add_argument('--block-id')
+    p.set_defaults(fn=cmd_warning_scan)
     sub.add_parser('recover').set_defaults(fn=cmd_recover)
     args = ap.parse_args()
     _adopt_project_generation_model(args)

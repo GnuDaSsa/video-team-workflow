@@ -74,6 +74,9 @@ for _name in dir(_shared):
     if not _name.startswith('__'):
         globals()[_name] = getattr(_shared, _name)
 
+# Account-warning detection/HOLD (detect_account_warning, guard_page, warning-scan, PROVIDER_HOLD)
+# lives once in the shared helper and is inherited by the copy loop above.
+
 # Expose a correctly named public guard while preserving the shared helper's
 # legacy symbol for its internal dynamic lookups.
 require_seedance_25 = _require_seedance_25

@@ -25,6 +25,7 @@ import unicodedata
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import generation_settings  # noqa: E402
 import media_registry  # noqa: E402
+import prompt_lint  # noqa: E402
 import prompt_packet_utils  # noqa: E402
 
 SCHEMA = 'preprod_v1'
@@ -591,6 +592,45 @@ def validate_shelf_prompt(project: Path, block_id: str) -> list[str]:
     return e
 
 
+def _lint_rows(rows: list[dict], where: str) -> list[dict]:
+    return [{**row, 'where': where} for row in rows]
+
+
+def lint_warnings(project: Path, stage: str, block_id: str = '') -> list[dict]:
+    """Advisory prompt_lint + copy_line findings (never an error, never blocks a lock).
+    Block/reference `lint_allow: [rule_id]` opts out of a rule."""
+    out: list[dict] = []
+    if stage == 'shelf':
+        path = shelf_dir(project, block_id) / 'prompt.txt'
+        if path.is_file():
+            allow = (_block(project, block_id).get('lint_allow') or [])
+            out += _lint_rows(prompt_lint.lint(path.read_text(encoding='utf-8'), 'seedance_prompt', allow),
+                              f'shelf:{block_id}')
+    elif stage == 'storyboard':
+        for block in storyboard(project).get('blocks') or []:
+            allow = block.get('lint_allow') or []
+            for shot in block.get('shots') or []:
+                where = f'storyboard:{shot.get("shot_id")}'
+                if not str(shot.get('copy_line') or '').strip():
+                    out.append({'id': 'missing_copy_line', 'where': where, 'match': '',
+                                'reason': '숏마다 근거 대사/가사 copy_line 필요(대사 없는 인서트는 "(insert)")',
+                                'hint': 'fill copy_line with the approved line this shot shows literally',
+                                'source': 'scenes-follow-copy-literally.md'})
+                text = ' '.join(str(shot.get(k) or '') for k in ('composition', 'action', 'edit_out')) + ' ' \
+                    + ' '.join(map(str, shot.get('must_include') or []))
+                out += _lint_rows(prompt_lint.lint(text, 'storyboard', allow), where)
+            out += _lint_rows(prompt_lint.lint(str(block.get('end_frame') or ''), 'storyboard', allow),
+                              f'storyboard:{block.get("block_id")}.end_frame')
+    elif stage == 'images':
+        for item in image_plan(project).get('references') or []:
+            path = root(project) / '03_image_prompts' / f'{item.get("ref_id")}.prompt.txt'
+            if path.is_file():
+                out += _lint_rows(prompt_lint.lint(path.read_text(encoding='utf-8'), 'image_prompt',
+                                                   item.get('lint_allow') or [], item.get('purpose')),
+                                  f'images:{item.get("ref_id")}')
+    return out
+
+
 def build_pack(project: Path, block_id: str) -> Path:
     out = shelf_dir(project, block_id)
     block = _block(project, block_id)
@@ -632,6 +672,22 @@ def build_pack(project: Path, block_id: str) -> Path:
 SHELF_FILES = ('prompt.txt', 'settings.json', 'refs.json', 'pack.json')
 
 
+def block_input_digest(project: Path, block_id: str) -> str:
+    """Hash of exactly what write_shelf_brief reads for this block. A shelf lock bound to it survives a
+    storyboard/images relock that did not touch this block (new-lover: 82% of 84 shelf relocks came from
+    an upstream hash change, 40% with an unchanged prompt). Bible style/identity changes still count."""
+    block, b = _block(project, block_id), bible(project)
+    concept = read_json(stage_file(project, 'concept')) or {}
+    chars = {c.get('id'): c.get('identity_block_en') for c in b.get('characters') or []}
+    payload = {
+        'block': block, 'generation': (read_json(stage_file(project, 'storyboard')) or {}).get('generation'),
+        'style': b.get('style_block_en'), 'forbidden': b.get('forbidden_looks'), 'resolution': b.get('resolution'),
+        'identity': {c: chars.get(c) for c in block.get('cast') or []},
+        'aspect_ratio': concept.get('aspect_ratio'), 'tier': concept.get('generation_tier'),
+    }
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode('utf-8')).hexdigest()
+
+
 def lock_shelf(project: Path, block_id: str) -> dict:
     out = shelf_dir(project, block_id)
     if not (out / 'brief.md').is_file():
@@ -654,6 +710,7 @@ def lock_shelf(project: Path, block_id: str) -> dict:
         'files': {name: sha(out / name) for name in SHELF_FILES},
         'refs': {r['token']: r['sha256'] for r in (read_json(out / 'refs.json') or {})['references']},
         'storyboard_sha256': (read_json(lock_path(project, 'storyboard')) or {}).get('sha256'),
+        'block_input_sha256': block_input_digest(project, block_id),
         'images_sha256': (read_json(lock_path(project, 'images')) or {}).get('sha256'),
         'attestation': result['attestation'], 'prompt_chars': len(nfc((out / 'prompt.txt').read_text(encoding='utf-8'))),
         'released': None, 'locked_at': now(),
@@ -679,8 +736,15 @@ def verify_shelf(project: Path, block_id: str, *, require_release: bool = True) 
     for row in (read_json(out / 'refs.json') or {}).get('references') or []:
         path = Path(row['path'])
         _need(e, path.is_file() and sha(path) == row['sha256'], f'shelf_ref_missing_or_changed:{row["token"]}')
-    _need(e, lock.get('storyboard_sha256') == (read_json(lock_path(project, 'storyboard')) or {}).get('sha256'),
-          'shelf_storyboard_relocked_since_shelf_lock')
+    if lock.get('block_input_sha256'):
+        try:
+            current = block_input_digest(project, block_id)
+        except (KeyError, ValueError, TypeError):
+            current = None  # block removed from the storyboard
+        _need(e, lock['block_input_sha256'] == current, 'shelf_block_inputs_changed_since_shelf_lock')
+    else:  # locks made before 2026-11-11: whole-storyboard binding
+        _need(e, lock.get('storyboard_sha256') == (read_json(lock_path(project, 'storyboard')) or {}).get('sha256'),
+              'shelf_storyboard_relocked_since_shelf_lock')
     _need(e, lock_state(project, 'storyboard')['state'] == 'LOCKED', 'shelf_storyboard_not_locked')
     if require_release:
         _need(e, bool(lock.get('released')), 'shelf_not_released_by_user')
@@ -774,14 +838,15 @@ def main() -> int:
             out = {'ok': True, **status(project)}
         elif args.cmd == 'check':
             errors = VALIDATORS[args.stage](project)
-            out = {'ok': not errors, 'stage': args.stage, 'errors': errors}
+            out = {'ok': not errors, 'stage': args.stage, 'errors': errors,
+                   'lint_warnings': lint_warnings(project, args.stage)}
         elif args.cmd == 'lock':
             out = {'ok': True, 'lock': lock_stage(project, args.stage, args.approval_quote)}
         elif args.cmd == 'shelf-brief':
             out = {'ok': True, 'brief': str(write_shelf_brief(project, args.block))}
         elif args.cmd == 'shelf-check':
             errors = validate_shelf_prompt(project, args.block)
-            out = {'ok': not errors, 'errors': errors}
+            out = {'ok': not errors, 'errors': errors, 'lint_warnings': lint_warnings(project, 'shelf', args.block)}
         elif args.cmd == 'shelf-lock':
             out = {'ok': True, 'lock': lock_shelf(project, args.block)}
         elif args.cmd == 'shelf-verify':

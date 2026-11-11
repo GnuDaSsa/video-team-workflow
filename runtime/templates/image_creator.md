@@ -12,6 +12,7 @@ Role: authors and generates every reference image the storyboard needs, and noth
 5. When every reference has an approved `asset_id`, run `preprod check --stage images` then `preprod lock --stage images`.
 
 ## Rules
+- Location references: architecture and light only, no story props, no paper margin or border, full-bleed.
 - One reference = one prompt = one standalone image. No grids or contact sheets as production references.
 - Never generate without a required identity reference; never switch to an API fallback.
 - Retries: on Unlimited/free generation, up to 3 attempts per reference proceed without asking; after that return `PARTIAL` (director substitutes official/approved art), not `NEEDS_USER`.

@@ -26,13 +26,7 @@ account; the session gets only the free slots); never in the long director threa
    sets/checks settings, pastes the shelf prompt, settings-verify, preflight.
 2. `READY` → view the `enlarged_screenshot` of each slot once (identity and
    environment are the approved refs). Then click the single visible Generate
-   **once**. For successive independent submissions, vary the pointer position
-   within the verified Generate button: first near the G, next near the first e,
-   then continue to a different letter/position and cycle as needed. Keep the
-   point inside the same enabled button and use the authorized visible Aside
-   interaction; if precise positioning is unavailable, do not invent another
-   browser or bypass. This never authorizes an extra click or uncertain retry.
-   Confirm the matching new card (In queue / Generating). Then
+   **once**, and confirm the matching new card (In queue / Generating). Then
    `H record-generate --project <p> --block-id <B> --state IN_QUEUE|GENERATING` (bookkeeping only).
    No card after a short look → `H recovery-record --project <p> --block-id <B> --incident RUNWAY_UI_STALE`; never click twice.
 3. Next block. Do not re-read docs between blocks.
@@ -45,6 +39,7 @@ account; the session gets only the free slots); never in the long director threa
 | `SLOT_IMAGE_*`, `SLOT_NOT_FILLED_AFTER_SELECT` | Remove that slot, re-run `run-block` once; twice → treat as `SLOT_NEEDS_NATIVE_UPLOAD`. |
 | `SETTINGS_NEED_OPERATOR` | Set the listed controls by hand, then `run-block --start settings`. |
 | `TIER_NOT_AUTOMATABLE`, credit/payment prompt | Stop the batch; ask the user. Never spend credits. |
+| `ACCOUNT_WARNING`, `PROVIDER_HOLD` | Runway 경고/정지 문구가 보이면 클릭·첨부 없이 즉시 ACCOUNT_WARNING으로 중단. 경고를 닫거나 우회하지 말고 사용자에게 알린다; 재개는 사용자 확인 후 `video-codex-runtime hold --clear`로만. |
 | `SHELF_VERIFY_FAILED` | Stop that block; it goes back to P4. Never edit a released prompt. |
 | `ASIDE_*`, `ASSET_SELECTOR_NOT_OPENED` | `H recovery-record --project <p> --block-id <B> --incident ASIDE_CONTROL_UNAVAILABLE` and follow its rung, then re-run. |
 | `PREFLIGHT_FAILED` | Fix only the listed item, `run-block --start preflight`. |

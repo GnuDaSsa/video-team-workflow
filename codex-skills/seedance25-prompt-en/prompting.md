@@ -153,21 +153,6 @@ places stay in separate sources. A good 2.5 block reads as a short scene:
 establish (often a no-person environment or object insert) → approach →
 the one decisive gesture → reaction → held end frame.
 
-### Hand-drawn / restrained-acting lessons (user feedback 2026-11-06)
-
-- Prefer small acting: a head turn, a hand pause, a slow walk. No running,
-  leaping, grabbing or chase energy unless the brief demands it.
-- Every block carries at least one **no-person shot**: environment, weather,
-  an object holding the story (a card, a flower, a leaf), or a reflection.
-  These breathe and make the background part of the story.
-- Avoid stock symbols the user rejected: closing elevator doors, ribbon
-  "votes", hand-over-and-run beats. Show choices through objects placed or
-  withheld.
-- Korean places read Korean: utility poles and wires, shop awnings, apartment
-  blocks, bus shelters; never a European street.
-- No legible text anywhere: signs, buses, packaging and screens stay blank
-  shapes or face away.
-
 ## Package and critic gate
 
 The handoff package must include at least:

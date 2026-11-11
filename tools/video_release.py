@@ -19,9 +19,12 @@ RETIRED = [
     '.local/bin/video-image-cli',
     'Documents/Codex/video-team-runtime/runtime/scripts/codex_app_image_cli.py',
     *('Documents/Codex/video-team-runtime/runtime/scripts/' + n + '.py' for n in (
-        'sol_prompt_bridge', 'seedance_inflight_monitor', 'image_qc_lane_runner', 'image_qc_queue')),
+        'sol_prompt_bridge', 'seedance_inflight_monitor', 'image_qc_lane_runner', 'image_qc_queue',
+        'image_creator_lane_runner')),
     # 2026-10-16: editor lane retired; deployed-only dead scripts and backups.
     'Documents/Codex/video-team-runtime/runtime/templates/editor.md',
+    # 2026-11-11: deprecated visual alias template.
+    'Documents/Codex/video-team-runtime/runtime/templates/visual.md',
     *('Documents/Codex/video-team-runtime/runtime/scripts/' + n for n in (
         'video_image_cli.py', 'fable_prompt_bridge.py', 'seedance_prompt_rules.py', 'migrate_status_enum.py',
         'video_codex_runtime.py.deprecated_backup', 'video_codex_runtime.py.stub-backup')),

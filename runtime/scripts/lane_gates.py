@@ -223,7 +223,7 @@ def cycle_status(project: Path) -> dict:
         )
         valid_contract = (
             contract.get('contract_version') == RESUME_CONTRACT_VERSION
-            and contract.get('delay_seconds') == 900
+            and contract.get('delay_seconds') in (180, 900)  # helper WAKE 180 since 11-10; older contracts 900
             and contract.get('same_codex_task_only') is True
             and contract.get('same_runway_browser_only') is True
             and contract.get('continuation_mode') == 'FOREGROUND_TOOL_LONG_POLL_ONLY'

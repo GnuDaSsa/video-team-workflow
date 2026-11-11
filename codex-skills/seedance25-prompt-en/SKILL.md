@@ -38,7 +38,7 @@ shape and one-move-per-shot rule do not apply to 2.5. No length target
 (Runway accepts 10,000 characters). The files below are review lenses, not
 alternative templates:
 
-- `../seedance-prompt-en/seedance-field-lessons.md`
+- `../seedance-prompt-en/seedance-field-lessons.md` (includes the shared user-rejected patterns)
 - `../seedance-prompt-en/hell-grind-production-prompting-adapter.md`
 - `../seedance-prompt-en/xazinga-prompting-adapter.md`
 - `../seedance-prompt-en/blender-previs-prompting.md` — required for Blender/3D previs, animatics or source restyling; version-neutral, no 2.0 UI/model rules

@@ -40,7 +40,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/hell-grind-production-prompting-adapter.md",
       "target": ".codex/skills/seedance-prompt-en/hell-grind-production-prompting-adapter.md",
-      "sha256": "5b4015b4de4609361b9331dd32c0deb2da3e33c563860224aa51a878bfae3935"
+      "sha256": "efd0c7e48e0b8ed4e11fcbe7d056e1ef896d1a3de8e5535d627bc60be2bdcebd"
     },
     {
       "source": "codex-skills/seedance-prompt-en/image-qc-source-frame-standard.md",
@@ -55,7 +55,7 @@
     {
       "source": "codex-skills/seedance-prompt-en/production-card.md",
       "target": ".codex/skills/seedance-prompt-en/production-card.md",
-      "sha256": "21cfa7d816992d19504b18faab2af750b77280ff9155956a74f83662bc8ac06d"
+      "sha256": "a226304a52485b7fcef38ca810b4569fba4d672919386f32dc3ea7eaefdb5bc2"
     },
     {
       "source": "codex-skills/seedance-prompt-en/prompt-review.md",
@@ -70,17 +70,17 @@
     {
       "source": "codex-skills/seedance-prompt-en/scripts/run_block.py",
       "target": ".codex/skills/seedance-prompt-en/scripts/run_block.py",
-      "sha256": "f69e0dc35edadbe2add37dbfbb52ef4549a76f3beea9b05b1feeeb9e22d1211a"
+      "sha256": "b7a77d89a8f4ba6d5fc74a445d9d67d72abf99aa96d2ac0b63089ee243a275cf"
     },
     {
       "source": "codex-skills/seedance-prompt-en/scripts/runway_ui_helper.py",
       "target": ".codex/skills/seedance-prompt-en/scripts/runway_ui_helper.py",
-      "sha256": "379a922cd3aebcdc0702ab8296b9c9346b1361fc89455a47543f9395f8e52069"
+      "sha256": "28949f6fbb63556b9066d9a697f23d1cfe97c442e67d739e713cc39f1d23920f"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-field-lessons.md",
       "target": ".codex/skills/seedance-prompt-en/seedance-field-lessons.md",
-      "sha256": "69a25f39e28ff59e884b4d808a930e593177aab543a5b90921749cc32b00d9c8"
+      "sha256": "9f8d49818173cf2fba3503da208505178ee050503130dd33b20d3f579de6aedc"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-production.md",
@@ -90,12 +90,12 @@
     {
       "source": "codex-skills/seedance-prompt-en/seedance-prompting.md",
       "target": ".codex/skills/seedance-prompt-en/seedance-prompting.md",
-      "sha256": "a309bf2e1d0f166315fa70ef8f2b7402fd1464b14a7bb2c6d54f081bd5099cea"
+      "sha256": "08c7de828744e42547a69c631da9763ee8267da0a9ea81c50a01f58f381068a6"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance-shared-contract.md",
       "target": ".codex/skills/seedance-prompt-en/seedance-shared-contract.md",
-      "sha256": "9e2db1b39bb7c7df4d3f04aa2bc257c21c068b2b7821f576a136e5b99010bcc3"
+      "sha256": "3a245cade21b360ac89f57429ec9673591030453ca9c0008dea388602b7711d1"
     },
     {
       "source": "codex-skills/seedance-prompt-en/seedance2-prompt-patterns.md",
@@ -110,7 +110,7 @@
     {
       "source": "codex-skills/seedance25-prompt-en/SKILL.md",
       "target": ".codex/skills/seedance25-prompt-en/SKILL.md",
-      "sha256": "62a137907a099906d8dfbba5dc4238db8e1c2425c705c1e815c8db6f965e20ec"
+      "sha256": "b50ad0e452704f91ed325f9e59b29261bfbace49c104f35b0f6e266287390cdf"
     },
     {
       "source": "codex-skills/seedance25-prompt-en/agents/openai.yaml",
@@ -125,17 +125,17 @@
     {
       "source": "codex-skills/seedance25-prompt-en/prompting.md",
       "target": ".codex/skills/seedance25-prompt-en/prompting.md",
-      "sha256": "37dbed8d8a3fcebf189df22e08039ddd7b6d6de620c63131428eaffaf88b2d03"
+      "sha256": "c0de544cb7515afb5c1e740c2d9e8a82739d309135ce7f2e10c6d4f08a683a59"
     },
     {
       "source": "codex-skills/seedance25-prompt-en/scripts/runway_ui_helper.py",
       "target": ".codex/skills/seedance25-prompt-en/scripts/runway_ui_helper.py",
-      "sha256": "995995fe50f99ad02146360701572dd6e56bcd4d4202ec44f89bc0064819a485"
+      "sha256": "0dcf73cef47bf3acc9dca1c9e3126947f033b18f8f62d2b0b2b4a449cd4d64b1"
     },
     {
       "source": "codex-skills/videodirector/SKILL.md",
       "target": ".codex/skills/videodirector/SKILL.md",
-      "sha256": "ffd79eead03bb729081e0117560fd9f62834daa60ae7acd56c0f06a9e6467e2d"
+      "sha256": "46aa6427702661ff9594064f56632d391ebdfa23f40646bdeeeae799b5bdbaed"
     },
     {
       "source": "codex-skills/videodirector/agents/openai.yaml",
@@ -170,7 +170,7 @@
     {
       "source": "codex-skills/videodirector/references/mv-team-standing-memory-low-signal-and-hito-neko.md",
       "target": ".codex/skills/videodirector/references/mv-team-standing-memory-low-signal-and-hito-neko.md",
-      "sha256": "51875762c2057d92b96a7d8584dc16548696903596b0769f6794973a4a6443a0"
+      "sha256": "ab254f4cf8893367a78e0617ddf9f4ebfcccbc7abae1f373b4bed183b0d9c0ed"
     },
     {
       "source": "codex-skills/videodirector/references/output-formats.md",
@@ -210,7 +210,7 @@
     {
       "source": "runtime/scripts/claude_author.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/claude_author.py",
-      "sha256": "e6ab7341432e7e71210137bb3a23fd5c3be9d06e12c646c0673a776484a2088a"
+      "sha256": "1033d06c8b8c1dbdd15a07439c2a9de3effb6d87f7ffd9652a39487190de6fdd"
     },
     {
       "source": "runtime/scripts/disposable_video_qc.py",
@@ -220,17 +220,12 @@
     {
       "source": "runtime/scripts/generation_settings.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/generation_settings.py",
-      "sha256": "cf308fd7e44cbcf90522333540e037420df81ac81cb08b6fa069073ebfa5d0e7"
-    },
-    {
-      "source": "runtime/scripts/image_creator_lane_runner.py",
-      "target": "Documents/Codex/video-team-runtime/runtime/scripts/image_creator_lane_runner.py",
-      "sha256": "0f2ba7d7636999b0413c010513c14ba59c091fd0e778225c35d7b2a7ee949c21"
+      "sha256": "2dbd72316f3f960f7ce11c2339c965c126cb68ff05bf7bc7f794e2c05b1ab327"
     },
     {
       "source": "runtime/scripts/lane_gates.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/lane_gates.py",
-      "sha256": "eb936a54831cba0d3b4a1f55492afceb477983d356cc0caaaa5269ed3005a0f2"
+      "sha256": "de5892e606010aab52280e7db92b5c29a0b2c7f03d757063cd43684a7fb678ca"
     },
     {
       "source": "runtime/scripts/lane_inputs.py",
@@ -240,12 +235,12 @@
     {
       "source": "runtime/scripts/lane_sessions.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/lane_sessions.py",
-      "sha256": "bc329ccd0d7612d293d9d6ed495f95816245e64c9209f34da9e18befe2014c4e"
+      "sha256": "5ca69ca10fde86fd69f313ce700e3ac120b044a7c4137cc5b6c76e5950821b2b"
     },
     {
       "source": "runtime/scripts/media_registry.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/media_registry.py",
-      "sha256": "c42bc881c0a64aa5e8622f87b520e9f68c133d41401366532719b48aadc3723f"
+      "sha256": "b6122ce8e6644aa21d93d8dfe59d4612dc6d8c55d7e8b2d7c689a00150d0435c"
     },
     {
       "source": "runtime/scripts/model_routing.py",
@@ -255,7 +250,7 @@
     {
       "source": "runtime/scripts/preprod.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/preprod.py",
-      "sha256": "d7f2262dbf56afae793986296cc4a62227bd346e5b2ffe8f616332f73216b18b"
+      "sha256": "0d7c627feae7695be190dad6455522b6c4eca1f9ec60c8b3e1cee54291071d3e"
     },
     {
       "source": "runtime/scripts/project_sweep.py",
@@ -263,9 +258,14 @@
       "sha256": "373f1c3d46ef5cf6b9e45b83f18d8bd68aacee08c60070c6a1361d67901fa8ca"
     },
     {
+      "source": "runtime/scripts/prompt_lint.py",
+      "target": "Documents/Codex/video-team-runtime/runtime/scripts/prompt_lint.py",
+      "sha256": "71fed98eb67f3ba37ccc2f7fc3e784c79a35d18b91dd550f41a28a8aeb818b18"
+    },
+    {
       "source": "runtime/scripts/prompt_packet_utils.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/prompt_packet_utils.py",
-      "sha256": "4c23dac784054941325751d510656810811367e300fb17ddd72e160b1843511e"
+      "sha256": "ba4eed520084472941be54572a76e589222efeeeac97105fef8daa0c4050e401"
     },
     {
       "source": "runtime/scripts/runway_ui_helper.py",
@@ -290,7 +290,7 @@
     {
       "source": "runtime/scripts/video_codex_runtime.py",
       "target": "Documents/Codex/video-team-runtime/runtime/scripts/video_codex_runtime.py",
-      "sha256": "ee875f5a2b609f0bc6cae6e06ca9a1419e146eeaacaf393b6050f0ce4f1864a9"
+      "sha256": "06c5abbbbc2f81c85043ac6ca4d374f8da42f3f4cf6aaf70065a2891327d1cac"
     },
     {
       "source": "runtime/scripts/video_knowledge_router.py",
@@ -315,7 +315,7 @@
     {
       "source": "runtime/templates/image_creator.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/image_creator.md",
-      "sha256": "13f2fc4d2dff0484ef65ae61835f507f26d0a1035c209055295d5ce568a4e015"
+      "sha256": "edc0756d6f21b7914763ed6efee4d0f771c716ab019cd8357880463740efaacd"
     },
     {
       "source": "runtime/templates/image_qc.md",
@@ -335,7 +335,7 @@
     {
       "source": "runtime/templates/planner.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/planner.md",
-      "sha256": "d3d425834454d9ac3071dc051225f8d6b6de1da2a5f4055d594d2309d1559460"
+      "sha256": "c7f5726d3ad2ead79526168b44d5649f80cb5004e57f6e3df0d9b5da13ff44b7"
     },
     {
       "source": "runtime/templates/preprod/README.md",
@@ -375,7 +375,7 @@
     {
       "source": "runtime/templates/seedance.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/seedance.md",
-      "sha256": "dea4dd443543d604af74ff67f8cc409dde296ec40c691904a00d028ca9b802cb"
+      "sha256": "d5b42d6716ad5eb44634e3cf224cef06bbeb9920d93f1f9e6d247a903e5def51"
     },
     {
       "source": "runtime/templates/seedance_qc.md",
@@ -385,22 +385,17 @@
     {
       "source": "runtime/templates/shared_lane_contract.md",
       "target": "Documents/Codex/video-team-runtime/runtime/templates/shared_lane_contract.md",
-      "sha256": "53ad11088d5c6cad74522f46c1971948c98fad670f1955fc90d4cef194ce820c"
-    },
-    {
-      "source": "runtime/templates/visual.md",
-      "target": "Documents/Codex/video-team-runtime/runtime/templates/visual.md",
-      "sha256": "41e99c344ca4487752a39cf794123ecdbf6904d4465d7990e671c4a1ad8701d6"
+      "sha256": "3550e65e88d4a7ed4dfd90573973f140c33b347f3359297c62c26bb8f24a96ca"
     },
     {
       "source": "GLOBAL_AGENTS.md",
       "target": ".codex/AGENTS.md",
-      "sha256": "24045fd16b388ff12567d734db44ece01bc8fce8e3bfb0bf7dc3058ecde240b0"
+      "sha256": "a2a4b5c92595578aed1c3e310704c65cdfa4aa75e67089816f29c2ff5ae8c17a"
     },
     {
       "source": "runtime/AGENTS.md",
       "target": "Documents/Codex/video-team-runtime/AGENTS.md",
-      "sha256": "563338abf6e82ebb3a365901fa8b0b06a24ade728ed4dc7c2ba0af938732c0bb"
+      "sha256": "8babdcdc2498313326581b8537a2e54deff7564212db024819d8d4aa39ad6dc2"
     },
     {
       "source": "references/character_sheet_prompt_standard.md",
@@ -473,7 +468,9 @@
     "Documents/Codex/video-team-runtime/runtime/scripts/seedance_inflight_monitor.py",
     "Documents/Codex/video-team-runtime/runtime/scripts/image_qc_lane_runner.py",
     "Documents/Codex/video-team-runtime/runtime/scripts/image_qc_queue.py",
+    "Documents/Codex/video-team-runtime/runtime/scripts/image_creator_lane_runner.py",
     "Documents/Codex/video-team-runtime/runtime/templates/editor.md",
+    "Documents/Codex/video-team-runtime/runtime/templates/visual.md",
     "Documents/Codex/video-team-runtime/runtime/scripts/video_image_cli.py",
     "Documents/Codex/video-team-runtime/runtime/scripts/fable_prompt_bridge.py",
     "Documents/Codex/video-team-runtime/runtime/scripts/seedance_prompt_rules.py",

@@ -468,7 +468,7 @@ class RuntimeV4Tests(unittest.TestCase):
             encoding='utf-8')
         prompt_packet_utils.attest(pack_path, project)
         contract = runway_ui_helper.build_resume_contract(project)
-        self.assertEqual(contract['delay_seconds'], 900)
+        self.assertEqual(contract['delay_seconds'], 180)  # helper WAKE_DELAY_SECONDS: in-session DOM re-read only
         self.assertTrue(contract['same_codex_task_only'])
         self.assertTrue(contract['same_runway_browser_only'])
         self.assertEqual(contract['continuation_mode'], 'FOREGROUND_TOOL_LONG_POLL_ONLY')
@@ -638,7 +638,7 @@ class RuntimeV4Tests(unittest.TestCase):
         self.assertNotIn("sub.add_parser('watch-generate')", runway_source)
         self.assertNotIn("sub.add_parser('observer-instruction')", runway_source)
         self.assertNotIn('seedance-monitor-start', runtime_source)
-        self.assertNotIn("if lane.startswith('image_creator_')", runtime_source)
+        self.assertFalse((SCRIPTS / 'image_creator_lane_runner.py').exists())
         self.assertNotIn("if lane == 'image_qc'", runtime_source)
         self.assertIn("'image_prompts': 'owning image_creator lane", runtime_source)
 

@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import datetime as dt
+import fcntl
 import json
 import os
+import re
 from pathlib import Path
 import shlex
 import signal
@@ -106,8 +109,11 @@ def read(p: Path) -> str:
 
 
 def write_json(p: Path, obj) -> None:
+    # tmp + rename: a crash mid-write must never leave a truncated state/status/manifest file
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(obj, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    tmp = p.with_name(f'.{p.name}.{os.getpid()}.tmp')
+    tmp.write_text(json.dumps(obj, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    os.replace(tmp, p)
 
 
 def append_jsonl(p: Path, obj) -> None:
@@ -151,7 +157,7 @@ def expand_lanes(items: list[str]) -> list[str]:
 
 
 def init_project(args) -> None:
-    generation_mode = getattr(args, 'mode', STANDARD_I2V_MODE)
+    generation_mode = getattr(args, 'mode', NO_I2V_MODE)
     if generation_mode not in GENERATION_MODES:
         raise SystemExit(f'unknown generation mode {generation_mode}; valid={GENERATION_MODES}')
     slug = slugify(args.slug or args.brief[:40] or 'video-project')
@@ -543,9 +549,11 @@ def active_lane_owners(project: Path) -> list[dict]:
             continue
         if pid_running(pid) and not pid_reused(pid, pid_path):
             status = json.loads(read(project / 'lanes' / lane / 'status.json') or '{}')
+            route = json.loads(read(project / 'lanes' / lane / 'model_route.json') or '{}')
             owners.append({
                 'lane': lane, 'pid': pid,
                 'phase': status.get('dispatch_phase') or status.get('phase') or 'lane',
+                'route_key': route.get('route_key'),
                 'model': status.get('model'),
             })
     return owners
@@ -567,7 +575,40 @@ def codex_exec_inner(project: Path, prompt_path: Path, result_path: Path, route:
     )
 
 
+DISPATCH_LOCK = Path(os.environ.get('VIDEO_TEAM_DISPATCH_LOCK', str(PROJECT_ROOT / '.dispatch.lock')))
+
+
+@contextlib.contextmanager
+def dispatch_lock():
+    """Owner check -> Popen -> pid file is one critical section; two dispatches started together
+    used to both pass the owner check."""
+    DISPATCH_LOCK.parent.mkdir(parents=True, exist_ok=True)
+    with open(DISPATCH_LOCK, 'a') as fh:
+        fcntl.flock(fh, fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(fh, fcntl.LOCK_UN)
+
+
+def owner_resource(lane: str, phase: str | None, route_key: str | None = None) -> str:
+    """'browser' lanes drive Aside/Runway/Suno; 'local' lanes only read and write files.
+    Unknown counts as browser: a misread owner must never let a second browser lane start."""
+    key = route_key
+    if not key:
+        try:
+            key = model_routing.route_key(lane, None if phase in (None, 'lane') else phase)
+        except ValueError:
+            return 'browser'
+    return 'browser' if key in lane_sessions.GUI_ROUTES else 'local'
+
+
 def dispatch(args) -> None:
+    with dispatch_lock():
+        _dispatch(args)
+
+
+def _dispatch(args) -> None:
     project = Path(args.project).expanduser().resolve()
     if not (project / 'state.json').exists():
         raise SystemExit(f'not a runtime project: {project}')
@@ -599,12 +640,22 @@ def dispatch(args) -> None:
         if getattr(args, 'parallel_browserless', False):
             raise SystemExit('PARALLEL_DISABLED: 2026-10-24 parallel lane sessions froze the 16GB Mac; '
                              'wait for the running owner, then dispatch')
-        # One Codex lane owner machine-wide, not per project.
+        resource = owner_resource(lane, phase)
+        if resource == 'browser' and lane_sessions.hold_active():
+            raise SystemExit('PROVIDER_HOLD: a Runway automation/suspension warning stopped every browser lane: '
+                             + json.dumps(lane_sessions.hold_active(), ensure_ascii=False)
+                             + ' — the user handles it on screen, then `video-codex-runtime hold --clear '
+                               '--approval-quote "<user words>"`')
+        # Machine-wide: at most one browser lane (one Aside/Runway owner) plus one local lane
+        # (QC, planning, prompting). Two sessions total keeps the 16GB Mac responsive (6 froze it
+        # on 2026-10-24); a music lane of another project no longer stalls Seedance QC for hours.
         owners = [dict(o, project=str(p)) for p in project_dirs() for o in active_lane_owners(p)]
-        if owners:
+        clash = [o for o in owners if owner_resource(o['lane'], o.get('phase'), o.get('route_key')) == resource
+                 or (o['lane'] == lane and o['project'] == str(project))]
+        if clash:
             raise SystemExit(
-                'SEQUENTIAL_OWNER_EXISTS: another Codex lane owner is still running: '
-                + json.dumps(owners, ensure_ascii=False))
+                f'SEQUENTIAL_OWNER_EXISTS: a {resource} lane owner is still running (one browser lane + '
+                'one local lane may run together): ' + json.dumps(clash, ensure_ascii=False))
         # Hard dispatch gates: single source of truth lives in lane_gates.gate_check
         # so `dispatch`, `gate`, `next`, and lanes doing manual work all apply the
         # SAME judgment. Rail: Director -> Music -> Planner -> Image -> Image QC ->
@@ -636,14 +687,20 @@ def dispatch(args) -> None:
             result_path = lane_dir / 'result.md'
             log_path = lane_dir / 'run.log'
         batch, remaining, harvest = [], [], []
+        refill = []
         if lane == 'seedance' and phase == 'production' and preprod.is_preprod_project(project):
+            slots = getattr(args, 'slots', None) or lane_sessions.provider_slots(
+                project, preprod.generation(project)['model'])
             batch, remaining = lane_sessions.production_batch(
-                project, preprod.released_blocks(project), getattr(args, 'blocks', None))
+                project, preprod.released_blocks(project), getattr(args, 'blocks', None), slots=slots)
             if not batch:
                 harvest = lane_sessions.undownloaded_jobs(project)
                 if not harvest:
                     raise SystemExit('SEEDANCE_NOTHING_LEFT: every released block is generated and downloaded; '
                                      'dispatch seedance_qc')
+                # the harvest frees slots: submit the next blocks in the same session
+                refill = remaining[:min(slots, len(harvest))]
+                remaining = remaining[len(refill):]
         elif lane == 'seedance' and phase == 'production':
             attested = _attested_seedance_packs(project)
             recovery = json.loads(read(lane_dir / 'recovery_state.json') or '{}')
@@ -658,6 +715,7 @@ def dispatch(args) -> None:
             previous.replace(lane_dir / (lane_sessions.RESULT_NAME + '.prev'))
         prompt_path.write_text(
             lane_sessions.production_prompt(project, batch, remaining, route) if batch
+            else lane_sessions.harvest_then_produce_prompt(project, harvest, refill, remaining, route) if refill
             else lane_sessions.harvest_prompt(project, harvest, route) if harvest
             else make_prompt(project, lane, phase), encoding='utf-8')
         status = {
@@ -669,7 +727,8 @@ def dispatch(args) -> None:
             'model_policy_version': route['policy_version'],
             'approved_spawn': approval_token if getattr(args, 'approved_spawn', None) == approval_token
                               else 'standing:' + standing.get('recorded_at', ''),
-            'blocks': batch,
+            'blocks': batch or refill,
+            'harvest': harvest,
         }
         write_json(lane_dir / 'model_route.json', {
             **route,
@@ -707,20 +766,179 @@ def dispatch(args) -> None:
             'reasoning_effort': route['reasoning_effort'],
             'model_policy_version': route['policy_version'],
             'approved_spawn': approval_token,
-            'monitor': None,
         })
         launched.append({
-            'lane': lane, 'phase': phase or 'lane', 'pid': proc.pid, 'blocks': batch,
+            'lane': lane, 'phase': phase or 'lane', 'pid': proc.pid, 'blocks': batch or refill, 'harvest': harvest,
             'wait': f'video-codex-runtime wait --project {project} --lane {lane}',
             'model': route['model'], 'reasoning_effort': route['reasoning_effort'],
             'log': str(log_path), 'result': str(result_path)})
     print(json.dumps({'project': str(project), 'launched': launched, 'skipped': skipped}, ensure_ascii=False, indent=2))
 
 
+def lane_alive(project: Path, lane: str):
+    pid_path = project / 'lanes' / lane / 'pid'
+    return lambda pid: pid_running(pid) and not (pid_path.is_file() and pid_reused(pid, pid_path))
+
+
 def wait_cmd(args) -> None:
     project = Path(args.project).expanduser().resolve()
-    print(json.dumps(lane_sessions.wait(project, args.lane, pid_running, args.timeout_min),
+    print(json.dumps(lane_sessions.wait(project, args.lane, lane_alive(project, args.lane), args.timeout_min),
                      ensure_ascii=False, indent=2))
+
+
+def hold_cmd(args) -> None:
+    if args.clear:
+        out = lane_sessions.clear_hold(args.approval_quote or '')
+    else:
+        out = lane_sessions.hold_active() or {'hold': None}
+    print(json.dumps(out, ensure_ascii=False, indent=2))
+
+
+# Session summaries are Korean prose written by the lane model; these only back up reason_code.
+WARNING_RE = re.compile(r'경고|warning|계정 ?정지|이용 ?정지|suspend|captcha|자동 ?클릭|auto-?click|automat', re.I)
+BUSY_RE = re.compile(r'In queue|대기|queue|STALL|정체|비활성|회색|흐리|생성 ?중|진행 ?중|Generating|\d+ ?%', re.I)
+PRODUCE_EXIT = {'ALL_DOWNLOADED': 0, 'NOT_RELEASED': 0, 'NEEDS_USER': 2, 'UNCLEAR_WARNING': 2, 'PROVIDER_HOLD': 3,
+                'TWO_FAILS_STOP': 4, 'SESSION_TIMEOUT': 4, 'SESSION_LOST': 4, 'DISPATCH_REFUSED': 5,
+                'MAX_SESSIONS': 6}
+
+
+def _now() -> dt.datetime:
+    return dt.datetime.now()
+
+
+def _sleep(seconds: float) -> None:
+    time.sleep(seconds)
+
+
+def _job_clicked(project: Path, block: str) -> dt.datetime | None:
+    stamps = [j.get('clicked_at') or j.get('accepted_at') for j in lane_sessions._provider_jobs(project)
+              if str(j.get('block_id')) == block and not j.get('downloaded')]
+    stamps = [x for x in stamps if x]
+    if not stamps:
+        return None
+    try:
+        when = dt.datetime.fromisoformat(max(stamps).replace('Z', '+00:00'))
+        return when.astimezone().replace(tzinfo=None) if when.tzinfo else when
+    except ValueError:
+        return None
+
+
+def produce(args) -> None:
+    """Foreground Seedance production loop (replaces per-project drive_seedance.sh).
+
+    Keeps the Runway slot busy the way the director's driver did — submit the moment a slot is
+    free, harvest and refill in one session — without spending sessions while a slot is busy:
+    no session starts before a running job can plausibly be done, then one bounded check every
+    `recheck` minutes. Stops for good on any provider warning (machine-wide hold), NEEDS_USER,
+    two unexplained failures, or the session cap. Run it in the background and read its exit.
+    """
+    project = Path(args.project).expanduser().resolve()
+    if not preprod.is_preprod_project(project):
+        raise SystemExit('PRODUCE_NEEDS_PREPROD_PROJECT: legacy projects use dispatch directly')
+    model = preprod.generation(project)['model']
+    slots = lane_sessions.provider_slots(project, model, args.credits)
+    first = args.first_check_min or (6 if args.credits else 65 if model.startswith('Seedance 2.5') else 70)
+    recheck = args.recheck_min or (5 if args.credits else 20)
+    lane_dir = project / 'lanes' / 'seedance'
+    lane_dir.mkdir(parents=True, exist_ok=True)
+    log = lane_dir / 'produce.log'
+
+    def say(event: str, **kw) -> None:
+        row = {'ts': _now().isoformat(timespec='seconds'), 'event': event, **kw}
+        with log.open('a', encoding='utf-8') as f:
+            f.write(json.dumps(row, ensure_ascii=False) + '\n')
+        print(json.dumps(row, ensure_ascii=False), flush=True)
+
+    def finish(event: str, **kw) -> None:
+        say(event, **kw)
+        append_jsonl(project / 'queues' / 'retry_router_queue.jsonl',
+                     {'ts': _now().isoformat(), 'event': 'produce_exit', 'reason': event, **kw})
+        raise SystemExit(PRODUCE_EXIT[event])
+
+    say('produce_start', model=model, slots=slots, credits=args.credits, first_check_min=first, recheck_min=recheck)
+    sessions, fails, not_before = 0, 0, _now()
+    alive = lane_alive(project, 'seedance')
+    while True:
+        if lane_sessions.hold_active():
+            finish('PROVIDER_HOLD', hold=lane_sessions.hold_active())
+        now = _now()
+        if now < not_before:
+            _sleep(min(60.0, (not_before - now).total_seconds()))
+            continue
+        released = preprod.released_blocks(project)
+        produced = lane_sessions.produced_blocks(project)
+        need = [b for b in released if b not in produced]
+        waiting = lane_sessions.undownloaded_jobs(project)
+        if not need and not waiting:
+            unreleased = [r['block_id'] for r in preprod.shelf_rows(project) if r['state'] != 'RELEASED']
+            finish('NOT_RELEASED' if unreleased else 'ALL_DOWNLOADED', unreleased=unreleased)
+        if not (need and slots - len(waiting) > 0):
+            clicked = [c for c in (_job_clicked(project, b) for b in waiting) if c]
+            due = min(clicked) + dt.timedelta(minutes=first) if clicked else now
+            if now < due:
+                say('slot_busy_sleep', waiting=waiting, until=due.isoformat(timespec='minutes'))
+                not_before = due
+                continue
+        if sessions >= args.max_sessions:
+            finish('MAX_SESSIONS', sessions=sessions)
+        cmd = [sys.executable, str(Path(__file__).resolve()), 'dispatch', '--project', str(project),
+               '--lanes', 'seedance', '--phase', 'production', '--slots', str(slots)]
+        proc = subprocess.run(cmd, capture_output=True, text=True)
+        text = (proc.stdout or '') + (proc.stderr or '')
+        if proc.returncode != 0:
+            if 'SEQUENTIAL_OWNER_EXISTS' in text:
+                say('browser_owner_busy_wait', seconds=args.owner_wait_sec)
+                not_before = _now() + dt.timedelta(seconds=args.owner_wait_sec)
+                continue
+            if 'PROVIDER_HOLD' in text:
+                finish('PROVIDER_HOLD', hold=lane_sessions.hold_active())
+            finish('DISPATCH_REFUSED', tail=text.strip()[-600:])
+        try:
+            launched = json.loads(proc.stdout or '{}').get('launched') or []
+        except json.JSONDecodeError:
+            launched = []
+        if not launched:  # a gate skipped it: never read the previous session's result as this one's
+            finish('DISPATCH_REFUSED', tail=text.strip()[-600:])
+        sessions += 1
+        say('session', n=sessions, need=need, waiting=waiting, blocks=launched[0].get('blocks'),
+            harvest=launched[0].get('harvest'))
+        deadline = time.monotonic() + args.session_timeout_min * 60
+        while True:
+            res = lane_sessions.wait(project, 'seedance', alive, timeout_min=5)
+            if not res.get('running') or time.monotonic() > deadline:
+                break
+        if res.get('running'):
+            finish('SESSION_TIMEOUT', pid=res.get('pid'), minutes=args.session_timeout_min)
+        result = res.get('result') or {}
+        status, code = result.get('status'), result.get('reason_code')
+        summary = str(result.get('summary') or res.get('last_message_tail') or '')
+        # "경고 없음" / "no warning" must not trip the hold
+        scan = re.sub(r'(no|without)\s+(warning|captcha)|(경고|warning|captcha)[^.\n]{0,8}?(없|안 ?보|미표시|not|none)',
+                      '', summary, flags=re.I)
+        say('result', status=status, reason_code=code, summary=summary[:300])
+        # The machine hold rests on structured evidence only (helper hold file or reason_code);
+        # summary prose like "경고 없음" or "prompt_lint 경고 2건" must not stop every lane.
+        if code == 'ACCOUNT_WARNING' or lane_sessions.hold_active():
+            lane_sessions.write_hold('ACCOUNT_WARNING', project, summary)
+            finish('PROVIDER_HOLD', hold=lane_sessions.hold_active())
+        if not code and WARNING_RE.search(scan):
+            finish('UNCLEAR_WARNING', summary=summary[:300],
+                   question='세션 요약에 경고로 읽히는 문구가 있습니다. Runway 화면에 경고가 있는지 확인해 주세요.')
+        if status == 'NEEDS_USER':
+            finish('NEEDS_USER', question=result.get('question_for_user'))
+        if status in (None, 'NO_RESULT'):
+            # the session may have clicked Generate before dying without recording it: resubmitting
+            # could generate the block twice, so the director checks the board first
+            finish('SESSION_LOST', blocks=launched[0].get('blocks'), tail=summary[-300:])
+        if status == 'DONE' or code in {'SUBMITTED', 'HARVESTED'}:
+            fails, not_before = 0, _now()
+        elif code in {'SLOT_BUSY', 'IN_QUEUE'} or (not code and BUSY_RE.search(summary)):
+            fails, not_before = 0, _now() + dt.timedelta(minutes=recheck)
+        else:
+            fails += 1
+            if fails >= 2:
+                finish('TWO_FAILS_STOP', status=status, reason_code=code, summary=summary[:300])
+            not_before = _now() + dt.timedelta(seconds=60)
 
 
 def session_policy_cmd(args) -> None:
@@ -1097,7 +1315,7 @@ def main() -> None:
     p = sub.add_parser('init')
     p.add_argument('--slug', default='')
     p.add_argument('--brief', required=True)
-    p.add_argument('--mode', choices=GENERATION_MODES, default=STANDARD_I2V_MODE)
+    p.add_argument('--mode', choices=GENERATION_MODES, default=NO_I2V_MODE)
     p.add_argument('--no-preprod', dest='preprod', action='store_false',
                    help='legacy rail without the fixed preprod/ stages (new projects use preprod by default)')
     p.add_argument('--author', choices=('claude', 'codex'), default='',
@@ -1118,9 +1336,26 @@ def main() -> None:
     p.add_argument('--approved-spawn',
                    help='exact current-conversation spawn approval token (not needed under a standing session-policy)')
     p.add_argument('--blocks', nargs='+', help='seedance production: released blocks for this session (default: next 4)')
+    p.add_argument('--slots', type=int, default=None,
+                   help='seedance production: Runway slots to fill (default 1 for Seedance 2.5 Unlimited, else 2)')
     p.add_argument('--parallel-browserless', action='store_true',
                    help='disabled 2026-10-24: lane sessions run one at a time machine-wide')
     p.set_defaults(func=dispatch)
+
+    p = sub.add_parser('hold', help='show or clear the machine-wide provider hold (Runway warning stop)')
+    p.add_argument('--clear', action='store_true')
+    p.add_argument('--approval-quote', default='')
+    p.set_defaults(func=hold_cmd)
+
+    p = sub.add_parser('produce', help='foreground Seedance submit/harvest loop for released shelf blocks; run in background')
+    p.add_argument('--project', required=True)
+    p.add_argument('--credits', action='store_true', help='credits mode: parallel slots, short checks')
+    p.add_argument('--first-check-min', type=float, default=None, help='minutes after Generate before the first harvest check')
+    p.add_argument('--recheck-min', type=float, default=None, help='minutes between checks while a job is still running')
+    p.add_argument('--max-sessions', type=int, default=30)
+    p.add_argument('--session-timeout-min', type=float, default=60)
+    p.add_argument('--owner-wait-sec', type=int, default=180)
+    p.set_defaults(func=produce)
 
     p = sub.add_parser('wait', help='foreground wait for the running lane session; prints its compact session_result')
     p.add_argument('--project', required=True)

@@ -143,6 +143,7 @@ def phase_attach(ctx: dict, page: Page, log: list, from_slot: int = 1) -> None:
             raise Stop('PACK_TOKENS_NOT_CONSECUTIVE', bundle['slots'])
         if index < from_slot:
             continue
+        scan_for_warning(ctx, page, f'run-block before attach {slot["reference_token"]}')
         file_path = Path(bundle['bundle_dir']) / slot['alias_name']
         if slot['attach'] != 'SELECT_EXISTING_RUNWAY_UPLOAD':
             raise Stop('SLOT_NEEDS_NATIVE_UPLOAD',
@@ -317,6 +318,7 @@ def preflight_errors(state: dict, want: dict, prompt: str, n_refs: int) -> list[
 
 
 def phase_preflight(ctx: dict, page: Page, log: list) -> None:
+    scan_for_warning(ctx, page, 'run-block before Generate (preflight)')
     state = page.js(STATE_JS)
     fail = preflight_errors(state, expected_settings(ctx['settings']),
                             ctx['prompt_path'].read_text(encoding='utf-8'), len(ctx['refs']))
@@ -349,13 +351,29 @@ def load_context(project: Path, block: str) -> dict:
             'settings': settings}
 
 
+def scan_for_warning(ctx: dict, page: Page, where: str) -> None:
+    """Visible-text account-warning check; a hit writes the HOLD file and stops the run."""
+    import runway_ui_helper as h
+    found = h.detect_account_warning(*h.parse_warning_payload(page.js(h.WARNING_TEXT_JS)))
+    if found:
+        result = h.account_warning_result(found, ctx['project'], ctx['block'], where)
+        raise Stop('ACCOUNT_WARNING', result, result['next_action'])
+
+
 def run(project: Path, block: str, *, start: str = 'attach', from_slot: int = 1) -> dict:
+    import runway_ui_helper as h
+    hold = h.read_provider_hold()
+    if hold is not None:  # touch nothing: no log file, no browser
+        return {'block': block, 'ok': False, 'outcome': 'STOPPED', 'stop': 'PROVIDER_HOLD',
+                'reason_code': 'PROVIDER_HOLD', 'hold': hold, 'hold_file': str(h.provider_hold_path()),
+                'next_action': 'Ask the user; clear only with `video-codex-runtime hold --clear` after their confirmation.'}
     t0 = time.monotonic()
     log: list = []
     result = {'block': block, 'started_at': _now(), 'start': start}
     try:
         ctx = load_context(project, block)
         page = Page(ctx['binding_path'])
+        scan_for_warning(ctx, page, 'run-block start')
         for phase in PHASES[PHASES.index(start):]:
             if phase == 'attach':
                 phase_attach(ctx, page, log, from_slot)
@@ -370,6 +388,8 @@ def run(project: Path, block: str, *, start: str = 'attach', from_slot: int = 1)
                                   'confirms the matching card, then the next block')
     except Stop as stop:
         result.update(ok=False, outcome='STOPPED', stop=stop.code, detail=stop.detail, next_action=stop.next_action)
+        if stop.code == 'ACCOUNT_WARNING':
+            result['reason_code'] = 'ACCOUNT_WARNING'
     result['steps'] = log
     result['seconds'] = round(time.monotonic() - t0, 1)
     try:

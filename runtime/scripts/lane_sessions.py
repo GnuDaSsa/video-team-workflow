@@ -22,6 +22,18 @@ import time
 # gets the "wait for your last generation" toast. A production session therefore
 # submits into the free slots and ends; a harvest session empties them.
 RUNWAY_ACTIVE_SLOTS = 2
+# Seedance 2.5 on Unlimited runs one job at a time (a second Generate only queues behind it);
+# credits mode runs jobs in parallel again (new-lover 2026-11-10).
+UNLIMITED_25_SLOTS = 1
+# Machine-wide provider stop. The Runway helper writes it the moment an automation / account
+# suspension warning is visible; every browser lane dispatch is refused until the user clears it
+# (`video-codex-runtime hold --clear --approval-quote ...`). Retrying after a warning is what
+# turned one warning into 34 sessions (2026-11-06) and a second warning (2026-11-10).
+HOLD_PATH = Path(os.environ.get('VIDEO_TEAM_PROVIDER_HOLD',
+                                '/Users/gnudas/Documents/Codex/video-team-runtime/PROVIDER_HOLD.json'))
+REASON_CODES = ('SUBMITTED', 'HARVESTED', 'SLOT_BUSY', 'IN_QUEUE', 'ACCOUNT_WARNING',
+                'PROMPT_CLEAR_FAILED', 'ASIDE_UNAVAILABLE', 'UI_STALE', 'ATTACH_FAILED',
+                'NEEDS_USER', 'OTHER')
 # Lanes whose session must reach the Aside CLI / native chooser (outside the
 # workspace sandbox). Everything else runs in the workspace-write sandbox.
 GUI_ROUTES = {'seedance:production', 'music', 'flow', 'image_creator_01:production', 'image_creator_02:production'}
@@ -71,6 +83,13 @@ def sandbox_args(route_key: str) -> list[str]:
 def _provider_jobs(project: Path) -> list[dict]:
     # state.json is the durable job ledger (record-generate and harvest write it); the lane's own
     # status.json is rewritten by every session, so it is only a fallback
+    state_path = project / 'state.json'
+    if state_path.is_file():
+        try:
+            json.loads(state_path.read_text(encoding='utf-8'))
+        except json.JSONDecodeError as exc:
+            raise SystemExit(f'LEDGER_CORRUPT: {state_path} is not valid JSON ({exc}); restore it before '
+                             'any production/harvest dispatch, or jobs would be generated twice')
     for rel in ('state.json', 'lanes/seedance/status.json'):
         jobs = _json(project / rel).get('provider_jobs')
         if jobs:
@@ -120,14 +139,17 @@ def result_contract(project: Path, lane: str) -> str:
 
 You are a lane session started by the director; the user is not reading this
 session. Do only this lane's scope, then write `{path}`:
-{{"status": "DONE|PARTIAL|STOPPED|NEEDS_USER", "summary": "<=5 short lines in Korean",
+{{"status": "DONE|PARTIAL|STOPPED|NEEDS_USER", "reason_code": "<one of {'|'.join(REASON_CODES)}>",
+  "summary": "<=5 short lines in Korean",
   "outputs": ["paths or asset IDs"], "remaining": ["what is left"],
   "question_for_user": null or "<one exact question>", "next": "<one line>"}}
 Then end. Do not ask the user anything here. `NEEDS_USER` (with the exact question)
 is only for payment, login/2FA/CAPTCHA, credit-spending (non-Unlimited) generation,
 public upload/submission, or deletion. Anything else: decide and proceed, or return
 `PARTIAL` saying exactly what the director must do (e.g. an `author run` with feedback).
-Never start another session, agent, scheduler or watcher.
+Never start another session, agent, scheduler or watcher. If Runway shows any automation,
+auto-click, suspension or CAPTCHA warning: touch nothing more, status STOPPED,
+reason_code ACCOUNT_WARNING (the producer loop then holds every browser lane).
 """
 
 
@@ -163,12 +185,66 @@ def harvest_prompt(project: Path, jobs: list[str], route: dict) -> str:
 Project: {project}
 Generated jobs not yet downloaded: {', '.join(jobs)}
 Do NOT click Generate or attach anything. On the bound tab
-(`lanes/seedance/aside_binding.json`): queue wait until each job settles, download the
+(`lanes/seedance/aside_binding.json`): if a job is still In queue / Generating after one
+bounded wake (at most 10 minutes), stop there with status PARTIAL, reason_code IN_QUEUE — the
+producer loop checks again later without a session. For each settled job: download the
 matching output, ffprobe (≈15 s), ingest to `media/06_videos_candidates_영상후보/`, set the
 job's `downloaded: true`. Procedure: `~/.codex/skills/seedance-prompt-en/seedance-production.md`
 from "Post-Generate continuation gate" on (read only that part). Video QC is the next
 session (`seedance_qc`), not this one. Write the session result and end.
 {result_contract(project, 'seedance')}"""
+
+
+def harvest_then_produce_prompt(project: Path, jobs: list[str], blocks: list[str], remaining: list[str],
+                                route: dict) -> str:
+    """One session for the common steady state: collect the finished job, then submit the next
+    block into the slot it freed. Two sessions per clip became one; the references are attached
+    once, right before Generate, never re-attached while a slot is busy."""
+    harvest = harvest_prompt(project, jobs, route).split('# SESSION RESULT CONTRACT')[0]
+    harvest = harvest.replace('Write the session result and end.', '')
+    produce = production_prompt(project, blocks, remaining, route)
+    return (f"{harvest}\nIf every job above is downloaded, continue in this same session with the "
+            f"production part below. If any is still In queue / Generating, do not attach or "
+            f"generate: write PARTIAL / IN_QUEUE and end.\n\n{produce}")
+
+
+def provider_slots(project: Path, model: str | None = None, credits: bool = False) -> int:
+    if credits:
+        return RUNWAY_ACTIVE_SLOTS
+    return UNLIMITED_25_SLOTS if (model or '').startswith('Seedance 2.5') else RUNWAY_ACTIVE_SLOTS
+
+
+def hold_active() -> dict:
+    """Fail closed: a hold file that exists but cannot be read still holds."""
+    if not HOLD_PATH.exists():
+        return {}
+    data = _json(HOLD_PATH)
+    return data or {'reason': 'UNREADABLE_HOLD_FILE', 'path': str(HOLD_PATH)}
+
+
+def write_hold(reason: str, project: Path | None = None, evidence: str = '') -> dict:
+    current = hold_active()
+    if current:
+        return current
+    data = {'held_at': dt.datetime.now().astimezone().isoformat(timespec='seconds'), 'reason': reason,
+            'project': str(project) if project else None, 'block': None, 'evidence': evidence[:400]}
+    _write_json(HOLD_PATH, data)
+    return data
+
+
+def clear_hold(approval_quote: str) -> dict:
+    if os.environ.get('VIDEO_TEAM_LANE'):
+        raise SystemExit('HOLD_CLEAR_FROM_LANE_REFUSED: only the director, after the user handled the warning, clears it')
+    if not approval_quote.strip():
+        raise SystemExit('HOLD_CLEAR_REQUIRES_USER_QUOTE: the user must confirm the Runway warning was handled')
+    current = hold_active()
+    if HOLD_PATH.exists():
+        archive = HOLD_PATH.with_name(HOLD_PATH.stem + '.cleared.jsonl')
+        with archive.open('a', encoding='utf-8') as f:
+            f.write(json.dumps({**current, 'cleared_at': dt.datetime.now().astimezone().isoformat(timespec='seconds'),
+                                'approval_quote': approval_quote.strip()}, ensure_ascii=False) + '\n')
+        HOLD_PATH.unlink()
+    return {'cleared': bool(current), 'previous': current}
 
 
 USER_APPROVAL_STAGES = {'concept', 'storyboard'}
@@ -228,7 +304,24 @@ def wait(project: Path, lane: str, pid_running, timeout_min: float = 10, poll_s:
         last = Path(status.get('result') or lane_dir / 'result.md')
         if last.is_file():
             out['last_message_tail'] = last.read_text(encoding='utf-8', errors='ignore')[-1200:]
+    if status.get('status') in {'LAUNCHING', 'RUNNING'}:
+        # the process is gone: record it so gates and the next dispatch stop seeing a live owner
+        rs = (result or {}).get('status')
+        status.update({'status': {'DONE': 'DONE', 'PARTIAL': 'PARTIAL_BLOCKED'}.get(rs, 'BLOCKED' if rs else 'FAILED'),
+                       'result_status': rs or 'NO_RESULT',
+                       'reason_code': (result or {}).get('reason_code') or ('DEAD_NO_RESULT' if not result else None),
+                       'ended_at': dt.datetime.now().isoformat(timespec='seconds')})
+        _write_json(lane_dir / 'status.json', status)
+        out['lane_status'] = status['status']
     return out
+
+
+def _write_json(path: Path, value: dict) -> None:
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f'.{path.name}.{os.getpid()}.tmp')
+    tmp.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    os.replace(tmp, path)
 
 
 def _json(path: Path) -> dict:

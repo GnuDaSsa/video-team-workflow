@@ -22,6 +22,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import preprod  # noqa: E402
+import prompt_lint  # noqa: E402
 
 MODES = ('codex', 'claude')
 CLAUDE_BIN = os.environ.get('CLAUDE_BIN', 'claude')
@@ -33,6 +34,8 @@ MAX_ATTEMPTS = 3
 TIMEOUT_SEC = int(os.environ.get('CLAUDE_AUTHOR_TIMEOUT_SEC', '1500'))
 
 STAGES = ('concept-options', 'concept-lock', 'bible', 'storyboard', 'image-prompts', 'shelf')
+LINT_KIND = {'concept-options': 'concept', 'concept-lock': 'concept', 'storyboard': 'storyboard',
+             'image-prompts': 'image_prompt', 'shelf': 'seedance_prompt'}
 LOCK_STAGE = {'concept-options': 'concept', 'concept-lock': 'concept', 'bible': 'bible',
               'storyboard': 'storyboard', 'image-prompts': 'images', 'shelf': 'shelf'}
 
@@ -66,7 +69,9 @@ TASK = {
                    'that fully decide composition, camera and timing, using ONLY the controlled vocabulary in '
                    'runtime/scripts/preprod.py (SHOT_SIZES, ANGLES, CAMERA_MOVES). Contiguous shot times from 0 to '
                    'duration_sec, one dominant camera move per shot, end_frame that hands off to the next block. refs[] = '
-                   'character sheets + location/prop refs only; never add <BLOCK>_START_FRAME or style-frame refs.'),
+                   'character sheets + location/prop refs only; never add <BLOCK>_START_FRAME or style-frame refs. Every shot '
+                   'carries copy_line: the approved line/lyric it shows literally ("(insert)" for a no-dialogue insert). '
+                   'Scenes follow the line literally; no forced metaphors (nature x AI mashups).'),
     'image-prompts': ('Write one English prompt file preprod/03_image_prompts/<REF_ID>.prompt.txt for every reference the '
                       'storyboard refs[] and the bible sheet_ref_id values need, and preprod/03_image_prompts/'
                       'image_plan.json references[] with ref_id, purpose, role_en (short English role phrase used to bind '
@@ -228,6 +233,8 @@ def build_prompt(project: Path, stage: str, block: str, feedback: str, errors: l
         '- No file names, paths, tool names, gate words or process notes inside prompts.',
         '- When finished, reply with a 3-line summary of what you decided (Korean is fine).',
     ]
+    if stage in LINT_KIND:
+        lines += ['', '## Patterns the user already rejected', prompt_lint.rules_brief(LINT_KIND[stage])]
     if feedback.strip():
         lines += ['', '## USER INPUT (binding)', feedback.strip()]
     if errors:
@@ -298,8 +305,10 @@ def author(project: Path, stage: str, block: str = '', feedback: str = '') -> di
     if stage == 'image-prompts':
         files = files + [preprod.root(project) / '03_image_prompts/image_plan.json']
     row = record_authorship(project, stage, block, result, files)
+    lint_stage = {'shelf': 'shelf', 'storyboard': 'storyboard', 'image-prompts': 'images'}.get(stage)
+    lint_warnings = preprod.lint_warnings(project, lint_stage, block) if lint_stage else []
     return {'ok': not errors, 'stage': stage, 'block': block or None, 'attempts': attempts,
-            'errors': errors, 'summary': str(result.get('result') or '')[:1200], 'authorship': row}
+            'errors': errors, 'lint_warnings': lint_warnings, 'summary': str(result.get('result') or '')[:1200], 'authorship': row}
 
 
 def main() -> int:

@@ -259,6 +259,23 @@ class PreprodPipelineTests(unittest.TestCase):
         self.assertIn('shelf_file_changed:prompt.txt', preprod.verify_shelf(self.project, 'B01'))
         self.assertTrue(runway_ui_helper.shelf_paste_error(shelf / 'prompt.txt', str(shelf / 'pack.json')))
 
+    def test_storyboard_relock_keeps_untouched_block_released(self) -> None:
+        self.lock_all()
+        preprod.write_shelf_brief(self.project, 'B01')
+        (self.pre / '04_shelf/B01/prompt.txt').write_text(self.prompt(), encoding='utf-8')
+        preprod.lock_shelf(self.project, 'B01')
+        preprod.release_shelf(self.project, ['B01'], '제작 시작')
+        board = json.loads((self.pre / '02_storyboard/storyboard.json').read_text())
+        board['notes_ko'] = '다른 블록만 고친 개정'
+        write(self.pre / '02_storyboard/storyboard.json', board)
+        preprod.lock_stage(self.project, 'storyboard', '콘티 수정 확정')
+        self.assertEqual(preprod.verify_shelf(self.project, 'B01'), [])
+        self.assertEqual(preprod.released_blocks(self.project), ['B01'])
+        board['blocks'][0]['shots'][1]['action'] = 'she opens it and laughs'
+        write(self.pre / '02_storyboard/storyboard.json', board)
+        preprod.lock_stage(self.project, 'storyboard', '콘티 수정 확정 2')
+        self.assertIn('shelf_block_inputs_changed_since_shelf_lock', preprod.verify_shelf(self.project, 'B01'))
+
     def _next(self) -> dict:
         out = io.StringIO()
         with mock.patch.object(video_codex_runtime.lane_sessions, 'load_policy',
