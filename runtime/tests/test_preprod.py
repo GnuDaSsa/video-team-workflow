@@ -313,7 +313,7 @@ class PreprodPipelineTests(unittest.TestCase):
         self.assertEqual((gate['action'], gate['gate']), ('ASK_USER', 'shelf_release'))
         preprod.release_shelf(self.project, ['B01'], '릴리스')
         nxt = self._next()
-        self.assertIn('--phase production', nxt['commands'][0])                   # P5 production session
+        self.assertIn('video-codex-runtime produce --project', nxt['commands'][0])  # P5: produce loop
 
     def test_upload_bundle_from_shelf_pack_is_ordered_ascii_clones(self) -> None:
         self.lock_all()

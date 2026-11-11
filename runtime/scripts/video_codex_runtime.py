@@ -1228,9 +1228,12 @@ def next_cmd(args) -> None:
             'new_owner': bool(lanes),
             'new_approval_for_role_change': False,
             'automatic_model_switch': False,
-            'commands': [f"video-codex-runtime dispatch --project {project} --lanes {row['lane']}"
-                         + (f" --phase {row['phase']}" if row['phase'] != 'lane' else '')
-                         + f" && video-codex-runtime wait --project {project} --lane {row['lane']}"
+            'commands': [(f"video-codex-runtime produce --project {project}  # run in background; read the exit"
+                          if row['lane'] == 'seedance' and row['phase'] == 'production'
+                          and preprod.is_preprod_project(project) else
+                          f"video-codex-runtime dispatch --project {project} --lanes {row['lane']}"
+                          + (f" --phase {row['phase']}" if row['phase'] != 'lane' else '')
+                          + f" && video-codex-runtime wait --project {project} --lane {row['lane']}")
                          for row in lanes[:1]],
             'dispatch_note': ('Main thread = director. Start the next lane as its own session, wait, read only '
                               'session_result.json, talk to the user. Do not do lane work in the main thread.'),
