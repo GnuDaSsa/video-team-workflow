@@ -130,6 +130,14 @@ current URL against Aside's front window/active tab and the unique AXMain window
 `open-panel`, even when the browser focus check succeeds. The action uses that
 same `nativeMainWindow`, never `window 1`. Proof repeats immediately before input;
 an unrelated dialog or changed tab fails closed.
+For this native upload only, vary the click point slightly within the currently
+verified, unobscured target's interior and vary the pauses between filename entry,
+selection, and Open within a short bounded range (0.5–1.5 seconds). Re-observe
+the target and focus after each pause; never click outside the verified control,
+type into an unverified window, or use random timing as a substitute for waiting
+for the actual UI state. This does not change Generate or queue timing, authorize
+an extra click, or override any warning/stop rule. If the user or another window
+interrupts focus, stop input and re-observe before resuming.
 `picker-go --path ~/RunwayUpload/<project>/<B>` navigates the chooser to the bundle
 folder (the folder popup must then read `<B>`). `picker-select --path <bundle-file>` selects one uniquely named visible file row in the
 verified native ListView without keys or clipboard input; it therefore does not depend
